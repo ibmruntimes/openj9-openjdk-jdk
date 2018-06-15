@@ -35,10 +35,14 @@ TARGETS += override-jvm.cfg
 TARGETS += \
 	$(INCLUDE_TARGET_DIR)/jvmti.h \
 	$(INCLUDE_TARGET_DIR)/ibmjvmti.h \
+	$(INCLUDE_TARGET_DIR)/jni_convert.h \
 	#
 
 $(INCLUDE_TARGET_DIR)/jvmti.h : $(TOPDIR)/openj9/runtime/include/jvmti.h
 	$(call install-file)
 
 $(INCLUDE_TARGET_DIR)/ibmjvmti.h : $(TOPDIR)/openj9/runtime/include/ibmjvmti.h
+	$(call install-file)
+
+$(INCLUDE_TARGET_DIR)/jni_convert.h : $(TOPDIR)/openj9/runtime/include/jni_convert.h
 	$(call install-file)
