@@ -25,7 +25,7 @@
 
 /*
  * (C) Copyright Taligent, Inc. 1996, 1997 - All Rights Reserved
- * (C) Copyright IBM Corp. 1996 - 1999 - All Rights Reserved
+ * (C) Copyright IBM Corp. 1996 - 2018 - All Rights Reserved
  *
  * The original version of this source code and documentation
  * is copyrighted and owned by Taligent, Inc., a wholly-owned
@@ -1696,7 +1696,12 @@ public abstract class ResourceBundle {
         Reference.reachabilityFence(callerModule);
         Reference.reachabilityFence(module);
 
-        return bundle;
+        //The OpenJ9 GC might collect the loader before we return here. This prevents that.
+        try {
+            return bundle;
+        } finally {
+            Reference.reachabilityFence(loader);
+        }
     }
 
     /**
