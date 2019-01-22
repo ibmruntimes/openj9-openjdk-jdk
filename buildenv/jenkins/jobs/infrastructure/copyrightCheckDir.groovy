@@ -33,7 +33,7 @@ timeout(time: 6, unit: 'HOURS') {
                 echo "Repository to check not specified.  Rerun with the ghprbGhRepository parameter pointing to a valid git repository."
                 sh 'exit 1'
             }
-            if ( params.Verbose == true) {
+            if ( params.verbose == true) {
                 VERBOSE="VERBOSE=1"
             }
             if ( params.rootDir != "") {
