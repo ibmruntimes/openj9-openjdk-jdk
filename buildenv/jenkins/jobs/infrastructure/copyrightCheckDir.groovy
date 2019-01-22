@@ -23,6 +23,7 @@
 */
 
 def VERBOSE = ""
+def ROOTDIR = ""
 def OUTPUT = ""
 
 timeout(time: 6, unit: 'HOURS') {
@@ -33,11 +34,14 @@ timeout(time: 6, unit: 'HOURS') {
                 sh 'exit 1'
             }
             if ( params.Verbose == "1") {
-                VERBOSE="-v"
+                VERBOSE="VERBOSE=1"
+            }
+            if ( params.rootDir != "") {
+                ROOTDIR="ROOTDIR=${params.rootDir}"
             }
             timestamps {
                 checkout scm
-                OUTPUT = sh (script: "sh buildenv/jenkins/jobs/infrastructure/copyrightCheckDir.sh REPO=${params.ghprbGhRepository}", returnStdout: true).trim()
+                OUTPUT = sh (script: "sh buildenv/jenkins/jobs/infrastructure/copyrightCheckDir.sh REPO=${params.ghprbGhRepository} ${VERBOSE} ${ROOTDIR}", returnStdout: true).trim()
                 echo OUTPUT
             } // timestamps
         } // node
