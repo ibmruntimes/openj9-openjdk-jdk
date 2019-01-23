@@ -29,7 +29,7 @@ trace () {
 }
 
 log () {
-  echo $1 1>&2
+  echo $1
   return
 }
 
@@ -111,354 +111,347 @@ check () {
     *) CHECK=1;;
   esac
 
-  if [ "$CHECK" = '1' ]; then
-    MAX_LINES=400
+  if [ "$CHECK" = '0' ]; then
+    return 0
+  fi
+  
+  # File needs checking
 
-    # Some source files have special characters such as the copyright symbol.
-    # Linux grep interprets these as binary files unless the '-a' option is used
-    GREP=grep
-    uname -a | grep -q Linux && GREP="grep -a"
-    # So remove any of those before the grepping
+  MAX_LINES=400
 
-    FOUND_ORACLE_DESIGNATES=$(head -n $MAX_LINES "$1" | $GREP -n "Oracle designates" | head -n 1 | cut -d: -f1)
-    [ -z "$FOUND_ORACLE_DESIGNATES" ] && FOUND_ORACLE_DESIGNATES=0
-    if [ "$FOUND_ORACLE_DESIGNATES" -gt 0 ]; then
-      trace "We have found the Oracle designates on line $FOUND_ORACLE_DESIGNATES in file: $1"
-    fi
+  # Some source files have special characters such as the copyright symbol.
+  # Linux grep interprets these as binary files unless the '-a' option is used
+  GREP=grep
+  uname -a | grep -q Linux && GREP="grep -a"
 
-    FOUND_IBM_DESIGNATES=$(head -n $MAX_LINES "$1" | $GREP -n "IBM designates" | head -n 1 | cut -d: -f1)
-    [ -z "$FOUND_IBM_DESIGNATES" ] && FOUND_IBM_DESIGNATES=0
-    if [ "$FOUND_IBM_DESIGNATES" -gt 0 ]; then
-      trace "We have found the IBM designates on line $FOUND_IBM_DESIGNATES in file: $1"
-    fi
+  FOUND_ORACLE_DESIGNATES=$(head -n $MAX_LINES "$1" | $GREP -n "Oracle designates" | head -n 1 | cut -d: -f1)
+  [ -z "$FOUND_ORACLE_DESIGNATES" ] && FOUND_ORACLE_DESIGNATES=0
+  if [ "$FOUND_ORACLE_DESIGNATES" -gt 0 ]; then
+    trace "We have found the Oracle designates on line $FOUND_ORACLE_DESIGNATES in file: $1"
+  fi
 
-    FOUND_IBM_COPYRIGHT=$(head -n $MAX_LINES "$1" | $GREP -n ".*Copyright IBM Corp.*All Rights Reserved.*" | head -n 1 | cut -d: -f1)
-    [ -z "$FOUND_IBM_COPYRIGHT" ] && FOUND_IBM_COPYRIGHT=0
-    if [ "$FOUND_IBM_COPYRIGHT" -gt 0 ]; then
-      trace "We have found the IBM Copyright on line $FOUND_IBM_COPYRIGHT in file: $1"
-    fi
+  FOUND_IBM_DESIGNATES=$(head -n $MAX_LINES "$1" | $GREP -n "IBM designates" | head -n 1 | cut -d: -f1)
+  [ -z "$FOUND_IBM_DESIGNATES" ] && FOUND_IBM_DESIGNATES=0
+  if [ "$FOUND_IBM_DESIGNATES" -gt 0 ]; then
+    trace "We have found the IBM designates on line $FOUND_IBM_DESIGNATES in file: $1"
+  fi
 
-    FOUND_IBM_PORTIONS_COPYRIGHT=$(head -n $MAX_LINES "$1" | $GREP -n ".*Portions Copyright.*IBM Corporation.*" | head -n 1 | cut -d: -f1)
-    [ -z "$FOUND_IBM_PORTIONS_COPYRIGHT" ] && FOUND_IBM_PORTIONS_COPYRIGHT=0
-    if [ "$FOUND_IBM_PORTIONS_COPYRIGHT" -gt 0 ]; then
-      trace "We have found the IBM Portions Copyright on line $FOUND_IBM_PORTIONS_COPYRIGHT in file: $1"
-    fi
+  FOUND_IBM_COPYRIGHT=$(head -n $MAX_LINES "$1" | $GREP -n ".*Copyright IBM Corp.*All Rights Reserved.*" | head -n 1 | cut -d: -f1)
+  [ -z "$FOUND_IBM_COPYRIGHT" ] && FOUND_IBM_COPYRIGHT=0
+  if [ "$FOUND_IBM_COPYRIGHT" -gt 0 ]; then
+    trace "We have found the IBM Copyright on line $FOUND_IBM_COPYRIGHT in file: $1"
+  fi
 
-    FOUND_APACHE_COPYRIGHT=$(head -n $MAX_LINES "$1" | $GREP -n ".*Licensed to the Apache Software Foundation.*" | head -n 1 | cut -d: -f1)
-    [ -z "$FOUND_APACHE_COPYRIGHT" ] && FOUND_APACHE_COPYRIGHT=0
-    if [ "$FOUND_APACHE_COPYRIGHT" -gt 0 ]; then
-      trace "We have found the Apache Software Foundation Copyright on line $FOUND_APACHE_COPYRIGHT in file: $1"
-    fi
+  FOUND_IBM_PORTIONS_COPYRIGHT=$(head -n $MAX_LINES "$1" | $GREP -n ".*Portions Copyright.*IBM Corporation.*" | head -n 1 | cut -d: -f1)
+  [ -z "$FOUND_IBM_PORTIONS_COPYRIGHT" ] && FOUND_IBM_PORTIONS_COPYRIGHT=0
+  if [ "$FOUND_IBM_PORTIONS_COPYRIGHT" -gt 0 ]; then
+    trace "We have found the IBM Portions Copyright on line $FOUND_IBM_PORTIONS_COPYRIGHT in file: $1"
+  fi
 
-    FOUND_BSD_OR_MIT_COPYRIGHT=$(head -n $MAX_LINES "$1" | $GREP -n -i "BSD license" | head -n 1 | cut -d: -f1)
+  FOUND_APACHE_COPYRIGHT=$(head -n $MAX_LINES "$1" | $GREP -n ".*Licensed to the Apache Software Foundation.*" | head -n 1 | cut -d: -f1)
+  [ -z "$FOUND_APACHE_COPYRIGHT" ] && FOUND_APACHE_COPYRIGHT=0
+  if [ "$FOUND_APACHE_COPYRIGHT" -gt 0 ]; then
+    trace "We have found the Apache Software Foundation Copyright on line $FOUND_APACHE_COPYRIGHT in file: $1"
+  fi
+
+  FOUND_BSD_OR_MIT_COPYRIGHT=$(head -n $MAX_LINES "$1" | $GREP -n -i "BSD license" | head -n 1 | cut -d: -f1)
+  [ -z "$FOUND_BSD_OR_MIT_COPYRIGHT" ] && FOUND_BSD_OR_MIT_COPYRIGHT=0
+  if [ "$FOUND_BSD_OR_MIT_COPYRIGHT" -gt 0 ]; then
+    trace "We have found a BSD, MIT or other Copyright on line $FOUND_BSD_OR_MIT_COPYRIGHT in file: $1"
+  else
+    FOUND_BSD_OR_MIT_COPYRIGHT=$(head -n $MAX_LINES "$1" | $GREP -n -i "MIT license" | head -n 1 | cut -d: -f1)
     [ -z "$FOUND_BSD_OR_MIT_COPYRIGHT" ] && FOUND_BSD_OR_MIT_COPYRIGHT=0
     if [ "$FOUND_BSD_OR_MIT_COPYRIGHT" -gt 0 ]; then
       trace "We have found a BSD, MIT or other Copyright on line $FOUND_BSD_OR_MIT_COPYRIGHT in file: $1"
     else
-      FOUND_BSD_OR_MIT_COPYRIGHT=$(head -n $MAX_LINES "$1" | $GREP -n -i "MIT license" | head -n 1 | cut -d: -f1)
+      FOUND_BSD_OR_MIT_COPYRIGHT=$(head -n $MAX_LINES "$1" | $GREP -n "Redistribution and use in source and binary forms" | head -n 1 | cut -d: -f1)
       [ -z "$FOUND_BSD_OR_MIT_COPYRIGHT" ] && FOUND_BSD_OR_MIT_COPYRIGHT=0
       if [ "$FOUND_BSD_OR_MIT_COPYRIGHT" -gt 0 ]; then
-        trace "We have found a BSD, MIT or other Copyright on line $FOUND_BSD_OR_MIT_COPYRIGHT in file: $1"
+        trace "We have found a BSD or MIT style Copyright on line $FOUND_BSD_OR_MIT_COPYRIGHT in file: $1"
       else
-        FOUND_BSD_OR_MIT_COPYRIGHT=$(head -n $MAX_LINES "$1" | $GREP -n "Redistribution and use in source and binary forms" | head -n 1 | cut -d: -f1)
+        FOUND_BSD_OR_MIT_COPYRIGHT=$(head -n $MAX_LINES "$1" | $GREP -n "PROVIDED.*AS IS" | head -n 1 | cut -d: -f1)
         [ -z "$FOUND_BSD_OR_MIT_COPYRIGHT" ] && FOUND_BSD_OR_MIT_COPYRIGHT=0
         if [ "$FOUND_BSD_OR_MIT_COPYRIGHT" -gt 0 ]; then
           trace "We have found a BSD or MIT style Copyright on line $FOUND_BSD_OR_MIT_COPYRIGHT in file: $1"
-        else
-          FOUND_BSD_OR_MIT_COPYRIGHT=$(head -n $MAX_LINES "$1" | $GREP -n "PROVIDED.*AS IS" | head -n 1 | cut -d: -f1)
-          [ -z "$FOUND_BSD_OR_MIT_COPYRIGHT" ] && FOUND_BSD_OR_MIT_COPYRIGHT=0
-          if [ "$FOUND_BSD_OR_MIT_COPYRIGHT" -gt 0 ]; then
-            trace "We have found a BSD or MIT style Copyright on line $FOUND_BSD_OR_MIT_COPYRIGHT in file: $1"
-          fi
         fi
       fi
     fi
+  fi
 
-    FOUND_ORACLE_PROPRIETARY_COPYRIGHT=$(head -n $MAX_LINES "$1" | $GREP -n -i "ORACLE PROPRIETARY" | head -n 1 | cut -d: -f1)
-    [ -z "$FOUND_ORACLE_PROPRIETARY_COPYRIGHT" ] && FOUND_ORACLE_PROPRIETARY_COPYRIGHT=0
-    if [ "$FOUND_ORACLE_PROPRIETARY_COPYRIGHT" -gt 0 ]; then
-      trace "We have found an Oracle Proprietary on line $FOUND_ORACLE_PROPRIETARY_COPYRIGHT in file: $1"
-    fi
+  FOUND_ORACLE_PROPRIETARY_COPYRIGHT=$(head -n $MAX_LINES "$1" | $GREP -n -i "ORACLE PROPRIETARY" | head -n 1 | cut -d: -f1)
+  [ -z "$FOUND_ORACLE_PROPRIETARY_COPYRIGHT" ] && FOUND_ORACLE_PROPRIETARY_COPYRIGHT=0
+  if [ "$FOUND_ORACLE_PROPRIETARY_COPYRIGHT" -gt 0 ]; then
+    trace "We have found an Oracle Proprietary on line $FOUND_ORACLE_PROPRIETARY_COPYRIGHT in file: $1"
+  fi
 
-    FOUND_ORACLE_COPYRIGHT=$(head -n $MAX_LINES "$1" | $GREP -n "Copyright (c).*Oracle" | head -n 1 | cut -d: -f1)
-    [ -z "$FOUND_ORACLE_COPYRIGHT" ] && FOUND_ORACLE_COPYRIGHT=0
-    if [ "$FOUND_ORACLE_COPYRIGHT" -gt 0 ]; then
-      trace "We have found an Oracle Copyright on line $FOUND_ORACLE_COPYRIGHT in file: $1"
-    fi
-    FOUND_COPYRIGHT=0
-    if [ "$FOUND_IBM_COPYRIGHT" -eq 0 ]; then
-      if [ "$FOUND_APACHE_COPYRIGHT" -eq 0 ]; then
-        if [ "$FOUND_BSD_OR_MIT_COPYRIGHT" -eq 0 ]; then
-          if [ "$FOUND_ORACLE_COPYRIGHT" -eq 0 ]; then
-            FOUND_COPYRIGHT=$(head -n $MAX_LINES "$1" | $GREP -n "Copyright" | head -n 1 | cut -d: -f1)
-          fi
+  FOUND_ORACLE_COPYRIGHT=$(head -n $MAX_LINES "$1" | $GREP -n "Copyright (c).*Oracle" | head -n 1 | cut -d: -f1)
+  [ -z "$FOUND_ORACLE_COPYRIGHT" ] && FOUND_ORACLE_COPYRIGHT=0
+  if [ "$FOUND_ORACLE_COPYRIGHT" -gt 0 ]; then
+    trace "We have found an Oracle Copyright on line $FOUND_ORACLE_COPYRIGHT in file: $1"
+  fi
+  FOUND_COPYRIGHT=0
+  if [ "$FOUND_IBM_COPYRIGHT" -eq 0 ]; then
+    if [ "$FOUND_APACHE_COPYRIGHT" -eq 0 ]; then
+      if [ "$FOUND_BSD_OR_MIT_COPYRIGHT" -eq 0 ]; then
+        if [ "$FOUND_ORACLE_COPYRIGHT" -eq 0 ]; then
+          FOUND_COPYRIGHT=$(head -n $MAX_LINES "$1" | $GREP -n "Copyright" | head -n 1 | cut -d: -f1)
         fi
       fi
     fi
-    [ -z "$FOUND_COPYRIGHT" ] && FOUND_COPYRIGHT=0
-    if [ "$FOUND_COPYRIGHT" -gt 0 ]; then
-      trace "We have found a different Copyright on line $FOUND_COPYRIGHT in file: $1"
-    fi
+  fi
+  [ -z "$FOUND_COPYRIGHT" ] && FOUND_COPYRIGHT=0
+  if [ "$FOUND_COPYRIGHT" -gt 0 ]; then
+    trace "We have found a different Copyright on line $FOUND_COPYRIGHT in file: $1"
+  fi
 
-    FOUND_IBM_CPE=0
-    FOUND_ORACLE_CPE=0
-    FOUND_CPE=$(head -n $MAX_LINES "$1" | $GREP -n " \"Classpath\"" | head -n 1 | cut -d: -f1)
+  FOUND_IBM_CPE=0
+  FOUND_ORACLE_CPE=0
+  FOUND_CPE=$(head -n $MAX_LINES "$1" | $GREP -n " \"Classpath\"" | head -n 1 | cut -d: -f1)
+  [ -z "$FOUND_CPE" ] && FOUND_CPE=0
+  if [ "$FOUND_CPE" -eq 0 ]; then
+    FOUND_CPE=$(head -n $MAX_LINES "$1" | $GREP -n -i " Classpath Exception" | head -n 1 | cut -d: -f1)
     [ -z "$FOUND_CPE" ] && FOUND_CPE=0
-    if [ "$FOUND_CPE" -eq 0 ]; then
-      FOUND_CPE=$(head -n $MAX_LINES "$1" | $GREP -n -i " Classpath Exception" | head -n 1 | cut -d: -f1)
-      [ -z "$FOUND_CPE" ] && FOUND_CPE=0
-    fi
-    if [ "$FOUND_CPE" -gt 0 ]; then
-      trace "We have found a Classpath Exception on line $FOUND_CPE in file: $1"
-      if [ "$FOUND_IBM_DESIGNATES" -gt 0 ]; then
-        FOUND_IBM_CPE=$FOUND_CPE
-        trace "We have found the IBM CPE on line $FOUND_ORACLE_CPE in file: $1"
-      else
-        if [ "$FOUND_ORACLE_DESIGNATES" -gt 0 ]; then
-          FOUND_ORACLE_CPE=$FOUND_CPE
-          trace "We have found the Oracle CPE on line $FOUND_ORACLE_CPE in file: $1"
-        fi
+  fi
+  if [ "$FOUND_CPE" -gt 0 ]; then
+    trace "We have found a Classpath Exception on line $FOUND_CPE in file: $1"
+    if [ "$FOUND_IBM_DESIGNATES" -gt 0 ]; then
+      FOUND_IBM_CPE=$FOUND_CPE
+      trace "We have found the IBM CPE on line $FOUND_ORACLE_CPE in file: $1"
+    else
+      if [ "$FOUND_ORACLE_DESIGNATES" -gt 0 ]; then
+        FOUND_ORACLE_CPE=$FOUND_CPE
+        trace "We have found the Oracle CPE on line $FOUND_ORACLE_CPE in file: $1"
       fi
     fi
+  fi
 
-    FOUND_GPLV2=$(head -n $MAX_LINES "$1" | $GREP -n "GNU General Public License" | head -n 1 | cut -d: -f1)
-    [ -z "$FOUND_GPLV2" ] && FOUND_GPLV2=0
-    if [ "$FOUND_GPLV2" -gt 0 ]; then
-      trace "We have found GPLv2 on line $FOUND_GPLV2 in file: $1"
+  FOUND_GPLV2=$(head -n $MAX_LINES "$1" | $GREP -n "GNU General Public License" | head -n 1 | cut -d: -f1)
+  [ -z "$FOUND_GPLV2" ] && FOUND_GPLV2=0
+  if [ "$FOUND_GPLV2" -gt 0 ]; then
+    trace "We have found GPLv2 on line $FOUND_GPLV2 in file: $1"
+  fi
+
+  FOUND_NON_IBM_COPYRIGHT=0
+  [ "$FOUND_APACHE_COPYRIGHT" -gt 0 ]     && FOUND_NON_IBM_COPYRIGHT=1
+  [ "$FOUND_BSD_OR_MIT_COPYRIGHT" -gt 0 ] && FOUND_NON_IBM_COPYRIGHT=1
+  [ "$FOUND_ORACLE_COPYRIGHT" -gt 0 ]     && FOUND_NON_IBM_COPYRIGHT=1
+  [ "$FOUND_COPYRIGHT" -gt 0 ]            && FOUND_NON_IBM_COPYRIGHT=1
+  if [ "$FOUND_NON_IBM_COPYRIGHT" -eq 1 ]; then
+    trace "We have found a non IBM copyright"
+  fi
+
+  # Check to see whether the file is in the built JDK
+  IN_JDK=1
+  case "$1" in
+    test/*)
+      trace "$1 deemed not to be in the built JDK because it matches case parameter expansion test/*"
+      IN_JDK=0;;
+    bin/*)
+      trace "$1 deemed not to be in the built JDK because it matches case parameter expansion bin/*"
+      IN_JDK=0;;
+    make/autoconf/*)
+      trace  "$1 deemed not to be in the built JDK because it matches case parameter expansion make/autoconf/*"
+      IN_JDK=0;;
+    make/hotspot/*)
+      trace  "$1 deemed not to be in the built JDK because it matches case parameter expansion make/hotspot/*)"
+      IN_JDK=0;;
+    make/langtools/*)
+      trace  "$1 deemed not to be in the built JDK because it matches case parameter expansion make/langtools/*"
+      IN_JDK=0;;
+    make/nashorn/*)
+      trace  "$1 deemed not to be in the built JDK because it matches case parameter expansion make/nashorn/*"
+      IN_JDK=0;;
+    make/scripts/*)
+      trace  "$1 deemed not to be in the built JDK because it matches case parameter expansion make/scripts/*"
+      IN_JDK=0;;
+    make/templates/*)
+      trace  "$1 deemed not to be in the built JDK because it matches case parameter expansion make/templates/*"
+      IN_JDK=0;;
+    src/utils/*)
+      trace  "$1 deemed not to be in the built JDK because it matches case parameter expansion src/utils/*"
+      IN_JDK=0;;
+    */test/*)
+      trace  "$1 deemed not to be in the built JDK because it matches case parameter expansion */test/*"
+      IN_JDK=0;;
+    *configure)
+      trace  "$1 deemed not to be in the built JDK because it matches case parameter expansion *configure"
+      IN_JDK=0;;
+    *.1)
+      trace "$1 deemed not to be in the built JDK because it matches case parameter expansion *.1"
+      IN_JDK=0;;
+    common/*) # common/autoconf and common/bin on jdk8 only
+      trace  "$1 deemed not to be in the built JDK because it matches case parameter expansion common/*"
+      IN_JDK=0;;
+    # langtools structure on jdk8 only
+    langtools/make/*)
+      trace  "$1 deemed not to be in the built JDK because it matches case parameter expansion langtools/make/*"
+      IN_JDK=0;;
+    # nashorn structure on jdk8 only
+    nashorn/bin/*)
+      trace  "$1 deemed not to be in the built JDK because it matches case parameter expansion nashorn/bin/*"
+      IN_JDK=0;;
+    nashorn/buildtools/*)
+      trace  "$1 deemed not to be in the built JDK because it matches case parameter expansion nashorn/buildtools/*"
+      IN_JDK=0;;
+    nashorn/docs/*)
+      trace  "$1 deemed not to be in the built JDK because it matches case parameter expansion nashorn/docs/*"
+      IN_JDK=0;;
+    nashorn/make/*)
+      trace  "$1 deemed not to be in the built JDK because it matches case parameter expansion nashorn/make/*"
+      IN_JDK=0;;
+    *) IN_JDK=1;;
+  esac
+
+  # We have pulled the info from the file, now do all the checks
+
+  # Files with no copyright......
+  if [ "$FOUND_IBM_COPYRIGHT" -eq 0 ] && [ "$FOUND_NON_IBM_COPYRIGHT" -eq 0 ]; then
+    if [ "$FOUND_ORACLE_CPE" -gt 0 ]; then
+      trace "$1: Found Oracle classpath exception but no copyright"
+    else
+      if [ "$FOUND_GPLV2" -gt 0 ]; then
+        trace "$1: Found GPLv2 but no copyright"
+      else
+        trace "$1 has no copyright"
+      fi
     fi
+  fi
 
-    FOUND_NON_IBM_COPYRIGHT=0
-    [ "$FOUND_APACHE_COPYRIGHT" -gt 0 ]     && FOUND_NON_IBM_COPYRIGHT=1
-    [ "$FOUND_BSD_OR_MIT_COPYRIGHT" -gt 0 ] && FOUND_NON_IBM_COPYRIGHT=1
-    [ "$FOUND_ORACLE_COPYRIGHT" -gt 0 ]     && FOUND_NON_IBM_COPYRIGHT=1
-    [ "$FOUND_COPYRIGHT" -gt 0 ]            && FOUND_NON_IBM_COPYRIGHT=1
-    if [ "$FOUND_NON_IBM_COPYRIGHT" -eq 1 ]; then
-      trace "We have found a non IBM copyright"
-    fi
+  CLOSED=0
+  case "$1" in
+    closed/*) CLOSED=1;;
+    *) CLOSED=0;;
+  esac
 
-    # Check to see whether the file is in the built JDK
-    IN_JDK=1
-    case "$1" in
-#      */solaris/*)
-#        echo  "$1 deemed not to be in the built JDK because it matches case parameter expansion */solaris/*"
-#        IN_JDK=0;;
-#      *make/*)
-#        echo  "$1 deemed not to be in the built JDK because it matches case parameter expansion *make/*"
-#        IN_JDK=0;;
-      test/*)
-        trace "$1 deemed not to be in the built JDK because it matches case parameter expansion test/*"
-        IN_JDK=0;;
-      bin/*)
-        trace "$1 deemed not to be in the built JDK because it matches case parameter expansion bin/*"
-        IN_JDK=0;;
-      make/autoconf/*)
-        trace  "$1 deemed not to be in the built JDK because it matches case parameter expansion make/autoconf/*"
-        IN_JDK=0;;
-      make/hotspot/*)
-        trace  "$1 deemed not to be in the built JDK because it matches case parameter expansion make/hotspot/*)"
-        IN_JDK=0;;
-      make/langtools/*)
-        trace  "$1 deemed not to be in the built JDK because it matches case parameter expansion make/langtools/*"
-        IN_JDK=0;;
-      make/nashorn/*)
-        trace  "$1 deemed not to be in the built JDK because it matches case parameter expansion make/nashorn/*"
-        IN_JDK=0;;
-      make/scripts/*)
-        trace  "$1 deemed not to be in the built JDK because it matches case parameter expansion make/scripts/*"
-        IN_JDK=0;;
-      make/templates/*)
-        trace  "$1 deemed not to be in the built JDK because it matches case parameter expansion make/templates/*"
-        IN_JDK=0;;
-      src/utils/*)
-        trace  "$1 deemed not to be in the built JDK because it matches case parameter expansion src/utils/*"
-        IN_JDK=0;;
-      */test/*)
-        trace  "$1 deemed not to be in the built JDK because it matches case parameter expansion */test/*"
-        IN_JDK=0;;
-#      */doc/*)
-#        trace  "$1 deemed not to be in the built JDK because it matches case parameter expansion */doc/*"
-#        IN_JDK=0;;
-      *configure)
-        trace  "$1 deemed not to be in the built JDK because it matches case parameter expansion *configure"
-        IN_JDK=0;;
-      *.1)
-        trace "$1 deemed not to be in the built JDK because it matches case parameter expansion *.1"
-        IN_JDK=0;;
-      common/*) # common/autoconf and common/bin on jdk8 only
-        trace  "$1 deemed not to be in the built JDK because it matches case parameter expansion common/*"
-        IN_JDK=0;;
-      # langtools structure on jdk8 only
-      langtools/make/*)
-        trace  "$1 deemed not to be in the built JDK because it matches case parameter expansion langtools/make/*"
-        IN_JDK=0;;
-      # nashorn structure on jdk8 only
-      nashorn/bin/*)
-        trace  "$1 deemed not to be in the built JDK because it matches case parameter expansion nashorn/bin/*"
-        IN_JDK=0;;
-      nashorn/buildtools/*)
-        trace  "$1 deemed not to be in the built JDK because it matches case parameter expansion nashorn/buildtools/*"
-        IN_JDK=0;;
-      nashorn/docs/*)
-        trace  "$1 deemed not to be in the built JDK because it matches case parameter expansion nashorn/docs/*"
-        IN_JDK=0;;
-      nashorn/make/*)
-        trace  "$1 deemed not to be in the built JDK because it matches case parameter expansion nashorn/make/*"
-        IN_JDK=0;;
-      *) IN_JDK=1;;
-    esac
-
-    # We have pulled the info from the file, now do all the checks
-
-    # Files with no copyright......
-    if [ "$FOUND_IBM_COPYRIGHT" -eq 0 ] && [ "$FOUND_NON_IBM_COPYRIGHT" -eq 0 ]; then
+  if [ "$CLOSED" -eq 1 ]; then
+    trace "$1 is in the closed directory"
+    if [ "$FOUND_NON_IBM_COPYRIGHT" -gt 0 ] && [ "$FOUND_GPLV2" -gt 0 ] && [ "$FOUND_CPE" -gt 0 ]; then
+      if [ "$FOUND_IBM_COPYRIGHT" -gt 0 ]; then
+        if [ "$FOUND_IBM_COPYRIGHT" -lt "$FOUND_ORACLE_COPYRIGHT" ] || [ "$FOUND_IBM_COPYRIGHT" -lt "$FOUND_BSD_OR_MIT_COPYRIGHT" ] || [ "$FOUND_IBM_COPYRIGHT" -lt "$FOUND_APACHE_COPYRIGHT" ] || [ "$FOUND_IBM_COPYRIGHT" -lt "$FOUND_COPYRIGHT" ]; then
+          log "E001: $1: IBM Copyright is not after the existing copyright"
+          ERROR=1
+        fi
+      else
+        log "E002: $1: Basic IBM Copyright is missing"
+        ERROR=1
+      fi
+    else
+      # The file is in the 'closed' directory and doesn't contain 
+      # Oracle copyright with GPLv2 and Classpath Exception so should
+      # have IBM copyright with GPLv2 and CE at the top of the file
+      if [ "$FOUND_IBM_COPYRIGHT" -gt 5 ]; then
+        log "E003: $1: IBM Copyright with GPLv2 and IBM Classpath Exception should be at the top of the file"
+        ERROR=1
+      fi
+      if [ "$FOUND_GPLV2" -eq 0 ]; then
+        log "E004: $1: IBM Copyright should contain the GPLv2 license"
+        ERROR=1
+      fi
+      if [ "$FOUND_IBM_CPE" -eq 0 ]; then
+        log "E005: $1: IBM Copyright should contain the IBM Classpath Exception"
+        ERROR=1
+      fi
       if [ "$FOUND_ORACLE_CPE" -gt 0 ]; then
-        trace "$1: Found Oracle classpath exception but no copyright"
-      else
-        if [ "$FOUND_GPLV2" -gt 0 ]; then
-          trace "$1: Found GPLv2 but no copyright"
-        else
-          trace "$1 has no copyright"
-        fi
+        log "E006: $1: IBM Copyright should not contain the Oracle Classpath Exception"
+        ERROR=1
       fi
     fi
+  fi
 
-    CLOSED=0
-    case "$1" in
-      closed/*) CLOSED=1;;
-      *) CLOSED=0;;
-    esac
-
-    if [ "$CLOSED" -eq 1 ]; then
-      trace "$1 is in the closed directory"
-      if [ "$FOUND_NON_IBM_COPYRIGHT" -gt 0 ] && [ "$FOUND_GPLV2" -gt 0 ] && [ "$FOUND_CPE" -gt 0 ]; then
+  if [ "$CLOSED" -eq 0 ]; then
+    trace "The file is NOT in the closed directory"
+    # Check that if the file has an IBM copyright or an IBM Portions copyright then it is
+    # positioned correctly in the file.
+    # If we don't have a non IBM copyright, i.e. Oracle, Apache, BSD, MIT etc., or GPLv2 header
+    # or classpath exception....
+    if [ "$FOUND_NON_IBM_COPYRIGHT" -eq 0 ] && [ "$FOUND_GPLV2" -eq 0 ] && [ "$FOUND_CPE" -eq 0 ]; then
+      trace "File $1 has no non IBM copyright, GPLv2 or classpath exception"
+      # Is the file a user configurable file?  If so it shouldn't have a copyright.
+      case "$1" in
+        *META-INF/*)
+          trace "$1 deemed to be a user configurable file because it matches parameter expansion *META-INF/*"
+          NOT_CONFIG_FILE=0;;
+        */Changelog)
+          trace "$1 deemed to be a user configurable file because it matches parameter expansion */Changelog"
+          NOT_CONFIG_FILE=0;;
+        *.policy)
+          trace "$1 deemed to be a user configurable file because it matches parameter expansion *.policy"
+          NOT_CONFIG_FILE=0;;
+        *.security)
+          trace "$1 deemed to be a user configurable file because it matches parameter expansion *.security"
+          NOT_CONFIG_FILE=0;;
+        *.plist)
+          trace "$1 deemed to be a user configurable file because it matches parameter expansion *.plist"
+          NOT_CONFIG_FILE=0;;
+        *) NOT_CONFIG_FILE=1;;
+      esac
+      if [ "$NOT_CONFIG_FILE" -eq 0 ]; then
         if [ "$FOUND_IBM_COPYRIGHT" -gt 0 ]; then
-          if [ "$FOUND_IBM_COPYRIGHT" -lt "$FOUND_ORACLE_COPYRIGHT" ] || [ "$FOUND_IBM_COPYRIGHT" -lt "$FOUND_BSD_OR_MIT_COPYRIGHT" ] || [ "$FOUND_IBM_COPYRIGHT" -lt "$FOUND_APACHE_COPYRIGHT" ] || [ "$FOUND_IBM_COPYRIGHT" -lt "$FOUND_COPYRIGHT" ]; then
-            log "E001: $1: IBM Copyright is not after the existing copyright"
-            ERROR=1
-          fi
-        else
-          log "E002: $1: Basic IBM Copyright is missing"
+          log "E007: $1: IBM Copyright should NOT be used in this file as it is a user config file"
           ERROR=1
         fi
       else
-        # The file is in the 'closed' directory and doesn't contain 
-        # Oracle copyright with GPLv2 and Classpath Exception so should
-        # have IBM copyright with GPLv2 and CE at the top of the file
-        if [ "$FOUND_IBM_COPYRIGHT" -gt 5 ]; then
-          log "E003: $1: IBM Copyright with GPLv2 and IBM Classpath Exception should be at the top of the file"
+        # The file is not a user configuration file.
+        # If it has been changed it should have IBM portions.
+        # Check to see if the IBM Portions copyright if present is at top of file.
+        if [ "$FOUND_IBM_PORTIONS_COPYRIGHT" -gt 3 ]; then
+          log "E009: $1: IBM Portions Copyright is not at top of the file"
           ERROR=1
         fi
-        if [ "$FOUND_GPLV2" -eq 0 ]; then
-          log "E004: $1: IBM Copyright should contain the GPLv2 license"
-          ERROR=1
-        fi
+      fi
+    fi # [ "$FOUND_NON_IBM_COPYRIGHT" -eq 0 ] && [ "$FOUND_GPLV2" -eq 0 ] && [ "$FOUND_CPE" -eq 0 ]
+
+    # If we don't have a non IBM copyright we were able to identify, i.e. Oracle, Apache, BSD, MIT etc.,
+    # and we have but we have a GPLv2 header but no classpath exception, and the file is built into
+    # the jdk....
+    if [ "$FOUND_NON_IBM_COPYRIGHT" -eq 0 ] && [ "$FOUND_GPLV2" -gt 0 ] && [ "$FOUND_CPE" -eq 0 ] && [ "$IN_JDK" -ne 0 ]; then
+      log "E010: File $1: GPLv2 is present but Classpath exception is missing"
+      ERROR=1
+    fi
+
+    # If we have a non IBM copyright, a GPLv2 header but no classpath exception, and the file is built
+    # into the jdk.....
+    if [ "$FOUND_NON_IBM_COPYRIGHT" -ne 0 ] && [ "$FOUND_GPLV2" -gt 0 ] && [ "$FOUND_CPE" -eq 0 ] && [ "$IN_JDK" -ne 0 ]; then
+      trace "$1 has no classpath exception but is in the JDK binary"
+      if [ "$1" = "LICENSE" ]; then
         if [ "$FOUND_IBM_CPE" -eq 0 ]; then
-          log "E005: $1: IBM Copyright should contain the IBM Classpath Exception"
+          log "E011: $1: LICENSE file does not contain IBM designated Classpath Exception"
           ERROR=1
         fi
-        if [ "$FOUND_ORACLE_CPE" -gt 0 ]; then
-          log "E006: $1: IBM Copyright should not contain the Oracle Classpath Exception"
+      else
+        log "E012: $1: GPLv2 is present but Classpath exception is missing"
+        ERROR=1
+      fi
+    fi
+
+    # If we have a non IBM copyright, a GPLv2 header and a classpath exception.....
+    if [ "$FOUND_NON_IBM_COPYRIGHT" -ne 0 ] && [ "$FOUND_GPLV2" -gt 0 ] && [ "$FOUND_CPE" -gt 0 ]; then
+      if [ "$1" = "LICENSE" ]; then
+        if [ "$FOUND_IBM_CPE" -eq 0 ]; then
+          log "E014: $1: LICENSE file does not contain IBM designated Classpath Exception"
           ERROR=1
         fi
       fi
     fi
 
-    if [ "$CLOSED" -eq 0 ]; then
-      trace "The file is NOT in the closed directory"
-      # Check that if the file has an IBM copyright or an IBM Portions copyright then it is
-      # positioned correctly in the file.
-      # If we don't have a non IBM copyright, i.e. Oracle, Apache, BSD, MIT etc., or GPLv2 header
-      # or classpath exception....
-      if [ "$FOUND_NON_IBM_COPYRIGHT" -eq 0 ] && [ "$FOUND_GPLV2" -eq 0 ] && [ "$FOUND_CPE" -eq 0 ]; then
-        trace "File $1 has no non IBM copyright, GPLv2 or classpath exception"
-        # Is the file a user configurable file?  If so it shouldn't have a copyright.
-        case "$1" in
-          *META-INF/*)
-            trace "$1 deemed to be a user configurable file because it matches parameter expansion *META-INF/*"
-            NOT_CONFIG_FILE=0;;
-          */Changelog)
-            trace "$1 deemed to be a user configurable file because it matches parameter expansion */Changelog"
-            NOT_CONFIG_FILE=0;;
-          *.policy)
-            trace "$1 deemed to be a user configurable file because it matches parameter expansion *.policy"
-            NOT_CONFIG_FILE=0;;
-          *.security)
-            trace "$1 deemed to be a user configurable file because it matches parameter expansion *.security"
-            NOT_CONFIG_FILE=0;;
-          *.plist)
-            trace "$1 deemed to be a user configurable file because it matches parameter expansion *.plist"
-            NOT_CONFIG_FILE=0;;
-          *) NOT_CONFIG_FILE=1;;
-        esac
-        if [ "$NOT_CONFIG_FILE" -eq 0 ]; then
-          if [ "$FOUND_IBM_COPYRIGHT" -gt 0 ]; then
-            log "E007: $1: IBM Copyright should NOT be used in this file as it is a user config file"
-            ERROR=1
-          fi
-        else
-          # The file is not a user configuration file.
-          # If it has been changed it should have IBM portions.
-          # Check to see if the IBM Portions copyright if present is at top of file.
-          if [ "$FOUND_IBM_PORTIONS_COPYRIGHT" -gt 3 ]; then
-            log "E009: $1: IBM Portions Copyright is not at top of the file"
-            ERROR=1
-          fi
-        fi
-      fi # [ "$FOUND_NON_IBM_COPYRIGHT" -eq 0 ] && [ "$FOUND_GPLV2" -eq 0 ] && [ "$FOUND_CPE" -eq 0 ]
-
-      # If we don't have a non IBM copyright we were able to identify, i.e. Oracle, Apache, BSD, MIT etc.,
-      # and we have but we have a GPLv2 header but no classpath exception, and the file is built into
-      # the jdk....
-      if [ "$FOUND_NON_IBM_COPYRIGHT" -eq 0 ] && [ "$FOUND_GPLV2" -gt 0 ] && [ "$FOUND_CPE" -eq 0 ] && [ "$IN_JDK" -ne 0 ]; then
-        log "E010: File $1: GPLv2 is present but Classpath exception is missing"
-        ERROR=1
-      fi
-
-      # If we have a non IBM copyright, a GPLv2 header but no classpath exception, and the file is built
-      # into the jdk.....
-      if [ "$FOUND_NON_IBM_COPYRIGHT" -ne 0 ] && [ "$FOUND_GPLV2" -gt 0 ] && [ "$FOUND_CPE" -eq 0 ] && [ "$IN_JDK" -ne 0 ]; then
-        trace "$1 has no classpath exception but is in the JDK binary"
-        if [ "$1" = "LICENSE" ]; then
-          if [ "$FOUND_IBM_CPE" -eq 0 ]; then
-            log "E011: $1: LICENSE file does not contain IBM designated Classpath Exception"
-            ERROR=1
-          fi
-        else
-          log "E012: $1: GPLv2 is present but Classpath exception is missing"
+    # If we have a non IBM copyright which is not GPLv2.....
+    if [ "$FOUND_NON_IBM_COPYRIGHT" -ne 0 ] && [ "$FOUND_GPLV2" -eq 0 ]; then
+      # If the file also has an IBM copyright, check that it is after
+      # any existing copyright
+      if [ "$FOUND_IBM_COPYRIGHT" -gt 0 ]; then
+        if [ "$FOUND_IBM_COPYRIGHT" -le "$FOUND_ORACLE_COPYRIGHT" ] || [ "$FOUND_IBM_COPYRIGHT" -le "$FOUND_BSD_OR_MIT_COPYRIGHT" ] || [ "$FOUND_IBM_COPYRIGHT" -le "$FOUND_APACHE_COPYRIGHT" ] || [ "$FOUND_IBM_COPYRIGHT" -le "$FOUND_COPYRIGHT" ]; then
+          log "E016: $1: IBM copyright is not after the existing copyright"
           ERROR=1
         fi
       fi
+    fi
 
-      # If we have a non IBM copyright, a GPLv2 header and a classpath exception.....
-      if [ "$FOUND_NON_IBM_COPYRIGHT" -ne 0 ] && [ "$FOUND_GPLV2" -gt 0 ] && [ "$FOUND_CPE" -gt 0 ]; then
-        if [ "$1" = "LICENSE" ]; then
-          if [ "$FOUND_IBM_CPE" -eq 0 ]; then
-            log "E014: $1: LICENSE file does not contain IBM designated Classpath Exception"
-            ERROR=1
-          fi
-        fi
-      fi
-
-      # If we have a non IBM copyright which is not GPLv2.....
-      if [ "$FOUND_NON_IBM_COPYRIGHT" -ne 0 ] && [ "$FOUND_GPLV2" -eq 0 ]; then
-        # If the file also has an IBM copyright, check that it is after
-        # any existing copyright
-        if [ "$FOUND_IBM_COPYRIGHT" -gt 0 ]; then
-          if [ "$FOUND_IBM_COPYRIGHT" -le "$FOUND_ORACLE_COPYRIGHT" ] || [ "$FOUND_IBM_COPYRIGHT" -le "$FOUND_BSD_OR_MIT_COPYRIGHT" ] || [ "$FOUND_IBM_COPYRIGHT" -le "$FOUND_APACHE_COPYRIGHT" ] || [ "$FOUND_IBM_COPYRIGHT" -le "$FOUND_COPYRIGHT" ]; then
-            log "E016: $1: IBM copyright is not after the existing copyright"
-            ERROR=1
-          fi
-        fi
-      fi
-
-      # If there is an Oracle Proprietary copyright....
-      if [ "$FOUND_ORACLE_PROPRIETARY_COPYRIGHT" -ne 0 ]; then
-        log "E017: File $1: Found Oracle Proprietary copyright"
-        ERROR=1
-      fi
-
-    fi # CLOSED
-  fi # CHECK
+    # If there is an Oracle Proprietary copyright....
+    if [ "$FOUND_ORACLE_PROPRIETARY_COPYRIGHT" -ne 0 ]; then
+      log "E017: File $1: Found Oracle Proprietary copyright"
+      ERROR=1
+    fi
+  fi # CLOSED
 
   if [ $ERROR -eq 1 ]; then
     grep -q "$1" $TEMPFILE

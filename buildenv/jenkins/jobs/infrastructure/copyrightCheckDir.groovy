@@ -28,23 +28,21 @@ def OUTPUT = ""
 
 timeout(time: 6, unit: 'HOURS') {
     stage('Copyright Check') {
-        node ('worker') {
-            if ( params.ghprbGhRepository == "") {
-                echo "Repository to check not specified.  Rerun with the ghprbGhRepository parameter pointing to a valid git repository."
-                sh 'exit 1'
-            }
-            if ( params.verbose == true) {
-                VERBOSE="VERBOSE=1"
-            }
-            if ( params.rootDir != "") {
-                ROOTDIR="ROOTDIR=${params.rootDir}"
-            }
-            timestamps {
+        timestamps {
+            node ('worker') {
+                if ( params.ghprbGhRepository == "") {
+                    error("Repository to check not specified.  Rerun with the ghprbGhRepository parameter pointing to a valid git repository.")
+                }
+                if ( params.verbose == true) {
+                    VERBOSE="VERBOSE=1"
+                }
+                if ( params.rootDir != "") {
+                    ROOTDIR="ROOTDIR=${params.rootDir}"
+                }
                 checkout scm
-                OUTPUT = sh (script: "sh buildenv/jenkins/jobs/infrastructure/copyrightCheckDir.sh REPO=${params.ghprbGhRepository} ${VERBOSE} ${ROOTDIR}", returnStdout: true).trim()
-                echo OUTPUT
-            } // timestamps
-        } // node
+                error (script: "sh buildenv/jenkins/jobs/infrastructure/copyrightCheckDir.sh REPO=${params.ghprbGhRepository} ${VERBOSE} ${ROOTDIR}", returnStdout: true).trim()
+            } // node
+        } // timestamps
     } // stage
 } // timeout
 
