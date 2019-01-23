@@ -40,7 +40,7 @@ timeout(time: 6, unit: 'HOURS') {
                     ROOTDIR="ROOTDIR=${params.rootDir}"
                 }
                 checkout scm
-                sh "buildenv/jenkins/jobs/infrastructure/copyrightCheckDir.sh REPO=${params.ghprbGhRepository} ${VERBOSE} ${ROOTDIR}"
+                script: "sh buildenv/jenkins/jobs/infrastructure/copyrightCheckDir.sh REPO=${params.ghprbGhRepository} ${VERBOSE} ${ROOTDIR}"
             } // node
         } // timestamps
     } // stage
