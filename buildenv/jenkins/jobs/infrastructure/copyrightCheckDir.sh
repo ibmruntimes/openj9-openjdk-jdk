@@ -7,7 +7,7 @@
 # under the terms of the GNU General Public License version 2 only, as
 # published by the Free Software Foundation.
 #
-# IBM designates this particular file as subject to the "Classpath" exception 
+# IBM designates this particular file as subject to the "Classpath" exception
 # as provided by IBM in the LICENSE file that accompanied this code.
 #
 # This code is distributed in the hope that it will be useful, but WITHOUT
@@ -114,7 +114,7 @@ check () {
   if [ "$CHECK" = '0' ]; then
     return 0
   fi
-  
+
   # File needs checking
 
   MAX_LINES=400
@@ -498,7 +498,7 @@ if [ $ARGS_ERROR -eq 1 ]; then
   echo
   echo Usage:
   echo
-  echo copyrightCheck.sh REPO=git_repository ROOTDIR-root_directory VERBOSE=1
+  echo copyrightCheck.sh REPO=git_repository ROOTDIR=root_directory VERBOSE=1
   echo REPO:    a github repository. Mandatory
   echo ROOTDIR: check only this durectory and subdirectories
   echo VERBOSE: output logging
@@ -530,7 +530,7 @@ fi
 
 mkdir -p $WORKDIR
 log "`date` Running git clone --depth=1 \"$REPO_URL\" \"$WORKDIR\""
-git clone "$REPO_URL" "$WORKDIR"
+git clone --depth=1 "$REPO_URL" "$WORKDIR"
 cd "$WORKDIR" || {
     log "ERROR: $WORKDIR does not exist after cloning $REPO_NAME. Check git clone output."
     exit 1
@@ -538,12 +538,12 @@ cd "$WORKDIR" || {
 log "`date` Clone finished, checking files...."
 
 # Create a file containing all the known files with errors we want to temporarily ignore.
-# These files are reported as errors but do not cause the script to exeit non-zero.
+# These files are reported as errors but do not cause the script to exit non-zero.
 
 TEMPFILE=$PWD/copyrightCheck.known.failures
 echo "Currently excluded files......." >$TEMPFILE
 
-echo "\n# openj9-openjdk-jdk known failures" >$TEMPFILE
+echo "\n# openj9-openjdk-jdk known failures" >>$TEMPFILE
 echo "src/java.base/share/classes/sun/security/util/math/intpoly/FieldGen.jsh" >>$TEMPFILE
 echo "src/java.base/solaris/native/libjvm_db/libjvm_db.c" >>$TEMPFILE
 echo "src/java.base/solaris/native/libjvm_db/libjvm_db.h" >>$TEMPFILE
@@ -581,6 +581,8 @@ echo "jdk/src/share/classes/org/jcp/xml/dsig/internal/dom/DOMXPathFilter2Transfo
 echo "jdk/src/share/classes/org/jcp/xml/dsig/internal/dom/XMLDSigRI.java" >>$TEMPFILE
 
 cat $TEMPFILE
+
+echo ""
 
 a=0
 e=0
