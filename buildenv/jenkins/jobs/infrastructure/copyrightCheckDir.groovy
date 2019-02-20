@@ -30,17 +30,21 @@ timeout(time: 6, unit: 'HOURS') {
     stage('Copyright Check') {
         timestamps {
             node ('worker') {
-                if ( params.ghprbGhRepository == "") {
-                    error("Repository to check not specified.  Rerun with the ghprbGhRepository parameter pointing to a valid git repository.")
+                try {
+                    if ( params.ghprbGhRepository == "") {
+                        error("Repository to check not specified.  Rerun with the ghprbGhRepository parameter pointing to a valid git repository.")
+                    }
+                    if ( params.verbose == true) {
+                        VERBOSE="VERBOSE=1"
+                    }
+                    if ( params.rootDir != "") {
+                        ROOTDIR="ROOTDIR=${params.rootDir}"
+                    }
+                    checkout scm
+                    sh (script: "sh buildenv/jenkins/jobs/infrastructure/copyrightCheckDir.sh REPO=${params.ghprbGhRepository} ${VERBOSE} ${ROOTDIR}")
+                } finally {
+                    cleanWs()
                 }
-                if ( params.verbose == true) {
-                    VERBOSE="VERBOSE=1"
-                }
-                if ( params.rootDir != "") {
-                    ROOTDIR="ROOTDIR=${params.rootDir}"
-                }
-                checkout scm
-                sh (script: "sh buildenv/jenkins/jobs/infrastructure/copyrightCheckDir.sh REPO=${params.ghprbGhRepository} ${VERBOSE} ${ROOTDIR}")
             } // node
         } // timestamps
     } // stage
