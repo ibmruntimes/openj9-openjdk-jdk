@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1998, 2017, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1998, 2019, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -22,6 +22,11 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
+/*
+ * ===========================================================================
+ * (c) Copyright IBM Corp. 2019, 2019 All Rights Reserved
+ * ===========================================================================
+ */
 
 package com.sun.tools.jdi;
 
@@ -41,7 +46,7 @@ import com.sun.jdi.connect.LaunchingConnector;
 
 abstract class ConnectorImpl implements Connector {
 
-    Map<String, Argument> defaultArguments = new LinkedHashMap<>();
+    Map<String, Argument> defaultArguments = Collections.synchronizedMap(new LinkedHashMap<>());
 
     // Used by BooleanArgument
     static String trueString = null;

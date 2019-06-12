@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2003, 2018, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2003, 2019, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -22,6 +22,11 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
+/*
+ * ===========================================================================
+ * (c) Copyright IBM Corp. 2019, 2019 All Rights Reserved
+ * ===========================================================================
+ */
 
 package com.sun.tools.jdi;
 
@@ -29,6 +34,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import com.sun.jdi.Bootstrap;
 import com.sun.jdi.VirtualMachine;
@@ -85,7 +91,7 @@ public class GenericListeningConnector
                 false,
                 0, Integer.MAX_VALUE);
 
-        listenMap = new HashMap<Map<String, ? extends Connector.Argument>, TransportService.ListenKey>(10);
+        listenMap = new ConcurrentHashMap<Map<String, ? extends Connector.Argument>, TransportService.ListenKey>(10);
     }
 
     /**
@@ -105,7 +111,7 @@ public class GenericListeningConnector
         return new GenericListeningConnector(ts, true);
     }
 
-    public String startListening(String address, Map<String,? extends Connector.Argument> args)
+    public synchronized String startListening(String address, Map<String,? extends Connector.Argument> args)
         throws IOException, IllegalConnectorArgumentsException
     {
         TransportService.ListenKey listener = listenMap.get(args);
@@ -119,7 +125,7 @@ public class GenericListeningConnector
         return listener.address();
     }
 
-    public String
+    public synchronized String
         startListening(Map<String, ? extends Connector.Argument> args)
         throws IOException, IllegalConnectorArgumentsException
     {
@@ -127,7 +133,7 @@ public class GenericListeningConnector
         return startListening(address, args);
     }
 
-    public void stopListening(Map<String, ? extends Connector.Argument> args)
+    public synchronized void stopListening(Map<String, ? extends Connector.Argument> args)
         throws IOException, IllegalConnectorArgumentsException
     {
         TransportService.ListenKey listener = listenMap.get(args);
