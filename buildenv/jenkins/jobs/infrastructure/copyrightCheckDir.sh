@@ -600,6 +600,9 @@ echo "jdk/make/src/native/fix_empty_sec_hdr_flags/fix_empty_sec_hdr_flags.c" >>$
 echo "jdk/src/macosx/native/jobjc/JObjC.xcodeproj/default.pbxuser" >>$TEMPFILE
 echo "jdk/src/share/classes/org/jcp/xml/dsig/internal/dom/DOMXPathFilter2Transform.java" >>$TEMPFILE
 echo "jdk/src/share/classes/org/jcp/xml/dsig/internal/dom/XMLDSigRI.java" >>$TEMPFILE
+# The following file refers to the license in other source files. That license is GPL v3 without classpath exception, but the files
+# themselves are not actually present in the openjdk source repository
+echo "src/java.smartcardio/unix/native/libj2pcsc/MUSCLE/COPYING" >>$TEMPFILE
 
 cat $TEMPFILE
 
