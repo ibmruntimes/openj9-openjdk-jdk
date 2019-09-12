@@ -310,7 +310,7 @@ check () {
     nashorn/make/*)
       trace  "$1 deemed not to be in the built JDK because it matches case parameter expansion nashorn/make/*"
       IN_JDK=0;;
-    src/java.base/share/classes/sun/security/util/math/intpoly/FieldGen.jsh)
+    share/classes/sun/security/util/math/intpoly/FieldGen.jsh)
       trace  "$1 is not part of the built JDK"
       IN_JDK=0;;
     *) IN_JDK=1;;
@@ -603,6 +603,9 @@ echo "jdk/src/share/classes/org/jcp/xml/dsig/internal/dom/XMLDSigRI.java" >>$TEM
 # The following file refers to the license in other source files. That license is GPL v3 without classpath exception, but the files
 # themselves are not actually present in the openjdk source repository
 echo "src/java.smartcardio/unix/native/libj2pcsc/MUSCLE/COPYING" >>$TEMPFILE
+# The following file was written by IBM, and then later some oracle code has been added to this file, 
+# After legal consideration, decesion was top add oracle copyrights where ever the oracle code is written which result IBM copyrights on top and later oracle.
+echo "src/windows/native/jdk/crypto/jniprovider/NativeCrypto_md.c" >>$TEMPFILE
 
 cat $TEMPFILE
 
