@@ -198,6 +198,7 @@ $(call openj9_add_jdk_shlibs, java.base, \
 	j9hookable29 \
 	j9jit29 \
 	j9jnichk29 \
+	j9jvm \
 	j9jvmti29 \
 	j9prt29 \
 	j9thr29 \
@@ -207,7 +208,6 @@ $(call openj9_add_jdk_shlibs, java.base, \
 	j9vrb29 \
 	j9zlib29 \
 	jclse29 \
-	jvm \
 	omrsig \
 	)
 
