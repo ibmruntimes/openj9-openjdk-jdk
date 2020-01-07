@@ -1,6 +1,6 @@
 #!/bin/sh
 # ===========================================================================
-# (c) Copyright IBM Corp. 2019, 2019 All Rights Reserved
+# (c) Copyright IBM Corp. 2019, 2020 All Rights Reserved
 # ===========================================================================
 #
 # This code is free software; you can redistribute it and/or modify it
@@ -603,6 +603,7 @@ echo "jdk/src/share/classes/org/jcp/xml/dsig/internal/dom/XMLDSigRI.java" >>$TEM
 # The following file refers to the license in other source files. That license is GPL v3 without classpath exception, but the files
 # themselves are not actually present in the openjdk source repository
 echo "src/java.smartcardio/unix/native/libj2pcsc/MUSCLE/COPYING" >>$TEMPFILE
+echo "src/solaris/native/sun/security/smartcardio/MUSCLE/COPYING" >>$TEMPFILE
 # The following file was written by IBM, and then later some oracle code has been added to this file, 
 # After legal consideration, decesion was top add oracle copyrights where ever the oracle code is written which result IBM copyrights on top and later oracle.
 echo "closed/adds/jdk/src/windows/native/jdk/crypto/jniprovider/NativeCrypto_md.c" >>$TEMPFILE
