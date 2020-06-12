@@ -329,10 +329,6 @@ public final class StringConcatFactory {
         Objects.requireNonNull(concatType, "Concat type is null");
         Objects.requireNonNull(constants, "Constants are null");
 
-        for (Object o : constants) {
-            Objects.requireNonNull(o, "Cannot accept null constants");
-        }
-
         if ((lookup.lookupModes() & MethodHandles.Lookup.PRIVATE) == 0) {
             throw new StringConcatException("Invalid caller: " +
                     lookup.lookupClass().getName());
@@ -386,11 +382,11 @@ public final class StringConcatFactory {
             if (c == TAG_CONST) {
                 if (cCount == constants.length) {
                     // Not enough constants
-                    throw constantMismatch(constants, cCount);
+                    throw constantMismatch(concatType, oCount);
                 }
                 // Accumulate constant args along with any constants encoded
                 // into the recipe
-                acc.append(constants[cCount++]);
+                acc.append(Objects.requireNonNull(constants[cCount++], "Cannot accept null constants"));
             } else if (c == TAG_ARG) {
                 // Flush any accumulated characters into a constant
                 if (acc.length() > 0) {
@@ -410,32 +406,28 @@ public final class StringConcatFactory {
         if (acc.length() > 0) {
             elements.add(acc.toString());
         }
+
         if (oCount != concatType.parameterCount()) {
-            throw argumentMismatch(concatType, oCount);
+            throw constantMismatch(concatType, oCount);
         }
-        if (cCount < constants.length) {
-            throw constantMismatch(constants, cCount);
+        if (cCount != constants.length) {
+            throw new StringConcatException(
+                    "Mismatched number of concat constants: recipe wants " +
+                            cCount +
+                            " constants, but only " +
+                            constants.length +
+                            " are passed");
         }
         return elements;
     }
 
-    private static StringConcatException argumentMismatch(MethodType concatType,
+    private static StringConcatException constantMismatch(MethodType concatType,
                                                           int oCount) {
         return new StringConcatException(
                 "Mismatched number of concat arguments: recipe wants " +
-                oCount +
-                " arguments, but signature provides " +
-                concatType.parameterCount());
-    }
-
-    private static StringConcatException constantMismatch(Object[] constants,
-            int cCount) {
-        return new StringConcatException(
-                "Mismatched number of concat constants: recipe wants " +
-                        cCount +
-                        " constants, but only " +
-                        constants.length +
-                        " are passed");
+                        oCount +
+                        " arguments, but signature provides " +
+                        concatType.parameterCount());
     }
 
     /**
