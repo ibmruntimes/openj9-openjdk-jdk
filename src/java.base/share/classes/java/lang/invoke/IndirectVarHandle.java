@@ -23,6 +23,11 @@
  *  questions.
  *
  */
+/*
+ * ===========================================================================
+ * (c) Copyright IBM Corp. 2020, 2020 All Rights Reserved.
+ * ===========================================================================
+ */
 
 package java.lang.invoke;
 
@@ -45,7 +50,7 @@ import java.util.function.BiFunction;
 /* package */ class IndirectVarHandle extends VarHandle {
 
     @Stable
-    private final MethodHandle[] handleMap = new MethodHandle[AccessMode.values().length];
+    private final MethodHandle[] handleMap;
     private final VarHandle directTarget; // cache, for performance reasons
     private final VarHandle target;
     private final BiFunction<AccessMode, MethodHandle, MethodHandle> handleFactory;
@@ -59,6 +64,7 @@ import java.util.function.BiFunction;
         this.directTarget = target.asDirect();
         this.value = value;
         this.coordinates = coordinates;
+        this.handleMap = this.handleTable = VarHandle.populateMHsJEP383(target, handleFactory);
     }
 
     @Override
@@ -95,14 +101,15 @@ import java.util.function.BiFunction;
     MethodHandle getMethodHandle(int mode) {
         MethodHandle handle = handleMap[mode];
         if (handle == null) {
-            MethodHandle targetHandle = target.getMethodHandle(mode); // might throw UOE of access mode is not supported, which is ok
-            handle = handleMap[mode] = handleFactory.apply(AccessMode.values()[mode], targetHandle);
+            /* OpenJ9 pre-initializes the handleMap in the constructor. So, there is no need to reapply handleFactory here. */
+            handle = target.getMethodHandle(mode); // might throw UOE of access mode is not supported, which is ok
         }
         return handle;
     }
 
     @Override
     public MethodHandle toMethodHandle(AccessMode accessMode) {
-        return getMethodHandle(accessMode.ordinal()).bindTo(directTarget);
+        MethodHandle mh = getMethodHandle(accessMode.ordinal());
+        return MethodHandles.insertArguments(mh, mh.type().parameterCount() - 1, directTarget);
     }
 }
