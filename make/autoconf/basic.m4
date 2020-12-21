@@ -23,6 +23,10 @@
 # questions.
 #
 
+# ===========================================================================
+# (c) Copyright IBM Corp. 2021, 2021 All Rights Reserved
+# ===========================================================================
+
 m4_include([basic_tools.m4])
 m4_include([basic_windows.m4])
 
@@ -389,6 +393,9 @@ AC_DEFUN_ONCE([BASIC_SETUP_OUTPUT_DIR],
   AC_SUBST(CONF_NAME)
   AC_SUBST(OUTPUTDIR)
   AC_SUBST(CONFIGURESUPPORT_OUTPUTDIR)
+
+  AC_SUBST(CC_NOFIXPATH)
+  AC_SUBST(CXX_NOFIXPATH)
 
   # The spec.gmk file contains all variables for the make system.
   AC_CONFIG_FILES([$OUTPUTDIR/spec.gmk:$AUTOCONF_DIR/spec.gmk.in])

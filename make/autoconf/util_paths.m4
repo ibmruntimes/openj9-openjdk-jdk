@@ -23,6 +23,10 @@
 # questions.
 #
 
+# ===========================================================================
+# (c) Copyright IBM Corp. 2021, 2021 All Rights Reserved
+# ===========================================================================
+
 ###############################################################################
 # Appends a string to a path variable, only adding the : when needed.
 AC_DEFUN([UTIL_APPEND_TO_PATH],
@@ -395,6 +399,12 @@ AC_DEFUN([UTIL_LOOKUP_PROGS],
             $1="$full_path"
             UTIL_FIXUP_EXECUTABLE($1, $3, $4)
             result="[$]$1"
+            if test "x$1" == xPOTENTIAL_CC; then
+              CC_NOFIXPATH="$full_path"
+            fi
+            if test "x$1" == xPOTENTIAL_CXX; then
+              CXX_NOFIXPATH="$full_path"
+            fi
 
             # If we have FIXPATH enabled, strip all instances of it and prepend
             # a single one, to avoid double fixpath prefixing.

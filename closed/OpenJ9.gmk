@@ -1,5 +1,5 @@
 # ===========================================================================
-# (c) Copyright IBM Corp. 2017, 2020 All Rights Reserved
+# (c) Copyright IBM Corp. 2017, 2021 All Rights Reserved
 # ===========================================================================
 # This code is free software; you can redistribute it and/or modify it
 # under the terms of the GNU General Public License version 2 only, as
@@ -215,8 +215,8 @@ SedUmaCommand = -e '/<property name="uma_make_cmd_$(strip $2)"/s|value="[^"]*"|v
 
 # Copy configured values to relevant UMA properties in .spec files.
 SPEC_SED_SCRIPT := \
-	$(call SedUmaCommand, CC,  cc) \
-	$(call SedUmaCommand, CXX, cxx) \
+	$(call SedUmaCommand, CC_NOFIXPATH,  cc) \
+	$(call SedUmaCommand, CXX_NOFIXPATH, cxx) \
 	$(call SedUmaCommand, CXX, interp_gcc) \
 	$(call SedUmaCommand, CXX, ppc_gcc_cxx) \
 	#

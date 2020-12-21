@@ -23,6 +23,10 @@
 # questions.
 #
 
+# ===========================================================================
+# (c) Copyright IBM Corp. 2021, 2021 All Rights Reserved
+# ===========================================================================
+
 # Configured @DATE_WHEN_CONFIGURED@ to build
 # for target system @OPENJDK_TARGET_OS@-@OPENJDK_TARGET_CPU@
 #   (called @OPENJDK_TARGET_AUTOCONF_NAME@ by autoconf)
@@ -493,6 +497,8 @@ ADLC_LDFLAGS=@ADLC_LDFLAGS@
 
 # Tools that potentially need to be cross compilation aware.
 CC := @CCACHE@ @ICECC@ @CC@
+CC_NOFIXPATH := @CC_NOFIXPATH@
+CXX_NOFIXPATH := @CXX_NOFIXPATH@
 
 # CFLAGS used to compile the jdk native libraries (C-code)
 CFLAGS_JDKLIB:=@CFLAGS_JDKLIB@

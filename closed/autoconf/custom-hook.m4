@@ -1,5 +1,5 @@
 # ===========================================================================
-# (c) Copyright IBM Corp. 2017, 2020 All Rights Reserved
+# (c) Copyright IBM Corp. 2017, 2021 All Rights Reserved
 # ===========================================================================
 # This code is free software; you can redistribute it and/or modify it
 # under the terms of the GNU General Public License version 2 only, as
@@ -168,7 +168,7 @@ AC_DEFUN([OPENJ9_CONFIGURE_CUDA],
       if test -f "$cuda_home/include/cuda.h" ; then
         if test "x$OPENJDK_BUILD_OS_ENV" = xwindows.cygwin ; then
           # UTIL_FIXUP_PATH yields a Unix-style path, but we need a mixed-mode path
-          cuda_home="`$CYGPATH -m $cuda_home`"
+          cuda_home="`cygpath -m $cuda_home`"
         fi
         if test "$cuda_home" = "$with_cuda" ; then
           AC_MSG_RESULT([$with_cuda])
@@ -190,7 +190,7 @@ AC_DEFUN([OPENJ9_CONFIGURE_CUDA],
       if test -f "$gdk_home/include/nvml.h" ; then
         if test "x$OPENJDK_BUILD_OS_ENV" = xwindows.cygwin ; then
           # UTIL_FIXUP_PATH yields a Unix-style path, but we need a mixed-mode path
-          gdk_home="`$CYGPATH -m $gdk_home`"
+          gdk_home="`cygpath -m $gdk_home`"
         fi
         if test "$gdk_home" = "$with_gdk" ; then
           AC_MSG_RESULT([$with_gdk])
@@ -464,7 +464,7 @@ AC_DEFUN([OPENJ9_THIRD_PARTY_REQUIREMENTS],
     fi
 
     if test "x$OPENJDK_BUILD_OS_ENV" = xwindows.cygwin ; then
-      FREEMARKER_JAR=`$CYGPATH -m "$with_freemarker_jar"`
+      FREEMARKER_JAR=`cygpath -m "$with_freemarker_jar"`
     else
       FREEMARKER_JAR=$with_freemarker_jar
     fi
@@ -514,6 +514,10 @@ AC_DEFUN_ONCE([CUSTOM_LATE_HOOK],
   CONFIGURE_OPENSSL
 
   CLOSED_AUTOCONF_DIR="$TOPDIR/closed/autoconf"
+
+  AC_SUBST(VS_INCLUDE_NOFIXPATH)
+  AC_SUBST(VS_LIB_NOFIXPATH)
+  AC_SUBST(PATH)
 
   # Create the custom-spec.gmk
   AC_CONFIG_FILES([$OUTPUTDIR/custom-spec.gmk:$CLOSED_AUTOCONF_DIR/custom-spec.gmk.in])

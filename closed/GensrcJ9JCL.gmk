@@ -1,5 +1,5 @@
 # ===========================================================================
-# (c) Copyright IBM Corp. 2020, 2020 All Rights Reserved
+# (c) Copyright IBM Corp. 2020, 2021 All Rights Reserved
 # ===========================================================================
 # This code is free software; you can redistribute it and/or modify it
 # under the terms of the GNU General Public License version 2 only, as
@@ -45,6 +45,7 @@ $(J9JCL_SOURCES_DONEFILE) : $(AllJclSource)
 	@$(ECHO) Building OpenJ9 Java Preprocessor
 	@$(MKDIR) -p $(J9TOOLS_DIR)
 	$(MAKE) $(MAKE_ARGS) -C $(OPENJ9_TOPDIR)/sourcetools -f buildj9tools.mk \
+		JAVA_SPEC_VERSION=$(VERSION_FEATURE) \
 		BOOT_JDK=$(BOOT_JDK) \
 		DEST_DIR=$(call FixPath,$(J9TOOLS_DIR)) \
 		JAVA_HOME=$(BOOT_JDK) \

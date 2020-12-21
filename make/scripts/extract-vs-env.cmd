@@ -22,6 +22,10 @@ REM or visit www.oracle.com if you need additional information or have any
 REM questions.
 REM
 
+# ===========================================================================
+# (c) Copyright IBM Corp. 2021, 2021 All Rights Reserved
+# ===========================================================================
+
 set vcvarscmd=%1
 set output=%2
 if not "%3" == "auto" set version=-vcvars_ver=%3
@@ -40,6 +44,13 @@ call :extract "%VCToolsRedistDir%", VCToolsRedistDir
 call :extract "%WindowsSdkDir%", WindowsSdkDir
 call :extract "%WINDOWSSDKDIR%", WINDOWSSDKDIR
 
+call :extractNoFix "%INCLUDE%", VS_INCLUDE_NOFIXPATH
+call :extractNoFix "%LIB%", VS_LIB_NOFIXPATH
+
+exit /b 0
+
+:extractNoFix
+echo %~2='%~1' >> %output%
 exit /b 0
 
 :extract

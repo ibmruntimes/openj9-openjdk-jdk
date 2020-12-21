@@ -1,5 +1,5 @@
 # ===========================================================================
-# (c) Copyright IBM Corp. 2017, 2020 All Rights Reserved
+# (c) Copyright IBM Corp. 2017, 2021 All Rights Reserved
 # ===========================================================================
 # This code is free software; you can redistribute it and/or modify it
 # under the terms of the GNU General Public License version 2 only, as
@@ -115,8 +115,9 @@ export ac_cv_prog_CXX   := @CXX@
 ifeq ($(OPENJDK_TARGET_OS), windows)
   # Set environment variables for Microsoft Visual Studio toolchain.
   # Note that PATH is set in spec.gmk.
-  export INCLUDE := "@VS_INCLUDE@"
-  export LIB := "@VS_LIB@"
+  export INCLUDE := "@VS_INCLUDE_NOFIXPATH@"
+  export LIB := "@VS_LIB_NOFIXPATH@"
+  export PATH := @PATH@
   export MSVC_VERSION := @TOOLCHAIN_VERSION@
 endif
 
