@@ -249,9 +249,9 @@ endif
 
 # Adjust CRIU Support enablement flags.
 ifeq (true,$(OPENJ9_ENABLE_CRIU_SUPPORT))
-  FEATURE_SED_SCRIPT += $(call SedEnable,opt_criuSupport)
+  SPEC_SED_SCRIPT += $(call SedEnable,opt_criuSupport)
 else # OPENJ9_ENABLE_CRIU_SUPPORT
-  FEATURE_SED_SCRIPT += $(call SedDisable,opt_criuSupport)
+  SPEC_SED_SCRIPT += $(call SedDisable,opt_criuSupport)
 endif # OPENJ9_ENABLE_CRIU_SUPPORT
 
 # Adjust OpenJDK MethodHandles enablement flags.
