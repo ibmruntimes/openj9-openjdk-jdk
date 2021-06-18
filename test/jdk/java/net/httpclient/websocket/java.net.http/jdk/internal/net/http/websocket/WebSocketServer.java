@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, 2021, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2019, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -20,6 +20,8 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
+
+package jdk.internal.net.http.websocket;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -58,7 +60,13 @@ import static java.util.Arrays.asList;
 import static java.util.Objects.requireNonNull;
 
 /**
- * Dummy WebSocket Server.
+ * WebSocket Server. This is a copy of the DummyWebSocketServer test class
+ * but which also supports sending and receiving of websocket messages
+ * using a simple API once the connection has been established
+ *
+ * MessageStreamHandler is the "listener" API to be implemented for handling
+ * incoming messages. MessageStreamResponder is used by that handler to send
+ * responses back to the client.
  *
  * Performs simpler version of the WebSocket Opening Handshake over HTTP (i.e.
  * no proxying, cookies, etc.) Supports sequential connections, one at a time,
@@ -84,7 +92,7 @@ import static java.util.Objects.requireNonNull;
  *     Sec-WebSocket-Accept: s3pPLMBiTxaQ9kYGzzhZRbK+xOo=
  *     Sec-WebSocket-Protocol: chat
  */
-public class DummyWebSocketServer implements Closeable {
+public class WebSocketServer implements Closeable {
 
     private final AtomicBoolean started = new AtomicBoolean();
     private final Thread thread;
@@ -92,6 +100,8 @@ public class DummyWebSocketServer implements Closeable {
     private volatile InetSocketAddress address;
     private ByteBuffer read = ByteBuffer.allocate(16384);
     private final CountDownLatch readReady = new CountDownLatch(1);
+    private final MessageStreamHandler handler;
+    private final WebSocketResponder responder;
     private volatile int receiveBufferSize;
 
     private static class Credentials {
@@ -105,18 +115,29 @@ public class DummyWebSocketServer implements Closeable {
         public String password() { return password; }
     }
 
-    public DummyWebSocketServer() {
-        this(defaultMapping(), null, null);
+    public WebSocketServer(MessageStreamHandler handler) {
+        this(handler, defaultMapping(), null, null);
     }
 
-    public DummyWebSocketServer(String username, String password) {
-        this(defaultMapping(), username, password);
+    public WebSocketServer() {
+        this(null, defaultMapping(), null, null);
     }
 
-    public DummyWebSocketServer(BiFunction<List<String>,Credentials,List<String>> mapping,
-                                String username,
-                                String password) {
+    public WebSocketServer(String username, String password) {
+        this(null, defaultMapping(), username, password);
+    }
+
+    public WebSocketServer(MessageStreamHandler handler,
+                           BiFunction<List<String>,Credentials,List<String>> mapping,
+                           String username, String password) {
         requireNonNull(mapping);
+        this.handler = handler;
+        if (handler == null) {
+            this.responder = null;
+        } else {
+            this.responder = new WebSocketResponder(handler);
+            handler.onInit(this.responder);
+        }
         Credentials credentials = username != null ?
                 new Credentials(username, password) : null;
 
@@ -150,7 +171,7 @@ public class DummyWebSocketServer implements Closeable {
                         err.println("Error in connection: " + channel + ", " + e);
                     } finally {
                         err.println("Closed: " + channel);
-                        closeChannel(channel);
+                        close(channel);
                         readReady.countDown();
                     }
                 }
@@ -162,33 +183,19 @@ public class DummyWebSocketServer implements Closeable {
                 err.println("Stopped at: " + getURI());
             }
         });
-        thread.setName("DummyWebSocketServer");
+        thread.setName("WebSocketServer");
         thread.setDaemon(false);
     }
 
+    // runs in own thread. Override to implement different behavior
     protected void read(SocketChannel ch) throws IOException {
-        // Read until the thread is interrupted or an error occurred
-        // or the input is shutdown
-        ByteBuffer b = ByteBuffer.allocate(65536);
-        while (ch.read(b) != -1) {
-            b.flip();
-            if (read.remaining() < b.remaining()) {
-                int required = read.capacity() - read.remaining() + b.remaining();
-                int log2required = 32 - Integer.numberOfLeadingZeros(required - 1);
-                ByteBuffer newBuffer = ByteBuffer.allocate(1 << log2required);
-                newBuffer.put(read.flip());
-                read = newBuffer;
-            }
-            read.put(b);
-            b.clear();
-        }
+        responder.readLoop(ch);
     }
 
-    protected void closeChannel(SocketChannel channel) {
-        close(channel);
+    // runs in own thread. Override to implement different behavior
+    protected void write(SocketChannel ch) throws IOException {
+        responder.writeLoop(ch);
     }
-
-    protected void write(SocketChannel ch) throws IOException { }
 
     protected final void serve(SocketChannel channel)
             throws InterruptedException
