@@ -18,5 +18,4 @@
 # 2 along with this work; if not, see <http://www.gnu.org/licenses/>.
 # ===========================================================================
 
-COPY     += .dat
-EXCLUDES += com/ibm/j9ddr/tools/ant
+COPY += .dat
