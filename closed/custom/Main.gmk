@@ -72,8 +72,6 @@ all-images : debug-image
 
 ALL_TARGETS += debug-image
 
-test-image : test-image-openj9
-
 # If not cross-compiling, capture 'java -version' output.
 test-image-openj9 : exploded-image
 	@+$(OPENJ9_MAKE) openj9_test_image
