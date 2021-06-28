@@ -1,6 +1,6 @@
 #!/bin/sh
 # ===========================================================================
-# (c) Copyright IBM Corp. 2019, 2020 All Rights Reserved
+# (c) Copyright IBM Corp. 2019, 2021 All Rights Reserved
 # ===========================================================================
 #
 # This code is free software; you can redistribute it and/or modify it
@@ -265,6 +265,9 @@ check () {
       IN_JDK=0;;
     make/hotspot/*)
       trace  "$1 deemed not to be in the built JDK because it matches case parameter expansion make/hotspot/*)"
+      IN_JDK=0;;
+    make/data/hotspot-symbols/*)
+      trace  "$1 deemed not to be in the built JDK because it matches case parameter expansion make/data/hotspot-symbols/*)"
       IN_JDK=0;;
     make/langtools/*)
       trace  "$1 deemed not to be in the built JDK because it matches case parameter expansion make/langtools/*"
@@ -590,6 +593,7 @@ echo "src/jdk.internal.vm.compiler.management/share/classes/org.graalvm.compiler
 
 echo "\n# openj9-openjdk-jdk11 known failures" >>$TEMPFILE
 echo "make/mapfiles/libjsig/mapfile-vers-solaris" >>$TEMPFILE
+echo "make/data/license-templates/gpl-header" >>$TEMPFILE
 echo "make/mapfiles/libjvm_db/mapfile-vers" >>$TEMPFILE
 echo "make/mapfiles/libjvm_dtrace/mapfile-vers" >>$TEMPFILE
 echo "src/java.base/solaris/native/libjvm_db/libjvm_db.c" >>$TEMPFILE
