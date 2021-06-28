@@ -20,12 +20,6 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-/*
- * =======================================================================
- * (c) Copyright IBM Corp. 2020, 2020 All Rights Reserved
- * =======================================================================
- */
-
 /**
  * @test
  * @bug 5015163 7172553 8249258

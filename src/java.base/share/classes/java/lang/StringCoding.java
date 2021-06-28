@@ -23,12 +23,6 @@
  * questions.
  */
 
-/*
- * ===========================================================================
- * (c) Copyright IBM Corp. 2021, 2021 All Rights Reserved
- * ===========================================================================
- */
-
 package java.lang;
 
 import jdk.internal.vm.annotation.IntrinsicCandidate;
