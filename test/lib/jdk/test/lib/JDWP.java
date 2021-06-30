@@ -21,38 +21,32 @@
  * questions.
  */
 
-import java.util.concurrent.Semaphore;
+package jdk.test.lib;
 
-class ClassLoadingThread extends Thread {
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-    private ClassLoader ldr = null;
-    private Semaphore mainSync = null;
+public class JDWP {
 
-    public ClassLoadingThread(ClassLoader loader, Semaphore sem) {
-        ldr = loader;
-        mainSync = sem;
+    public record ListenAddress(String transport, String address) {
     }
 
-    private boolean success = true;
-    public boolean report_success() { return success; }
+    // lazy initialized
+    private static Pattern listenRegexp;
 
-    public void run() {
-        try {
-            ThreadPrint.println("Starting...");
-            // Initiate class loading using specified type
-            Class<?> a = Class.forName("ClassInLoader", true, ldr);
-            Object obj = a.getConstructor().newInstance();
-
-        } catch (Throwable e) {
-            ThreadPrint.println("Exception is caught: " + e);
-            e.printStackTrace();
-            success = false;
-        } finally {
-            ThreadPrint.println("Finished");
-            // Signal main thread to start t2.
-            if (mainSync != null) {
-                mainSync.release();
-            }
+    /**
+     * Parses debuggee output to get listening transport and address.
+     * Returns null if the string specified does not contain required info.
+     */
+    public static ListenAddress parseListenAddress(String debuggeeOutput) {
+        if (listenRegexp == null) {
+            listenRegexp = Pattern.compile("Listening for transport \\b(.+)\\b at address: \\b(.+)\\b");
         }
+        Matcher m = listenRegexp.matcher(debuggeeOutput);
+        if (m.find()) {
+            return new ListenAddress(m.group(1), m.group(2));
+        }
+        return null;
     }
+
 }
