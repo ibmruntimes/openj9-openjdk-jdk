@@ -23,6 +23,12 @@
  * questions.
  */
 
+/*
+ * ===========================================================================
+ * (c) Copyright IBM Corp. 2021, 2022 All Rights Reserved
+ * ===========================================================================
+ */
+
 package jdk.internal.foreign;
 
 import jdk.incubator.foreign.MemorySegment;
@@ -55,9 +61,14 @@ public class SystemLookup implements SymbolLookup {
      * on Windows. For this reason, on Windows we do not generate any side-library, and load msvcrt.dll directly instead.
      */
     private static final SymbolLookup syslookup = switch (CABI.current()) {
-        case SysV, LinuxAArch64, MacOsAArch64 -> libLookup(libs -> libs.load(jdkLibraryPath("syslookup")));
+        case SysV, LinuxAArch64, MacOsAArch64, SysVPPC64le, SysVS390x -> libLookup(libs -> libs.load(jdkLibraryPath("syslookup")));
+        case AIX -> makeAixLookup();
         case Win64 -> makeWindowsLookup(); // out of line to workaround javac crash
     };
+
+    private static SymbolLookup makeAixLookup() { // Intended for libc.a on AIX
+        throw new InternalError("Default library loading is not yet implemented on AIX"); //$NON-NLS-1$
+    }
 
     private static SymbolLookup makeWindowsLookup() {
         Path system32 = Path.of(System.getenv("SystemRoot"), "System32");
@@ -107,7 +118,7 @@ public class SystemLookup implements SymbolLookup {
     private static Path jdkLibraryPath(String name) {
         Path javahome = Path.of(GetPropertyAction.privilegedGetProperty("java.home"));
         String lib = switch (CABI.current()) {
-            case SysV, LinuxAArch64, MacOsAArch64 -> "lib";
+            case SysV, LinuxAArch64, MacOsAArch64, AIX, SysVPPC64le, SysVS390x -> "lib";
             case Win64 -> "bin";
         };
         String libname = System.mapLibraryName(name);

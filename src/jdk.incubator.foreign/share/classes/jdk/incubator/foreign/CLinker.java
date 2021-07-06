@@ -23,12 +23,22 @@
  *  questions.
  *
  */
+
+/*
+ * ===========================================================================
+ * (c) Copyright IBM Corp. 2021, 2022 All Rights Reserved
+ * ===========================================================================
+ */
+
 package jdk.incubator.foreign;
 
 import jdk.internal.foreign.SystemLookup;
 import jdk.internal.foreign.abi.SharedUtils;
 import jdk.internal.foreign.abi.aarch64.linux.LinuxAArch64Linker;
 import jdk.internal.foreign.abi.aarch64.macos.MacOsAArch64Linker;
+import jdk.internal.foreign.abi.ppc64.aix.AixPPC64Linker;
+import jdk.internal.foreign.abi.ppc64.sysv.SysVPPC64leLinker;
+import jdk.internal.foreign.abi.s390x.sysv.SysVS390xLinker;
 import jdk.internal.foreign.abi.x64.sysv.SysVx64Linker;
 import jdk.internal.foreign.abi.x64.windows.Windowsx64Linker;
 import jdk.internal.reflect.CallerSensitive;
@@ -142,7 +152,7 @@ import java.util.Optional;
  * @implSpec
  * Implementations of this interface are immutable, thread-safe and <a href="{@docRoot}/java.base/java/lang/doc-files/ValueBased.html">value-based</a>.
  */
-public sealed interface CLinker extends SymbolLookup permits Windowsx64Linker, SysVx64Linker, LinuxAArch64Linker, MacOsAArch64Linker {
+public sealed interface CLinker extends SymbolLookup permits Windowsx64Linker, SysVx64Linker, LinuxAArch64Linker, MacOsAArch64Linker, SysVPPC64leLinker, SysVS390xLinker, AixPPC64Linker {
 
     /**
      * Returns the C linker for the current platform.

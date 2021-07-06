@@ -26,7 +26,7 @@
 
 /*
  * ===========================================================================
- * (c) Copyright IBM Corp. 2021, 2021 All Rights Reserved
+ * (c) Copyright IBM Corp. 2021, 2022 All Rights Reserved
  * ===========================================================================
  */
 
@@ -158,14 +158,9 @@ public abstract class CallArranger {
         return handle;
     }
 
+    /* Replace ProgrammableUpcallHandler in OpenJDK with the implementation of ProgrammableUpcallHandler specific to OpenJ9 */
     public NativeSymbol arrangeUpcall(MethodHandle target, MethodType mt, FunctionDescriptor cDesc, ResourceScope scope) {
-        Bindings bindings = getBindings(mt, cDesc, true);
-
-        if (bindings.isInMemoryReturn) {
-            target = SharedUtils.adaptUpcallForIMR(target, true /* drop return, since we don't have bindings for it */);
-        }
-
-        return ProgrammableUpcallHandler.make(C, target, bindings.callingSequence,scope);
+        throw new InternalError("arrangeUpcall is not yet implemented"); //$NON-NLS-1$
     }
 
     private static boolean isInMemoryReturn(Optional<MemoryLayout> returnLayout) {
