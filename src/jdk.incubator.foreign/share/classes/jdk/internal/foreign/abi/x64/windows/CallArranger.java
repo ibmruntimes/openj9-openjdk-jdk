@@ -22,6 +22,13 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
+
+/*
+ * ===========================================================================
+ * (c) Copyright IBM Corp. 2021, 2021 All Rights Reserved
+ * ===========================================================================
+ */
+
 package jdk.internal.foreign.abi.x64.windows;
 
 import jdk.incubator.foreign.Addressable;
@@ -124,15 +131,9 @@ public class CallArranger {
         return new Bindings(csb.csb.build(), returnInMemory);
     }
 
+    /* Replace ProgrammableInvoker in OpenJDK with the implementation of ProgrammableInvoker specific to OpenJ9 */
     public static MethodHandle arrangeDowncall(Addressable addr, MethodType mt, FunctionDescriptor cDesc) {
-        Bindings bindings = getBindings(mt, cDesc, false);
-
-        MethodHandle handle = new ProgrammableInvoker(CWindows, addr, bindings.callingSequence).getBoundMethodHandle();
-
-        if (bindings.isInMemoryReturn) {
-            handle = SharedUtils.adaptDowncallForIMR(handle, cDesc);
-        }
-
+        MethodHandle handle = ProgrammableInvoker.getBoundMethodHandle(addr, mt, cDesc);
         return handle;
     }
 
