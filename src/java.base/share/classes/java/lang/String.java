@@ -59,6 +59,7 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import jdk.internal.misc.Unsafe;
+import jdk.internal.util.Preconditions;
 import jdk.internal.vm.annotation.ForceInline;
 import jdk.internal.vm.annotation.IntrinsicCandidate;
 import jdk.internal.vm.annotation.Stable;
@@ -2212,9 +2213,7 @@ public final class String
      */
     public int codePointBefore(int index) {
         int i = index - 1;
-        if (i < 0 || i >= length()) {
-            throw new StringIndexOutOfBoundsException(index);
-        }
+        checkIndex(i, length());
         if (isLatin1()) {
             return (value[i] & 0xff);
         }
@@ -2243,10 +2242,7 @@ public final class String
      * @since  1.5
      */
     public int codePointCount(int beginIndex, int endIndex) {
-        if (beginIndex < 0 || beginIndex > endIndex ||
-            endIndex > length()) {
-            throw new IndexOutOfBoundsException();
-        }
+        Objects.checkFromToIndex(beginIndex, endIndex, length());
         if (isLatin1()) {
             return endIndex - beginIndex;
         }
@@ -5316,10 +5312,7 @@ public final class String
      * negative or greater than or equal to {@code length}.
      */
     static void checkIndex(int index, int length) {
-        if (index < 0 || index >= length) {
-            throw new StringIndexOutOfBoundsException("index " + index +
-                                                      ", length " + length);
-        }
+        Preconditions.checkIndex(index, length, Preconditions.SIOOBE_FORMATTER);
     }
 
     /*
@@ -5327,10 +5320,7 @@ public final class String
      * is negative or greater than {@code length}.
      */
     static void checkOffset(int offset, int length) {
-        if (offset < 0 || offset > length) {
-            throw new StringIndexOutOfBoundsException("offset " + offset +
-                                                      ", length " + length);
-        }
+        Preconditions.checkFromToIndex(offset, length, length, Preconditions.SIOOBE_FORMATTER);
     }
 
     /*
@@ -5342,10 +5332,7 @@ public final class String
      *          or {@code offset} is greater than {@code length - count}
      */
     static void checkBoundsOffCount(int offset, int count, int length) {
-        if (offset < 0 || count < 0 || offset > length - count) {
-            throw new StringIndexOutOfBoundsException(
-                "offset " + offset + ", count " + count + ", length " + length);
-        }
+        Preconditions.checkFromIndexSize(offset, count, length, Preconditions.SIOOBE_FORMATTER);
     }
 
     /*
@@ -5357,10 +5344,7 @@ public final class String
      *          {@code end}, or {@code end} is greater than {@code length}.
      */
     static void checkBoundsBeginEnd(int begin, int end, int length) {
-        if (begin < 0 || begin > end || end > length) {
-            throw new StringIndexOutOfBoundsException(
-                "begin " + begin + ", end " + end + ", length " + length);
-        }
+        Preconditions.checkFromToIndex(begin, end, length, Preconditions.SIOOBE_FORMATTER);
     }
 
     /**
