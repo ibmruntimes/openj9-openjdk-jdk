@@ -76,6 +76,15 @@ $(call openj9_copy_shlibs, \
 	omrsig \
 	)
 
+ifeq ($(OPENJDK_TARGET_OS), zos)
+
+$(call openj9_copy_files_and_debuginfos, \
+	$(addsuffix /$(call SHARED_LIBRARY,j9a2e), \
+		$(OPENJ9_VM_BUILD_DIR) \
+		$(LIB_DST_DIR)))
+
+endif
+
 # static libraries that are needed on some platforms
 
 ifneq (,$(filter windows zos,$(OPENJDK_TARGET_OS)))
