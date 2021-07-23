@@ -24,7 +24,7 @@
  */
 /*
  * ===========================================================================
- * (c) Copyright IBM Corp. 2018, 2019 All Rights Reserved
+ * (c) Copyright IBM Corp. 2018, 2021 All Rights Reserved
  * ===========================================================================
  */
 
@@ -96,6 +96,15 @@ public final class SunJCE extends Provider {
      */
     private static final boolean useNativeChaCha20Cipher = nativeChaCha20Init();
 
+    /*
+     * Check system properties to see whether native crypto should be enabled.
+     * By default, the native crypto is enabled and uses the native library.
+     * The property 'jdk.nativeGCM' is used to control native GCM alone
+     * and 'jdk.nativeCrypto' is used to control all native crypto implementations
+     * (Digest, CBC, GCM, and ChaCha20).
+     */
+    private static final boolean useNativeGaloisCounterMode = nativeGCMInit();
+
     private static boolean nativeChaCha20Init() {
         boolean nativeChaCha20 = true;
         String nativeCryptTrace = GetPropertyAction.privilegedGetProperty("jdk.nativeCryptoTrace");
@@ -153,6 +162,51 @@ public final class SunJCE extends Provider {
         }
 
         return nativeChaCha20;
+    }
+
+    private static boolean nativeGCMInit() {
+        boolean nativeGCM = true;
+        String nativeCryptTrace = GetPropertyAction.privilegedGetProperty("jdk.nativeCryptoTrace");
+        String nativeCryptStr = GetPropertyAction.privilegedGetProperty("jdk.nativeCrypto");
+
+        if ((nativeCryptStr != null) && !Boolean.parseBoolean(nativeCryptStr)) {
+            /* nativeCrypto is explicitly disabled */
+            nativeGCM = false;
+        } else {
+            String nativeGCMStr = GetPropertyAction.privilegedGetProperty("jdk.nativeGCM");
+
+            if ((nativeGCMStr != null) && !Boolean.parseBoolean(nativeGCMStr)) {
+                /* nativeGCM is explicitly disabled */
+                nativeGCM = false;
+            }
+        }
+
+        if (!nativeGCM) {
+            if (nativeCryptTrace != null) {
+                System.err.println("NativeGaloisCounterMode load - Native crypto library disabled.");
+            }
+        } else {
+            /*
+             * User wants to use the native crypto implementation.
+             * Make sure the native crypto library is loaded successfully.
+             * Otherwise, issue a warning message and fall back to the built-in
+             * java crypto implementation.
+             */
+            if (!NativeCrypto.isLoaded()) {
+                nativeGCM = false;
+
+                if (nativeCryptTrace != null) {
+                    System.err.println("Warning: Native crypto library load failed." +
+                            " Using Java crypto implementation");
+                }
+            } else {
+                if (nativeCryptTrace != null) {
+                    System.err.println("NativeGaloisCounterMode load - using Native crypto library.");
+                }
+            }
+        }
+
+        return nativeGCM;
     }
 
     @java.io.Serial
@@ -349,18 +403,33 @@ public final class SunJCE extends Provider {
         attrs.put("SupportedModes", "GCM");
         attrs.put("SupportedKeyFormats", "RAW");
 
-        ps("Cipher", "AES/GCM/NoPadding",
-                "com.sun.crypto.provider.GaloisCounterMode$AESGCM", null,
-                attrs);
-        psA("Cipher", "AES_128/GCM/NoPadding",
-                "com.sun.crypto.provider.GaloisCounterMode$AES128",
-                attrs);
-        psA("Cipher", "AES_192/GCM/NoPadding",
-                "com.sun.crypto.provider.GaloisCounterMode$AES192",
-                attrs);
-        psA("Cipher", "AES_256/GCM/NoPadding",
-                "com.sun.crypto.provider.GaloisCounterMode$AES256",
-                attrs);
+        if (useNativeGaloisCounterMode) {
+            ps("Cipher", "AES/GCM/NoPadding",
+                    "com.sun.crypto.provider.NativeGaloisCounterMode$AESGCM", null,
+                    attrs);
+            psA("Cipher", "AES_128/GCM/NoPadding",
+                    "com.sun.crypto.provider.NativeGaloisCounterMode$AES128",
+                    attrs);
+            psA("Cipher", "AES_192/GCM/NoPadding",
+                    "com.sun.crypto.provider.NativeGaloisCounterMode$AES192",
+                    attrs);
+            psA("Cipher", "AES_256/GCM/NoPadding",
+                    "com.sun.crypto.provider.NativeGaloisCounterMode$AES256",
+                    attrs);
+        } else {
+            ps("Cipher", "AES/GCM/NoPadding",
+                    "com.sun.crypto.provider.GaloisCounterMode$AESGCM", null,
+                    attrs);
+            psA("Cipher", "AES_128/GCM/NoPadding",
+                    "com.sun.crypto.provider.GaloisCounterMode$AES128",
+                    attrs);
+            psA("Cipher", "AES_192/GCM/NoPadding",
+                    "com.sun.crypto.provider.GaloisCounterMode$AES192",
+                    attrs);
+            psA("Cipher", "AES_256/GCM/NoPadding",
+                    "com.sun.crypto.provider.GaloisCounterMode$AES256",
+                    attrs);
+        }
 
         attrs.clear();
         attrs.put("SupportedModes", "CBC");
