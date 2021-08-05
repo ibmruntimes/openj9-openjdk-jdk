@@ -1,5 +1,6 @@
 /*
- * Copyright (c) 2016, 2021, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2021, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2021 SAP SE. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -19,26 +20,30 @@
  * Please contact Oracle, 500 Oracle Parkway, Redwood Shores, CA 94065 USA
  * or visit www.oracle.com if you need additional information or have any
  * questions.
+ *
  */
 
 /*
- * @test
- * @requires vm.flavor == "minimal"
- * @requires vm.flagless
- * @modules java.base/jdk.internal.misc
- * @library /test/lib
- * @run driver CheckJNI
+ * This tests NMT by running gtests with NMT enabled.
+ *
+ * To save time, we just run them for debug builds (where we would catch assertions) and only a selection of tests
+ * (namely, NMT tests themselves, and - for the detail statistics - os tests, since those reserve a lot and stress NMT)
  */
 
-import jdk.test.lib.process.OutputAnalyzer;
-import jdk.test.lib.process.ProcessTools;
+/* @test id=nmt-summary
+ * @summary Run NMT-related gtests with summary statistics
+ * @library /test/lib
+ * @modules java.base/jdk.internal.misc
+ *          java.xml
+ * @requires vm.debug
+ * @run main/native GTestWrapper --gtest_filter=NMT* -XX:NativeMemoryTracking=summary
+ */
 
-public class CheckJNI {
-
-    public static void main(String args[]) throws Exception {
-        ProcessBuilder pb = ProcessTools.createJavaProcessBuilder("-minimal", "-Xcheck:jni", "-version");
-        new OutputAnalyzer(pb.start())
-                .shouldContain("Minimal VM warning: JNI CHECKING is not supported in this VM")
-                .shouldHaveExitValue(0);
-    }
-}
+/* @test id=nmt-detail
+ * @summary Run NMT-related gtests with detailed statistics
+ * @library /test/lib
+ * @modules java.base/jdk.internal.misc
+ *          java.xml
+ * @requires vm.debug
+ * @run main/native GTestWrapper --gtest_filter=NMT*:os* -XX:NativeMemoryTracking=detail
+ */
