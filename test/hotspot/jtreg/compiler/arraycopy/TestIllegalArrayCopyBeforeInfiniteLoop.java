@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2021, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (C) 2021 THL A29 Limited, a Tencent company. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -21,37 +21,41 @@
  * questions.
  */
 
-package gc.stringdedup;
-
-/*
- * @test TestStringDeduplicationInterned
- * @summary Test string deduplication of interned strings
- * @bug 8029075
- * @requires vm.gc.G1
- * @library /test/lib
- * @library /
- * @modules java.base/jdk.internal.misc:open
- * @modules java.base/java.lang:open
- *          java.management
- * @run driver gc.stringdedup.TestStringDeduplicationInterned G1
+/**
+ * @test
+ * @bug 8272131
+ * @requires vm.compiler2.enabled
+ * @summary ArrayCopy with negative index before infinite loop
+ * @run main/othervm -Xbatch -XX:-TieredCompilation
+ *                   -XX:CompileCommand=compileonly,"*TestIllegalArrayCopyBeforeInfiniteLoop::foo"
+ *                   compiler.arraycopy.TestIllegalArrayCopyBeforeInfiniteLoop
  */
 
-/*
- * @test TestStringDeduplicationInterned
- * @summary Test string deduplication of interned strings
- * @bug 8029075
- * @requires vm.gc.Z
- * @library /test/lib
- * @library /
- * @modules java.base/jdk.internal.misc:open
- * @modules java.base/java.lang:open
- *          java.management
- * @run driver gc.stringdedup.TestStringDeduplicationInterned Z
- */
+package compiler.arraycopy;
 
-public class TestStringDeduplicationInterned {
+import java.util.Arrays;
+
+public class TestIllegalArrayCopyBeforeInfiniteLoop {
+    private static char src[] = new char[10];
+    private static int count = 0;
+    private static final int iter = 10_000;
+
     public static void main(String[] args) throws Exception {
-        TestStringDeduplicationTools.selectGC(args);
-        TestStringDeduplicationTools.testInterned();
+        for (int i = 0; i < iter; ++i) {
+            foo();
+        }
+        if (count != iter) {
+            throw new RuntimeException("test failed");
+        }
+    }
+
+    static void foo() {
+        try {
+            Arrays.copyOfRange(src, -1, 128);
+            do {
+            } while (true);
+        } catch (ArrayIndexOutOfBoundsException ex) {
+            count++;
+        }
     }
 }
