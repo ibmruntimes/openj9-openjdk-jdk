@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, 2021, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2021, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -21,33 +21,30 @@
  * questions.
  */
 
-import java.io.IOException;
-
-import jdk.test.lib.dcmd.CommandExecutor;
-
 /*
  * @test
- * @summary Test of diagnostic command GC.heap_dump -all=true
- * @library /test/lib
- * @modules java.base/jdk.internal.misc
- *          java.compiler
- *          java.management
- *          jdk.internal.jvmstat/sun.jvmstat.monitor
- * @run testng/timeout=240 HeapDumpAllTest
+ * @bug 8271276
+ * @run main/othervm -Xbatch compiler.inlining.LateInlineVirtualNullReceiverCheck
  */
-public class HeapDumpAllTest extends HeapDumpTest {
-    public HeapDumpAllTest() {
-        super();
-        heapDumpArgs = "-all=true";
+package compiler.inlining;
+
+import java.util.regex.Pattern;
+
+public class LateInlineVirtualNullReceiverCheck {
+    static final Pattern pattern = Pattern.compile("");
+
+    public static void test(String s) {
+        pattern.matcher(s);
     }
 
-    @Override
-    public void run(CommandExecutor executor, boolean overwrite) throws IOException {
-        // Trigger gc by hand, so the created heap dump isnt't too large and
-        // takes too long to parse.
-        System.gc();
-        super.run(executor, overwrite);
+    public static void main(String[] args) {
+        for (int i = 0; i < 10_000; ++i) {
+            try {
+                test(null);
+            } catch (NullPointerException npe) {
+                // ignore
+            }
+        }
+        System.out.println("TEST PASSED");
     }
-
-    /* See HeapDumpTest for test cases */
 }
