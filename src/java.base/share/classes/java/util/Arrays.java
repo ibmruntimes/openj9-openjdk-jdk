@@ -4296,7 +4296,7 @@ public class Arrays {
      * @return a content-based hash code for {@code a}
      * @since 1.5
      */
-    public static int hashCode(long a[]) {
+    public static int hashCode(long[] a) {
         if (a == null)
             return 0;
 
@@ -4325,7 +4325,7 @@ public class Arrays {
      * @return a content-based hash code for {@code a}
      * @since 1.5
      */
-    public static int hashCode(int a[]) {
+    public static int hashCode(int[] a) {
         if (a == null)
             return 0;
 
@@ -4352,7 +4352,7 @@ public class Arrays {
      * @return a content-based hash code for {@code a}
      * @since 1.5
      */
-    public static int hashCode(short a[]) {
+    public static int hashCode(short[] a) {
         if (a == null)
             return 0;
 
@@ -4379,7 +4379,7 @@ public class Arrays {
      * @return a content-based hash code for {@code a}
      * @since 1.5
      */
-    public static int hashCode(char a[]) {
+    public static int hashCode(char[] a) {
         if (a == null)
             return 0;
 
@@ -4406,7 +4406,7 @@ public class Arrays {
      * @return a content-based hash code for {@code a}
      * @since 1.5
      */
-    public static int hashCode(byte a[]) {
+    public static int hashCode(byte[] a) {
         if (a == null)
             return 0;
 
@@ -4433,7 +4433,7 @@ public class Arrays {
      * @return a content-based hash code for {@code a}
      * @since 1.5
      */
-    public static int hashCode(boolean a[]) {
+    public static int hashCode(boolean[] a) {
         if (a == null)
             return 0;
 
@@ -4460,7 +4460,7 @@ public class Arrays {
      * @return a content-based hash code for {@code a}
      * @since 1.5
      */
-    public static int hashCode(float a[]) {
+    public static int hashCode(float[] a) {
         if (a == null)
             return 0;
 
@@ -4487,7 +4487,7 @@ public class Arrays {
      * @return a content-based hash code for {@code a}
      * @since 1.5
      */
-    public static int hashCode(double a[]) {
+    public static int hashCode(double[] a) {
         if (a == null)
             return 0;
 
@@ -4520,7 +4520,7 @@ public class Arrays {
      * @see #deepHashCode(Object[])
      * @since 1.5
      */
-    public static int hashCode(Object a[]) {
+    public static int hashCode(Object[] a) {
         if (a == null)
             return 0;
 
@@ -4561,7 +4561,7 @@ public class Arrays {
      * @see #hashCode(Object[])
      * @since 1.5
      */
-    public static int deepHashCode(Object a[]) {
+    public static int deepHashCode(Object[] a) {
         if (a == null)
             return 0;
 
