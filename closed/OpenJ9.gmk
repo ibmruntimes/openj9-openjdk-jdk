@@ -187,9 +187,8 @@ $(foreach file, \
 		testlibB \
 		vmruntimestateagent29 \
 		) \
-	$(patsubst %, $(OPENJ9_VM_BUILD_DIR)/lib%.jnilib, \
-		loadLibraryTest \
-		), \
+	$(OPENJ9_VM_BUILD_DIR)/libloadLibraryTest.jnilib \
+	$(SUPPORT_OUTPUTDIR)/test/agct/lib/$(call SHARED_LIBRARY,AsyncGetCallTraceTest), \
 	$(if $(wildcard $(file)), \
 		$(eval $(call openj9_test_image_rules, $(file)))))
 
@@ -434,7 +433,7 @@ ifeq (true,$(OPENJ9_ENABLE_CMAKE))
 
   # Propagate configure option '--disable-warnings-as-errors-openj9' to OpenJ9.
   ifeq (false,$(WARNINGS_AS_ERRORS_OPENJ9))
-     CMAKE_ARGS += -DJ9VM_WARNINGS_AS_ERRORS=OFF
+    CMAKE_ARGS += -DJ9VM_WARNINGS_AS_ERRORS=OFF
  endif
 
   # Do this last so extra args take precedence.
