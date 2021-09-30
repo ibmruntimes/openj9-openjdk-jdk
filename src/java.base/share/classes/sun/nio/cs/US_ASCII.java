@@ -23,11 +23,6 @@
  * questions.
  */
 
-/*
- * ===========================================================================
- * (c) Copyright IBM Corp. 2018, 2021 All Rights Reserved
- * ===========================================================================
- */
 package sun.nio.cs;
 
 import jdk.internal.access.JavaLangAccess;
@@ -169,38 +164,20 @@ public class US_ASCII
             dp += n;
 
             try {
-                if((dl-dp) >= (sl-sp)) {                                             //OpenJ9-perf_converter
-                    
-                    int n = encodeASCII(sa,sp,sl-sp,da,dp);
-                    sp = sp+n;
-                    dp = dp+n;
-
-                    if (sp<sl)
-                    {
-                        char c = sa[sp];
-                        if (sgp.parse(c, sa, sp, sl) < 0) {                 //OpenJ9-perf_converter
-                            return sgp.error();                                  //OpenJ9-perf_converter
-                        }                                                //OpenJ9-perf_converter
-                        else return sgp.unmappableResult();              //OpenJ9-perf_converter
+                while (sp < sl) {
+                    char c = sa[sp];
+                    if (c < 0x80) {
+                        if (dp >= dl)
+                            return CoderResult.OVERFLOW;
+                        da[dp] = (byte)c;
+                        sp++; dp++;
+                        continue;
                     }
-
-                    return CoderResult.UNDERFLOW;                            //OpenJ9-perf_converter
-                }                                                                        //OpenJ9-perf_converter
-                else {                                                               //OpenJ9-perf_converter
-                    int n = encodeASCII(sa,sp,dl-dp,da,dp);
-                    sp = sp+n;
-                    dp = dp+n;
-                    if (dp<dl)
-                    {
-                        char c = sa[sp];
-                        if (sgp.parse(c, sa, sp, sl) < 0) {                 //OpenJ9-perf_converter
-                               return sgp.error();                              //OpenJ9-perf_converter
-                           }                                                        //OpenJ9-perf_converter
-                        else return sgp.unmappableResult();                  //OpenJ9-perf_converter
-                    }
-
-                    return CoderResult.OVERFLOW;                                     //OpenJ9-perf_converter
+                    if (sgp.parse(c, sa, sp, sl) < 0)
+                        return sgp.error();
+                    return sgp.unmappableResult();
                 }
+                return CoderResult.UNDERFLOW;
             } finally {
                 src.position(sp - src.arrayOffset());
                 dst.position(dp - dst.arrayOffset());
@@ -240,18 +217,5 @@ public class US_ASCII
                 return encodeBufferLoop(src, dst);
         }
 
-        public final int encodeASCII(char[] src, int sp, int len, byte[] dst, int dp) {
-            int n = 0;
-            while (n < len) {
-               char c = src[sp++];
-               if (c < 0x80) {
-                   dst[dp++] = (byte)c;
-                   n++;
-                   continue;
-               }
-               break;
-            }
-           return n;
-         }
     }
 }
