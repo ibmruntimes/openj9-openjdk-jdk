@@ -255,13 +255,8 @@ else # OPENJ9_ENABLE_CRIU_SUPPORT
 endif # OPENJ9_ENABLE_CRIU_SUPPORT
 
 # Adjust OpenJDK MethodHandles enablement flags.
-ifeq (true,$(OPENJ9_ENABLE_OPENJDK_METHODHANDLES))
-  FEATURE_SED_SCRIPT += $(call SedEnable,opt_openjdkMethodhandle)
-  FEATURE_SED_SCRIPT += $(call SedDisable,opt_methodHandle)
-else # OPENJ9_ENABLE_OPENJDK_METHODHANDLES
-  FEATURE_SED_SCRIPT += $(call SedEnable,opt_methodHandle)
-  FEATURE_SED_SCRIPT += $(call SedDisable,opt_openjdkMethodhandle)
-endif # OPENJ9_ENABLE_OPENJDK_METHODHANDLES
+FEATURE_SED_SCRIPT += $(call SedEnable,opt_openjdkMethodhandle)
+FEATURE_SED_SCRIPT += $(call SedDisable,opt_methodHandle)
 
 # Disable windows rebase.
 SPEC_SED_SCRIPT += $(call SedDisable,uma_windowsRebase)
@@ -418,13 +413,8 @@ ifeq (true,$(OPENJ9_ENABLE_CMAKE))
     CMAKE_ARGS += -DJ9VM_OPT_CRIU_SUPPORT=OFF
   endif # OPENJ9_ENABLE_CRIU_SUPPORT
 
-  ifeq (true,$(OPENJ9_ENABLE_OPENJDK_METHODHANDLES))
-    CMAKE_ARGS += -DJ9VM_OPT_OPENJDK_METHODHANDLE=ON
-    CMAKE_ARGS += -DJ9VM_OPT_METHOD_HANDLE=OFF
-  else # OPENJ9_ENABLE_OPENJDK_METHODHANDLES
-    CMAKE_ARGS += -DJ9VM_OPT_METHOD_HANDLE=ON
-    CMAKE_ARGS += -DJ9VM_OPT_OPENJDK_METHODHANDLE=OFF
-  endif # OPENJ9_ENABLE_OPENJDK_METHODHANDLES
+  CMAKE_ARGS += -DJ9VM_OPT_OPENJDK_METHODHANDLE=ON
+  CMAKE_ARGS += -DJ9VM_OPT_METHOD_HANDLE=OFF
 
   # Propagate configure option '--disable-warnings-as-errors-omr' to OMR.
   ifeq (false,$(WARNINGS_AS_ERRORS_OMR))
