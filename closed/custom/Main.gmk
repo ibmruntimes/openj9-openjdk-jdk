@@ -74,6 +74,9 @@ ALL_TARGETS += debug-image
 
 # If not cross-compiling, capture 'java -version' output.
 test-image-openj9 : exploded-image
+ifeq ($(call isTargetOs, linux), true)
+	@+$(MAKE) $(MAKE_ARGS) -f $(TOPDIR)/closed/AsyncGetCallTrace.gmk
+endif
 	@+$(OPENJ9_MAKE) openj9_test_image
 ifneq ($(COMPILE_TYPE), cross)
 	$(JDK_OUTPUTDIR)/bin/java -version 2>&1 | $(TEE) $(TEST_IMAGE_DIR)/openj9/java-version.txt
