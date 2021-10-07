@@ -163,6 +163,7 @@ $(foreach file, \
 		bcuwhite \
 		bcvrelationships \
 		bcvwhite \
+		clinkerffitests \
 		gptest \
 		hooktests \
 		j9aixbaddep \
