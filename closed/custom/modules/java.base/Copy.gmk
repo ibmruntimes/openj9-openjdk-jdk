@@ -50,8 +50,9 @@ $(call openj9_copy_files_and_debuginfos, \
 		$(OPENJ9_VM_BUILD_DIR)/ \
 		$(addprefix $(LIB_DST_DIR), / /j9vm/ /server/)))
 
-# CPU targets without JIT support.
-NO_JIT_CPUS := riscv64
+# Target platforms without JIT support.
+NO_JIT_PLATFORMS := linux_riscv64 macosx_aarch64
+TARGET_PLATFORM := $(OPENJDK_TARGET_OS)_$(OPENJDK_TARGET_CPU)
 
 $(call openj9_copy_shlibs, \
 	j9dmp29 \
@@ -60,7 +61,7 @@ $(call openj9_copy_shlibs, \
 	j9gcchk29 \
 	$(if $(filter static,$(OMR_MIXED_REFERENCES_MODE)),j9gcchk_full29) \
 	j9hookable29 \
-	$(if $(filter $(NO_JIT_CPUS),$(OPENJDK_TARGET_CPU)),,j9jit29) \
+	$(if $(filter $(NO_JIT_PLATFORMS),$(TARGET_PLATFORM)),,j9jit29) \
 	j9jnichk29 \
 	j9jvmti29 \
 	j9prt29 \
@@ -173,10 +174,10 @@ ifneq ($(OPENSSL_BUNDLE_LIB_PATH), )
   TARGETS += $(LIBCRYPTO_TARGET_LIB)
   $(LIBCRYPTO_TARGET_LIB) : $(LIBCRYPTO_PATH)
 	$(call install-file)
-  ifeq ($(OPENJDK_BUILD_OS), macosx)
+  ifeq ($(OPENJDK_TARGET_OS), macosx)
     # update @rpath of the crypto library as the default is /usr/local/lib/
 	install_name_tool -id "@rpath/$(@F)" $@
-  else ifeq ($(OPENJDK_BUILD_OS), windows)
+  else ifeq ($(OPENJDK_TARGET_OS), windows)
 	$(CHMOD) a+rx $@
   endif
 	$(call CodesignFile,"$@")
