@@ -22,11 +22,6 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-/*
- * ===========================================================================
- * (c) Copyright IBM Corp. 2020, 2020 All Rights Reserved.
- * ===========================================================================
- */
 
 package java.lang.invoke;
 
@@ -651,7 +646,7 @@ public final class StringConcatFactory {
             MethodHandle prepend = JLA.stringConcatHelper("prepend",
                     methodType(long.class, long.class, byte[].class,
                             Wrapper.asPrimitiveType(c), String.class));
-            return prepend;
+            return prepend.rebind();
         }
     };
 
@@ -668,7 +663,7 @@ public final class StringConcatFactory {
         public MethodHandle apply(Class<?> c) {
             MethodHandle mix = JLA.stringConcatHelper("mix",
                     methodType(long.class, long.class, Wrapper.asPrimitiveType(c)));
-            return mix;
+            return mix.rebind();
         }
     };
 
@@ -678,7 +673,7 @@ public final class StringConcatFactory {
         if (mh == null) {
             MethodHandle simpleConcat = JLA.stringConcatHelper("simpleConcat",
                     methodType(String.class, Object.class, Object.class));
-            SIMPLE_CONCAT = mh = simpleConcat;
+            SIMPLE_CONCAT = mh = simpleConcat.rebind();
         }
         return mh;
     }
@@ -689,7 +684,7 @@ public final class StringConcatFactory {
         if (mh == null) {
             MethodHandle newString = JLA.stringConcatHelper("newString",
                     methodType(String.class, byte[].class, long.class));
-            NEW_STRING = mh = newString;
+            NEW_STRING = mh = newString.rebind();
         }
         return mh;
     }
@@ -700,7 +695,7 @@ public final class StringConcatFactory {
         if (mh == null) {
             MethodHandle newArrayWithSuffix = JLA.stringConcatHelper("newArrayWithSuffix",
                     methodType(byte[].class, String.class, long.class));
-            NEW_ARRAY_SUFFIX = mh = newArrayWithSuffix;
+            NEW_ARRAY_SUFFIX = mh = newArrayWithSuffix.rebind();
         }
         return MethodHandles.insertArguments(mh, 0, suffix);
     }
