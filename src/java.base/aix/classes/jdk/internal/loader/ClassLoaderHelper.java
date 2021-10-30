@@ -25,7 +25,7 @@
 
 /*
  * ===========================================================================
- * (c) Copyright IBM Corp. 2020, 2020 All Rights Reserved
+ * (c) Copyright IBM Corp. 2020, 2021 All Rights Reserved
  * ===========================================================================
  */
 
@@ -37,6 +37,14 @@ import java.util.ArrayList;
 class ClassLoaderHelper {
 
     private ClassLoaderHelper() {}
+
+    /**
+     * Returns true if loading a native library only if
+     * it's present on the file system.
+     */
+    static boolean loadLibraryOnlyIfPresent() {
+        return true;
+    }
 
     /**
      * Returns an alternate path name for the given file
