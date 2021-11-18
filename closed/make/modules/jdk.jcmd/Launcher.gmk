@@ -47,4 +47,4 @@ $(eval $(call SetupBuildLauncher, jstat, \
 ))
 
 # Do not copy man pages where there is no equivalent openj9 implementation.
-TARGETS := $(filter-out %/jcmd.1 %/jinfo.1 %/jps.1 %/jstack.1 %/jstat.1, $(TARGETS))
+TARGETS := $(filter-out %/jcmd.1 %/jinfo.1 %/jmap.1 %/jps.1 %/jstack.1 %/jstat.1, $(TARGETS))
