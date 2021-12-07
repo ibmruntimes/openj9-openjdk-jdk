@@ -22,6 +22,12 @@
  */
 
 /*
+ * ===========================================================================
+ * (c) Copyright IBM Corp. 2021, 2021 All Rights Reserved
+ * ===========================================================================
+ */
+
+/*
  * @test
  * @bug 8010117
  * @summary Test if the VM enforces Reflection.getCallerClass
@@ -118,7 +124,10 @@ public class GetCallerClassTest {
             gcc.missingCallerSensitiveAnnotation();
             throw new RuntimeException("shouldn't have succeeded");
         } catch (InternalError e) {
-            if (e.getMessage().startsWith("CallerSensitive annotation expected")) {
+            String errorMessage = e.getMessage();
+            if (errorMessage.startsWith("CallerSensitive annotation expected")
+            || errorMessage.startsWith("Caller is not annotated as @sun.reflect.CallerSensitive")
+            ) {
                 System.out.println("Expected error: " + e.getMessage());
             } else {
                 throw e;
@@ -133,7 +142,10 @@ public class GetCallerClassTest {
             Class<?> c = Reflection.getCallerClass();
             throw new RuntimeException("shouldn't have succeeded");
         } catch (InternalError e) {
-            if (e.getMessage().startsWith("CallerSensitive annotation expected")) {
+            String errorMessage = e.getMessage();
+            if (errorMessage.startsWith("CallerSensitive annotation expected")
+            || errorMessage.startsWith("Caller is not annotated as @sun.reflect.CallerSensitive")
+            ) {
                 System.out.println("Expected error: " + e.getMessage());
             } else {
                 throw e;
