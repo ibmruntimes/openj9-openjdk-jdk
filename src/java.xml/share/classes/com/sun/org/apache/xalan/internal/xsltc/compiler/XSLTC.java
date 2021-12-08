@@ -18,6 +18,12 @@
  * limitations under the License.
  */
 
+/*
+ * ===========================================================================
+ * (c) Copyright IBM Corp. 2021, 2021 All Rights Reserved
+ * ===========================================================================
+ */
+
 package com.sun.org.apache.xalan.internal.xsltc.compiler;
 
 import com.sun.org.apache.bcel.internal.classfile.JavaClass;
@@ -461,7 +467,11 @@ public final class XSLTC {
                     setClassName(name);
                 }
                 else if (systemId != null && !systemId.equals("")) {
-                    setClassName(Util.baseName(systemId));
+                    String baseName = Util.baseName(systemId);
+                    // Use the default class name if the base name converted from systemId doesn't exist
+                    if ((baseName != null) && (baseName.length() > 0)) {
+                        setClassName(baseName);
+                    }
                 }
 
                 // Ensure we have a non-empty class name at this point
