@@ -25,7 +25,7 @@
 
 /*
  * =======================================================================
- * (c) Copyright IBM Corp. 2018, 2020 All Rights Reserved
+ * (c) Copyright IBM Corp. 2018, 2021 All Rights Reserved
  * =======================================================================
  */
 
@@ -386,13 +386,13 @@ public class ObjectInputStream
      * read* requests
      */
 
-    /* ClassCache Entry for caching class.forName results upon enableClassCaching */
-    private static final ClassCache classCache;
+    /* ClassNameCache Entry for caching class.forName results upon enableClassCaching */
+    private static final ClassNameCache classCache;
     private static final boolean isClassCachingEnabled;
     static {
         isClassCachingEnabled =
             AccessController.doPrivileged(new GetClassCachingSettingAction());
-        classCache = (isClassCachingEnabled ? new ClassCache() : null);
+        classCache = (isClassCachingEnabled ? new ClassNameCache() : null);
     }
   
 

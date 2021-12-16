@@ -1,6 +1,6 @@
 /*
  * ===========================================================================
- * (c) Copyright IBM Corp. 2017, 2019 All Rights Reserved
+ * (c) Copyright IBM Corp. 2017, 2021 All Rights Reserved
  * ===========================================================================
  * 
  * This code is free software; you can redistribute it and/or modify it
@@ -30,16 +30,19 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
-/* ClassCache is Primarily responsible for Caching the results of the className lookups and hence to avoid 
+/* ClassNameCache is Primarily responsible for Caching the results of the className lookups and hence to avoid
  * multiple Lookup for same Class Instance.
- * ClassCache provides a ConcurrentHash based ClassCache which is looked up prior to calling the class.forName
+ * ClassNameCache provides a ConcurrentHash based ClassNameCache which is looked up prior to calling the class.forName
  *  Method resolveClass() from ObjectInputStream uses this Cache.
  *  
  *  Caching is done only when the actually used loader for a Class is one of the Sytem loaders (ie) App Class Loader,
  *  System Extension loader and BootStrap loader
- *   
+ *
+ *  Renamed from ClassCache to avoid name collision with OpenJDK java.io.ClassCache introduced by
+ *  JDK-8199589 : ObjectStreamClass does not provide a mechanism to clear the cache.
+ *  This class is referred by java.io.ObjectInputStream.
  */
-final class ClassCache {
+final class ClassNameCache {
 /* Main Cache for storing the Class.forName results Here Key used would be CacheKey */
     private final ConcurrentHashMap<Key,Object> cache =
         new ConcurrentHashMap<Key,Object>(); 
@@ -57,7 +60,7 @@ final class ClassCache {
  * monitors the ReferenceQueue for stale loaders
  */
     
-    public ClassCache() {
+    public ClassNameCache() {
         ClassLoader loader = ClassLoader.getSystemClassLoader(); 
         while (loader != null) {
             setCanonicalSystemLoaderRef(loader);
@@ -171,10 +174,10 @@ final class ClassCache {
     private static final class FutureValue {
         private final CacheKey key;
         private final LoaderRef loaderRef;
-        private final ClassCache cache;
+        private final ClassNameCache cache;
         private Class<?> value = null;
 
-        FutureValue(CacheKey key, ClassCache cache) {
+        FutureValue(CacheKey key, ClassNameCache cache) {
             this.key = key;
             this.loaderRef = key.loaderRef;
             this.cache = cache;
@@ -200,27 +203,27 @@ final class ClassCache {
 
     private static final class CreateReaperAction
             implements PrivilegedAction<Thread> {
-        private final ClassCache cache;
+        private final ClassNameCache cache;
         private final ReferenceQueue<Object> queue;
 
-        CreateReaperAction(ClassCache cache, ReferenceQueue<Object> queue) {
+        CreateReaperAction(ClassNameCache cache, ReferenceQueue<Object> queue) {
             this.cache = cache;
             this.queue = queue;
         }
 
         public Thread run() {
             Reaper reaper = new Reaper(cache, queue);
-            return com.ibm.oti.vm.VM.getVMLangAccess().createThread(reaper, "ClassCache Reaper", true, false, true, null);
+            return com.ibm.oti.vm.VM.getVMLangAccess().createThread(reaper, "ClassNameCache Reaper", true, false, true, null);
         }
     }
 
     private static final class Reaper implements Runnable {
-        private final WeakReference<ClassCache> cacheRef;
+        private final WeakReference<ClassNameCache> cacheRef;
         private final ReferenceQueue<Object> queue;
 
-        Reaper(ClassCache cache, ReferenceQueue<Object> queue) {
+        Reaper(ClassNameCache cache, ReferenceQueue<Object> queue) {
             this.queue = queue;
-            cacheRef = new WeakReference<ClassCache>(cache, queue);
+            cacheRef = new WeakReference<ClassNameCache>(cache, queue);
         }
 
         /*
@@ -240,7 +243,7 @@ final class ClassCache {
         }
 
         private void processStaleRef(LoaderRef staleRef) {
-            ClassCache cache = cacheRef.get();
+            ClassNameCache cache = cacheRef.get();
             if (cache == null) return;
 
             cache.removeStaleRef(staleRef);
@@ -351,7 +354,7 @@ final class ClassCache {
 
     private static final class LookupKey extends Key {
         private final Object loaderObj;
-        private final ClassCache cache;
+        private final ClassNameCache cache;
 
         private static int hashCode(String className, ClassLoader loader) {
             int hashcode = className.hashCode();
@@ -363,7 +366,7 @@ final class ClassCache {
         }
 
         public LookupKey(String className, ClassLoader loader,
-                ClassCache cache) {
+                ClassNameCache cache) {
             super(Objects.requireNonNull(className),
                     hashCode(className, loader));
             loaderObj = LoaderRef.getLoaderObj(loader);
