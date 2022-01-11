@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, 2022, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2022, Red Hat, Inc. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -21,27 +21,45 @@
  * questions.
  */
 
-package jdk.jfr.event.gc.collection;
-import jdk.test.lib.jfr.GCHelper;
+package compiler.c2.irTests;
 
-/**
+import compiler.lib.ir_framework.*;
+import jdk.test.lib.Utils;
+import java.util.Random;
+
+/*
  * @test
- * @key jfr
- * @requires vm.hasJFR
- *
- * @requires vm.gc == "G1" | vm.gc == null
- * @requires vm.opt.ExplicitGCInvokesConcurrent != true
- * @library /test/lib /test/jdk
- *
- * @run driver jdk.jfr.event.gc.collection.TestGCCauseWithG1FullCollection
+ * @bug 8278228
+ * @summary C2: Improve identical back-to-back if elimination
+ * @library /test/lib /
+ * @run driver compiler.c2.irTests.TestBackToBackIfs
  */
-public class TestGCCauseWithG1FullCollection {
-    public static void main(String[] args) throws Exception {
-        String testID = "G1FullCollection";
-        String[] vmFlags = {"-XX:+UseG1GC"};
-        String[] gcNames = {GCHelper.gcG1New, GCHelper.gcG1Old, GCHelper.gcG1Full};
-        String[] gcCauses = {"GCLocker Initiated GC", "G1 Evacuation Pause", "G1 Preventive Collection",
-                             "G1 Compaction Pause", "System.gc()"};
-        GCGarbageCollectionUtil.test(testID, vmFlags, gcNames, gcCauses);
+
+public class TestBackToBackIfs {
+    public static void main(String[] args) {
+        TestFramework.run();
+    }
+
+    static private int int_field;
+
+    @Test
+    @IR(counts = { IRNode.IF, "1" })
+    public static void test(int a, int b) {
+        if (a == b) {
+            int_field = 0x42;
+        } else {
+            int_field = 42;
+        }
+        if (a == b) {
+            int_field = 0x42;
+        } else {
+            int_field = 42;
+        }
+    }
+
+    @Run(test = "test")
+    public static void test_runner() {
+        test(42, 0x42);
+        test(0x42, 0x42);
     }
 }
