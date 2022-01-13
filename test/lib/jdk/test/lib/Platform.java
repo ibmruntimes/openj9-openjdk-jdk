@@ -21,6 +21,12 @@
  * questions.
  */
 
+/*
+ * ===========================================================================
+ * (c) Copyright IBM Corp. 2022, 2022 All Rights Reserved
+ * ===========================================================================
+ */
+
 package jdk.test.lib;
 
 import java.io.FileNotFoundException;
@@ -358,7 +364,10 @@ public class Platform {
     }
 
     private static String variant() {
-        if (Platform.isServer()) {
+        if (Platform.isServer()
+        || vmName.toLowerCase().contains("openj9")
+        || vmName.toLowerCase().contains("ibm")
+        ) {
             return "server";
         } else if (Platform.isClient()) {
             return "client";
