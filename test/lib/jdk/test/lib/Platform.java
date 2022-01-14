@@ -60,12 +60,16 @@ public class Platform {
                 PrivilegedAction<String>) () -> System.getProperty(key));
     }
 
+    private static boolean isJ9() {
+        return vmName.contains("OpenJ9") || vmName.contains("IBM");
+    }
+
     public static boolean isClient() {
         return vmName.endsWith(" Client VM");
     }
 
     public static boolean isServer() {
-        return vmName.endsWith(" Server VM");
+        return isJ9() || vmName.endsWith(" Server VM");
     }
 
     public static boolean isZero() {
@@ -364,10 +368,7 @@ public class Platform {
     }
 
     private static String variant() {
-        if (Platform.isServer()
-        || vmName.toLowerCase().contains("openj9")
-        || vmName.toLowerCase().contains("ibm")
-        ) {
+        if (Platform.isServer()) {
             return "server";
         } else if (Platform.isClient()) {
             return "client";
@@ -383,7 +384,7 @@ public class Platform {
 
     public static boolean isDefaultCDSArchiveSupported() {
         return (is64bit()  &&
-                isServer() &&
+                isServer() && !isJ9() &&
                 (isLinux()   ||
                  isOSX()     ||
                  isWindows()) &&
