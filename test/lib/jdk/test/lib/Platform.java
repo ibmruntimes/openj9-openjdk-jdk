@@ -21,6 +21,12 @@
  * questions.
  */
 
+/*
+ * ===========================================================================
+ * (c) Copyright IBM Corp. 2022, 2022 All Rights Reserved
+ * ===========================================================================
+ */
+
 package jdk.test.lib;
 
 import java.io.FileNotFoundException;
@@ -54,12 +60,16 @@ public class Platform {
                 PrivilegedAction<String>) () -> System.getProperty(key));
     }
 
+    private static boolean isJ9() {
+        return vmName.contains("OpenJ9") || vmName.contains("IBM");
+    }
+
     public static boolean isClient() {
         return vmName.endsWith(" Client VM");
     }
 
     public static boolean isServer() {
-        return vmName.endsWith(" Server VM");
+        return isJ9() || vmName.endsWith(" Server VM");
     }
 
     public static boolean isZero() {
@@ -374,7 +384,7 @@ public class Platform {
 
     public static boolean isDefaultCDSArchiveSupported() {
         return (is64bit()  &&
-                isServer() &&
+                isServer() && !isJ9() &&
                 (isLinux()   ||
                  isOSX()     ||
                  isWindows()) &&
