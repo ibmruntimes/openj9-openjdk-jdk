@@ -22,6 +22,12 @@
  */
 
 /*
+ * ===========================================================================
+ * (c) Copyright IBM Corp. 2022, 2022 All Rights Reserved
+ * ===========================================================================
+ */
+
+/*
  * @test
  * @bug 8276422
  * @summary Invalid/missing values for the finalization option should be rejected
@@ -37,9 +43,9 @@ public class InvalidFinalizationOption {
         record TestData(String arg, String expected) { }
 
         TestData[] testData = {
-            new TestData("--finalization",        "Unrecognized option"),
-            new TestData("--finalization=",       "Invalid finalization value"),
-            new TestData("--finalization=azerty", "Invalid finalization value")
+            new TestData("--finalization",        "Command-line option unrecognised"),
+            new TestData("--finalization=",       "Command-line option unrecognised"),
+            new TestData("--finalization=azerty", "Command-line option unrecognised")
         };
 
         for (var data : testData) {
