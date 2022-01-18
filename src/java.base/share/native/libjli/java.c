@@ -24,6 +24,12 @@
  */
 
 /*
+ * ===========================================================================
+ * (c) Copyright IBM Corp. 2022, 2022 All Rights Reserved
+ * ===========================================================================
+ */
+
+/*
  * Shared source for 'java' command line tool.
  *
  * If JAVA_ARGS is defined, then acts as a launcher for applications. For
@@ -864,9 +870,13 @@ AddOption(char *str, void *info)
      * 'default' sizes (either from JVM or system configuration, e.g. 'ulimit -s' on linux),
      * and is not itself a small stack size that will be rejected. So we ignore -Xss0 here.
      */
-    if (JLI_StrCCmp(str, "-Xss") == 0) {
+
+    /* In OpenJ9 -Xmso is used to set native stack size instead of -Xss. -Xss is used to
+     * set Java thread size only, which is handled in the JVM code.
+     */
+    if (JLI_StrCCmp(str, "-Xmso") == 0) {
         jlong tmp;
-        if (parse_size(str + 4, &tmp)) {
+        if (parse_size(str + 5, &tmp)) {
             threadStackSize = tmp;
             if (threadStackSize > 0 && threadStackSize < (jlong)STACK_SIZE_MINIMUM) {
                 threadStackSize = STACK_SIZE_MINIMUM;
