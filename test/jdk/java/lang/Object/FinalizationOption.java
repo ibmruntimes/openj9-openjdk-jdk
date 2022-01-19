@@ -22,6 +22,12 @@
  */
 
 /*
+ * ===========================================================================
+ * (c) Copyright IBM Corp. 2022, 2022 All Rights Reserved
+ * ===========================================================================
+ */
+
+/*
  * @test
  * @bug 8276422
  * @summary add command-line option to disable finalization
@@ -66,7 +72,7 @@ public class FinalizationOption {
 
         Thread ft = null;
         for (int i = 0; i < nt; i++) {
-            if ("Finalizer".equals(threads[i].getName())) {
+            if ("Finalizer thread".equals(threads[i].getName())) {
                 ft = threads[i];
                 break;
             }
