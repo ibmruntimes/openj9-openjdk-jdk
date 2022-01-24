@@ -1,5 +1,5 @@
 # ===========================================================================
-# (c) Copyright IBM Corp. 2017, 2021 All Rights Reserved
+# (c) Copyright IBM Corp. 2017, 2022 All Rights Reserved
 # ===========================================================================
 # This code is free software; you can redistribute it and/or modify it
 # under the terms of the GNU General Public License version 2 only, as
@@ -69,19 +69,12 @@ ifneq (,@OPENJ9_GDK_HOME@)
 export GDK_HOME         := @OPENJ9_GDK_HOME@
 endif
 
-# DDR
-OPENJ9_ENABLE_DDR       := @OPENJ9_ENABLE_DDR@
-
-OPENJ9_ENABLE_DEMOS     := @OPENJ9_ENABLE_DEMOS@
-
-# JITSERVER
-OPENJ9_ENABLE_JITSERVER := @OPENJ9_ENABLE_JITSERVER@
-
-# Inline-Types
-OPENJ9_ENABLE_INLINE_TYPES := @OPENJ9_ENABLE_INLINE_TYPES@
-
-# CRIU Support
+# feature enablement flags
 OPENJ9_ENABLE_CRIU_SUPPORT := @OPENJ9_ENABLE_CRIU_SUPPORT@
+OPENJ9_ENABLE_DDR          := @OPENJ9_ENABLE_DDR@
+OPENJ9_ENABLE_DEMOS        := @OPENJ9_ENABLE_DEMOS@
+OPENJ9_ENABLE_INLINE_TYPES := @OPENJ9_ENABLE_INLINE_TYPES@
+OPENJ9_ENABLE_JITSERVER    := @OPENJ9_ENABLE_JITSERVER@
 
 # for constructing version output
 COMPILER_VERSION_STRING := @COMPILER_VERSION_STRING@
@@ -156,6 +149,7 @@ BUILD_OPENSSL           := @BUILD_OPENSSL@
 OPENSSL_BUNDLE_LIB_PATH := @OPENSSL_BUNDLE_LIB_PATH@
 OPENSSL_CFLAGS          := @OPENSSL_CFLAGS@
 OPENSSL_DIR             := @OPENSSL_DIR@
+PERL                    := @PERL@
 WITH_OPENSSL            := @WITH_OPENSSL@
 
 # Use '=' instead of ':=' because bootcycle-spec.gmk overrides OUTPUTDIR.
