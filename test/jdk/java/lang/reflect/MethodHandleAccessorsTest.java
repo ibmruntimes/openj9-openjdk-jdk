@@ -20,6 +20,11 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
+/*
+ * ===========================================================================
+ * (c) Copyright IBM Corp. 2022, 2022 All Rights Reserved.
+ * ===========================================================================
+ */
 
 /*
  * @test
@@ -331,9 +336,6 @@ public class MethodHandleAccessorsTest {
 
     static boolean exceptionMatches(Throwable exc, Throwable expected) {
         return expected.getClass().isInstance(exc) &&
-                (Objects.equals(expected.getMessage(), exc.getMessage()) ||
-                        (exc.getMessage() != null && expected.getMessage() != null &&
-                         exc.getMessage().startsWith(expected.getMessage()))) &&
                 (expected.getCause() == null || exceptionMatches(exc.getCause(), expected.getCause()));
     }
 
