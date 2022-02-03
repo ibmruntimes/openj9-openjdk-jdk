@@ -1,6 +1,6 @@
 /*
  * ===========================================================================
- * (c) Copyright IBM Corp. 2019, 2021 All Rights Reserved
+ * (c) Copyright IBM Corp. 2019, 2022 All Rights Reserved
  * ===========================================================================
  * 
  * This code is free software; you can redistribute it and/or modify it
@@ -41,6 +41,7 @@ public class OpenJ9PropsExt implements Callable<Map<String, String>> {
             map.put("vm.hasJFR", "false");
             map.put("vm.compiler2.enabled", "false");
             map.put("vm.jvmti", "true");
+            map.put("vm.musl", "false");
         }
         catch (Exception e) {
             e.printStackTrace();
