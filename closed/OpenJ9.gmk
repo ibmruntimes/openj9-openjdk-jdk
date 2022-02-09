@@ -259,11 +259,11 @@ endif # OPENJ9_ENABLE_CRIU_SUPPORT
 FEATURE_SED_SCRIPT += $(call SedEnable,opt_openjdkMethodhandle)
 FEATURE_SED_SCRIPT += $(call SedDisable,opt_methodHandle)
 
-# Adjust OJDKTHREAD_SUPPORT enablement flags.
+# Adjust OpenJDK thread support enablement flags.
 ifeq (true,$(OPENJ9_ENABLE_OPENJDK_THREAD_SUPPORT))
-  FEATURE_SED_SCRIPT += $(call SedEnable,opt_ojdkThreadSupport)
+  FEATURE_SED_SCRIPT += $(call SedEnable,opt_openjdkThreadSupport)
 else
-  FEATURE_SED_SCRIPT += $(call SedDisable,opt_ojdkThreadSupport)
+  FEATURE_SED_SCRIPT += $(call SedDisable,opt_openjdkThreadSupport)
 endif
 
 # Disable windows rebase.
