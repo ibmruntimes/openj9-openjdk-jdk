@@ -1,5 +1,5 @@
 # ===========================================================================
-# (c) Copyright IBM Corp. 2020, 2021 All Rights Reserved
+# (c) Copyright IBM Corp. 2020, 2022 All Rights Reserved
 # ===========================================================================
 # This code is free software; you can redistribute it and/or modify it
 # under the terms of the GNU General Public License version 2 only, as
@@ -46,6 +46,10 @@ endif # OPENJ9_ENABLE_CRIU_SUPPORT
 ifeq (true,$(OPENJ9_ENABLE_INLINE_TYPES))
   JPP_TAGS += INLINE-TYPES
 endif # OPENJ9_ENABLE_INLINE_TYPES
+
+ifeq (true,$(OPENJ9_ENABLE_OPENJDK_THREAD_SUPPORT))
+  JPP_TAGS += OJDKTHREAD_SUPPORT
+endif # OPENJ9_ENABLE_OPENJDK_THREAD_SUPPORT
 
 $(J9JCL_SOURCES_DONEFILE) : $(AllJclSource) $(AllDdrSource)
 	@$(ECHO) Building OpenJ9 Java Preprocessor
