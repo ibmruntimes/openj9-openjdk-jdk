@@ -119,8 +119,8 @@ public class FinalizationOption {
             }
         };
 
-        boolean threadPass = checkFinalizerThread(finalizationEnabled);
         boolean calledPass = checkFinalizerCalled(finalizationEnabled);
+        boolean threadPass = checkFinalizerThread(finalizationEnabled);
 
         if (!threadPass || !calledPass)
             throw new AssertionError("Test failed.");
