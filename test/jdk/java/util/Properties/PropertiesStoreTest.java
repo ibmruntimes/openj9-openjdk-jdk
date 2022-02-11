@@ -20,6 +20,12 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
+/*
+ * ===========================================================================
+ * (c) Copyright IBM Corp. 2022, 2022 All Rights Reserved
+ * ===========================================================================
+ */
+
 
 import org.testng.Assert;
 import org.testng.annotations.DataProvider;
@@ -47,7 +53,7 @@ import java.util.TreeSet;
  * @test
  * @summary tests the order in which the Properties.store() method writes out the properties
  * @bug 8231640
- * @run testng PropertiesStoreTest
+ * @run testng/othervm -Duser.language=en -Duser.country=US PropertiesStoreTest
  */
 public class PropertiesStoreTest {
 
