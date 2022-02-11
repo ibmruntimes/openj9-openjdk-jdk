@@ -20,6 +20,12 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
+/*
+ * ===========================================================================
+ * (c) Copyright IBM Corp. 2022, 2022 All Rights Reserved
+ * ===========================================================================
+ */
+
 
 import jdk.test.lib.process.OutputAnalyzer;
 import jdk.test.lib.process.ProcessTools;
@@ -425,7 +431,8 @@ public class StoreReproducibilityTest {
         System.out.println("Found date comment " + dateComment + " in file " + destFile);
         final Date parsedDate;
         try {
-            Instant instant = Instant.from(DateTimeFormatter.ofPattern(DATE_FORMAT_PATTERN).parse(dateComment));
+            // use root locale instead of system default so there are no format conflicts with parsing the date comment
+            Instant instant = Instant.from(DateTimeFormatter.ofPattern(DATE_FORMAT_PATTERN).withLocale(Locale.ROOT).parse(dateComment));
             parsedDate = new Date(instant.toEpochMilli());
         } catch (DateTimeParseException pe) {
             throw new RuntimeException("Unexpected date " + dateComment + " in stored properties " + destFile);
