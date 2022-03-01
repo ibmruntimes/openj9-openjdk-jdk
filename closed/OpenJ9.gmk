@@ -262,8 +262,18 @@ FEATURE_SED_SCRIPT += $(call SedDisable,opt_methodHandle)
 # Adjust OpenJDK thread support enablement flags.
 ifeq (true,$(OPENJ9_ENABLE_OPENJDK_THREAD_SUPPORT))
   FEATURE_SED_SCRIPT += $(call SedEnable,opt_openjdkThreadSupport)
+else ifeq (true,$(OPENJ9_ENABLE_LOOM_SUPPORT))
+  # Project Loom support requires OpenJDk thread support
+  FEATURE_SED_SCRIPT += $(call SedEnable,opt_openjdkThreadSupport)
 else
   FEATURE_SED_SCRIPT += $(call SedDisable,opt_openjdkThreadSupport)
+endif
+
+# Adjust Project Loom support enablement flags.
+ifeq (true,$(OPENJ9_ENABLE_LOOM_SUPPORT))
+  FEATURE_SED_SCRIPT += $(call SedEnable,opt_loom)
+else
+  FEATURE_SED_SCRIPT += $(call SedDisable,opt_loom)
 endif
 
 # Disable windows rebase.
@@ -423,9 +433,18 @@ ifeq (true,$(OPENJ9_ENABLE_CMAKE))
 
   ifeq (true,$(OPENJ9_ENABLE_OPENJDK_THREAD_SUPPORT))
     CMAKE_ARGS += -DJ9VM_OPT_OPENJDK_THREAD_SUPPORT=ON
+  else ifeq (true,$(OPENJ9_ENABLE_LOOM_SUPPORT))
+    # Project Loom support requires OpenJDk thread support
+    CMAKE_ARGS += -DJ9VM_OPT_OPENJDK_THREAD_SUPPORT=ON
   else # OPENJ9_ENABLE_OPENJDK_THREAD_SUPPORT
     CMAKE_ARGS += -DJ9VM_OPT_OPENJDK_THREAD_SUPPORT=OFF
   endif # OPENJ9_ENABLE_OPENJDK_THREAD_SUPPORT
+
+  ifeq (true,$(OPENJ9_ENABLE_LOOM_SUPPORT))
+    CMAKE_ARGS += -DJ9VM_OPT_LOOM=ON
+  else # OPENJ9_ENABLE_LOOM_SUPPORT
+    CMAKE_ARGS += -DJ9VM_OPT_LOOM=OFF
+  endif # OPENJ9_ENABLE_LOOM_SUPPORT
 
   CMAKE_ARGS += -DJ9VM_OPT_OPENJDK_METHODHANDLE=ON
   CMAKE_ARGS += -DJ9VM_OPT_METHOD_HANDLE=OFF
