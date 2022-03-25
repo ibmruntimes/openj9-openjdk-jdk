@@ -207,6 +207,10 @@ public class Platform {
         return isArch("arm.*");
     }
 
+    public static boolean isRISCV64() {
+        return isArch("riscv64");
+    }
+
     public static boolean isPPC() {
         return isArch("ppc.*");
     }
