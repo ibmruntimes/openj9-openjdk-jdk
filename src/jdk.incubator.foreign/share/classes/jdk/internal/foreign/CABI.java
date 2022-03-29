@@ -23,6 +23,13 @@
  *  questions.
  *
  */
+
+/*
+ * ===========================================================================
+ * (c) Copyright IBM Corp. 2021, 2022 All Rights Reserved
+ * ===========================================================================
+ */
+
 package jdk.internal.foreign;
 
 import static jdk.incubator.foreign.ValueLayout.ADDRESS;
@@ -32,7 +39,10 @@ public enum CABI {
     SysV,
     Win64,
     LinuxAArch64,
-    MacOsAArch64;
+    MacOsAArch64,
+    SysVPPC64le,
+    SysVS390x,
+    AIX;
 
     private static final CABI current;
 
@@ -55,7 +65,15 @@ public enum CABI {
                 // The Linux ABI follows the standard AAPCS ABI
                 current = LinuxAArch64;
             }
-        } else {
+        } else if (arch.startsWith("ppc64")) {
+            if (os.startsWith("Linux")) {
+                current = SysVPPC64le;
+            } else {
+                current = AIX;
+            }
+         } else if (arch.equals("s390x") && os.startsWith("Linux")) {
+                current = SysVS390x;
+         } else {
             throw new ExceptionInInitializerError(
                 "Unsupported os, arch, or address size: " + os + ", " + arch + ", " + addressSize);
         }

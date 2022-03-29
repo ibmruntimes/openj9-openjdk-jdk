@@ -22,6 +22,13 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
+
+/*
+ * ===========================================================================
+ * (c) Copyright IBM Corp. 2021, 2022 All Rights Reserved
+ * ===========================================================================
+ */
+
 package jdk.internal.foreign.abi;
 
 import jdk.incubator.foreign.Addressable;
@@ -47,6 +54,9 @@ import jdk.internal.foreign.ResourceScopeImpl;
 import jdk.internal.foreign.Utils;
 import jdk.internal.foreign.abi.aarch64.linux.LinuxAArch64Linker;
 import jdk.internal.foreign.abi.aarch64.macos.MacOsAArch64Linker;
+import jdk.internal.foreign.abi.ppc64.aix.AixPPC64Linker;
+import jdk.internal.foreign.abi.ppc64.sysv.SysVPPC64leLinker;
+import jdk.internal.foreign.abi.s390x.sysv.SysVS390xLinker;
 import jdk.internal.foreign.abi.x64.sysv.SysVx64Linker;
 import jdk.internal.foreign.abi.x64.windows.Windowsx64Linker;
 import jdk.internal.vm.annotation.ForceInline;
@@ -275,6 +285,9 @@ public class SharedUtils {
             case SysV -> SysVx64Linker.getInstance();
             case LinuxAArch64 -> LinuxAArch64Linker.getInstance();
             case MacOsAArch64 -> MacOsAArch64Linker.getInstance();
+            case SysVPPC64le -> SysVPPC64leLinker.getInstance();
+            case SysVS390x -> SysVS390xLinker.getInstance();
+            case AIX -> AixPPC64Linker.getInstance();
         };
     }
 
@@ -606,6 +619,9 @@ public class SharedUtils {
             case SysV -> SysVx64Linker.newVaList(actions, scope);
             case LinuxAArch64 -> LinuxAArch64Linker.newVaList(actions, scope);
             case MacOsAArch64 -> MacOsAArch64Linker.newVaList(actions, scope);
+            case SysVPPC64le -> SysVPPC64leLinker.newVaList(actions, scope);
+            case SysVS390x -> SysVS390xLinker.newVaList(actions, scope);
+            case AIX -> AixPPC64Linker.newVaList(actions, scope);
         };
     }
 
@@ -615,6 +631,9 @@ public class SharedUtils {
             case SysV -> SysVx64Linker.newVaListOfAddress(ma, scope);
             case LinuxAArch64 -> LinuxAArch64Linker.newVaListOfAddress(ma, scope);
             case MacOsAArch64 -> MacOsAArch64Linker.newVaListOfAddress(ma, scope);
+            case SysVPPC64le -> SysVPPC64leLinker.newVaListOfAddress(ma, scope);
+            case SysVS390x -> SysVS390xLinker.newVaListOfAddress(ma, scope);
+            case AIX -> AixPPC64Linker.newVaListOfAddress(ma, scope);
         };
     }
 
@@ -624,6 +643,9 @@ public class SharedUtils {
             case SysV -> SysVx64Linker.emptyVaList();
             case LinuxAArch64 -> LinuxAArch64Linker.emptyVaList();
             case MacOsAArch64 -> MacOsAArch64Linker.emptyVaList();
+            case SysVPPC64le -> SysVPPC64leLinker.emptyVaList();
+            case SysVS390x -> SysVS390xLinker.emptyVaList();
+            case AIX -> AixPPC64Linker.emptyVaList();
         };
     }
 
