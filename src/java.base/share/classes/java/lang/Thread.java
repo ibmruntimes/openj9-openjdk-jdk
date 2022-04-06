@@ -32,8 +32,6 @@
 package java.lang;
 
 import java.lang.reflect.Method;
-import java.io.FileDescriptor;
-import java.nio.charset.Charset;
 import java.security.AccessController;
 import java.security.AccessControlContext;
 import java.security.PrivilegedAction;
@@ -1556,6 +1554,10 @@ public class Thread implements Runnable {
         contextClassLoader = cl;
     }
 
+    void internalSetContextClassLoader(ClassLoader cl) {
+        contextClassLoader = cl;
+    }
+
     /**
      * Returns {@code true} if and only if the current thread holds the
      * monitor lock on the specified object.
@@ -2067,41 +2069,6 @@ public class Thread implements Runnable {
 
     // Used internally to compute Thread names that comply with the Java specification
     private static int createCount = -1;
-
-    /*
-     * Called after everything else is initialized.
-     */
-    void completeInitialization() {
-        // Get the java.system.class.loader
-        contextClassLoader = ClassLoader.getSystemClassLoader();
-        jdk.internal.misc.VM.initLevel(4);
-        System.startSNMPAgent();
-
-        /* Although file.encoding is used to set the default Charset, some Charset's are not available
-         * in the java.base module and so are not used at startup. There are additional Charset's in the
-         * jdk.charsets module, which is only loaded later. This means the default Charset may not be the
-         * same as file.encoding. Now that all modules and Charset's are available, check if the desired
-         * encodings can be used for System.err and System.out.
-         */
-        Properties props = System.internalGetProperties();
-        // If the sun.stderr.encoding was already set in System, don't change the encoding
-        if (!System.hasSetErrEncoding()) {
-            Charset stderrCharset = System.getCharset(props.getProperty("sun.stderr.encoding"), true);
-            if (stderrCharset != null) {
-                System.err.flush();
-                System.setErr(System.createConsole(FileDescriptor.err, stderrCharset));
-            }
-        }
-
-        // If the sun.stdout.encoding was already set in System, don't change the encoding
-        if (!System.hasSetOutEncoding()) {
-            Charset stdoutCharset = System.getCharset(props.getProperty("sun.stdout.encoding"), true);
-            if (stdoutCharset != null) {
-                System.out.flush();
-                System.setOut(System.createConsole(FileDescriptor.out, stdoutCharset));
-            }
-        }
-    }
 
     void uncaughtException(Throwable e) {
         UncaughtExceptionHandler handler = getUncaughtExceptionHandler();
