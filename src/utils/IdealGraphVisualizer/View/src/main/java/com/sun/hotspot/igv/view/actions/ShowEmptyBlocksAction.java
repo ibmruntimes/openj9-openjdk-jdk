@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007, 2022, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2022, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -19,21 +19,35 @@
  * Please contact Oracle, 500 Oracle Parkway, Redwood Shores, CA 94065 USA
  * or visit www.oracle.com if you need additional information or have any
  * questions.
+ *
  */
-/*
- * @test
- * @bug 6277243
- * @summary Verify that there is Locale.ROOT constant, and it is equal to Locale("", "", "")
- */
+package com.sun.hotspot.igv.view.actions;
 
-import java.util.Locale;
+import java.awt.event.ActionEvent;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.ImageIcon;
+import org.openide.util.ImageUtilities;
 
-public class bug6277243 {
+public class ShowEmptyBlocksAction extends AbstractAction {
 
-    public static void main(String[] args) throws Exception {
-        Locale root = Locale.of("", "", "");
-        if (!Locale.ROOT.equals(root)) {
-            throw new RuntimeException("Locale.ROOT is not equal to Locale(\"\", \"\", \"\")");
-        }
+    private boolean state;
+    public static final String STATE = "state";
+
+    public ShowEmptyBlocksAction() {
+        state = true;
+        putValue(AbstractAction.SMALL_ICON, new ImageIcon(ImageUtilities.loadImage(iconResource())));
+        putValue(STATE, true);
+        putValue(Action.SHORT_DESCRIPTION, "Show empty blocks in control-flow graph view");
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent ev) {
+        this.state = !state;
+        this.putValue(STATE, state);
+    }
+
+    protected String iconResource() {
+        return "com/sun/hotspot/igv/view/images/showEmptyBlocks.png";
     }
 }
