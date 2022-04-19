@@ -1687,7 +1687,7 @@ public class Thread implements Runnable {
         int count = systemThreadGroup.activeCount() + 20;
         Thread[] threads = new Thread[count];
         count = systemThreadGroup.enumerate(threads);
-        Map<Thread, StackTraceElement[]> result = new HashMap<>(count);
+        Map<Thread, StackTraceElement[]> result = HashMap.newHashMap(count);
         for (int i = 0; i < count; i++) {
             result.put(threads[i], threads[i].getStackTrace());
         }
