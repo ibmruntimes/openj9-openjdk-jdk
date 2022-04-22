@@ -299,7 +299,7 @@ AC_DEFUN([OPENJ9_CONFIGURE_HEALTHCENTER],
         else
           if test "x$OPENJDK_BUILD_OS_ENV" = xwindows.cygwin ; then
             # UTIL_FIXUP_PATH yields a Unix-style path, but we need a mixed-mode path
-            healthcenter_jar="`$CYGPATH -m $healthcenter_jar`"
+            healthcenter_jar="`$PATHTOOL -m $healthcenter_jar`"
           fi
           if test "$healthcenter_jar" = "$with_healthcenter" ; then
             AC_MSG_RESULT([$with_healthcenter])
