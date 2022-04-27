@@ -1,6 +1,6 @@
 /*
  * ===========================================================================
- * (c) Copyright IBM Corp. 2018, 2019 All Rights Reserved
+ * (c) Copyright IBM Corp. 2018, 2022 All Rights Reserved
  * ===========================================================================
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -36,15 +36,19 @@ public class NativeCrypto {
     //ossl_vers:
     // -1 : library load failed
     //  0 : openssl 1.0.x
-    //  1 : openssl 1.1.x
+    //  1 : openssl 1.1.x or newer
     private static final int ossl_ver = AccessController.doPrivileged(
             (PrivilegedAction<Integer>) () -> {
                 int ossl_ver;
+                boolean traceEnabled = Boolean.getBoolean("jdk.nativeCryptoTrace");
                 try {
                     System.loadLibrary("jncrypto"); // check for native library
                     // load OpenSSL crypto library dynamically
-                    ossl_ver = loadCrypto(Boolean.getBoolean("jdk.nativeCryptoTrace"));
-                } catch (UnsatisfiedLinkError e) {
+                    ossl_ver = loadCrypto(traceEnabled);
+                } catch (UnsatisfiedLinkError usle) {
+                    if (traceEnabled) {
+                        System.err.println("UnsatisfiedLinkError: Failure attempting to load jncrypto JNI library");
+                    }
                     // signal load failure
                     ossl_ver = -1;
                 }
