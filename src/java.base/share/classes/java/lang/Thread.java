@@ -400,41 +400,14 @@ public class Thread implements Runnable {
             }
         }
 
-        /*
-         * Do we have the required permissions?
-         */
-        if (security != null) {
-            /* checkAccess regardless of whether or not threadgroup is
-               explicitly passed in. */
-            security.checkAccess(g);
+        initialize(false, g, parent, acc, inheritThreadLocals);
 
-            if (isCCLOverridden(getClass())) {
-                security.checkPermission(
-                        SecurityConstants.SUBCLASS_IMPLEMENTATION_PERMISSION);
-            }
-        }
-
-        g.addUnstarted();
-
-        this.group = g;
         this.daemon = parent.isDaemon();
         this.priority = parent.getPriority();
-        if (security == null || isCCLOverridden(parent.getClass()))
-            this.contextClassLoader = parent.getContextClassLoader();
-        else
-            this.contextClassLoader = parent.contextClassLoader;
-        this.inheritedAccessControlContext =
-                acc != null ? acc : AccessController.getContext();
         this.target = target;
         setPriority(priority);
-        if (inheritThreadLocals && parent.inheritableThreadLocals != null)
-            this.inheritableThreadLocals =
-                ThreadLocal.createInheritedMap(parent.inheritableThreadLocals);
         /* Stash the specified stack size in case the VM cares */
         this.stackSize = stackSize;
-
-        /* Set thread ID */
-        this.tid = nextThreadID();
     }
 
     /**
@@ -811,17 +784,18 @@ public class Thread implements Runnable {
     }
 
     /**
-     * This method is called by the system to give a Thread
-     * a chance to clean up before it actually exits.
+     * Called by J9VMInternals.threadCleanup() so the Thread can release resources
+     * and change its state.
+     *
+     * @see J9VMInternals#threadCleanup()
      */
-    private void exit() {
+    void exit() {
+        /* Refresh interrupted value so it is accurate when thread reference is removed. */
+        interrupted = interrupted();
         if (threadLocals != null && TerminatingThreadLocal.REGISTRY.isPresent()) {
             TerminatingThreadLocal.threadTerminated();
         }
-        if (group != null) {
-            group.threadTerminated(this);
-            group = null;
-        }
+        group = null;
         /* Aggressively null out all reference fields: see bug 4006245 */
         target = null;
         /* Speed the release of some of these resources */
@@ -830,6 +804,10 @@ public class Thread implements Runnable {
         inheritedAccessControlContext = null;
         blocker = null;
         uncaughtExceptionHandler = null;
+        synchronized (blockerLock) {
+            // so that isAlive() can work
+            eetop = Thread.NO_REF;
+        }
     }
 
     /**
@@ -2061,14 +2039,10 @@ public class Thread implements Runnable {
     private boolean stopCalled;
     // Assigned by the vm
     private static ThreadGroup systemThreadGroup;
-    private static long tidCount = 1;
     // ThreadGroup where the "main" Thread starts
     private static ThreadGroup mainGroup;
     // Symbolic constant, no threadRef assigned or already cleaned up
     static final long NO_REF = 0;
-
-    // Used internally to compute Thread names that comply with the Java specification
-    private static int createCount = -1;
 
     void uncaughtException(Throwable e) {
         UncaughtExceptionHandler handler = getUncaughtExceptionHandler();
@@ -2082,25 +2056,23 @@ public class Thread implements Runnable {
      *
      * @param booting Indicates if the JVM is booting up, i.e. if the main thread is being attached
      * @param threadGroup The ThreadGroup to which the receiver is being added
-     * @param parentThread The creator Thread from which to inherit some values like local storage, etc.
+     * @param parent The creator Thread from which to inherit some values like local storage, etc.
      *                     If null, the receiver is either the main Thread or a JNI-C attached Thread
      * @param acc The AccessControlContext. If null, use the current context
      * @param inheritThreadLocals A boolean indicating whether to inherit initial values for inheritable thread-local variables
      */
-    private void initialize(boolean booting, ThreadGroup threadGroup, Thread parentThread, AccessControlContext acc, boolean inheritThreadLocals) {
+    private void initialize(boolean booting, ThreadGroup threadGroup, Thread parent, AccessControlContext acc, boolean inheritThreadLocals) {
         tid = nextThreadID();
         this.group = threadGroup;
         if (booting) {
             System.afterClinitInitialization();
         }
-
         // initialize the thread local storage before making other calls
-        if (parentThread != null) {
+        if (parent != null) {
             // Non-main thread
-            if (inheritThreadLocals && (parentThread.inheritableThreadLocals != null)) {
-                inheritableThreadLocals = ThreadLocal.createInheritedMap(parentThread.inheritableThreadLocals);
+            if (inheritThreadLocals && (parent.inheritableThreadLocals != null)) {
+                inheritableThreadLocals = ThreadLocal.createInheritedMap(parent.inheritableThreadLocals);
             }
-
             @SuppressWarnings("removal")
             final SecurityManager sm = System.getSecurityManager();
             final Class<?> implClass = getClass();
@@ -2131,7 +2103,7 @@ public class Thread implements Runnable {
                 }
             }
             // By default a Thread "inherits" the context ClassLoader from its creator
-            contextClassLoader = parentThread.getContextClassLoader();
+            contextClassLoader = parent.getContextClassLoader();
         } else {
             // no parent: main thread, or one attached through JNI-C
             if (booting) {
@@ -2142,7 +2114,6 @@ public class Thread implements Runnable {
                     // Continue silently if the class can't be loaded and initialized for some reason,
                     // The JIT will tolerate this.
                 }
-
                 // Explicitly initialize ClassLoaders, so ClassLoader methods (such as
                 // ClassLoader.callerClassLoader) can be used before System is initialized
                 ClassLoader.initializeClassLoaders();
@@ -2150,10 +2121,8 @@ public class Thread implements Runnable {
             // Just set the context class loader
             contextClassLoader = ClassLoader.getSystemClassLoader();
         }
-
         threadGroup.checkAccess();
         threadGroup.addUnstarted();
-
         inheritedAccessControlContext = (acc == null) ? AccessController.getContext() : acc;
     }
 
@@ -2171,7 +2140,6 @@ public class Thread implements Runnable {
      */
     private Thread(String vmName, Object vmThreadGroup, int vmPriority, boolean vmIsDaemon) {
         super();
-
         if (vmName == null) {
             if (threadInitNumber == 0) {
                 name = "main";
@@ -2181,14 +2149,11 @@ public class Thread implements Runnable {
         } else {
             name = vmName;
         }
-
         daemon = vmIsDaemon;
         // If we called setPriority(), it would have to be after setting the ThreadGroup (further down),
         // because of the checkAccess() call (which requires the ThreadGroup set). However, for the main
         // Thread or JNI-C attached Threads we just trust the value the VM is passing us, and just assign.
         priority = vmPriority;
-
-        ThreadGroup threadGroup = null;
         boolean booting = false;
         if (mainGroup == null) {
             // only occurs during bootstrap
@@ -2197,8 +2162,7 @@ public class Thread implements Runnable {
         } else {
             setNameImpl(eetop, name);
         }
-        threadGroup = (vmThreadGroup == null) ? mainGroup : (ThreadGroup)vmThreadGroup;
-
+        ThreadGroup threadGroup = (vmThreadGroup == null) ? mainGroup : (ThreadGroup)vmThreadGroup;
         // no parent Thread
         initialize(booting, threadGroup, null, null, true);
         this.group.add(this);
@@ -2223,62 +2187,10 @@ public class Thread implements Runnable {
         }
     }
 
-    private volatile boolean deadInterrupt;
-
-    void cleanup() {
-        /* Refresh deadInterrupt value so it is accurate when thread reference is removed. */
-        deadInterrupt = interrupted();
-        if ((threadLocals != null) && TerminatingThreadLocal.REGISTRY.isPresent()) {
-            TerminatingThreadLocal.threadTerminated();
-        }
-        group = null;
-        target = null;
-        inheritedAccessControlContext = null;
-        threadLocals = null;
-        inheritableThreadLocals = null;
-        synchronized (blockerLock) {
-            // So that isAlive() can work
-            eetop = Thread.NO_REF;
-        }
-    }
-
     Thread(Runnable runnable, String threadName, boolean isSystemThreadGroup, boolean inheritThreadLocals, boolean isDaemon, ClassLoader contextClassLoader) {
-        this(isSystemThreadGroup ? systemThreadGroup : null, runnable, threadName, null, inheritThreadLocals);
+        this(isSystemThreadGroup ? systemThreadGroup : null, runnable, threadName, 0, null, inheritThreadLocals);
         this.daemon = isDaemon;
         this.contextClassLoader = contextClassLoader;
     }
 
-    private Thread(ThreadGroup group, Runnable runnable, String threadName, AccessControlContext acc, boolean inheritThreadLocals) {
-        super();
-        if (threadName == null) {
-            throw new NullPointerException();
-        }
-        // We avoid the public API 'setName', since it does redundant work (checkAccess)
-        this.name = threadName;
-        // No API available here, so just direct access to inst. var.
-        this.target = runnable;
-        Thread currentThread = currentThread();
-
-        // We avoid the public API 'setDaemon', since it does redundant work (checkAccess)
-        this.daemon = currentThread.isDaemon();
-
-        if (group == null) {
-            @SuppressWarnings("removal")
-            SecurityManager currentManager = System.getSecurityManager();
-            // if there is a security manager...
-            if (currentManager != null) {
-                // Ask SecurityManager for ThreadGroup
-                group = currentManager.getThreadGroup();
-            }
-        }
-        if (group == null) {
-            // Same group as Thread that created us
-            group = currentThread.getThreadGroup();
-        }
-
-        initialize(false, group, currentThread, acc, inheritThreadLocals);
-
-        // In this case we can call the public API according to the spec - 20.20.10
-        setPriority(currentThread.getPriority());
-    }
 }
