@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Red Hat, Inc. All rights reserved.
+ * Copyright (c) 2022, Arm Limited. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -24,42 +24,38 @@
 package compiler.c2.irTests;
 
 import compiler.lib.ir_framework.*;
-import java.util.Objects;
 
 /*
  * @test
- * @bug 8279888
- * @summary Local variable independently used by multiple loops can interfere with loop optimizations
+ * @bug 8284981
+ * @summary Auto-vectorization enhancement for special counting down loops
+ * @requires os.arch=="amd64" | os.arch=="x86_64" | os.arch=="aarch64"
  * @library /test/lib /
- * @requires vm.compiler2.enabled
- * @run driver compiler.c2.irTests.TestDuplicateBackedge
+ * @run driver compiler.c2.irTests.TestAutoVecCountingDownLoop
  */
 
-public class TestDuplicateBackedge {
+public class TestAutoVecCountingDownLoop {
+    final private static int ARRLEN = 3000;
+
+    private static int[] a = new int[ARRLEN];
+    private static int[] b = new int[ARRLEN];
+
     public static void main(String[] args) {
-        TestFramework.runWithFlags("-XX:LoopMaxUnroll=1");
-        TestFramework.runWithFlags("-XX:LoopMaxUnroll=1", "-XX:-DuplicateBackedge");
+        TestFramework.run();
     }
+
 
     @Test
-    @IR(applyIf = { "DuplicateBackedge", "true" }, counts = { IRNode.LOOP, "1", IRNode.COUNTEDLOOP, "1" })
-    @IR(applyIf = { "DuplicateBackedge", "false" }, counts = { IRNode.LOOP, "1" })
-    @IR(applyIf = { "DuplicateBackedge", "false" }, failOn = { IRNode.COUNTEDLOOP })
-    public static float test() {
-        float res = 1;
-        for (int i = 1;;) {
-            if (i % 10 == 0) {
-                i = (i * 2) + 1;
-                res /= 42;
-            } else {
-                i++;
-                res *= 42;
-            }
-            if (i >= 1000) {
-                break;
-            }
+    @IR(counts = {IRNode.LOAD_VECTOR,  " >0 "})
+    @IR(counts = {IRNode.STORE_VECTOR, " >0 "})
+    private static void testCountingDown(int[] a, int[] b) {
+        for (int i = 2000; i > 0; i--) {
+            b[ARRLEN - i] = a[ARRLEN - i];
         }
-        return res;
     }
 
+    @Run(test = "testCountingDown")
+    private void testCountingDown_runner() {
+        testCountingDown(a, b);
+    }
 }
