@@ -49,7 +49,6 @@ WARNINGS_AS_ERRORS_OPENJ9 := @WARNINGS_AS_ERRORS_OPENJ9@
 # only ignore warnings in these modules
 WARNING_MODULES := \
 	java.base \
-	jdk.management \
 	openj9.dtfj \
 	openj9.dtfjview \
 	openj9.traceformat \
