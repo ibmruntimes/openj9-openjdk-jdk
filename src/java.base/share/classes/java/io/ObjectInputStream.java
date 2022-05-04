@@ -25,7 +25,7 @@
 
 /*
  * =======================================================================
- * (c) Copyright IBM Corp. 2018, 2021 All Rights Reserved
+ * (c) Copyright IBM Corp. 2018, 2022 All Rights Reserved
  * =======================================================================
  */
 
@@ -381,13 +381,13 @@ public class ObjectInputStream
      * read* requests
      */
 
-    /* ClassNameCache Entry for caching class.forName results upon enableClassCaching */
-    private static final ClassNameCache classCache;
+    /* ClassByNameCache Entry for caching class.forName results upon enableClassCaching */
+    private static final ClassByNameCache classByNameCache;
     private static final boolean isClassCachingEnabled;
     static {
         isClassCachingEnabled =
             AccessController.doPrivileged(new GetClassCachingSettingAction());
-        classCache = (isClassCachingEnabled ? new ClassNameCache() : null);
+        classByNameCache = (isClassCachingEnabled ? new ClassByNameCache() : null);
     }
   
 
@@ -914,14 +914,14 @@ public class ObjectInputStream
     {
         String name = desc.getName();
         try {
-            if (null == classCache) {
+            if (null == classByNameCache) {
                 return Class.forName(name, false, latestUserDefinedLoader());
             } else {
                 if (refreshLudcl) {
                     cachedLudcl = latestUserDefinedLoader();
                     refreshLudcl = false;
                 }
-                return classCache.get(name, cachedLudcl);
+                return classByNameCache.get(name, cachedLudcl);
             }
         } catch (ClassNotFoundException ex) {
             Class<?> cl = primClasses.get(name);
