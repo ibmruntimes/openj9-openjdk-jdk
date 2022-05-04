@@ -1,6 +1,6 @@
 /*
  * ===========================================================================
- * (c) Copyright IBM Corp. 2017, 2021 All Rights Reserved
+ * (c) Copyright IBM Corp. 2017, 2022 All Rights Reserved
  * ===========================================================================
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -152,7 +152,7 @@ final class ClassByNameCache {
         LookupKey key = new LookupKey(className, loader, this);
         Object value = cache.get(key);
         if (value == null) {
-        	value = createEntry(key.createCacheKey());
+            value = createEntry(key.createCacheKey());
         }
 
         if (value instanceof FutureValue) {
