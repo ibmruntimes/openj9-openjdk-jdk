@@ -21,22 +21,13 @@
  * questions.
  */
 
-/*
- * @test TestEventWriterLog
- * @summary Test that log message of JFR when handle bytecodes
- * @key jfr
- * @requires vm.hasJFR
- * @library /test/lib /test/jdk
- * @run main/othervm TestEventWriterLog
- */
+package jdk.jfr.jvm;
 
-import jdk.test.lib.process.ProcessTools;
-import jdk.test.lib.process.OutputAnalyzer;
+// Purpose of this class is to have something to
+// statically link against for TestGetEventWriter.
+//
+// When the class is loaded "jdk.jfr.jvm.PlaceholderEventWriter"
+// will be replaced with "jdk.jfr.internal.event.EventWriter"
+public class PlaceholderEventWriter {
 
-public class TestEventWriterLog {
-    public static void main(String[] args) throws Exception {
-        ProcessBuilder pb = ProcessTools.createJavaProcessBuilder("-Xlog:jfr+system+bytecode=trace", "-XX:StartFlightRecording", "-version");
-        OutputAnalyzer output = new OutputAnalyzer(pb.start());
-        output.shouldContain("extends jdk/jfr/events/AbstractJDKEvent");
-    }
 }

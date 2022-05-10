@@ -20,23 +20,16 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
+package jdk.jfr.jvm;
 
-/*
- * @test TestEventWriterLog
- * @summary Test that log message of JFR when handle bytecodes
- * @key jfr
- * @requires vm.hasJFR
- * @library /test/lib /test/jdk
- * @run main/othervm TestEventWriterLog
- */
+// Purpose of this class is to have something to
+// statically link against for TestGetEventWriter.
+//
+// When the class is loaded "jdk.jfr.jvm.PlaceholderEventWriterFactory"
+// will be replaced with "jdk.jfr.internal.event.EventWriterFactory"
+public class PlaceholderEventWriterFactory {
 
-import jdk.test.lib.process.ProcessTools;
-import jdk.test.lib.process.OutputAnalyzer;
-
-public class TestEventWriterLog {
-    public static void main(String[] args) throws Exception {
-        ProcessBuilder pb = ProcessTools.createJavaProcessBuilder("-Xlog:jfr+system+bytecode=trace", "-XX:StartFlightRecording", "-version");
-        OutputAnalyzer output = new OutputAnalyzer(pb.start());
-        output.shouldContain("extends jdk/jfr/events/AbstractJDKEvent");
+    public static PlaceholderEventWriter getEventWriter(long value) {
+        throw new RuntimeException("Test error, PlaceholderEventWriterFactory class should have been replaced with EventWriterFactory");
     }
 }
