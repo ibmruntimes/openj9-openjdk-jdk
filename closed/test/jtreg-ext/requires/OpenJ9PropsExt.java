@@ -36,10 +36,11 @@ public class OpenJ9PropsExt implements Callable<Map<String, String>> {
 
         Map<String, String> map = new HashMap<>();
         try {
-            map.put("vm.graal.enabled", "false");
             map.put("vm.bits", vmBits());
-            map.put("vm.hasJFR", "false");
             map.put("vm.compiler2.enabled", "false");
+            map.put("vm.gc.Z", "false");
+            map.put("vm.graal.enabled", "false");
+            map.put("vm.hasJFR", "false");
             map.put("vm.jvmti", "true");
             map.put("vm.musl", "false");
         }
