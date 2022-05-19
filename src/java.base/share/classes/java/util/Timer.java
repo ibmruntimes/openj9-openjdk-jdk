@@ -23,11 +23,21 @@
  * questions.
  */
 
+/*
+ * ===========================================================================
+ * (c) Copyright IBM Corp. 2022, 2022 All Rights Reserved
+ * ===========================================================================
+ */
+
 package java.util;
 import java.util.Date;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.lang.ref.Cleaner.Cleanable;
 import jdk.internal.ref.CleanerFactory;
+
+/*[IF CRIU_SUPPORT]*/
+import openj9.internal.criu.InternalCRIUSupport;
+/*[ENDIF] CRIU_SUPPORT*/
 
 /**
  * A facility for threads to schedule tasks for future execution in a
@@ -202,6 +212,12 @@ public class Timer {
     public void schedule(TimerTask task, long delay) {
         if (delay < 0)
             throw new IllegalArgumentException("Negative delay.");
+        /*[IF CRIU_SUPPORT]*/
+        // only tasks scheduled before Checkpoint to be adjusted
+        if (InternalCRIUSupport.getCheckpointRestoreNanoTimeDelta() == 0) {
+            task.criuAdjustRequired = true;
+        }
+        /*[ENDIF] CRIU_SUPPORT*/
         sched(task, System.currentTimeMillis()+delay, 0);
     }
 
@@ -257,6 +273,12 @@ public class Timer {
             throw new IllegalArgumentException("Negative delay.");
         if (period <= 0)
             throw new IllegalArgumentException("Non-positive period.");
+        /*[IF CRIU_SUPPORT]*/
+        // only tasks scheduled before Checkpoint to be adjusted
+        if (InternalCRIUSupport.getCheckpointRestoreNanoTimeDelta() == 0) {
+            task.criuAdjustRequired = true;
+        }
+        /*[ENDIF] CRIU_SUPPORT*/
         sched(task, System.currentTimeMillis()+delay, -period);
     }
 
@@ -337,6 +359,12 @@ public class Timer {
             throw new IllegalArgumentException("Negative delay.");
         if (period <= 0)
             throw new IllegalArgumentException("Non-positive period.");
+        /*[IF CRIU_SUPPORT]*/
+        // only tasks scheduled before Checkpoint to be adjusted
+        if (InternalCRIUSupport.getCheckpointRestoreNanoTimeDelta() == 0) {
+            task.criuAdjustRequired = true;
+        }
+        /*[ENDIF] CRIU_SUPPORT*/
         sched(task, System.currentTimeMillis()+delay, period);
     }
 
@@ -547,6 +575,18 @@ class TimerThread extends Thread {
                             continue;  // No action required, poll queue again
                         }
                         currentTime = System.currentTimeMillis();
+                        /*[IF CRIU_SUPPORT]*/
+                        if (task.criuAdjustRequired) {
+                            long checkpointRestoreTimeDelta = InternalCRIUSupport.getCheckpointRestoreNanoTimeDelta();
+                            // A zero checkpointRestoreTimeDelta value indicates no Checkpoint performed yet,
+                            // it can't be negative, otherwise a RestoreException already was thrown.
+                            if (checkpointRestoreTimeDelta > 0) {
+                                task.nextExecutionTime += (checkpointRestoreTimeDelta / 1000000);
+                                // clear the flag - only one time adjustment required
+                                task.criuAdjustRequired = false;
+                            }
+                        }
+                        /*[ENDIF] CRIU_SUPPORT*/
                         executionTime = task.nextExecutionTime;
                         if (taskFired = (executionTime<=currentTime)) {
                             if (task.period == 0) { // Non-repeating, remove
