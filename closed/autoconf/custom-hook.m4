@@ -49,7 +49,6 @@ AC_DEFUN_ONCE([CUSTOM_EARLY_HOOK],
   OPENJ9_CONFIGURE_WARNINGS
   OPENJ9_CONFIGURE_JITSERVER
   OPENJ9_CONFIGURE_INLINE_TYPES
-  OPENJ9_CONFIGURE_OPENJDK_THREAD_SUPPORT
   OPENJ9_THIRD_PARTY_REQUIREMENTS
   OPENJ9_CHECK_NASM_VERSION
 ])
@@ -402,25 +401,6 @@ AC_DEFUN([OPENJ9_CONFIGURE_JITSERVER],
   fi
 
   AC_SUBST(OPENJ9_ENABLE_JITSERVER)
-])
-
-AC_DEFUN([OPENJ9_CONFIGURE_OPENJDK_THREAD_SUPPORT],
-[
-  AC_MSG_CHECKING([for OpenJDK Thread support])
-  AC_ARG_ENABLE([openjdk-thread-support], [AS_HELP_STRING([--enable-openjdk-thread-support], [enable OpenJDK Thread support @<:@disabled@:>@])])
-  OPENJ9_ENABLE_OPENJDK_THREAD_SUPPORT=false
-
-  if test "x$enable_openjdk_thread_support" = xyes ; then
-    AC_MSG_RESULT([yes (explicitly enabled)])
-    OPENJ9_ENABLE_OPENJDK_THREAD_SUPPORT=true
-  elif test "x$enable_openjdk_thread_support" = xno ; then
-    AC_MSG_RESULT([no (explicitly disabled)])
-  elif test "x$enable_openjdk_thread_support" = x ; then
-    AC_MSG_RESULT([no (default)])
-  else
-    AC_MSG_ERROR([--enable-openjdk-thread-support accepts no argument])
-  fi
-  AC_SUBST(OPENJ9_ENABLE_OPENJDK_THREAD_SUPPORT)
 ])
 
 AC_DEFUN([OPENJ9_PLATFORM_SETUP],
