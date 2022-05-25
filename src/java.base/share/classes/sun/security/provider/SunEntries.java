@@ -24,7 +24,7 @@
  */
 /*
  * ===========================================================================
- * (c) Copyright IBM Corp. 2018, 2019 All Rights Reserved
+ * (c) Copyright IBM Corp. 2018, 2022 All Rights Reserved
  * ===========================================================================
  */
 
@@ -38,6 +38,7 @@ import java.security.*;
 import jdk.crypto.jniprovider.NativeCrypto;
 import jdk.internal.util.StaticProperty;
 import sun.security.action.GetBooleanAction;
+import sun.security.action.GetPropertyAction;
 import sun.security.util.SecurityProviderConstants;
 import static sun.security.util.SecurityProviderConstants.getAliases;
 
