@@ -25,7 +25,7 @@
 
 /*
  * ===========================================================================
- * (c) Copyright IBM Corp. 2021, 2021 All Rights Reserved
+ * (c) Copyright IBM Corp. 2021, 2022 All Rights Reserved
  * ===========================================================================
  */
 
@@ -1862,7 +1862,7 @@ public final class String
 			} while (quot != 0);
 
 			if (v1 < 0) {
-				helpers.putCharInArrayByIndex(value, index, (char) '-');
+				helpers.putCharInArrayByIndex(value, index, '-');
 			}
 
 			// Copy in s1 contents
@@ -2021,7 +2021,7 @@ public final class String
 			} while (quot2 != 0);
 
 			if (v2 < 0) {
-				helpers.putCharInArrayByIndex(value, index2--, (char) '-');
+				helpers.putCharInArrayByIndex(value, index2--, '-');
 			}
 
 			// Copy in s1 contents
@@ -2048,7 +2048,7 @@ public final class String
 			} while (quot1 != 0);
 
 			if (v1 < 0) {
-				helpers.putCharInArrayByIndex(value, index1--, (char) '-');
+				helpers.putCharInArrayByIndex(value, index1--, '-');
 			}
 
 			if (COMPACT_STRINGS) {
