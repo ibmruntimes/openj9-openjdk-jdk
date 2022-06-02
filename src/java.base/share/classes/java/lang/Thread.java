@@ -3094,7 +3094,7 @@ public class Thread implements Runnable {
     private void stop0(Object o) {
         synchronized (interruptLock) {
             if (o != null) {
-                if (started) {
+                if (!started) {
                     /* [PR CMVC 179978] Java7:JCK:java_lang.Thread fails in all platform */
                     /* If the thread has not yet been simply store the fact that stop has been called,
                      * the JVM uses this to determine if stop has been called before start.
