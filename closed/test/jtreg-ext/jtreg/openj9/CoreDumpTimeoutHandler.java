@@ -25,7 +25,7 @@
 
 /*
  * ===========================================================================
- * (c) Copyright IBM Corp. 2020, 2020 All Rights Reserved
+ * (c) Copyright IBM Corp. 2020, 2022 All Rights Reserved
  * ===========================================================================
  */
 
@@ -40,8 +40,8 @@ import java.io.PrintWriter;
 import com.sun.javatest.regtest.TimeoutHandler;
 
 /**
- * This is the OpenJ9 core dump timeout handler. It runs jcmd on the process that
- * has timed out to request a system dump, as well as running jstack as the default
+ * This is the OpenJ9 core dump timeout handler. It runs jcmd on the process that has
+ * timed out to request a system and java dump, as well as running jstack as the default
  * timeout handler does.
  */
 public class CoreDumpTimeoutHandler extends TimeoutHandler {
@@ -99,6 +99,26 @@ public class CoreDumpTimeoutHandler extends TimeoutHandler {
     }
 
     /**
+     * Run the specified jcmd command and log the output.
+     * @param jcmdPath the absolute path of the jcmd executable
+     * @param pid the pid, as a String, of the process to run jcmd on
+     * @param command the jcmd command to run
+     */
+    private void runJcmdCommand(String jcmdPath, String pid, String command) throws InterruptedException, IOException {
+        ProcessBuilder pb = new ProcessBuilder(jcmdPath, pid, command);
+        pb.redirectErrorStream(true);
+
+        Process p = pb.start();
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                log.println(line);
+            }
+            p.waitFor();
+        }
+    }
+
+    /**
      * Run jcmd on the specified pid.
      * @param pid Process Id
      */
@@ -112,18 +132,10 @@ public class CoreDumpTimeoutHandler extends TimeoutHandler {
                 log.println("Will not run jcmd.");
                 return;
             }
-
-            ProcessBuilder pb = new ProcessBuilder(jcmd.getAbsolutePath(), Long.toString(pid), "Dump.system");
-            pb.redirectErrorStream(true);
-
-            Process p = pb.start();
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()))) {
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    log.println(line);
-                }
-                p.waitFor();
-            }
+            String jcmdPath = jcmd.getAbsolutePath();
+            String pidString = Long.toString(pid);
+            runJcmdCommand(jcmdPath, pidString, "Dump.system");
+            runJcmdCommand(jcmdPath, pidString, "Dump.java");
         } catch (IOException ex) {
             ex.printStackTrace(log);
         }
