@@ -1,5 +1,5 @@
 # ===========================================================================
-# Portions Copyright 2018, 2018 IBM Corporation.
+# Portions Copyright 2018, 2022 IBM Corporation.
 # ===========================================================================
 # This code is free software; you can redistribute it and/or modify it
 # under the terms of the GNU General Public License version 2 only, as
@@ -86,6 +86,7 @@ requires.properties= \
     vm.hasSA \
     vm.hasJFR \
     vm.jvmci \
+    vm.openj9 \
     docker.support \
     release.implementor \
     jdk.containerized
