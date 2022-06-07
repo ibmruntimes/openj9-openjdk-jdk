@@ -1,10 +1,12 @@
 /*
- * Copyright (c) 2021, 2022, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2022, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License version 2 only, as
- * published by the Free Software Foundation.
+ * published by the Free Software Foundation.  Oracle designates this
+ * particular file as subject to the "Classpath" exception as provided
+ * by Oracle in the LICENSE file that accompanied this code.
  *
  * This code is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
@@ -21,31 +23,26 @@
  * questions.
  */
 
-package pkg;
 
-import java.lang.annotation.Documented;
+#ifndef PackageFile_h
+#define PackageFile_h
 
-/**
- * An annotation interface.
- * @since 2.0b
- */
-@Documented public @interface TestAnnotation {
+#include "tstrings.h"
 
-    /**
-     * Optional annotation interface element.
-     * @since 3.2
-     */
-    String optional() default "unknown";
 
-    /**
-     * Required annotation interface element.
-     * @since 2.0b
-     */
-    @Deprecated(forRemoval=true,since="3.2")
-    int required();
+class PackageFile {
+public:
+    static PackageFile loadFromAppDir(const tstring& appDirPath);
 
-    /**
-     * @since 6
-     */
-    int field = 0;
-}
+    tstring getPackageName() const {
+        return packageName;
+    }
+
+private:
+    PackageFile(const tstring& packageName);
+
+private:
+    tstring packageName;
+};
+
+#endif // PackageFile_h
