@@ -22,6 +22,14 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
+
+
+/*
+ * ===========================================================================
+ * (c) Copyright IBM Corp. 2022, 2022 All Rights Reserved
+ * ===========================================================================
+ */
+
 package jdk.internal.loader;
 
 import jdk.internal.misc.VM;
@@ -339,6 +347,20 @@ public final class NativeLibraries {
         }
     }
 
+    public static final NativeLibrary defaultLibrary = new NativeLibraryImpl(Object.class, "<default>", true) {
+
+        @Override
+        boolean open() {
+            throw new UnsupportedOperationException("Cannot load default library");
+        }
+
+        @Override
+        public long find(String name) {
+            return NativeLibraries.findEntryInProcess(name);
+        }
+
+    };
+
     /*
      * The run() method will be invoked when this class loader becomes
      * phantom reachable to unload the native library.
@@ -534,4 +556,5 @@ public final class NativeLibraries {
      */
     private static native void unload(String name, boolean isBuiltin, long handle);
     private static native String findBuiltinLib(String name);
+    private static native long findEntryInProcess(String name);
 }

@@ -23,6 +23,12 @@
  * questions.
  */
 
+/*
+ * ===========================================================================
+ * (c) Copyright IBM Corp. 2022, 2022 All Rights Reserved
+ * ===========================================================================
+ */
+
 #include <stdlib.h>
 #include <assert.h>
 #include <string.h>
@@ -175,7 +181,13 @@ Java_jdk_internal_loader_NativeLibraries_load
     }
 
     (*env)->SetLongField(env, lib, handleID, ptr_to_jlong(handle));
-    loaded = JNI_TRUE;
+    /* Fix this to resolve the library loading issue on macOS so as to
+     * ensure it returns true only when the handle is non-null given
+     * the official solution has not yet been released in OpenJDK.
+     */
+    if (handle) {
+        loaded = JNI_TRUE;
+    }
 
  done:
     JNU_ReleaseStringPlatformChars(env, name, cname);
@@ -295,3 +307,31 @@ Java_jdk_internal_loader_NativeLibraries_findBuiltinLib
     free(libName);
     return NULL;
 }
+
+#ifdef _AIX
+/*
+ * Class:     jdk_internal_loader_NativeLibraries
+ * Method:    findEntryInProcess
+ * Signature: (Ljava/lang/String;)J
+ */
+JNIEXPORT jlong JNICALL
+Java_jdk_internal_loader_NativeLibraries_findEntryInProcess
+  (JNIEnv *env, jclass cls, jstring name)
+{
+    const char *cname;
+    jlong res;
+
+    if (!initIDs(env)) {
+        return jlong_zero;
+    }
+
+    cname = (*env)->GetStringUTFChars(env, name, 0);
+    if (0 == cname) {
+        return jlong_zero;
+    }
+
+    res = ptr_to_jlong(findEntryInProcess(cname));
+    (*env)->ReleaseStringUTFChars(env, name, cname);
+    return res;
+}
+#endif /* _AIX */

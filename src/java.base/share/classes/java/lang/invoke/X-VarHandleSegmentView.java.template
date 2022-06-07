@@ -22,6 +22,13 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
+
+/*
+ * ===========================================================================
+ * (c) Copyright IBM Corp. 2022, 2022 All Rights Reserved
+ * ===========================================================================
+ */
+
 package java.lang.invoke;
 
 import jdk.internal.foreign.AbstractMemorySegmentImpl;
@@ -35,6 +42,8 @@ import java.util.Objects;
 
 import static java.lang.invoke.MethodHandleStatics.UNSAFE;
 
+import sun.security.action.GetPropertyAction;
+
 #warn
 
 final class VarHandleSegmentAs$Type$s extends VarHandleSegmentViewBase {
@@ -46,6 +55,8 @@ final class VarHandleSegmentAs$Type$s extends VarHandleSegmentViewBase {
     static final int VM_ALIGN = $BoxType$.BYTES - 1;
 
     static final VarForm FORM = new VarForm(VarHandleSegmentAs$Type$s.class, MemorySegment.class, $type$.class, long.class);
+
+    static final boolean isAixOS = GetPropertyAction.privilegedGetProperty("os.name").startsWith("AIX") ? true : false;
 
     VarHandleSegmentAs$Type$s(boolean be, long length, long alignmentMask, boolean exact) {
         super(FORM, be, length, alignmentMask, exact);
@@ -106,9 +117,17 @@ final class VarHandleSegmentAs$Type$s extends VarHandleSegmentViewBase {
     @ForceInline
     static long offset(AbstractMemorySegmentImpl bb, long offset, long alignmentMask) {
         long address = offsetNoVMAlignCheck(bb, offset, alignmentMask);
-        if ((address & VM_ALIGN) != 0) {
-            throw VarHandleSegmentViewBase.newIllegalArgumentExceptionForMisalignedAccess(address);
+#if[floatingPoint]
+        /* Ignore the alignement check for float/double on AIX/PPC to handle the case of [float/int, double]
+         * given the size of [float/int, double] on AIX/PPC 64-bit is 12 bytes without padding while the
+         * same struct is 16 bytes with padding on other platforms
+         */
+        if (!isAixOS) {
+            if ((address & VM_ALIGN) != 0) {
+                throw VarHandleSegmentViewBase.newIllegalArgumentExceptionForMisalignedAccess(address);
+            }
         }
+#end[floatingPoint]
         return address;
     }
 
@@ -116,10 +135,18 @@ final class VarHandleSegmentAs$Type$s extends VarHandleSegmentViewBase {
     static long offsetNoVMAlignCheck(AbstractMemorySegmentImpl bb, long offset, long alignmentMask) {
         long base = bb.unsafeGetOffset();
         long address = base + offset;
-        long maxAlignMask = bb.maxAlignMask();
-        if (((address | maxAlignMask) & alignmentMask) != 0) {
-            throw VarHandleSegmentViewBase.newIllegalArgumentExceptionForMisalignedAccess(address);
+#if[floatingPoint]
+        /* Ignore the alignement check for float/double on AIX/PPC to handle the case of [float/int, double]
+         * given the size of [float/int, double] on AIX/PPC 64-bit is 12 bytes without padding while the
+         * same struct is 16 bytes with padding on other platforms
+         */
+        if (!isAixOS) {
+            long maxAlignMask = bb.maxAlignMask();
+            if (((address | maxAlignMask) & alignmentMask) != 0) {
+                throw VarHandleSegmentViewBase.newIllegalArgumentExceptionForMisalignedAccess(address);
+            }
         }
+#end[floatingPoint]
         return address;
     }
 

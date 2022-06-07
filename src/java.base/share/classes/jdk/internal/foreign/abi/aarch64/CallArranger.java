@@ -23,6 +23,13 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
+
+/*
+ * ===========================================================================
+ * (c) Copyright IBM Corp. 2022, 2022 All Rights Reserved
+ * ===========================================================================
+ */
+
 package jdk.internal.foreign.abi.aarch64;
 
 import java.lang.foreign.FunctionDescriptor;
@@ -149,26 +156,15 @@ public abstract class CallArranger {
         return new Bindings(csb.build(), returnInMemory);
     }
 
-    public MethodHandle arrangeDowncall(MethodType mt, FunctionDescriptor cDesc) {
-        Bindings bindings = getBindings(mt, cDesc, false);
-
-        MethodHandle handle = new DowncallLinker(C, bindings.callingSequence).getBoundMethodHandle();
-
-        if (bindings.isInMemoryReturn) {
-            handle = SharedUtils.adaptDowncallForIMR(handle, cDesc);
-        }
-
+    /* Replace DowncallLinker in OpenJDK with the implementation of DowncallLinker specific to OpenJ9 */
+    public static MethodHandle arrangeDowncall(MethodType mt, FunctionDescriptor cDesc) {
+        MethodHandle handle = DowncallLinker.getBoundMethodHandle(mt, cDesc);
         return handle;
     }
 
-    public MemorySegment arrangeUpcall(MethodHandle target, MethodType mt, FunctionDescriptor cDesc, MemorySession session) {
-        Bindings bindings = getBindings(mt, cDesc, true);
-
-        if (bindings.isInMemoryReturn) {
-            target = SharedUtils.adaptUpcallForIMR(target, true /* drop return, since we don't have bindings for it */);
-        }
-
-        return UpcallLinker.make(C, target, bindings.callingSequence, session);
+    /* Replace UpcallLinker in OpenJDK with the implementation of UpcallLinker specific to OpenJ9 */
+    public static MemorySegment arrangeUpcall(MethodHandle target, MethodType mt, FunctionDescriptor cDesc, MemorySession session) {
+        throw new InternalError("arrangeUpcall is not yet implemented"); //$NON-NLS-1$
     }
 
     private static boolean isInMemoryReturn(Optional<MemoryLayout> returnLayout) {
