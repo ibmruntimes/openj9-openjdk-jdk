@@ -1,13 +1,13 @@
 /*
  * ===========================================================================
- * (c) Copyright IBM Corp. 2018, 2018 All Rights Reserved
+ * (c) Copyright IBM Corp. 2018, 2022 All Rights Reserved
  * ===========================================================================
  * 
  * This code is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License version 2 only, as
  * published by the Free Software Foundation.  
  *
- * IBM designates this particular file as subject to the "Classpath" exception 
+ * IBM designates this particular file as subject to the "Classpath" exception
  * as provided by IBM in the LICENSE file that accompanied this code.
  *
  * This code is distributed in the hope that it will be useful, but WITHOUT
@@ -23,7 +23,11 @@
 */
 
 def FAIL = false
-def SRC_REPO = 'https://github.com/${ghprbGhRepository}.git'
+Boolean KEEP_WORKSPACE = params.KEEP_WORKSPACE ?: true
+String NODE_LABEL =  params.NODE_LABEL ?: 'worker'
+String SRC_HOST = params.SRC_HOST ?: 'https://github.com/'
+String SRC_REPO = "${SRC_HOST}${ghprbGhRepository}.git"
+def GIT_CREDENTIALS_ID = params.GIT_CREDENTIALS_ID ?: ''
 def BAD_FILES = [:]
 def CONFIG_EXTENSIONS = [".policy", ".security", ".plist"]
 def CONFIG_PATHS = ["/META-INF/", "/ChangeLog"]
@@ -36,105 +40,110 @@ def ignorefile = "${env.WORKSPACE}/.copyrightignore"
 
 timeout(time: 6, unit: 'HOURS') {
     stage('Copyright Check') {
-        node ('worker') {
+        node (NODE_LABEL) {
             timestamps {
-                checkout changelog: false, poll: false,
-                        scm: [$class: 'GitSCM',
-                            branches: [[name: sha1]],
-                            doGenerateSubmoduleConfigurations: false,
-                            extensions: [[$class: 'CloneOption',
-                                            depth: 0,
-                                            noTags: false,
-                                            reference: '/home/jenkins/openjdk_cache',
-                                            shallow: false]],
-                            userRemoteConfigs: [[refspec: "+refs/pull/${ghprbPullId}/*:refs/remotes/origin/pr/${ghprbPullId}/* +refs/heads/${ghprbTargetBranch}:refs/remotes/origin/${ghprbTargetBranch}",
-                                                    url: SRC_REPO]]]
-                FILES = sh (
-                    script: "git diff -C --diff-filter=ACM --name-only origin/${ghprbTargetBranch} HEAD",
-                    returnStdout: true
-                ).trim()
-                echo FILES
-                if (FILES == "") {
-                    echo "There are no files to check for copyrights"
-                } else {
-                    def FILES_LIST = FILES.split("\\r?\\n")
-                    DATE_YEAR = sh (
-                        script: "date +%Y",
-                        returnStdout: true
-                    ).trim()
-                    
-                    // Set a different Copyright regex depending on the Repo the PR is from
-                    if (ghprbGhRepository ==~ "eclipse.*") {
-                        REGEX = "\'Copyright \\(c\\) ([0-9]{4}), ${DATE_YEAR}\'"
-                    } else if (ghprbGhRepository ==~ "ibmruntimes.*") {
-                        REGEX = "\'\\(c\\) Copyright IBM Corp. ([0-9]{4}), ${DATE_YEAR} All Rights Reserved\'"
+                try {
+                    def remoteConfigParameters = [refspec: "+refs/pull/${ghprbPullId}/*:refs/remotes/origin/pr/${ghprbPullId}/* +refs/heads/${ghprbTargetBranch}:refs/remotes/origin/${ghprbTargetBranch}",
+                                                      url: SRC_REPO]
+                    if (GIT_CREDENTIALS_ID) {
+                        remoteConfigParameters.put("credentialsId", "${GIT_CREDENTIALS_ID}")
+                    }
+                    String REPO_CACHE_DIR = params.REPO_CACHE_DIR ?: "${env.HOME}/openjdk_cache"
+
+                    checkout changelog: false, poll: false,
+                            scm: [$class: 'GitSCM',
+                                branches: [[name: sha1]],
+                                doGenerateSubmoduleConfigurations: false,
+                                extensions: [[$class: 'CloneOption',
+                                                depth: 0,
+                                                noTags: false,
+                                                reference: "${REPO_CACHE_DIR}",
+                                                shallow: false]],
+                                userRemoteConfigs: [remoteConfigParameters]]
+
+                    if (GIT_CREDENTIALS_ID) {
+                        sshagent(credentials:["${GIT_CREDENTIALS_ID}"]) {
+                            FILES = get_files()
+                        }
                     } else {
-                        error("Unrecognized repository. Unable to determine correct Copyright regex")
+                        FILES = get_files()
                     }
+                    echo FILES
+                    if (FILES == "") {
+                        echo "There are no files to check for copyrights"
+                    } else {
+                        def FILES_LIST = FILES.split("\\r?\\n")
+                        DATE_YEAR = sh (
+                            script: "date +%Y",
+                            returnStdout: true
+                        ).trim()
 
-                    if (fileExists("${env.WORKSPACE}/.copyrightignore")) {
-                        def readinFiles = readFile("${env.WORKSPACE}/.copyrightignore")
-                        def READLIST = readinFiles.split("\\r?\\n")
-                        for (item in READLIST) {
-                            regexsElm = item
+                        REGEX = /\(c\) Copyright IBM Corp\. \d{4}, ${DATE_YEAR} All Rights Reserved/
 
-                            if (item.contains("#")) {
-                                regexsElm = regexsElm.substring(0, regexsElm.indexOf("#"))
-                            }
+                        if (fileExists("${env.WORKSPACE}/.copyrightignore")) {
+                            def readinFiles = get_file_content("${env.WORKSPACE}/.copyrightignore")
+                            def READLIST = readinFiles.split("\\r?\\n")
+                            for (item in READLIST) {
+                                regexsElm = item
 
-                            if (regexsElm != "") {
-                                if (item.contains("*")) {
-                                    regexsElm = regexsElm.replaceAll(/[*]/, /\.\*/)
+                                if (item.contains("#")) {
+                                    regexsElm = regexsElm.substring(0, regexsElm.indexOf("#"))
                                 }
 
-                                if (item.startsWith("/") && item.lastIndexOf("/") == 0 ) {
-                                    regexsElm = regexsElm.replaceAll("[/]","");
-                                    if (item.contains("*.")) {
-                                        regexsElm = regexsElm.replaceAll("[*]","");
-                                        regexsElm =  "[A-Za-z0-9[^/]+]+" + regexsElm
+                                if (regexsElm != "") {
+                                    if (item.contains("*")) {
+                                        regexsElm = regexsElm.replaceAll(/[*]/, /\.\*/)
                                     }
 
-                                    if (!item.contains(".")){
-                                        regexsElm = regexsElm + /\// + ".*" + /|$/
-                                    }
+                                    if (item.startsWith("/") && item.lastIndexOf("/") == 0 ) {
+                                        regexsElm = regexsElm.replaceAll("[/]","");
+                                        if (item.contains("*.")) {
+                                            regexsElm = regexsElm.replaceAll("[*]","");
+                                            regexsElm =  "[A-Za-z0-9[^/]+]+" + regexsElm
+                                        }
 
-                                } else if (!item.startsWith("/") && item.lastIndexOf("/") != 0 && item.contains("/")) {
-                                    regexsElm = regexsElm.replaceAll(/\//,/\/+/)
-                                    if (!item.contains(".")){
-                                        regexsElm = regexsElm + ".*"
+                                        if (!item.contains(".")){
+                                            regexsElm = regexsElm + /\// + ".*" + /|$/
+                                        }
+
+                                    } else if (!item.startsWith("/") && item.lastIndexOf("/") != 0 && item.contains("/")) {
+                                        regexsElm = regexsElm.replaceAll(/\//,/\/+/)
+                                        if (!item.contains(".")){
+                                            regexsElm = regexsElm + ".*"
+                                        }
+                                    } else {
+                                        regexsElm = regexsElm.replaceAll("[/]","");
                                     }
-                                } else {
-                                    regexsElm = regexsElm.replaceAll("[/]","");
+                                }
+                                if (regexsElm.contains ("/+.*.*")) {
+                                    regexsElm = regexsElm.replace("/+.*.*","/*.*.*");
+                                }
+
+                                if (regexsElm ==~ /.*.[A-Za-z0-9]/){
+                                    print regexsElm;
+                                    regexsElm = regexsElm.substring(0, regexsElm.lastIndexOf(".")) + /\./ + regexsElm.substring(regexsElm.lastIndexOf(".") + 1);
+                                }
+
+                                REGEXLIST << regexsElm
+                            }
+                            print REGEXLIST
+                            FILES_LIST.each { fileName ->
+                               for (regex in REGEXLIST) {
+                                    if (fileName ==~ /${regex}/) {
+                                        FILES_LIST = FILES_LIST.collect { it.toString() } - "${fileName}"
+                                        echo "Ignoring File: '${fileName}', as it appears to match .copyrightignore regex " + /${regex}/
+                                        break
+                                    }
                                 }
                             }
-                            if (regexsElm.contains ("/+.*.*")) {
-                                regexsElm = regexsElm.replace("/+.*.*","/*.*.*");
-                            }
-                            
-                            if (regexsElm ==~ /.*.[A-Za-z0-9]/){
-                                print regexsElm;
-                                regexsElm = regexsElm.substring(0, regexsElm.lastIndexOf(".")) + /\./ + regexsElm.substring(regexsElm.lastIndexOf(".") + 1);
-                            }
-                            
-                            REGEXLIST << regexsElm
                         }
-                        print REGEXLIST
-                        FILES_LIST.each { fileName ->
-                           for (regex in REGEXLIST) {
-                                if (fileName ==~ /${regex}/) {
-                                    FILES_LIST = FILES_LIST.collect { it.toString() } - "${fileName}"
-                                    echo "Ignoring File: '${fileName}', as it appears to match .copyrightignore regex " + /${regex}/
-                                    break
-                                }
-                            }
-                        }
-                    }
 
-                    FILES_LIST.each { file ->
-                        def checkCopyrightDate = true
-                        if (ghprbGhRepository ==~ "ibmruntimes.*") {
+                        FILES_LIST.each { file ->
+                            def checkCopyrightDate = true
+                            def theFile
+
                             println "Checking file: '${file}'"
-                            
+
                             def lineCount = 0
                             def foundOracleCopyright = -1
                             def foundIBMCopyright = -1
@@ -149,9 +158,9 @@ timeout(time: 6, unit: 'HOURS') {
                             def foundNonIBMCopyright = false
                             def inJDK = true
                             def maxLines = 100
-                            
-                            def theFile = readFile "${file}"
-                            
+
+                            theFile = get_file_content("${file}")
+
                             if( theFile.length() <= 0 ) {
                                 println "File is empty"
                             } else {
@@ -160,30 +169,31 @@ timeout(time: 6, unit: 'HOURS') {
                                     maxLines=400
                                 }
                                 toLines = fileLines.size()
-                                if (toLines > maxLines) { toLines = maxLines }
+                                if (toLines > maxLines) {
+                                    toLines = maxLines
+                                }
                                 println "The number of lines being checked is ${toLines} with max ${maxLines}"
                                 for (lineCount = 0; lineCount < toLines; lineCount++) {
                                     String line = fileLines[lineCount]
                                     if (line.contains("Oracle designates")) {
-                                        foundOracleDesignates = lineCount; 
+                                        foundOracleDesignates = lineCount;
                                         println "We have found the Oracle designates on line '${foundOracleDesignates}' in file: '${file}'"
                                     }
-                                    
+
                                     if (foundIBMCopyright < 0 && line.contains("Copyright IBM Corp") && line.contains("All Rights Reserved")) {
                                         foundIBMCopyright = lineCount;
                                         println "We have found the IBM Copyright on line '${foundIBMCopyright}' in file: '${file}'"
-                                        REGEX = "\'\\(c\\) Copyright IBM Corp. ([0-9]{4}), ${DATE_YEAR} All Rights Reserved\'"
                                     }
                                     if (line.contains("Portions Copyright") && line.contains("IBM Corporation")) {
                                         foundIBMPortionsCopyright = lineCount;
                                         println "We have found the IBM Portions Copyright on line '${foundIBMPortionsCopyright}' in file: '${file}'"
-                                        REGEX = "\'Portions Copyright ([0-9]{4}), ${DATE_YEAR} IBM Corporation.\'"
+                                        REGEX = /Portions Copyright \d{4}, ${DATE_YEAR} IBM Corporation\./
                                     }
                                     if (foundApacheCopyright < 0 && line.contains("Licensed to the Apache Software Foundation")) {
                                         foundApacheCopyright = lineCount;
                                         println "We have found the ASF copyright on line '${foundApacheCopyright}' in file: '${file}'"
                                     }
-                                    if ((foundBSDorMITCopyright < 0 && line.contains("BSD license")) || line.contains("MIT license") || 
+                                    if ((foundBSDorMITCopyright < 0 && line.contains("BSD license")) || line.contains("MIT license") ||
                                         line.contains("Redistribution and use in source and binary forms") ||
                                         (line.contains("PROVIDED") && line.contains("AS IS"))) {
                                             foundBSDorMITCopyright = lineCount;
@@ -221,12 +231,12 @@ timeout(time: 6, unit: 'HOURS') {
                                 }
                             }
                             // Check to see if we have a non IBM Copyright and set boolean
-                            if (foundOracleCopyright >= 0 || foundApacheCopyright >= 0 || 
+                            if (foundOracleCopyright >= 0 || foundApacheCopyright >= 0 ||
                                 foundBSDorMITCopyright >= 0 || foundCopyright >= 0) {
                                 println "We have found a non IBM copyright"
                                 foundNonIBMCopyright = true
                             }
-                            
+
                             // Check to see whether the file is on the built JDK
                             if (checkMatches("${file}", NON_JDK_EXTENSIONS, NON_JDK_PATHS)) {
                                 // The file is not in the IBM/Adopt built JDK
@@ -254,7 +264,7 @@ timeout(time: 6, unit: 'HOURS') {
                                         checkCopyrightDate = false
                                     }
                                 } else {
-                                    // The file is in the 'closed' directory and doesnt contain 
+                                    // The file is in the 'closed' directory and doesnt contain
                                     // Oracle copyright with GPLv2 and Classpath Exception so should
                                     // have IBM copyright with GPLv2 and CE at the top of the file
                                     if (foundIBMCopyright >= 5) {
@@ -276,13 +286,13 @@ timeout(time: 6, unit: 'HOURS') {
                                 }
                             } else {
                                 println "The file is NOT in the closed directory"
-                                // We have updated the file so it should have an 
+                                // We have updated the file so it should have an
                                 // IBM copyright or an IBM Portions copyright
-                                
+
                                 // If we dont have some other copyright, ie Oracle, ASF, BSD, MIT etc
                                 if (!foundNonIBMCopyright) {
-                                    // and dont have a GPLv2 or CPE 
-                                    if (foundGPLv2 < 0) { 
+                                    // and dont have a GPLv2 or CPE
+                                    if (foundGPLv2 < 0) {
                                         if (foundCPE < 0) {
                                             println "We have no GPLv2 with CE"
                                             // and the file is a user config
@@ -385,37 +395,33 @@ timeout(time: 6, unit: 'HOURS') {
                                     }
                                 } // !foundNonIBMCopyright
                             } // if closed
-                        } else {
-                            // must be an eclipse repository, so just 
-                            // check that the date is valid
-                            checkCopyrightDate = true
-                            println "Checking file: '${file}'"
-                        }
-                            
-                         // We need to check that the copyright update year is the current year 
-                        if (checkCopyrightDate) {
-                            RESULT = sh (
-                                script: "grep -qE ${REGEX} '${file}'",
-                                returnStatus: true)
-                            if(RESULT != 0) {
-                                errorStr = "IBM Copyright date appears to be incorrect"
-                                FAIL = addError(BAD_FILES, "${file}", errorStr)
-                            } else {
-                                echo "Copyright date in file: appears to be correct"
+
+                             // We need to check that the copyright update year is the current year
+                            if (checkCopyrightDate) {
+                                if (!theFile.find(REGEX)) {
+                                    errorStr = "IBM Copyright date appears to be incorrect"
+                                    FAIL = addError(BAD_FILES, "${file}", errorStr)
+                                } else {
+                                    echo "Copyright date in file: appears to be correct"
+                                }
                             }
                         }
-                    }
-                    
-                    if (FAIL) {
-                        echo "${HASHES}"
-                        echo "The following files were modified and have incorrect copyrights"
-                        BAD_FILES.keySet().each {badfile ->
-                            echo "${badfile}"+BAD_FILES.get("${badfile}")
+
+                        if (FAIL) {
+                            echo "${HASHES}"
+                            echo "The following files were modified and have incorrect copyrights"
+                            BAD_FILES.keySet().each {badfile ->
+                                echo "${badfile}"+BAD_FILES.get("${badfile}")
+                            }
+                            echo "${HASHES}"
+                            error "Found ${BAD_FILES.size()} files with incorrect copyrights"
+                        } else {
+                            echo "All modified files appear to have correct copyrights"
                         }
-                        echo "${HASHES}"
-                        sh 'exit 1'
-                    } else {
-                        echo "All modified files appear to have correct copyrights"
+                    }
+                } finally {
+                    if (!KEEP_WORKSPACE) {
+                        cleanWs()
                     }
                 }
             }
@@ -445,4 +451,29 @@ def checkMatches(checkFile, fileExtensions, filePaths) {
         }
     }
     return false;
+}
+
+def get_files() {
+    return sh (
+        script: "git diff -C --diff-filter=ACM --name-only origin/${ghprbTargetBranch} HEAD",
+        returnStdout: true
+        ).trim()
+}
+
+def get_file_content(inFile) {
+    def fileContent
+    def fileType = sh (
+        script: "file -b ${inFile}",
+        returnStdout: true
+    ).trim()
+
+    if (fileType && fileType.contains('EBCDIC text')) {
+        fileContent = readFile file: "${inFile}", encoding: "IBM-1047"
+        // fix line terminator
+        fileContent = fileContent.replaceAll('\u0085', '\r\n')
+    } else {
+        fileContent = readFile file: "${inFile}"
+    }
+
+    return fileContent
 }
