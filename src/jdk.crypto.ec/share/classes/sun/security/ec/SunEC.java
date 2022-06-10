@@ -44,6 +44,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
+import jdk.crypto.jniprovider.NativeCrypto;
+
+import sun.security.action.GetPropertyAction;
 import sun.security.ec.ed.EdDSAAlgorithmParameters;
 import sun.security.ec.ed.EdDSAKeyFactory;
 import sun.security.ec.ed.EdDSAKeyPairGenerator;
@@ -63,6 +66,20 @@ import openj9.internal.security.FIPSConfigurator;
 public final class SunEC extends Provider {
 
     private static final long serialVersionUID = -2279741672933606418L;
+
+    /*
+     * Check whether native crypto is disabled with property.
+     *
+     * By default, the native crypto is enabled and uses the native
+     * crypto library implementation.
+     *
+     * The property 'jdk.nativeEC' is used to disable Native EC alone and
+     * 'jdk.nativeCrypto' is used to disable all native cryptos (Digest,
+     * CBC, GCM, RSA, ChaCha20, and EC).
+     */
+    private static boolean useNativeCrypto;
+
+    private static boolean useNativeEC;
 
     private static class ProviderServiceA extends ProviderService {
         ProviderServiceA(Provider p, String type, String algo, String cn,
@@ -176,7 +193,11 @@ public final class SunEC extends Provider {
                     }
                 } else  if (type.equals("KeyAgreement")) {
                     if (algo.equals("ECDH")) {
-                        return new ECDHKeyAgreement();
+                        if (useNativeEC) {
+                            return new NativeECDHKeyAgreement();
+                        } else {
+                            return new ECDHKeyAgreement();
+                        }
                     } else if (algo.equals("XDH")) {
                         return new XDHKeyAgreement();
                     } else if (algo.equals("X25519")) {
@@ -336,8 +357,13 @@ public final class SunEC extends Provider {
         /*
          * Key Agreement engine
          */
-        putService(new ProviderService(this, "KeyAgreement",
-            "ECDH", "sun.security.ec.ECDHKeyAgreement", null, ATTRS));
+        if (useNativeEC) {
+            putService(new ProviderService(this, "KeyAgreement",
+                "ECDH", "sun.security.ec.NativeECDHKeyAgreement", null, ATTRS));
+        } else {
+            putService(new ProviderService(this, "KeyAgreement",
+                "ECDH", "sun.security.ec.ECDHKeyAgreement", null, ATTRS));
+        }
     }
 
     private void putXDHEntries() {
@@ -401,5 +427,44 @@ public final class SunEC extends Provider {
         putService(new ProviderServiceA(this, "Signature",
             "Ed448", "sun.security.ec.ed.EdDSASignature.Ed448", ATTRS));
 
+    }
+
+    static {
+        String nativeCryptTrace = GetPropertyAction.privilegedGetProperty("jdk.nativeCryptoTrace");
+        String nativeCryptStr   = GetPropertyAction.privilegedGetProperty("jdk.nativeCrypto");
+        String nativeECStr      = GetPropertyAction.privilegedGetProperty("jdk.nativeEC");
+
+        useNativeCrypto = (nativeCryptStr == null) || Boolean.parseBoolean(nativeCryptStr);
+
+        if (!useNativeCrypto) {
+            useNativeEC = false;
+        } else {
+            useNativeEC = (nativeECStr == null) || Boolean.parseBoolean(nativeECStr);
+        }
+
+        if (useNativeEC) {
+            /*
+             * User wants to use the native crypto implementation.
+             * Make sure the native crypto library is loaded successfully.
+             * Otherwise, throw a warning message and fall back to the in-built
+             * java crypto implementation.
+             */
+            if (!NativeCrypto.isLoaded()) {
+                useNativeEC = false;
+
+                if (nativeCryptTrace != null) {
+                    System.err.println("Warning: Native crypto library load failed." +
+                            " Using Java crypto implementation");
+                }
+            } else {
+                if (nativeCryptTrace != null) {
+                    System.err.println("SunEC Load - using native crypto library.");
+                }
+            }
+        } else {
+            if (nativeCryptTrace != null) {
+                System.err.println("SunEC Load - native crypto library disabled.");
+            }
+        }
     }
 }
