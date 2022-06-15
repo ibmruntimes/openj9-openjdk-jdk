@@ -20,6 +20,13 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
+
+/*
+ * ===========================================================================
+ * (c) Copyright IBM Corp. 2022, 2022 All Rights Reserved
+ * ===========================================================================
+ */
+
 #ifndef __CallHelper_hpp__
 #define __CallHelper_hpp__
 
@@ -78,14 +85,15 @@ protected:
 
     // check if an expected exception was thrown
     void checkExpectedExceptionThrown(const std::string& exception) {
+         jthrowable t = env->ExceptionOccurred();
+         // unless the exception is cleared before calling FindClass, OpenJ9 will return NULL from FindClass, which will assert below
+         env->ExceptionClear();
          jclass expected = env->FindClass(exception.c_str());
          assert(expected != NULL);
-         jthrowable t = env->ExceptionOccurred();
          if (env->IsInstanceOf(t, expected) == JNI_FALSE) {
             emitErrorMessage("Didn't get the expected " + exception);
             ::exit(-1);
          }
-         env->ExceptionClear();
     }
 
 protected:
