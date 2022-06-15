@@ -42,6 +42,8 @@ import sun.security.action.GetPropertyAction;
 import sun.security.util.SecurityProviderConstants;
 import static sun.security.util.SecurityProviderConstants.getAliases;
 
+import openj9.internal.security.FIPSConfigurator;
+
 /**
  * Defines the entries of the SUN provider.
  *
@@ -110,6 +112,52 @@ public final class SunEntries {
         // common attribute map
         HashMap<String, String> attrs = new HashMap<>(3);
 
+        attrs.put("ImplementedIn", "Software");
+
+        /*
+         * Certificates
+         */
+        addWithAlias(p, "CertificateFactory", "X.509",
+                "sun.security.provider.X509Factory", attrs);
+
+        /*
+         * CertStores
+         */
+        add(p, "CertStore", "Collection",
+                "sun.security.provider.certpath.CollectionCertStore",
+                attrs);
+        add(p, "CertStore", "com.sun.security.IndexedCollection",
+                "sun.security.provider.certpath.IndexedCollectionCertStore",
+                attrs);
+
+        /*
+         * Policy
+         */
+        add(p, "Policy", "JavaPolicy", "sun.security.provider.PolicySpiFile");
+
+        /*
+         * Configuration
+         */
+        add(p, "Configuration", "JavaLoginConfig",
+                "sun.security.provider.ConfigFile$Spi");
+
+        /*
+         * CertPathBuilder and CertPathValidator
+         */
+        attrs.put("ValidationAlgorithm", "RFC5280");
+
+        add(p, "CertPathBuilder", "PKIX",
+                "sun.security.provider.certpath.SunCertPathBuilder",
+                attrs);
+        add(p, "CertPathValidator", "PKIX",
+                "sun.security.provider.certpath.PKIXCertPathValidator",
+                attrs);
+
+        if (FIPSConfigurator.enableFIPS()) {
+            return;
+        }
+
+        attrs.clear();
         /*
          * SecureRandom engines
          */
@@ -277,12 +325,6 @@ public final class SunEntries {
                 "sun.security.provider.SHA3$SHA512", attrs);
 
         /*
-         * Certificates
-         */
-        addWithAlias(p, "CertificateFactory", "X.509",
-                "sun.security.provider.X509Factory", attrs);
-
-        /*
          * KeyStore
          */
         add(p, "KeyStore", "PKCS12",
@@ -292,42 +334,6 @@ public final class SunEntries {
         add(p, "KeyStore", "CaseExactJKS",
                 "sun.security.provider.JavaKeyStore$CaseExactJKS", attrs);
         add(p, "KeyStore", "DKS", "sun.security.provider.DomainKeyStore$DKS",
-                attrs);
-
-
-        /*
-         * CertStores
-         */
-        add(p, "CertStore", "Collection",
-                "sun.security.provider.certpath.CollectionCertStore",
-                attrs);
-        add(p, "CertStore", "com.sun.security.IndexedCollection",
-                "sun.security.provider.certpath.IndexedCollectionCertStore",
-                attrs);
-
-        /*
-         * Policy
-         */
-        add(p, "Policy", "JavaPolicy", "sun.security.provider.PolicySpiFile");
-
-        /*
-         * Configuration
-         */
-        add(p, "Configuration", "JavaLoginConfig",
-                "sun.security.provider.ConfigFile$Spi");
-
-        /*
-         * CertPathBuilder and CertPathValidator
-         */
-        attrs.clear();
-        attrs.put("ValidationAlgorithm", "RFC5280");
-        attrs.put("ImplementedIn", "Software");
-
-        add(p, "CertPathBuilder", "PKIX",
-                "sun.security.provider.certpath.SunCertPathBuilder",
-                attrs);
-        add(p, "CertPathValidator", "PKIX",
-                "sun.security.provider.certpath.PKIXCertPathValidator",
                 attrs);
     }
 
