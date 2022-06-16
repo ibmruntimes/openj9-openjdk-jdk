@@ -220,6 +220,12 @@ import static java.util.concurrent.TimeUnit.NANOSECONDS;
  * @since   1.0
  */
 public class Thread implements Runnable {
+    /* Make sure registerNatives is the first thing <clinit> does. */
+    private static native void registerNatives();
+    static {
+        registerNatives();
+    }
+
     /* Reserved for exclusive use by the JVM, maybe move to FieldHolder */
     private long eetop;
 
