@@ -23,7 +23,18 @@
  * questions.
  */
 
-import jdk.internal.javac.ParticipatesInPreview;
+/*
+ * ===========================================================================
+ * (c) Copyright IBM Corp. 2022, 2022 All Rights Reserved
+ * ===========================================================================
+ */
+
+/*
+ * OpenJ9 contributes module-info.java.extra for this module which triggers use
+ * of GenModuleInfoSource, but that tool has not yet been updated to handle this
+ * import nor the annotation below. Comment them out for now.
+ */
+//import jdk.internal.javac.ParticipatesInPreview;
 
 /**
  * Defines the Java Management Extensions (JMX) API.
@@ -37,7 +48,7 @@ import jdk.internal.javac.ParticipatesInPreview;
  * @moduleGraph
  * @since 9
  */
-@ParticipatesInPreview
+//@ParticipatesInPreview
 module java.management {
 
     exports java.lang.management;
