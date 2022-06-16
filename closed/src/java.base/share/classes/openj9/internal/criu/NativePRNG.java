@@ -73,6 +73,9 @@ public final class NativePRNG extends SecureRandomSpi {
     // name of the pure random file (also used for setSeed())
     private static final String NAME_RANDOM = "/dev/random";
 
+    // name of the pseudo random file
+    private static final String NAME_URANDOM = "/dev/urandom";
+
     // singleton instance or null if not available
     private static final RandomIO INSTANCE = initIO();
 
@@ -85,7 +88,7 @@ public final class NativePRNG extends SecureRandomSpi {
                 @Override
                 public RandomIO run() {
                     File seedFile = new File(NAME_RANDOM);
-                    File nextFile = new File(NAME_RANDOM);
+                    File nextFile = new File(NAME_URANDOM);
 
                     if (debug != null) {
                         debug.println("NativePRNG." +
@@ -132,9 +135,7 @@ public final class NativePRNG extends SecureRandomSpi {
     // get pseudo random bytes
     @Override
     protected void engineNextBytes(byte[] bytes) {
-        int len = bytes.length;
-        byte[] b = INSTANCE.implGenerateSeed(len);
-        System.arraycopy(b, 0, bytes, 0, len);
+        INSTANCE.implNextBytes(bytes);
     }
 
     // get true random bytes
@@ -143,12 +144,16 @@ public final class NativePRNG extends SecureRandomSpi {
         return INSTANCE.implGenerateSeed(numBytes);
     }
 
+    static void clearRNGState() {
+        INSTANCE.clearRNGState();
+    }
+
     /**
      * Nested class doing the actual work. Singleton, see INSTANCE above.
      */
     private static final class RandomIO {
 
-        // Holder for the seedFile.  Used if we ever add seed material.
+        // holder for the seedFile, used if we ever add seed material
         private File seedFile;
 
         // In/OutputStream for "seed" and "next".
@@ -158,11 +163,12 @@ public final class NativePRNG extends SecureRandomSpi {
         // flag indicating if we have tried to open seedOut yet
         private boolean seedOutInitialized;
 
-        // mutex lock for generateSeed()
-        private final Object LOCK_GET_SEED = new Object();
+        // SHA1PRNG instance for mixing
+        // initialized lazily on demand to avoid problems during startup
+        private volatile SHA1PRNG mixRandom;
 
-        // mutex lock for setSeed()
-        private final Object LOCK_SET_SEED = new Object();
+        // mutex lock for accessing the seed file stream
+        private final Object LOCK_GET_SEED = new Object();
 
         // constructor, called only once from initIO()
         private RandomIO(File seedFile, File nextFile) throws IOException {
@@ -183,22 +189,32 @@ public final class NativePRNG extends SecureRandomSpi {
             this.nextIn = nextStream;
         }
 
+        // get the SHA1PRNG for mixing
+        // initialize if not yet created
+        private SHA1PRNG getMixRandom() {
+            SHA1PRNG prngObj = mixRandom;
+            if (prngObj == null) {
+                synchronized (LOCK_GET_SEED) {
+                    prngObj = mixRandom;
+                    if (prngObj == null) {
+                        try {
+                            prngObj = SHA1PRNG.seedFrom(seedIn);
+                        } catch (IOException e) {
+                            throw new ProviderException("init failed", e);
+                        }
+                        mixRandom = prngObj;
+                    }
+                }
+            }
+            return prngObj;
+        }
         // Read data.length bytes from in.
         // These are not normal files, so we need to loop the read.
         // Just keep trying as long as we are making progress.
         private static void readFully(InputStream in, byte[] data)
                 throws IOException {
             int len = data.length;
-            int ofs = 0;
-            while (len > 0) {
-                int k = in.read(data, ofs, len);
-                if (k <= 0) {
-                    throw new EOFException("File(s) closed?");
-                }
-                ofs += k;
-                len -= k;
-            }
-            if (len > 0) {
+            if (in.readNBytes(data, 0, len) < len) {
                 throw new IOException("Could not read from file(s)");
             }
         }
@@ -219,30 +235,49 @@ public final class NativePRNG extends SecureRandomSpi {
         // supply random bytes to the OS
         // write to "seed" if possible
         // always add the seed to our mixing random
-        private void implSetSeed(byte[] seed) {
-            synchronized (LOCK_SET_SEED) {
-                if (seedOutInitialized == false) {
-                    seedOutInitialized = true;
-                    seedOut = AccessController.doPrivileged(
-                            new PrivilegedAction<>() {
-                        @Override
-                        public OutputStream run() {
-                            try {
-                                return new FileOutputStream(seedFile, true);
-                            } catch (Exception e) {
-                                return null;
-                            }
-                        }
-                    });
+        private synchronized void implSetSeed(byte[] seed) {
+           if (seedOutInitialized == false) {
+               seedOutInitialized = true;
+               seedOut = AccessController.doPrivileged(
+                       new PrivilegedAction<>() {
+                   @Override
+                   public OutputStream run() {
+                       try {
+                           return new FileOutputStream(seedFile, true);
+                       } catch (IOException e) {
+                           return null;
+                       }
+                   }
+               });
+           }
+           if (seedOut != null) {
+               try {
+                   seedOut.write(seed);
+               } catch (IOException e) {
+                   // ignored, on Mac OS X, /dev/urandom can be opened
+                   // for write, but actual write is not permitted
+               }
+           }
+           getMixRandom().engineSetSeed(seed);
+        }
+
+        private synchronized void implNextBytes(byte[] data) {
+            getMixRandom().engineNextBytes(data);
+            try {
+                // read random data from non blocking source
+                byte[] rawData = new byte[data.length];
+                readFully(nextIn, rawData);
+                for (int i = 0; i < data.length; i++) {
+                    data[i] ^= rawData[i];
                 }
-                if (seedOut != null) {
-                    try {
-                        seedOut.write(seed);
-                    } catch (IOException e) {
-                        // Ignored. On Mac OS X, /dev/urandom can be opened
-                        // for write, but actual write is not permitted.
-                    }
-                }
+            } catch (IOException e) {
+                throw new ProviderException("nextBytes() failed", e);
+            }
+        }
+
+        private void clearRNGState() {
+            if (mixRandom != null) {
+                mixRandom.clearState();
             }
         }
     }
