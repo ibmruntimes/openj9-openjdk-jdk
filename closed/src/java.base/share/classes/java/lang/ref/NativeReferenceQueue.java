@@ -22,33 +22,21 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-package jdk.incubator.concurrent;
+/*
+ * ===========================================================================
+ * (c) Copyright IBM Corp. 2022, 2022 All Rights Reserved
+ * ===========================================================================
+ */
+package java.lang.ref;
 
 /**
- * Thrown when a structure violation is detected.
- *
- * @see StructuredTaskScope#close()
- *
- * @since 19
+ * An implementation of a ReferenceQueue that uses native monitors.
+ * The use of java.util.concurrent.lock locks interacts with various mechanisms,
+ * such as virtual threads and ForkJoinPool, that might not be appropriate for some
+ * low-level mechanisms, in particular MethodType's weak intern set.
  */
-public final class StructureViolationException extends RuntimeException {
-    @java.io.Serial
-    private static final long serialVersionUID = -7705327650798235468L;
-
-    /**
-     * Constructs a {@code StructureViolationException} with no detail message.
-     */
-    public StructureViolationException() {
-        super();
-    }
-
-    /**
-     * Constructs a {@code StructureViolationException} with the specified
-     * detail message.
-     *
-     * @param  message the detail message, can be null
-     */
-    public StructureViolationException(String message) {
-        super(message);
-    }
+final class NativeReferenceQueue<T> extends ReferenceQueue<T> {
+	public NativeReferenceQueue() {
+		super(0);
+	}
 }

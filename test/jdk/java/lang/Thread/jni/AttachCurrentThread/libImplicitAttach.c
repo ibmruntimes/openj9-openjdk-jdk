@@ -1,12 +1,10 @@
 /*
- * Copyright (c) 2011, 2022, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2022, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License version 2 only, as
- * published by the Free Software Foundation.  Oracle designates this
- * particular file as subject to the "Classpath" exception as provided
- * by Oracle in the LICENSE file that accompanied this code.
+ * published by the Free Software Foundation.
  *
  * This code is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
@@ -22,35 +20,25 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
+#include <stdio.h>
+#include <pthread.h>
 
-package com.sun.source.doctree;
+#define STACK_SIZE 0x100000
 
 /**
- * A tree node for an {@code @value} inline tag.
- *
- * <pre>
- *    {&#064;value reference}
- *    {&#064;value format reference}
- * </pre>
- *
- * @since 1.8
+ * Creates n threads to execute the given function.
  */
-public interface ValueTree extends InlineTagTree {
-    /**
-     * Returns the reference to the value.
-     * @return the reference
-     */
-    ReferenceTree getReference();
+void start_threads(int n, void *(*f)(void *)) {
+    pthread_t tid;
+    pthread_attr_t attr;
+    int i;
 
-    /**
-     * Returns the format string, or {@code null} if none was provided.
-     *
-     * @return the format string
-     *
-     * @implSpec This implementation returns {@code null}.
-     * @since 20
-     */
-    default TextTree getFormat() {
-        return null;
+    pthread_attr_init(&attr);
+    pthread_attr_setstacksize(&attr, STACK_SIZE);
+    for (i = 0; i < n ; i++) {
+        int res = pthread_create(&tid, &attr, f, NULL);
+        if (res != 0) {
+            fprintf(stderr, "pthread_create failed: %d\n", res);
+        }
     }
 }
