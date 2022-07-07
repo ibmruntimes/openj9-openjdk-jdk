@@ -129,7 +129,7 @@ static void TranslateApplicationArgs(int jargc, const char **jargv, int *pargc, 
 static jboolean AddApplicationOptions(int cpathc, const char **cpathv);
 static void SetApplicationClassPath(const char**);
 
-static void PrintJavaVersion(JNIEnv *env, jboolean extraLF);
+static void PrintJavaVersion(JNIEnv *env);
 static void PrintUsage(JNIEnv* env, jboolean doXUsage);
 static void ShowSettings(JNIEnv* env, char *optString);
 static void ShowResolvedModules(JNIEnv* env);
@@ -447,7 +447,7 @@ JavaMain(void* _args)
     }
 
     if (printVersion || showVersion) {
-        PrintJavaVersion(env, showVersion);
+        PrintJavaVersion(env);
         CHECK_EXCEPTION_LEAVE(0);
         if (printVersion) {
             LEAVE();
@@ -1814,7 +1814,7 @@ static void SetJavaLauncherProp() {
  * Prints the version information from the java.version and other properties.
  */
 static void
-PrintJavaVersion(JNIEnv *env, jboolean extraLF)
+PrintJavaVersion(JNIEnv *env)
 {
     jclass ver;
     jmethodID print;
@@ -1822,7 +1822,7 @@ PrintJavaVersion(JNIEnv *env, jboolean extraLF)
     NULL_CHECK(ver = FindBootStrapClass(env, "java/lang/VersionProps"));
     NULL_CHECK(print = (*env)->GetStaticMethodID(env,
                                                  ver,
-                                                 (extraLF == JNI_TRUE) ? "println" : "print",
+                                                 "print",
                                                  "(Z)V"
                                                  )
               );
