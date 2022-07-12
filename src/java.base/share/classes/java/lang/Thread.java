@@ -3305,13 +3305,13 @@ public class Thread implements Runnable {
         boolean booting = false;
         if (mainGroup == null) {
             // only occurs during bootstrap
+            // vmName must be main at booting
             booting = true;
-            mainGroup = new ThreadGroup(systemThreadGroup, "main");
+            mainGroup = new ThreadGroup(systemThreadGroup, name);
         } else {
             setNameImpl(eetop, name);
         }
         ThreadGroup threadGroup = (vmThreadGroup == null) ? mainGroup : (ThreadGroup)vmThreadGroup;
-
         // If we called setPriority(), it would have to be after setting the ThreadGroup (further down),
         // because of the checkAccess() call (which requires the ThreadGroup set). However, for the main
         // Thread or JNI-C attached Threads we just trust the value the VM is passing us, and just assign.
