@@ -21,39 +21,11 @@
  * questions.
  */
 
-/* @test
-   @bug 8224267 8290162
-   @key headful
-   @summary Verifies if StackOverflowError is not thrown for multiple newlines
-   @run main TestOptionPaneStackOverflow
- */
+#include "jni.h"
 
-import javax.swing.JDialog;
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-import javax.swing.SwingUtilities;
-
-public class TestOptionPaneStackOverflow
-{
-    static JFrame frame;
-
-    public static void main(String[] argv) throws Exception
-    {
-        try {
-            String message = java.nio.CharBuffer.allocate(5000).toString().
-                                  replace('\0','\n');
-            SwingUtilities.invokeAndWait(() -> {
-                frame = new JFrame();
-                JOptionPane optionPane = new JOptionPane();
-                optionPane.createDialog(frame, null);
-                optionPane.setMessage(message);
-            });
-        } finally {
-            SwingUtilities.invokeAndWait(() -> {
-                if (frame != null) {
-                    frame.dispose();
-                }
-            });
-        }
+JNIEXPORT void JNICALL Java_TracePinnedThreads_invokePark(JNIEnv *env, jclass clazz) {
+    jmethodID mid = (*env)->GetStaticMethodID(env, clazz, "park", "()V");
+    if (mid != NULL) {
+        (*env)->CallStaticVoidMethod(env, clazz, mid);
     }
 }
