@@ -55,6 +55,7 @@ import javax.crypto.spec.SecretKeySpec;
 import jdk.crypto.jniprovider.NativeCrypto;
 
 import sun.security.action.GetPropertyAction;
+import sun.security.util.ECUtil;
 import sun.security.util.NamedCurve;
 
 /**
@@ -102,6 +103,8 @@ public final class NativeECDHKeyAgreement extends KeyAgreementSpi {
         /* attempt to translate the key if it is not an ECKey */
         this.privateKey = (ECPrivateKeyImpl) ECKeyFactory.toECKey(key);
         this.publicKey = null;
+
+        ECUtil.checkPrivateKey(this.privateKey);
 
         ECParameterSpec params = this.privateKey.getParams();
         if (params instanceof NamedCurve) {
