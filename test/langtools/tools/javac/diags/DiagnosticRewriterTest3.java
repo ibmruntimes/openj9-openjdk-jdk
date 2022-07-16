@@ -1,6 +1,5 @@
 /*
- * Copyright (c) 2021, 2022, Oracle and/or its affiliates. All rights reserved.
- * Copyright (c) 2021, BELLSOFT. All rights reserved.
+ * Copyright (c) 2022, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -23,28 +22,25 @@
  */
 
 /*
- * Class1 loads a native library.
+ * @test
+ * @bug 8268312
+ * @summary Compilation error with nested generic functional interface
+ * @compile DiagnosticRewriterTest3.java
  */
-package p;
 
-public class Class1 {
+import java.util.Optional;
 
-    public Class1() {
+class DiagnosticRewriterTest3 {
+    void m() {
+        Optional.of("").map(outer -> {
+            Optional.of("")
+                    .map(inner -> returnGeneric(outer))
+                    .ifPresent(String::toString);
+            return "";
+        });
     }
 
-    // method called from java threads
-    public void loadLibrary(Object obj) throws Exception {
-        System.loadLibrary("loadLibraryUnload");
-        System.out.println("Native library loaded from Class1.");
-        synchronized (Class1.class) {
-            setRef(obj);
-        }
+    <T> T returnGeneric(T generic) {
+        return generic;
     }
-
-    /**
-     * Native method to store an object ref in a native Global reference
-     * to be cleared when the library is unloaded.
-     * @param obj an object
-     */
-    private static native void setRef(Object obj);
 }
