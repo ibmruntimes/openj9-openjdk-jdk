@@ -23,6 +23,12 @@
  * questions.
  */
 
+/*
+ * ===========================================================================
+ * (c) Copyright IBM Corp. 2022, 2022 All Rights Reserved
+ * ===========================================================================
+ */
+
 #ifndef JNI_UTIL_H
 #define JNI_UTIL_H
 
@@ -335,6 +341,10 @@ void* getProcessHandle();
 
 void buildJniFunctionName(const char *sym, const char *cname,
                           char *jniEntryName);
+
+#ifdef _AIX
+void* findEntryInProcess(const char* name);
+#endif /* _AIX */
 
 JNIEXPORT size_t JNICALL
 getLastErrorString(char *buf, size_t len);
