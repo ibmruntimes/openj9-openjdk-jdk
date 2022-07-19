@@ -22,6 +22,12 @@
  *
  */
 
+/*
+ * ===========================================================================
+ * (c) Copyright IBM Corp. 2022, 2022 All Rights Reserved
+ * ===========================================================================
+ */
+
 import java.lang.foreign.Addressable;
 import java.lang.foreign.FunctionDescriptor;
 import java.lang.foreign.Linker;
@@ -33,6 +39,8 @@ import java.lang.foreign.ValueLayout;
 import java.lang.invoke.MethodHandle;
 
 public class NativeTestHelper {
+
+    private static final boolean isAixOS = System.getProperty("os.name").startsWith("AIX");
 
     public static boolean isIntegral(MemoryLayout layout) {
         return layout instanceof ValueLayout valueLayout && isIntegral(valueLayout.carrier());
@@ -69,7 +77,7 @@ public class NativeTestHelper {
     /**
      * The layout for the {@code long long} C type.
      */
-    public static final ValueLayout.OfLong C_LONG_LONG = ValueLayout.JAVA_LONG.withBitAlignment(64);
+    public static final ValueLayout.OfLong C_LONG_LONG = ValueLayout.JAVA_LONG.withBitAlignment(isAixOS ? 32 : 64);
     /**
      * The layout for the {@code float} C type
      */
@@ -77,11 +85,11 @@ public class NativeTestHelper {
     /**
      * The layout for the {@code double} C type
      */
-    public static final ValueLayout.OfDouble C_DOUBLE = ValueLayout.JAVA_DOUBLE.withBitAlignment(64);
+    public static final ValueLayout.OfDouble C_DOUBLE = ValueLayout.JAVA_DOUBLE.withBitAlignment(isAixOS ? 32 : 64);
     /**
      * The {@code T*} native type.
      */
-    public static final ValueLayout.OfAddress C_POINTER = ValueLayout.ADDRESS.withBitAlignment(64);
+    public static final ValueLayout.OfAddress C_POINTER = ValueLayout.ADDRESS.withBitAlignment(isAixOS ? 32 : 64);
 
     private static Linker LINKER = Linker.nativeLinker();
 

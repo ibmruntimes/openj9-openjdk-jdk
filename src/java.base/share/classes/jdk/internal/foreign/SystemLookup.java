@@ -41,8 +41,8 @@ import java.nio.file.Path;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
-import jdk.internal.loader.NativeLibrary;
 import jdk.internal.loader.NativeLibraries;
+import jdk.internal.loader.NativeLibrary;
 import jdk.internal.loader.RawNativeLibraries;
 import sun.security.action.GetPropertyAction;
 

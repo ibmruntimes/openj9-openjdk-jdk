@@ -342,9 +342,9 @@ void* getProcessHandle();
 void buildJniFunctionName(const char *sym, const char *cname,
                           char *jniEntryName);
 
-#ifdef _AIX
-void* findEntryInProcess(const char* name);
-#endif /* _AIX */
+#if defined(_AIX)
+void *findEntryInProcess(const char *name);
+#endif /* defined(_AIX) */
 
 JNIEXPORT size_t JNICALL
 getLastErrorString(char *buf, size_t len);

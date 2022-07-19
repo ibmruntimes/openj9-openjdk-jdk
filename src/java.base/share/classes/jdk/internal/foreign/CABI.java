@@ -71,9 +71,9 @@ public enum CABI {
             } else {
                 current = AIX;
             }
-         } else if (arch.equals("s390x") && os.startsWith("Linux")) {
-                current = SysVS390x;
-         } else {
+        } else if (arch.equals("s390x") && os.startsWith("Linux")) {
+            current = SysVS390x;
+        } else {
             throw new UnsupportedOperationException(
                 "Unsupported os, arch, or address size: " + os + ", " + arch + ", " + addressSize);
         }

@@ -23,13 +23,6 @@
  *  questions.
  *
  */
-
-/*
- * ===========================================================================
- * (c) Copyright IBM Corp. 2022, 2022 All Rights Reserved
- * ===========================================================================
- */
-
 package jdk.internal.foreign;
 
 import jdk.internal.vm.annotation.ForceInline;
@@ -47,8 +40,6 @@ import java.util.Arrays;
 import java.util.Objects;
 import java.util.function.UnaryOperator;
 
-import sun.security.action.GetPropertyAction;
-
 /**
  * This class provide support for constructing layout paths; that is, starting from a root path (see {@link #rootPath(MemoryLayout)},
  * a path can be constructed by selecting layout elements using the selector methods provided by this class
@@ -61,7 +52,6 @@ public class LayoutPath {
 
     private static final MethodHandle MH_ADD_SCALED_OFFSET;
     private static final MethodHandle MH_SLICE;
-    private static final boolean isAixOS = GetPropertyAction.privilegedGetProperty("os.name").startsWith("AIX") ? true : false;
 
     static {
         try {
@@ -153,15 +143,7 @@ public class LayoutPath {
         if (!(layout instanceof ValueLayout valueLayout)) {
             throw new IllegalArgumentException("Path does not select a value layout");
         }
-
-        /* Ignore the alignement check for float/double on AIX/PPC to handle the case of [float/int, double]
-         * given the size of [float/int, double] on AIX/PPC 64-bit is 12 bytes without padding while the
-         * same struct is 16 bytes with padding on other platforms
-         */
-        Class<?> javaType = valueLayout.carrier();
-        if (!isAixOS || ((javaType != float.class) && (javaType != double.class))) {
-            checkAlignment(this);
-        }
+        checkAlignment(this);
 
         VarHandle handle = Utils.makeSegmentViewVarHandle(valueLayout);
         for (int i = strides.length - 1; i >= 0; i--) {
