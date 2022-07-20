@@ -23,6 +23,12 @@
  * questions.
  */
 
+/*
+ * ===========================================================================
+ * (c) Copyright IBM Corp. 2022, 2022 All Rights Reserved
+ * ===========================================================================
+ */
+
 package java.lang.invoke;
 
 import jdk.internal.access.SharedSecrets;
@@ -52,6 +58,10 @@ import static java.lang.invoke.MethodHandleNatives.Constants.REF_putStatic;
 import static java.lang.invoke.MethodHandleStatics.*;
 import static java.lang.invoke.MethodHandles.Lookup.IMPL_LOOKUP;
 import static jdk.internal.org.objectweb.asm.Opcodes.*;
+
+/*[IF CRIU_SUPPORT]*/
+import openj9.internal.criu.NotCheckpointSafe;
+/*[ENDIF] CRIU_SUPPORT */
 
 /**
  * Class specialization code.
@@ -159,6 +169,9 @@ abstract class ClassSpecializer<T,K,S extends ClassSpecializer<T,K,S>.SpeciesDat
         }
     };
 
+    /*[IF CRIU_SUPPORT]*/
+    @NotCheckpointSafe
+    /*[ENDIF] CRIU_SUPPORT */
     public final S findSpecies(K key) {
         // Note:  Species instantiation may throw VirtualMachineError because of
         // code cache overflow.  If this happens the species bytecode may be
