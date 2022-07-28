@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2003, 2022, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2022, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -21,23 +21,29 @@
  * questions.
  */
 
-package pkg;
+/*
+ * @test
+ * @bug 8290705
+ * @summary Test correctness of the string concatenation optimization with
+ *          a store between StringBuffer allocation and constructor invocation.
+ * @compile SideEffectBeforeConstructor.jasm
+ * @run main/othervm -Xbatch compiler.stringopts.TestSideEffectBeforeConstructor
+ */
 
-import java.io.*;
+package compiler.stringopts;
 
-public abstract class XReader extends FilterReader implements DataInput {
+public class TestSideEffectBeforeConstructor {
 
-   /**
-    * This tests overriding an external method.
-    */
-    public int read() throws IOException {
-       return 'W';
-    }
-
-   /**
-    * This tests implementing an external method.
-    */
-    public int readInt() throws IOException {
-       return 'W';
+    public static void main(String[] args) {
+        for (int i = 0; i < 100_000; ++i) {
+            try {
+                SideEffectBeforeConstructor.test(null);
+            } catch (NullPointerException npe) {
+                // Expected
+            }
+        }
+        if (SideEffectBeforeConstructor.result != 100_000) {
+            throw new RuntimeException("Unexpected result: " + SideEffectBeforeConstructor.result);
+        }
     }
 }

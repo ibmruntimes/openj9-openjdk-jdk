@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2003, 2022, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2022, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -21,23 +21,38 @@
  * questions.
  */
 
-package pkg;
+super public class compiler/stringopts/SideEffectBeforeConstructor
+	version 51:0
+{
+  public static Field result:I;
 
-import java.io.*;
+  static Method "<clinit>":"()V"
+	stack 2 locals 0
+  {
+		iconst_0;
+		putstatic	Field result:"I";
+		return;
+  }
+  public Method "<init>":"()V"
+	stack 1 locals 1
+  {
+		aload_0;
+		invokespecial	Method java/lang/Object."<init>":"()V";
+		return;
+  }
 
-public abstract class XReader extends FilterReader implements DataInput {
-
-   /**
-    * This tests overriding an external method.
-    */
-    public int read() throws IOException {
-       return 'W';
-    }
-
-   /**
-    * This tests implementing an external method.
-    */
-    public int readInt() throws IOException {
-       return 'W';
-    }
+  public static Method test:"(Ljava/lang/String;)V"
+	stack 4 locals 1
+  {
+		new	class java/lang/StringBuffer;
+		dup;
+		getstatic	Field result:"I";
+		iconst_1;
+		iadd;
+		putstatic	Field result:"I";
+		aload_0;
+		invokespecial	Method java/lang/StringBuffer."<init>":"(Ljava/lang/String;)V";
+		invokevirtual	Method java/lang/StringBuffer.toString:"()Ljava/lang/String;";
+		return;
+  }
 }

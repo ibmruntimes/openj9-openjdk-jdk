@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2003, 2022, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2022, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -21,23 +21,34 @@
  * questions.
  */
 
-package pkg;
+#include <stdio.h>
+#include <jni.h>
+#include <signal.h>
+#include <sys/ucontext.h>
+#include <errno.h>
+#include <string.h>
 
-import java.io.*;
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-public abstract class XReader extends FilterReader implements DataInput {
+void sig_handler(int sig, siginfo_t *info, ucontext_t *context) {
 
-   /**
-    * This tests overriding an external method.
-    */
-    public int read() throws IOException {
-       return 'W';
-    }
+    printf( " HANDLER (1) " );
+}
 
-   /**
-    * This tests implementing an external method.
-    */
-    public int readInt() throws IOException {
-       return 'W';
+JNIEXPORT void JNICALL Java_TestPosixSig_changeSigActionFor(JNIEnv *env, jclass klass, jint val) {
+    struct sigaction act;
+    act.sa_handler = (void (*)())sig_handler;
+    sigemptyset(&act.sa_mask);
+    act.sa_flags = 0;
+    int retval = sigaction(val, &act, 0);
+    if (retval != 0) {
+        printf("ERROR: failed to set %d signal handler error=%s\n", val, strerror(errno));
     }
 }
+
+#ifdef __cplusplus
+}
+#endif
+
