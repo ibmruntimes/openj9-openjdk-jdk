@@ -36,16 +36,6 @@ import java.lang.foreign.MemoryLayout;
 import java.lang.foreign.ValueLayout;
 
 public class PlatformLayouts {
-    public static <Z extends MemoryLayout> Z pick(Z sysv, Z win64, Z aarch64, Z sysvppc64le, Z sysvs390x, Z aix) {
-        return switch (CABI.current()) {
-            case SysV -> sysv;
-            case Win64 -> win64;
-            case LinuxAArch64, MacOsAArch64 -> aarch64;
-            case SysVPPC64le -> sysvppc64le;
-            case SysVS390x -> sysvs390x;
-            case AIX -> aix;
-        };
-    }
 
     /**
      * This class defines layout constants modelling standard primitive types supported by the x64 SystemV ABI.
@@ -379,7 +369,7 @@ public class PlatformLayouts {
         /**
          * The {@code long long} native type.
          */
-        public static final ValueLayout.OfLong C_LONG_LONG = ValueLayout.JAVA_LONG.withBitAlignment(64);
+        public static final ValueLayout.OfLong C_LONG_LONG = ValueLayout.JAVA_LONG.withBitAlignment(32);
 
         /**
          * The {@code float} native type.
@@ -389,12 +379,12 @@ public class PlatformLayouts {
         /**
          * The {@code double} native type.
          */
-        public static final ValueLayout.OfDouble C_DOUBLE = ValueLayout.JAVA_DOUBLE.withBitAlignment(64);
+        public static final ValueLayout.OfDouble C_DOUBLE = ValueLayout.JAVA_DOUBLE.withBitAlignment(32);
 
         /**
          * The {@code T*} native type.
          */
-        public static final ValueLayout.OfAddress C_POINTER = ValueLayout.ADDRESS.withBitAlignment(64);
+        public static final ValueLayout.OfAddress C_POINTER = ValueLayout.ADDRESS.withBitAlignment(32);
 
         /**
          * The {@code va_list} native type, as it is passed to a function.

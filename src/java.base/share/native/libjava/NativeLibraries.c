@@ -306,7 +306,7 @@ Java_jdk_internal_loader_NativeLibraries_findBuiltinLib
     return NULL;
 }
 
-#ifdef _AIX
+#if defined(_AIX)
 /*
  * Class:     jdk_internal_loader_NativeLibraries
  * Method:    findEntryInProcess
@@ -316,15 +316,15 @@ JNIEXPORT jlong JNICALL
 Java_jdk_internal_loader_NativeLibraries_findEntryInProcess
   (JNIEnv *env, jclass cls, jstring name)
 {
-    const char *cname;
-    jlong res;
+    const char *cname = NULL;
+    jlong res = 0;
 
     if (!initIDs(env)) {
         return jlong_zero;
     }
 
     cname = (*env)->GetStringUTFChars(env, name, 0);
-    if (0 == cname) {
+    if (NULL == cname) {
         return jlong_zero;
     }
 
@@ -332,4 +332,4 @@ Java_jdk_internal_loader_NativeLibraries_findEntryInProcess
     (*env)->ReleaseStringUTFChars(env, name, cname);
     return res;
 }
-#endif /* _AIX */
+#endif /* defined(_AIX) */

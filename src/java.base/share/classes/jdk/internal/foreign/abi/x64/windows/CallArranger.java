@@ -29,7 +29,6 @@
  * ===========================================================================
  */
 
-
 package jdk.internal.foreign.abi.x64.windows;
 
 import jdk.internal.foreign.Utils;
