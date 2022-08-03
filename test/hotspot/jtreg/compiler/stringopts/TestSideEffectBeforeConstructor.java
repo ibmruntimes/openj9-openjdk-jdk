@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Arm Limited. All rights reserved.
+ * Copyright (c) 2022, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -21,34 +21,29 @@
  * questions.
  */
 
-package org.openjdk.bench.vm.compiler;
+/*
+ * @test
+ * @bug 8290705
+ * @summary Test correctness of the string concatenation optimization with
+ *          a store between StringBuffer allocation and constructor invocation.
+ * @compile SideEffectBeforeConstructor.jasm
+ * @run main/othervm -Xbatch compiler.stringopts.TestSideEffectBeforeConstructor
+ */
 
-import org.openjdk.jmh.annotations.Benchmark;
-import org.openjdk.jmh.annotations.Param;
-import org.openjdk.jmh.annotations.Scope;
-import org.openjdk.jmh.annotations.State;
+package compiler.stringopts;
 
-@State(Scope.Benchmark)
-public class RangeCheckHoisting {
+public class TestSideEffectBeforeConstructor {
 
-    private static final int SIZE = 65536;
-
-    @Param("6789") private int count;
-
-    private static int[] a = new int[SIZE];
-    private static int[] b = new int[SIZE];
-
-    @Benchmark
-    public void ivScaled3() {
-        for (int i = 0; i < count; i++) {
-            b[3 * i] = a[3 * i];
+    public static void main(String[] args) {
+        for (int i = 0; i < 100_000; ++i) {
+            try {
+                SideEffectBeforeConstructor.test(null);
+            } catch (NullPointerException npe) {
+                // Expected
+            }
         }
-    }
-
-    @Benchmark
-    public void ivScaled7() {
-        for (int i = 0; i < count; i++) {
-            b[7 * i] = a[7 * i];
+        if (SideEffectBeforeConstructor.result != 100_000) {
+            throw new RuntimeException("Unexpected result: " + SideEffectBeforeConstructor.result);
         }
     }
 }
