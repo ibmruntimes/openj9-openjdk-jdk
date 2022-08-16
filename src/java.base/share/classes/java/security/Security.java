@@ -48,7 +48,7 @@ import sun.security.jca.*;
 /*[IF CRIU_SUPPORT]*/
 import openj9.internal.criu.InternalCRIUSupport;
 import openj9.internal.criu.security.CRIUConfigurator;
-/*[ENDIF] CRIU_SUPPORT*/
+/*[ENDIF] CRIU_SUPPORT */
 
 import openj9.internal.security.FIPSConfigurator;
 
@@ -207,18 +207,12 @@ public final class Security {
         if (InternalCRIUSupport.isCheckpointAllowed()) {
             CRIUConfigurator.setCRIUSecMode(props);
         }
-/*[ENDIF] CRIU_SUPPORT*/
+/*[ENDIF] CRIU_SUPPORT */
 
-        // Load FIPS properties
-        if (loadedProps) {
-            boolean fipsEnabled = FIPSConfigurator.configureFIPS(props);
-            if (sdebug != null) {
-                if (fipsEnabled) {
-                    sdebug.println("FIPS mode enabled.");
-                } else {
-                    sdebug.println("FIPS mode disabled.");
-                }
-            }
+        // Load FIPS properties.
+        boolean fipsEnabled = FIPSConfigurator.configureFIPS(props);
+        if (sdebug != null) {
+            sdebug.println(fipsEnabled ? "FIPS mode enabled.": "FIPS mode disabled.");
         }
     }
 
