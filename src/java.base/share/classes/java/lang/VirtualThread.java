@@ -22,6 +22,11 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
+/*
+ * ===========================================================================
+ * (c) Copyright IBM Corp. 2022, 2022 All Rights Reserved
+ * ===========================================================================
+ */
 package java.lang;
 
 import java.security.AccessController;
@@ -1008,6 +1013,7 @@ final class VirtualThread extends BaseVirtualThread {
     private static native void registerNatives();
     static {
         registerNatives();
+        notifyJvmtiEvents = true;
     }
 
     /**
