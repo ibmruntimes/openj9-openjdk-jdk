@@ -55,6 +55,6 @@ public class CallArranger {
 
 	/* Replace UpcallLinker in OpenJDK with the implementation of UpcallLinker specific to OpenJ9 */
 	public static MemorySegment arrangeUpcall(MethodHandle target, MethodType mt, FunctionDescriptor cDesc, MemorySession session) {
-		throw new InternalError("arrangeUpcall is not yet implemented"); //$NON-NLS-1$
+		return UpcallLinker.make(target, mt, cDesc, session);
 	}
 }

@@ -355,7 +355,12 @@ public final class NativeLibraries {
 
         @Override
         public long find(String name) {
-            return NativeLibraries.findEntryInProcess(name);
+            boolean isAixOS = System.getProperty("os.name").toLowerCase().contains("aix");
+            if (isAixOS) {
+                return NativeLibraries.findEntryInProcess(name);
+            } else {
+                throw new UnsupportedOperationException("Cannot find on non-AIX platforms");
+            }
         }
 
     };
