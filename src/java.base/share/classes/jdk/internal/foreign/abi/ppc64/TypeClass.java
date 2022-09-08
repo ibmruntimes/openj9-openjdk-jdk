@@ -44,9 +44,9 @@ import java.lang.invoke.VarHandle;
  * of TypeClass on x64/windows as the template.
  */
 public enum TypeClass {
-		BASE, // Intended for all primitive types
-		POINTER,
-		STRUCT;
+	PRIMITIVE, /* Intended for all primitive types */
+	POINTER,
+	STRUCT;
 
 	public static VarHandle classifyVarHandle(ValueLayout layout) {
 		VarHandle argHandle = null;
@@ -55,15 +55,18 @@ public enum TypeClass {
 		/* According to the API Spec, all non-long integral types are promoted to long
 		 * while a float is promoted to double.
 		 */
-		if ((carrier == boolean.class) || (carrier == byte.class)
-		|| (carrier == char.class) || (carrier == short.class)
-		|| (carrier == int.class)
+		if ((carrier == boolean.class)
+			|| (carrier == byte.class)
+			|| (carrier == char.class)
+			|| (carrier == short.class)
+			|| (carrier == int.class)
 		) {
 			argHandle = JAVA_LONG.varHandle();
 		} else if (carrier == float.class) {
 			argHandle = JAVA_DOUBLE.varHandle();
-		} else if ((carrier == long.class) || (carrier == double.class)
-		|| (carrier == MemoryAddress.class)
+		} else if ((carrier == long.class)
+			|| (carrier == double.class)
+			|| (carrier == MemoryAddress.class)
 		) {
 			argHandle = layout.varHandle();
 		} else {
@@ -91,12 +94,16 @@ public enum TypeClass {
 		TypeClass layoutType = null;
 		Class<?> carrier = layout.carrier();
 
-		if ((carrier == boolean.class) || (carrier == byte.class)
-		|| (carrier == char.class) || (carrier == short.class)
-		|| (carrier == int.class) || (carrier == long.class)
-		|| (carrier == float.class) || (carrier == double.class)
+		if ((carrier == boolean.class)
+			|| (carrier == byte.class)
+			|| (carrier == char.class)
+			|| (carrier == short.class)
+			|| (carrier == int.class)
+			|| (carrier == long.class)
+			|| (carrier == float.class)
+			|| (carrier == double.class)
 		) {
-			layoutType = BASE;
+			layoutType = PRIMITIVE;
 		} else if (carrier == MemoryAddress.class) {
 			layoutType = POINTER;
 		} else {

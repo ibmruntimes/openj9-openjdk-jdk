@@ -55,14 +55,14 @@ import static jdk.internal.foreign.PlatformLayouts.SysVPPC64le;
  * typedef void * va_list;
  *
  * Specifically, va_list is simply a pointer (similar to the va_list on x64/windows) to a buffer
- * with all supportted types of arugments, including struct (passed by value), pointer and 
+ * with all supportted types of arugments, including struct (passed by value), pointer and
  * primitive types, which are aligned with 8 bytes.
  */
 public non-sealed class SysVPPC64leVaList implements VaList, Scoped {
 	public static final Class<?> CARRIER = MemoryAddress.class;
 
 	/* Every primitive/pointer occupies 8 bytes and structs are aligned
-	 * with 8 bytes in the total size when stacking the va_list buffer. 
+	 * with 8 bytes in the total size when stacking the va_list buffer.
 	 */
 	private static final long VA_LIST_SLOT_BYTES = 8;
 	private static final VaList EMPTY = new SharedUtils.EmptyVaList(MemoryAddress.NULL);
@@ -101,8 +101,37 @@ public non-sealed class SysVPPC64leVaList implements VaList, Scoped {
 
 	@Override
 	public MemorySegment nextVarg(GroupLayout layout, SegmentAllocator allocator) {
-		Objects.requireNonNull(allocator);
 		return (MemorySegment)readArg(layout, allocator);
+	}
+
+	private Object readArg(MemoryLayout argLayout) {
+		return readArg(argLayout, SharedUtils.THROWING_ALLOCATOR);
+	}
+
+	private Object readArg(MemoryLayout argLayout, SegmentAllocator allocator) {
+		Objects.requireNonNull(argLayout);
+		Objects.requireNonNull(allocator);
+		Object argument = null;
+
+		TypeClass typeClass = TypeClass.classifyLayout(argLayout);
+		long argByteSize = getAlignedArgSize(argLayout);
+		checkNextArgument(argLayout, argByteSize);
+
+		switch (typeClass) {
+			case PRIMITIVE, POINTER -> {
+				VarHandle argHandle = TypeClass.classifyVarHandle((ValueLayout)argLayout);
+				argument = argHandle.get(segment);
+			}
+			case STRUCT -> {
+				/* Copy the struct argument with the aligned size from the va_list buffer to allocated memory */
+				argument = allocator.allocate(argByteSize).copyFrom(segment.asSlice(0, argByteSize));
+			}
+			default -> throw new IllegalStateException("Unsupported TypeClass: " + typeClass);
+		}
+
+		/* Move to the next argument in the va_list buffer */
+		segment = segment.asSlice(argByteSize);
+		return argument;
 	}
 
 	private static long getAlignedArgSize(MemoryLayout argLayout) {
@@ -119,49 +148,25 @@ public non-sealed class SysVPPC64leVaList implements VaList, Scoped {
 		return argLayoutSize;
 	}
 
-	private Object readArg(MemoryLayout argLayout) {
-		return readArg(argLayout, SharedUtils.THROWING_ALLOCATOR);
-	}
-
-	private Object readArg(MemoryLayout argLayout, SegmentAllocator allocator) {
-		Objects.requireNonNull(argLayout);
-		long argByteSize = VA_LIST_SLOT_BYTES; // Always aligned with 8 bytes for primitives/pointer by default
-		Object argument = null;
-
-		TypeClass typeClass = TypeClass.classifyLayout(argLayout);
-		switch (typeClass) {
-			case BASE, POINTER -> {
-				VarHandle argHandle = TypeClass.classifyVarHandle((ValueLayout)argLayout);
-				argument = argHandle.get(segment);
-			}
-			case STRUCT -> {
-				argByteSize = getAlignedArgSize(argLayout);
-				/* Copy the struct argument with the aligned size from the va_list buffer to allocated memory */
-				argument = allocator.allocate(argByteSize).copyFrom(segment.asSlice(0, argByteSize));
-			}
-			default -> throw new IllegalStateException("Unsupported TypeClass: " + typeClass);
+	/* Check whether the argument to be skipped exceeds the existing memory size in the VaList */
+	private void checkNextArgument(MemoryLayout argLayout, long argByteSize) {
+		if (argByteSize > segment.byteSize()) {
+			throw SharedUtils.newVaListNSEE(argLayout);
 		}
-
-		/* Move to the next argument in the va_list buffer */
-		segment = segment.asSlice(argByteSize);
-		return argument;
 	}
 
 	@Override
 	public void skip(MemoryLayout... layouts) {
 		Objects.requireNonNull(layouts);
 		sessionImpl().checkValidState();
-		Stream.of(layouts).forEach(Objects::requireNonNull);
 
-		/* All primitves/pointer (aligned with 8 bytes) are directly stored
-		 * in the va_list buffer and all elements of stuct are totally copied
-		 * to the va_list buffer (instead of storing the va_list address), in
-		 * which case we need to calculate the total byte size to be skipped
-		 * in the va_list buffer.
-		 */
-		long totalArgsSize = Stream.of(layouts).reduce(0L,
-				(accum, layout) -> accum + getAlignedArgSize(layout), Long::sum);
-		segment = segment.asSlice(totalArgsSize);
+		for (MemoryLayout layout : layouts) {
+			Objects.requireNonNull(layout);
+			long argByteSize = getAlignedArgSize(layout);
+			checkNextArgument(layout, argByteSize);
+			/* Skip to the next argument in the va_list buffer */
+			segment = segment.asSlice(argByteSize);
+		}
 	}
 
 	public static VaList ofAddress(MemoryAddress addr, MemorySession session) {
@@ -242,7 +247,7 @@ public non-sealed class SysVPPC64leVaList implements VaList, Scoped {
 
 			/* All primitves/pointer (aligned with 8 bytes) are directly stored in the va_list buffer
 			 * and all elements of stuct are totally copied to the va_list buffer (instead of storing
-			 * the va_list address), in which  case we need to calculate the total byte size of the
+			 * the va_list address), in which case we need to calculate the total byte size of the
 			 * buffer to be allocated for va_list.
 			 */
 			long totalArgsSize = stackArgs.stream().reduce(0L,
@@ -254,21 +259,18 @@ public non-sealed class SysVPPC64leVaList implements VaList, Scoped {
 			for (SimpleVaArg arg : stackArgs) {
 				MemoryLayout argLayout = arg.layout;
 				TypeClass typeClass = TypeClass.classifyLayout(argLayout);
-
 				switch (typeClass) {
-					case BASE, POINTER -> {
+					case PRIMITIVE, POINTER -> {
 						VarHandle argHandle = TypeClass.classifyVarHandle((ValueLayout)argLayout);
 						argHandle.set(cursorSegment, arg.value);
-						/* Move to the location for the next argument by 8 bytes */
-						cursorSegment = cursorSegment.asSlice(VA_LIST_SLOT_BYTES);
 					}
 					case STRUCT -> {
 						cursorSegment.copyFrom((MemorySegment)(arg.value));
-						/* Move to the location for the next argument by the aligned struct size */
-						cursorSegment = cursorSegment.asSlice(getAlignedArgSize(arg.layout));
 					}
 					default -> throw new IllegalStateException("Unsupported TypeClass: " + typeClass);
 				}
+				/* Move to the next argument by the aligned size of the current argument */
+				cursorSegment = cursorSegment.asSlice(getAlignedArgSize(argLayout));
 			}
 			return new SysVPPC64leVaList(segment, session);
 		}

@@ -59,7 +59,7 @@ import static java.lang.foreign.MemoryLayout.PathElement.*;
 
 public class TestVarArgs extends CallGeneratorHelper {
 
-	private static boolean isAixOS = System.getProperty("os.name").toLowerCase().contains("aix");
+    private static boolean isAixOS = System.getProperty("os.name").toLowerCase().contains("aix");
     static final VarHandle VH_IntArray = C_INT.arrayElementVarHandle();
     static final MethodHandle MH_CHECK;
 
@@ -137,10 +137,9 @@ public class TestVarArgs extends CallGeneratorHelper {
         List<Consumer<Object>> checks = varArg.checks;
         try (MemorySession session = MemorySession.openConfined()) {
             MemorySegment seg = MemorySegment.ofAddress(ptr, layout.byteSize(), session);
-            /* Vararg float is promoted to double (8 bytes) in native (See libVarArgs.c) in which case
-             * the float value must be converted from the double value the same native address in java
-             * on the big-endian platforms such as AIX to ensure the test code obtains the expected value
-             * on this ddress.
+            /* Vararg float is promoted to double (8 bytes) in native (See libVarArgs.c)
+             * in which case float must be converted back from double at the same memory
+             * address in java on the Big-Endian(BE) platforms such as AIX.
              */
             if (isAixOS && (layout instanceof ValueLayout) && (((ValueLayout)layout).carrier() == float.class)) {
                 MemorySegment doubleSegmt = MemorySegment.ofAddress(ptr, JAVA_DOUBLE.byteSize(), session);
