@@ -24,7 +24,7 @@
 #
 
 # ===========================================================================
-# (c) Copyright IBM Corp. 2020, 2021 All Rights Reserved
+# (c) Copyright IBM Corp. 2020, 2022 All Rights Reserved
 # ===========================================================================
 
 ################################################################################
@@ -231,6 +231,8 @@ $(eval $(call DeclareRecipesForPhase, LAUNCHER, \
 
 ALL_TARGETS += $(LAUNCHER_TARGETS)
 
+ifeq ($(OPENJ9_TOPDIR),) # not OpenJ9
+
 ################################################################################
 # Build hotspot target
 
@@ -299,6 +301,8 @@ $(eval $(call SetupTarget, compile-commands-hotspot, \
 ))
 
 ALL_TARGETS += $(COMPILE_COMMANDS_TARGETS_HOTSPOT) $(COMPILE_COMMANDS_TARGETS_JDK)
+
+endif # not OpenJ9
 
 ################################################################################
 # VS Code projects
@@ -1168,13 +1172,8 @@ all-docs-bundles: docs-jdk-bundles docs-javase-bundles docs-reference-bundles
 
 # This target builds the test image
 test-image: prepare-test-image test-image-jdk-jtreg-native \
-    test-image-demos-jdk \
+    test-image-demos-jdk test-image-libtest-jtreg-native \
     test-image-lib-native
-
-# OpenJ9 builds don't have the sources required to build test-image-libtest-jtreg-native.
-ifeq ($(OPENJ9_TOPDIR),)
-test-image: test-image-libtest-jtreg-native
-endif
 
 ifneq ($(JVM_TEST_IMAGE_TARGETS), )
   # If JVM_TEST_IMAGE_TARGETS is externally defined, use it instead of the
