@@ -22,6 +22,12 @@
  */
 
 /*
+ * ===========================================================================
+ * (c) Copyright IBM Corp. 2022, 2022 All Rights Reserved
+ * ===========================================================================
+ */
+
+/*
  * @test
  * @bug 8271308
  * @summary Verify that transferTo() copies more than Integer.MAX_VALUE bytes
@@ -53,10 +59,15 @@ public class Transfer2GPlus {
 
     public static void main(String[] args) throws IOException {
         Path src = Files.createTempFile("src", ".dat");
-        src.toFile().deleteOnExit();
-        byte[] b = createSrcFile(src);
-        testToFileChannel(src, b);
-        testToWritableByteChannel(src, b);
+        File srcFile = src.toFile();
+        srcFile.deleteOnExit();
+        try {
+            byte[] b = createSrcFile(src);
+            testToFileChannel(src, b);
+            testToWritableByteChannel(src, b);
+        } finally {
+            srcFile.delete();
+        }
     }
 
     // Create a file of size LENGTH with EXTRA random bytes at offset BASE.
@@ -77,38 +88,43 @@ public class Transfer2GPlus {
     private static void testToFileChannel(Path src, byte[] expected)
         throws IOException {
         Path dst = Files.createTempFile("dst", ".dat");
-        dst.toFile().deleteOnExit();
-        try (FileChannel srcCh = FileChannel.open(src)) {
-            try (FileChannel dstCh = FileChannel.open(dst,
-                 StandardOpenOption.READ, StandardOpenOption.WRITE)) {
-                long total = 0L;
-                if ((total = srcCh.transferTo(0, LENGTH, dstCh)) < LENGTH) {
-                    if (!Platform.isLinux())
-                        throw new RuntimeException("Transfer too small: " + total);
+        File dstFile = dst.toFile();
+        dstFile.deleteOnExit();
+        try {
+            try (FileChannel srcCh = FileChannel.open(src)) {
+                try (FileChannel dstCh = FileChannel.open(dst,
+                     StandardOpenOption.READ, StandardOpenOption.WRITE)) {
+                    long total = 0L;
+                    if ((total = srcCh.transferTo(0, LENGTH, dstCh)) < LENGTH) {
+                        if (!Platform.isLinux())
+                            throw new RuntimeException("Transfer too small: " + total);
 
-                    // If this point is reached we're on Linux which cannot
-                    // transfer all LENGTH bytes in one call to sendfile(2),
-                    // so loop to get the rest.
-                    do {
-                        long n = srcCh.transferTo(total, LENGTH, dstCh);
-                        if (n == 0)
-                            break;
-                        total += n;
-                    } while (total < LENGTH);
+                        // If this point is reached we're on Linux which cannot
+                        // transfer all LENGTH bytes in one call to sendfile(2),
+                        // so loop to get the rest.
+                        do {
+                            long n = srcCh.transferTo(total, LENGTH, dstCh);
+                            if (n == 0)
+                                break;
+                            total += n;
+                        } while (total < LENGTH);
+                    }
+
+                    if (dstCh.size() < LENGTH)
+                        throw new RuntimeException("Target file too small: " +
+                            dstCh.size() + " < " + LENGTH);
+
+                    System.out.println("Transferred " + total + " bytes");
+
+                    dstCh.position(BASE);
+                    ByteBuffer bb = ByteBuffer.allocate(EXTRA);
+                    dstCh.read(bb);
+                    if (!Arrays.equals(bb.array(), expected))
+                        throw new RuntimeException("Unexpected values");
                 }
-
-                if (dstCh.size() < LENGTH)
-                    throw new RuntimeException("Target file too small: " +
-                        dstCh.size() + " < " + LENGTH);
-
-                System.out.println("Transferred " + total + " bytes");
-
-                dstCh.position(BASE);
-                ByteBuffer bb = ByteBuffer.allocate(EXTRA);
-                dstCh.read(bb);
-                if (!Arrays.equals(bb.array(), expected))
-                    throw new RuntimeException("Unexpected values");
             }
+        } finally {
+            dstFile.delete();
         }
     }
 
@@ -117,27 +133,31 @@ public class Transfer2GPlus {
         throws IOException {
         File file = File.createTempFile("dst", ".dat");
         file.deleteOnExit();
-        try (FileChannel srcCh = FileChannel.open(src)) {
-            // The FileOutputStream is wrapped so that newChannel() does not
-            // return a FileChannelImpl and so make a faster path be taken.
-            try (DataOutputStream stream =
-                new DataOutputStream(new FileOutputStream(file))) {
-                try (WritableByteChannel wbc = Channels.newChannel(stream)) {
-                    long n;
-                    if ((n = srcCh.transferTo(0, LENGTH, wbc)) < LENGTH)
-                        throw new RuntimeException("Too few bytes transferred: " +
-                            n + " < " + LENGTH);
+        try {
+            try (FileChannel srcCh = FileChannel.open(src)) {
+                // The FileOutputStream is wrapped so that newChannel() does not
+                // return a FileChannelImpl and so make a faster path be taken.
+                try (DataOutputStream stream =
+                    new DataOutputStream(new FileOutputStream(file))) {
+                    try (WritableByteChannel wbc = Channels.newChannel(stream)) {
+                        long n;
+                        if ((n = srcCh.transferTo(0, LENGTH, wbc)) < LENGTH)
+                            throw new RuntimeException("Too few bytes transferred: " +
+                                n + " < " + LENGTH);
 
-                    System.out.println("Transferred " + n + " bytes");
+                        System.out.println("Transferred " + n + " bytes");
 
-                    RandomAccessFile raf = new RandomAccessFile(file, "r");
-                    raf.seek(BASE);
-                    byte[] b = new byte[EXTRA];
-                    raf.read(b);
-                    if (!Arrays.equals(b, expected))
-                        throw new RuntimeException("Unexpected values");
+                        RandomAccessFile raf = new RandomAccessFile(file, "r");
+                        raf.seek(BASE);
+                        byte[] b = new byte[EXTRA];
+                        raf.read(b);
+                        if (!Arrays.equals(b, expected))
+                            throw new RuntimeException("Unexpected values");
+                    }
                 }
             }
+        } finally {
+            file.delete();
         }
     }
 }
