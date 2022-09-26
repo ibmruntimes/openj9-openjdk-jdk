@@ -23,6 +23,10 @@
 # questions.
 #
 
+# ===========================================================================
+# (c) Copyright IBM Corp. 2022, 2022 All Rights Reserved
+# ===========================================================================
+
 ################################################################################
 # This file contains helper functions for Init.gmk.
 # It is divided in two parts, depending on if a SPEC is present or not
@@ -311,7 +315,7 @@ else # $(HAS_SPEC)=true
   define SetupReproducibleBuild
     ifeq ($$(SOURCE_DATE), updated)
       # For static values of SOURCE_DATE (not "updated"), these are set in spec.gmk
-      export SOURCE_DATE_EPOCH := $$(shell $$(DATE) +"%s")
+      export SOURCE_DATE_EPOCH := $$(shell $$(JAVA) $$(TOPDIR)/make/src/classes/DateUtil.java)
       export SOURCE_DATE_ISO_8601 := $$(call EpochToISO8601, $$(SOURCE_DATE_EPOCH))
     endif
   endef

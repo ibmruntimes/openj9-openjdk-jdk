@@ -23,6 +23,10 @@
 # questions.
 #
 
+# ===========================================================================
+# (c) Copyright IBM Corp. 2022, 2022 All Rights Reserved
+# ===========================================================================
+
 ifeq (,$(_MAKEBASE_GMK))
   $(error You must include MakeBase.gmk prior to including Utils.gmk)
 endif
@@ -227,15 +231,7 @@ Or = \
 # Convert an UNIX epoch based timestamp (as an integer) to an ISO 8601 date
 # string.
 # Param 1 - timestamp
-ifeq ($(IS_GNU_DATE), yes)
-  EpochToISO8601 = \
-    $(shell $(DATE) --utc --date="@$(strip $1)" \
-         +"$(ISO_8601_FORMAT_STRING)" 2> /dev/null)
-else
-  EpochToISO8601 = \
-    $(shell $(DATE) -u -j -f "%s" "$(strip $1)" \
-         +"$(ISO_8601_FORMAT_STRING)" 2> /dev/null)
-endif
+EpochToISO8601 = $(shell $(JAVA) $(TOPDIR)/make/src/classes/DateUtil.java --date="$(strip $1)" --format="yyyy-MM-dd'T'HH:mm:ss'Z'")
 
 ################################################################################
 # Parse a multiple-keyword variable, like FOO="KEYWORD1=val1;KEYWORD2=val2;..."
