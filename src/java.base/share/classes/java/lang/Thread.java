@@ -1524,7 +1524,7 @@ public class Thread implements Runnable {
     void start(ThreadContainer container) {
         synchronized (this) {
             // zero status corresponds to state "NEW".
-            if (started && (eetop != NO_REF))
+            if (this.started && (eetop != NO_REF))
                 throw new IllegalThreadStateException();
 
             // bind thread to container
