@@ -20,6 +20,11 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
+/*
+ * ===========================================================================
+ * (c) Copyright IBM Corp. 2022, 2022 All Rights Reserved
+ * ===========================================================================
+ */
 
 #include <string.h>
 #include "jvmti.h"
@@ -122,7 +127,7 @@ jint Agent_Initialize(JavaVM *jvm, char *options, void *reserved) {
 
   memset(&callbacks, 0, sizeof(callbacks));
   callbacks.VMObjectAlloc= &VMObjectAlloc;
-  if (jvmti->SetEventCallbacks(&callbacks, sizeof(callbacks) != JVMTI_ERROR_NONE)) {
+  if (jvmti->SetEventCallbacks(&callbacks, sizeof(callbacks)) != JVMTI_ERROR_NONE) {
     return JNI_ERR;
   }
 
