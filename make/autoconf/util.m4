@@ -23,6 +23,10 @@
 # questions.
 #
 
+# ===========================================================================
+# (c) Copyright IBM Corp. 2022, 2022 All Rights Reserved
+# ===========================================================================
+
 m4_include([util_paths.m4])
 
 ###############################################################################
@@ -234,24 +238,7 @@ AC_DEFUN([UTIL_GET_MATCHING_VALUES],
 # $2: input date/time string
 AC_DEFUN([UTIL_GET_EPOCH_TIMESTAMP],
 [
-  if test "x$IS_GNU_DATE" = xyes; then
-    # GNU date
-    timestamp=$($DATE --utc --date=$2 +"%s" 2> /dev/null)
-  else
-    # BSD date
-    # ISO-8601 date&time in Zulu 'date'T'time'Z
-    timestamp=$($DATE -u -j -f "%FT%TZ" "$2" "+%s" 2> /dev/null)
-    if test "x$timestamp" = x; then
-      # BSD date cannot handle trailing milliseconds.
-      # Try again ignoring characters at end
-      timestamp=$($DATE -u -j -f "%Y-%m-%dT%H:%M:%S" "$2" "+%s" 2> /dev/null)
-    fi
-    if test "x$timestamp" = x; then
-      # Perhaps the time was missing.
-      timestamp=$($DATE -u -j -f "%FT%TZ" "$2""T00:00:00Z" "+%s" 2> /dev/null)
-    fi
-  fi
-  $1=$timestamp
+  $1=$($JAVA $TOPDIR/make/src/classes/DateUtil.java --date="$2")
 ])
 
 ###############################################################################
