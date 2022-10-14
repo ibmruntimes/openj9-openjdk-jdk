@@ -22,10 +22,17 @@
  */
 
 /*
+ * ===========================================================================
+ * (c) Copyright IBM Corp. 2022, 2022 All Rights Reserved
+ * ===========================================================================
+ */
+
+/*
  * @test
  * @enablePreview
  * @library ../
  * @requires ((os.arch == "amd64" | os.arch == "x86_64") & sun.arch.data.model == "64") | os.arch == "aarch64"
+ * | os.arch == "ppc64" | os.arch == "ppc64le" | os.arch == "s390x"
  * @run testng/othervm --enable-native-access=ALL-UNNAMED TestMixedMallocFree
  */
 
