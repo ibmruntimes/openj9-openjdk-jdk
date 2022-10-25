@@ -77,7 +77,7 @@ public class NativeTestHelper {
     /**
      * The layout for the {@code long long} C type.
      */
-    public static final ValueLayout.OfLong C_LONG_LONG = ValueLayout.JAVA_LONG.withBitAlignment(isAixOS ? 32 : 64);
+    public static final ValueLayout.OfLong C_LONG_LONG = ValueLayout.JAVA_LONG.withBitAlignment(64);
     /**
      * The layout for the {@code float} C type
      */
@@ -89,7 +89,7 @@ public class NativeTestHelper {
     /**
      * The {@code T*} native type.
      */
-    public static final ValueLayout.OfAddress C_POINTER = ValueLayout.ADDRESS.withBitAlignment(isAixOS ? 32 : 64);
+    public static final ValueLayout.OfAddress C_POINTER = ValueLayout.ADDRESS.withBitAlignment(64);
 
     private static Linker LINKER = Linker.nativeLinker();
 
