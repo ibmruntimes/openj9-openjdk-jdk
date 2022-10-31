@@ -2490,6 +2490,10 @@ public class Thread implements Runnable {
     private Object getStackTrace0() {
         Throwable t;
         synchronized (interruptLock) {
+            /* Ensure only live thread is passed to native code. */
+            if (!isAlive()) {
+                return EMPTY_STACK_TRACE;
+            }
             t = getStackTraceImpl();
         }
         return (Object)J9VMInternals.getStackTrace(t, false);
