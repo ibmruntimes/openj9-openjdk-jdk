@@ -161,8 +161,7 @@ public non-sealed class SysVPPC64leVaList implements VaList, Scoped {
 	}
 
 	private static long getSmallerStructArgSize(MemorySegment structSegment, MemoryLayout structArgLayout) {
-		return (structSegment.byteSize() > structArgLayout.byteSize()) ?
-							structArgLayout.byteSize() : structSegment.byteSize();
+		return Math.min(structSegment.byteSize(), structArgLayout.byteSize());
 	}
 
 	@Override
