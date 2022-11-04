@@ -25,7 +25,7 @@
 
 /*
  * ===========================================================================
- * (c) Copyright IBM Corp. 1997, 2020 All Rights Reserved
+ * (c) Copyright IBM Corp. 1997, 2022 All Rights Reserved
  * ===========================================================================
  */
 
@@ -618,6 +618,7 @@ public class URLClassPath {
                                         isDefaultJarHandler(url) &&
                                         file.endsWith("!/")) {
                                     // extract the nested URL
+                                    @SuppressWarnings("deprecation")
                                     URL nestedUrl = new URL(file.substring(0, file.length() - 2));
                                     return new JarLoader(nestedUrl, jarHandler, lmap, acc, usingSharedClasses());   //OpenJ9-shared_classes_misc
                                 } else {
@@ -730,7 +731,8 @@ public class URLClassPath {
         URL findResource(final String name, boolean check) {
             URL url;
             try {
-                url = new URL(base, ParseUtil.encodePath(name, false));
+                @SuppressWarnings("deprecation")
+                var _unused = url = new URL(base, ParseUtil.encodePath(name, false));
             } catch (MalformedURLException e) {
                 return null;
             }
@@ -766,7 +768,8 @@ public class URLClassPath {
         Resource getResource(final String name, boolean check) {
             final URL url;
             try {
-                url = new URL(base, ParseUtil.encodePath(name, false));
+                @SuppressWarnings("deprecation")
+                var _unused = url = new URL(base, ParseUtil.encodePath(name, false));
             } catch (MalformedURLException e) {
                 return null;
             }
@@ -855,7 +858,7 @@ public class URLClassPath {
                           @SuppressWarnings("removal") AccessControlContext acc, boolean usingSharedClasses)   //OpenJ9-shared_classes_misc
             throws IOException
         {
-            super(new URL("jar", "", -1, url + "!/", jarHandler));
+            super(newURL("jar", "", -1, url + "!/", jarHandler));
             this.usingSharedClasses = usingSharedClasses;                       //OpenJ9-shared_classes_misc
             csu = url;
             handler = jarHandler;
@@ -863,6 +866,13 @@ public class URLClassPath {
             this.acc = acc;
 
             ensureOpen();
+        }
+
+        @SuppressWarnings("deprecation")
+        private static URL newURL(String protocol, String host, int port, String file, URLStreamHandler handler)
+                throws MalformedURLException
+        {
+            return new URL(protocol, host, port, file, handler);
         }
 
         @Override
@@ -914,6 +924,7 @@ public class URLClassPath {
                                 // URL until we actually need to try to load something from them.
                                     for (int i = 0; i < jarfiles.length; i++) {
                                         try {
+                                            @SuppressWarnings("deprecation")
                                             URL jarURL = new URL(csu, jarfiles[i]);
                                             // If a non-null loader already exists, leave it alone.
                                             String urlNoFragString = URLUtil.urlNoFragString(jarURL);
@@ -961,6 +972,7 @@ public class URLClassPath {
                 return checkJar(new JarFile(new File(p.getPath()), true, ZipFile.OPEN_READ,
                         JarFile.runtimeVersion()));
             }
+            @SuppressWarnings("deprecation")
             URLConnection uc = (new URL(getBaseURL(), "#runtime")).openConnection();
             uc.setRequestProperty(USER_AGENT_JAVA_VERSION, JAVA_VERSION);
             JarFile jarFile = ((JarURLConnection)uc).getJarFile();
@@ -994,7 +1006,8 @@ public class URLClassPath {
                 } else {
                     nm = name;
                 }
-                url = new URL(getBaseURL(), ParseUtil.encodePath(nm, false));
+                @SuppressWarnings("deprecation")
+                var _unused = url = new URL(getBaseURL(), ParseUtil.encodePath(nm, false));
                 if (check) {
                     URLClassPath.check(url);
                 }
@@ -1125,7 +1138,8 @@ public class URLClassPath {
                     final URL url;
 
                     try{
-                        url = new URL(csu, jarName);
+                        @SuppressWarnings("deprecation")
+                        var _unused = url = new URL(csu, jarName);
                         String urlNoFragString = URLUtil.urlNoFragString(url);
                         if ((newLoader = (JarLoader)lmap.get(urlNoFragString)) == null) {
                             /* no loader has been set up for this jar file
@@ -1248,6 +1262,7 @@ public class URLClassPath {
             int i = 0;
             while (st.hasMoreTokens()) {
                 String path = st.nextToken();
+                @SuppressWarnings("deprecation")
                 URL url = DISABLE_CP_URL_CHECK ? new URL(base, path) : tryResolve(base, path);
                 if (url != null) {
                     urls[i] = url;
@@ -1284,6 +1299,7 @@ public class URLClassPath {
          * @throws MalformedURLException
          */
         static URL tryResolveFile(URL base, String input) throws MalformedURLException {
+            @SuppressWarnings("deprecation")
             URL retVal = new URL(base, input);
             if (input.indexOf(':') >= 0 &&
                     !"file".equalsIgnoreCase(retVal.getProtocol())) {
@@ -1305,6 +1321,7 @@ public class URLClassPath {
         static URL tryResolveNonFile(URL base, String input) throws MalformedURLException {
             String child = input.replace(File.separatorChar, '/');
             if (isRelative(child)) {
+                @SuppressWarnings("deprecation")
                 URL url = new URL(base, child);
                 String bp = base.getPath();
                 String urlp = url.getPath();
@@ -1349,7 +1366,8 @@ public class URLClassPath {
             String path = url.getFile().replace('/', File.separatorChar);
             path = ParseUtil.decode(path);
             dir = (new File(path)).getCanonicalFile();
-            normalizedBase = new URL(getBaseURL(), ".");
+            @SuppressWarnings("deprecation")
+            var _unused = normalizedBase = new URL(getBaseURL(), ".");
         }
 
         /*
@@ -1368,7 +1386,8 @@ public class URLClassPath {
         Resource getResource(final String name, boolean check) {
             final URL url;
             try {
-                url = new URL(getBaseURL(), ParseUtil.encodePath(name, false));
+                @SuppressWarnings("deprecation")
+                var _unused = url = new URL(getBaseURL(), ParseUtil.encodePath(name, false));
 
                 if (url.getFile().startsWith(normalizedBase.getFile()) == false) {
                     // requested resource had ../..'s in path
