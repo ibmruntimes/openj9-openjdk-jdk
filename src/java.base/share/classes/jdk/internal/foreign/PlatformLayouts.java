@@ -369,7 +369,7 @@ public class PlatformLayouts {
         /**
          * The {@code long long} native type.
          */
-        public static final ValueLayout.OfLong C_LONG_LONG = ValueLayout.JAVA_LONG.withBitAlignment(32);
+        public static final ValueLayout.OfLong C_LONG_LONG = ValueLayout.JAVA_LONG.withBitAlignment(64);
 
         /**
          * The {@code float} native type.
@@ -384,7 +384,7 @@ public class PlatformLayouts {
         /**
          * The {@code T*} native type.
          */
-        public static final ValueLayout.OfAddress C_POINTER = ValueLayout.ADDRESS.withBitAlignment(32);
+        public static final ValueLayout.OfAddress C_POINTER = ValueLayout.ADDRESS.withBitAlignment(64);
 
         /**
          * The {@code va_list} native type, as it is passed to a function.

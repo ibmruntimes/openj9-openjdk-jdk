@@ -123,8 +123,13 @@ public non-sealed class SysVPPC64leVaList implements VaList, Scoped {
 				argument = argHandle.get(segment);
 			}
 			case STRUCT -> {
-				/* Copy the struct argument with the aligned size from the va_list buffer to allocated memory */
-				argument = allocator.allocate(argByteSize).copyFrom(segment.asSlice(0, argByteSize));
+				/* With the smaller size of the allocated struct segment and the corresponding layout,
+				 * it ensures the struct value is copied correctly from the va_list segment to the
+				 * returned struct argument.
+				 */
+				MemorySegment structSegment = allocator.allocate(argLayout);
+				long structByteSize = getSmallerStructArgSize(structSegment, argLayout);
+				argument = structSegment.copyFrom(segment.asSlice(0, structByteSize));
 			}
 			default -> throw new IllegalStateException("Unsupported TypeClass: " + typeClass);
 		}
@@ -153,6 +158,10 @@ public non-sealed class SysVPPC64leVaList implements VaList, Scoped {
 		if (argByteSize > segment.byteSize()) {
 			throw SharedUtils.newVaListNSEE(argLayout);
 		}
+	}
+
+	private static long getSmallerStructArgSize(MemorySegment structSegment, MemoryLayout structArgLayout) {
+		return Math.min(structSegment.byteSize(), structArgLayout.byteSize());
 	}
 
 	@Override
@@ -257,20 +266,29 @@ public non-sealed class SysVPPC64leVaList implements VaList, Scoped {
 			MemorySegment cursorSegment = segment;
 
 			for (SimpleVaArg arg : stackArgs) {
+				Object argValue = arg.value;
 				MemoryLayout argLayout = arg.layout;
+				long argByteSize = getAlignedArgSize(argLayout);
 				TypeClass typeClass = TypeClass.classifyLayout(argLayout);
+
 				switch (typeClass) {
 					case PRIMITIVE, POINTER -> {
 						VarHandle argHandle = TypeClass.classifyVarHandle((ValueLayout)argLayout);
-						argHandle.set(cursorSegment, arg.value);
+						argHandle.set(cursorSegment, argValue);
 					}
 					case STRUCT -> {
-						cursorSegment.copyFrom((MemorySegment)(arg.value));
+						/* With the smaller size of the struct argument and the corresponding layout,
+						 * it ensures the struct value is copied correctly from the struct argument
+						 * to the va_list.
+						 */
+						MemorySegment structSegment = (MemorySegment)argValue;
+						long structByteSize = getSmallerStructArgSize(structSegment, argLayout);
+						cursorSegment.copyFrom(structSegment.asSlice(0, structByteSize));
 					}
 					default -> throw new IllegalStateException("Unsupported TypeClass: " + typeClass);
 				}
 				/* Move to the next argument by the aligned size of the current argument */
-				cursorSegment = cursorSegment.asSlice(getAlignedArgSize(argLayout));
+				cursorSegment = cursorSegment.asSlice(argByteSize);
 			}
 			return new SysVPPC64leVaList(segment, session);
 		}
