@@ -22,6 +22,12 @@
  */
 
 /*
+ * ===========================================================================
+ * (c) Copyright IBM Corp. 2021, 2022 All Rights Reserved
+ * ===========================================================================
+ */
+
+/*
  * @test
  * @summary Test verifies that selfsuspend doesn' block unmount by VTMTDisabler
  * @requires vm.continuations
@@ -63,7 +69,7 @@ public class SelfSuspendDisablerTest {
 
         System.out.printf("Expected %s thread state: %06X got: %06X\n",
                           kindStr, expectedState, state);
-        if (state != expectedState) {
+        if ((state & expectedState) != expectedState) {
             throw new RuntimeException("Test FAILED: Unexpected thread state");
         }
     }
