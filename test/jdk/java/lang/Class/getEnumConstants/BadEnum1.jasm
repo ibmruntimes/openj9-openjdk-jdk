@@ -1,12 +1,10 @@
 /*
- * Copyright (c) 1997, 2022, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2022, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License version 2 only, as
- * published by the Free Software Foundation.  Oracle designates this
- * particular file as subject to the "Classpath" exception as provided
- * by Oracle in the LICENSE file that accompanied this code.
+ * published by the Free Software Foundation.
  *
  * This code is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
@@ -23,24 +21,14 @@
  * questions.
  */
 
-package sun.security.util;
-
-import java.io.IOException;
-
-/**
- * Interface to an object that knows how to write its own DER
- * encoding to an output stream.
- *
- * @author D. N. Hoover
- */
-public interface DerEncoder {
-
-    /**
-     * DER encode this object and write the results to a stream.
-     *
-     * @param out  the stream on which the DER encoding is written.
-     */
-    void encode(DerOutputStream out)
-        throws IOException;
-
+super final enum class BadEnum1 extends java/lang/Enum
+version 52:0
+{
+    public Method values:"()[LBadEnum1;"
+    stack 1
+    {
+        iconst_0;
+        anewarray BadEnum1;
+        areturn;
+    }
 }
