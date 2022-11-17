@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, 2022, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2022, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -23,30 +23,27 @@
 
 /*
  * @test
- * @bug 8262891 8269354
- * @summary Test parenthesized pattern
- * @enablePreview
+ * @bug 8296442
+ * @summary EncryptedPrivateKeyInfo can be created with an uninitialized AlgorithmParameters
+ * @modules java.base/sun.security.x509
  */
-public class Parenthesized {
-    public static void main(String... args) {
-        new Parenthesized().run();
-    }
 
-    void run() {
-        Object o = "";
-        switch (o) {
-            case (String s) when s.isEmpty() -> System.err.println("OK: " + s);
-            default -> throw new AssertionError();
-        }
-        System.err.println(switch (o) {
-            case (String s) when s.isEmpty() -> "OK: " + s;
-            default -> throw new AssertionError();
-        });
-        if (o instanceof (String s) && s.isEmpty()) {
-            System.err.println("OK: " + s);
-        }
-        boolean b1 = o instanceof (String s) && s.isEmpty();
-        boolean b2 = o instanceof String s && s.isEmpty();
-    }
+import sun.security.x509.AlgorithmId;
 
+import java.security.AlgorithmParameters;
+
+public class Uninitialized {
+    public static void main(String[] args) throws Exception {
+        AlgorithmParameters ap = AlgorithmParameters.getInstance("EC");
+        boolean success;
+        try {
+            AlgorithmId.get(ap);
+            success = true;
+        } catch (Exception e) {
+            success = false;
+        }
+        if (success) {
+            throw new RuntimeException();
+        }
+    }
 }

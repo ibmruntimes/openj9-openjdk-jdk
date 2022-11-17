@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, 2022, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2022, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -21,32 +21,17 @@
  * questions.
  */
 
-/*
- * @test
- * @bug 8262891 8269354
- * @summary Test parenthesized pattern
- * @enablePreview
- */
-public class Parenthesized {
-    public static void main(String... args) {
-        new Parenthesized().run();
+package jdk.vm.ci.hotspot;
+
+import jdk.vm.ci.meta.JavaType;
+import jdk.vm.ci.meta.ResolvedJavaField;
+
+public class HotSpotResolvedJavaFieldHelper {
+    public static ResolvedJavaField createField(HotSpotResolvedObjectTypeImpl holder, JavaType type, int offset, int modifiers, int index) {
+        return new HotSpotResolvedJavaFieldImpl(holder, type, offset, modifiers, index);
     }
 
-    void run() {
-        Object o = "";
-        switch (o) {
-            case (String s) when s.isEmpty() -> System.err.println("OK: " + s);
-            default -> throw new AssertionError();
-        }
-        System.err.println(switch (o) {
-            case (String s) when s.isEmpty() -> "OK: " + s;
-            default -> throw new AssertionError();
-        });
-        if (o instanceof (String s) && s.isEmpty()) {
-            System.err.println("OK: " + s);
-        }
-        boolean b1 = o instanceof (String s) && s.isEmpty();
-        boolean b2 = o instanceof String s && s.isEmpty();
+    public static int getIndex(ResolvedJavaField field) {
+        return ((HotSpotResolvedJavaFieldImpl) field).getIndex();
     }
-
 }
