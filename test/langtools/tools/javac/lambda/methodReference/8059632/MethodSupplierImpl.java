@@ -1,6 +1,5 @@
 /*
- * Copyright (c) 2021 SAP SE. All rights reserved.
- * Copyright (c) 2021, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2022, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -22,31 +21,6 @@
  * questions.
  */
 
-import org.testng.annotations.Test;
-import jdk.test.lib.dcmd.CommandExecutor;
-import jdk.test.lib.dcmd.JMXExecutor;
-import jdk.test.lib.process.OutputAnalyzer;
-
-/*
- * @test
- * @summary Test of diagnostic command VM.trim_libc_heap
- * @library /test/lib
- * @requires (os.family=="linux") & !vm.musl
- * @modules java.base/jdk.internal.misc
- *          java.compiler
- *          java.management
- *          jdk.internal.jvmstat/sun.jvmstat.monitor
- * @run testng TrimLibcHeapTest
- */
-public class TrimLibcHeapTest {
-    public void run(CommandExecutor executor) {
-        OutputAnalyzer output = executor.execute("System.trim_native_heap");
-        output.reportDiagnosticSummary();
-        output.shouldMatch(".*Trim native heap: RSS\\+Swap: \\d+[BKM]->\\d+[BKM].*");
-    }
-
-    @Test
-    public void jmx() {
-        run(new JMXExecutor());
-    }
+class MethodRefQualifyingTypeTest$MethodSupplierImpl {
+    int m(int a) { return a; }
 }
