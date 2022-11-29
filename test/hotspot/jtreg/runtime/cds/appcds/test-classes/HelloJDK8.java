@@ -1,12 +1,10 @@
 /*
- * Copyright (c) 2015, 2022, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2022, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License version 2 only, as
- * published by the Free Software Foundation.  Oracle designates this
- * particular file as subject to the "Classpath" exception as provided
- * by Oracle in the LICENSE file that accompanied this code.
+ * published by the Free Software Foundation.
  *
  * This code is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
@@ -21,14 +19,18 @@
  * Please contact Oracle, 500 Oracle Parkway, Redwood Shores, CA 94065 USA
  * or visit www.oracle.com if you need additional information or have any
  * questions.
+ *
  */
 
-/**
- * Internal option processing API
- *
- * @since 9
- */
-module jdk.internal.opt {
-    exports jdk.internal.joptsimple to jdk.jlink, jdk.jshell;
-    exports jdk.internal.opt to jdk.jartool, jdk.jlink, jdk.jpackage;
+
+// Used by tests like dynamicArchive/TestAutoCreateSharedArchiveUpgrade.java, which
+// runs this class in an earlier JDK
+//
+// It should be compiled like this in the jtreg spec:
+// @compile -source 1.8 -target 1.8 test-classes/HelloJDK8.java
+
+public class HelloJDK8 {
+    public static void main(String args[]) {
+        System.out.println("This class is compiled by JDK 8");
+    }
 }
