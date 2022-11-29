@@ -1756,15 +1756,14 @@ public class Thread implements Runnable {
     }
 
     boolean getAndClearInterrupt() {
-        boolean oldValue = interrupted;
-        // We may have been interrupted the moment after we read the field,
-        // so only clear the field if we saw that it was set and will return
-        // true; otherwise we could lose an interrupt.
-        if (oldValue) {
-            interrupted = false;
-            clearInterruptEvent();
+        synchronized (interruptLock) {
+            boolean oldValue = interrupted;
+            if (oldValue) {
+                interrupted = false;
+                clearInterruptEvent();
+            }
+            return oldValue;
         }
-        return oldValue;
     }
 
     /**
