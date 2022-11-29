@@ -1,12 +1,10 @@
 /*
- * Copyright (c) 2015, 2022, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010, 2022, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License version 2 only, as
- * published by the Free Software Foundation.  Oracle designates this
- * particular file as subject to the "Classpath" exception as provided
- * by Oracle in the LICENSE file that accompanied this code.
+ * published by the Free Software Foundation.
  *
  * This code is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
@@ -22,13 +20,27 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-
 /**
- * Internal option processing API
- *
- * @since 9
+ * @test
+ * @bug 8295447
+ * @summary NullPointerException with invalid pattern matching construct in constructor call
+ * @modules jdk.compiler
+ * @compile/fail/ref=T8295447.out -XDrawDiagnostics --enable-preview -source ${jdk.version} T8295447.java
  */
-module jdk.internal.opt {
-    exports jdk.internal.joptsimple to jdk.jlink, jdk.jshell;
-    exports jdk.internal.opt to jdk.jartool, jdk.jlink, jdk.jpackage;
+public class T8295447 {
+    class Foo {
+        void m(Object o) {
+            if(o instanceof Foo(int x)) {}
+        }
+
+        Foo(Object o) {
+            m((o instanceof Foo(int x))? 0 : 1);
+        }
+        void m(int i) { }
+    }
+
+    class Base { int i; Base(int j) { i = j; } }
+    class Sub extends Base {
+        Sub(Object o) { super(o instanceof java.awt.Point(int x, int y)? x + y: 0); }
+    }
 }
