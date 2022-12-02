@@ -31,6 +31,7 @@
 
 package java.lang;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.security.AccessController;
 import java.security.AccessControlContext;
@@ -1087,14 +1088,21 @@ public class Thread implements Runnable {
      */
     private static class ThreadNumbering {
         private static final Unsafe U;
-        private static final long NEXT;
+        private static final Object NEXT_BASE;
+        private static final long NEXT_OFFSET;
         static {
             U = Unsafe.getUnsafe();
-            NEXT = U.objectFieldOffset(ThreadNumbering.class, "next");
+            try {
+                Field nextField = ThreadNumbering.class.getDeclaredField("next");
+                NEXT_BASE = U.staticFieldBase(nextField);
+                NEXT_OFFSET = U.staticFieldOffset(nextField);
+            } catch (NoSuchFieldException e) {
+                throw new ExceptionInInitializerError(e);
+            }
         }
         private static volatile int next;
         static int next() {
-            return U.getAndAddInt(ThreadNumbering.class, NEXT, 1);
+            return U.getAndAddInt(NEXT_BASE, NEXT_OFFSET, 1);
         }
     }
 
