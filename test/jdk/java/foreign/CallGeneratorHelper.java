@@ -22,6 +22,12 @@
  *
  */
 
+/*
+ * ===========================================================================
+ * (c) Copyright IBM Corp. 2023, 2023 All Rights Reserved
+ * ===========================================================================
+ */
+
 import java.lang.foreign.Addressable;
 import java.lang.foreign.Linker;
 import java.lang.foreign.FunctionDescriptor;
@@ -153,8 +159,9 @@ public class CallGeneratorHelper extends NativeTestHelper {
                 long align = 0;
                 for (StructFieldType field : fields) {
                     MemoryLayout l = field.layout();
-                    long padding = offset % l.bitAlignment();
-                    if (padding != 0) {
+                    long alignment = l.bitAlignment();
+                    long padding = alignment - (offset % alignment);
+                    if (padding != alignment) {
                         layouts.add(MemoryLayout.paddingLayout(padding));
                         offset += padding;
                     }
@@ -162,9 +169,11 @@ public class CallGeneratorHelper extends NativeTestHelper {
                     align = Math.max(align, l.bitAlignment());
                     offset += l.bitSize();
                 }
-                long padding = offset % align;
-                if (padding != 0) {
-                    layouts.add(MemoryLayout.paddingLayout(padding));
+                if (align != 0) {
+                    long padding = align - (offset % align);
+                    if (padding != align) {
+                        layouts.add(MemoryLayout.paddingLayout(padding));
+                    }
                 }
                 return MemoryLayout.structLayout(layouts.toArray(new MemoryLayout[0]));
             } else {
