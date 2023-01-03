@@ -50,8 +50,6 @@ import sun.security.action.GetPropertyAction;
 import sun.security.util.SecurityProviderConstants;
 import static sun.security.util.SecurityProviderConstants.getAliases;
 
-import openj9.internal.security.FIPSConfigurator;
-
 /**
  * Defines the entries of the SUN provider.
  *
@@ -156,10 +154,6 @@ public final class SunEntries {
         add(p, "CertPathValidator", "PKIX",
                 "sun.security.provider.certpath.PKIXCertPathValidator",
                 attrs);
-
-        if (FIPSConfigurator.enableFIPS()) {
-            return;
-        }
 
         attrs.clear();
         /*
