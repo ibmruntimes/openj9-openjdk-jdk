@@ -1,5 +1,5 @@
 # ===========================================================================
-# (c) Copyright IBM Corp. 2017, 2022 All Rights Reserved
+# (c) Copyright IBM Corp. 2017, 2023 All Rights Reserved
 # ===========================================================================
 # This code is free software; you can redistribute it and/or modify it
 # under the terms of the GNU General Public License version 2 only, as
@@ -438,7 +438,6 @@ ifeq (true,$(OPENJ9_ENABLE_CMAKE))
 
   CMAKE_ARGS += -DJ9VM_OPT_METHOD_HANDLE=OFF
   CMAKE_ARGS += -DJ9VM_OPT_OPENJDK_METHODHANDLE=ON
-  CMAKE_ARGS += -DJ9VM_OPT_OPENJDK_THREAD_SUPPORT=ON
 
   # Propagate configure option '--disable-warnings-as-errors-omr' to OMR.
   ifeq (false,$(WARNINGS_AS_ERRORS_OMR))

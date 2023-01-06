@@ -1,5 +1,5 @@
 # ===========================================================================
-# (c) Copyright IBM Corp. 2020, 2022 All Rights Reserved
+# (c) Copyright IBM Corp. 2020, 2023 All Rights Reserved
 # ===========================================================================
 # This code is free software; you can redistribute it and/or modify it
 # under the terms of the GNU General Public License version 2 only, as
@@ -36,7 +36,7 @@ ifeq (true,$(OPENJ9_ENABLE_DDR))
   JppSourceDirs += $(OPENJ9_TOPDIR)/debugtools/DDR_VM/src
 endif # OPENJ9_ENABLE_DDR
 
-JPP_TAGS := PLATFORM-$(OPENJ9_PLATFORM_CODE) OPENJDK_THREAD_SUPPORT
+JPP_TAGS := PLATFORM-$(OPENJ9_PLATFORM_CODE)
 
 ifeq (true,$(OPENJ9_ENABLE_CRIU_SUPPORT))
   JPP_TAGS += CRIU_SUPPORT
