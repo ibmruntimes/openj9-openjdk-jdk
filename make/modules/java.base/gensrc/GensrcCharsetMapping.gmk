@@ -24,7 +24,7 @@
 #
 
 # ===========================================================================
-# (c) Copyright IBM Corp. 2022, 2022 All Rights Reserved
+# (c) Copyright IBM Corp. 2022, 2023 All Rights Reserved
 # ===========================================================================
 
 ################################################################################
@@ -32,6 +32,9 @@
 # Generate StandardCharsets.java and individul sun.nio.cs charset class using
 # the charsetmapping tool
 #
+
+include $(TOPDIR)/closed/JPP.gmk
+
 CHARSET_DATA_DIR := $(TOPDIR)/make/data/charsetmapping
 CHARSET_EXTSRC_DIR := $(TOPDIR)/src/jdk.charsets/share/classes/sun/nio/cs/ext
 CHARSET_GENSRC_JAVA_DIR_BASE := $(SUPPORT_OUTPUTDIR)/gensrc/java.base/sun/nio/cs
@@ -43,26 +46,6 @@ CHARSET_TEMPLATES := \
 CHARSET_STANDARD_JAVA_TEMPLATES := \
     $(TOPDIR)/src/java.base/share/classes/sun/nio/cs/StandardCharsets.java.template
 CHARSET_STANDARD_OS := stdcs-$(OPENJDK_TARGET_OS)
-
-J9TOOLS_DIR := $(SUPPORT_OUTPUTDIR)/j9tools
-JPP_JAR     := $(J9TOOLS_DIR)/jpp.jar
-JPP_TAGS    := PLATFORM-$(OPENJ9_PLATFORM_CODE)
-
-define RunJPP
-	@$(BOOT_JDK)/bin/java \
-		-cp "$(call FixPath,$(JPP_JAR))" \
-		-Dfile.encoding=US-ASCII \
-		com.ibm.jpp.commandline.CommandlineBuilder \
-			-verdict \
-			-config $1 \
-			-baseDir "$(call FixPath,$(dir $2))" \
-			-srcRoot $(notdir $2)/ \
-			-xml "$(call FixPath,$(OPENJ9_TOPDIR)/jcl/jpp_configuration.xml)" \
-			-dest "$(call FixPath,$(SUPPORT_OUTPUTDIR)$(strip $3))" \
-			-tag:define "$(subst $(SPACE),;,$(sort $(JPP_TAGS)))" \
-			-includeIfUnsure \
-			-noWarnIncludeIf
-endef # RunJPP
 
 $(CHARSET_DONE_BASE)-stdcs: $(CHARSET_DATA_DIR)/charsets \
     $(wildcard $(CHARSET_DATA_DIR)/$(CHARSET_STANDARD_OS)) \
@@ -77,7 +60,7 @@ $(CHARSET_DONE_BASE)-stdcs: $(CHARSET_DATA_DIR)/charsets \
             $(LOG_DEBUG)
 	$(MKDIR) -p $(SUPPORT_OUTPUTDIR)/overlay-gensrc/src/java.base/sun/nio/cs
 	$(CP) $(CHARSET_GENSRC_JAVA_DIR_BASE)/StandardCharsets.java $(SUPPORT_OUTPUTDIR)/overlay-gensrc/src/java.base/sun/nio/cs/
-	$(call RunJPP, JAVA$(VERSION_FEATURE), $(SUPPORT_OUTPUTDIR)/overlay-gensrc, /overlay-result)
+	$(call RunJPP, JAVA$(VERSION_FEATURE), $(SUPPORT_OUTPUTDIR)/overlay-gensrc, /overlay-result, -includeIfUnsure -noWarnIncludeIf)
 	$(CP) $(SUPPORT_OUTPUTDIR)/overlay-result/java.base/sun/nio/cs/StandardCharsets.java $(CHARSET_GENSRC_JAVA_DIR_BASE)/
 	$(TOUCH) '$@'
 
