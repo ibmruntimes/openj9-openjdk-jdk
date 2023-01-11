@@ -277,9 +277,6 @@ endif # OPENJ9_ENABLE_CRIU_SUPPORT
 FEATURE_SED_SCRIPT += $(call SedDisable,opt_methodHandle)
 FEATURE_SED_SCRIPT += $(call SedEnable,opt_openjdkMethodhandle)
 
-# Adjust OpenJDK thread support enablement flags.
-FEATURE_SED_SCRIPT += $(call SedEnable,opt_openjdkThreadSupport)
-
 # Disable windows rebase.
 SPEC_SED_SCRIPT += $(call SedDisable,uma_windowsRebase)
 
