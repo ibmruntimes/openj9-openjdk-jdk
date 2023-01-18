@@ -45,11 +45,18 @@
  *  POSSIBILITY  OF SUCH DAMAGE.
  */
 
+/*
+ * ===========================================================================
+ * (c) Copyright IBM Corp. 2022, 2023 All Rights Reserved
+ * ===========================================================================
+ */
+
 package sun.security.pkcs11.wrapper;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
+import java.util.function.Consumer;
 
 import java.security.AccessController;
 import java.security.PrivilegedAction;
@@ -57,6 +64,7 @@ import java.security.PrivilegedAction;
 import sun.security.util.Debug;
 
 import sun.security.pkcs11.P11Util;
+import sun.security.pkcs11.SunPKCS11;
 import static sun.security.pkcs11.wrapper.PKCS11Constants.*;
 import static sun.security.pkcs11.wrapper.PKCS11Exception.RV.*;
 
@@ -140,6 +148,43 @@ public class PKCS11 {
     private static final Map<String,PKCS11> moduleMap =
         new HashMap<String,PKCS11>();
 
+    static boolean isKey(CK_ATTRIBUTE[] attrs) {
+        for (CK_ATTRIBUTE attr : attrs) {
+            if ((attr.type == CKA_CLASS) && (attr.getLong() == CKO_SECRET_KEY)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // This is the SunPKCS11 provider instance
+    // there can only be a single PKCS11 provider in
+    // FIPS mode.
+    private static SunPKCS11 mysunpkcs11;
+
+    private static final class InnerPKCS11 extends PKCS11 implements Consumer<SunPKCS11> {
+        InnerPKCS11(String pkcs11ModulePath, String functionListName) throws IOException {
+            super(pkcs11ModulePath, functionListName);
+        }
+
+        // Set PKCS11 instance to FIPS mode, called by SunPKCS11 provider.
+        @Override
+        public void accept(SunPKCS11 sunpkcs11) {
+            mysunpkcs11 = sunpkcs11;
+        }
+
+        // Overriding the JNI method C_CreateObject so that first check if FIPS mode is on and the object is a
+        // secret key, in which case invoke the importKey method in SunPKCS11 provider to import the secret key
+        // into the PKCS11 device.
+        @Override
+        public synchronized long C_CreateObject(long hSession, CK_ATTRIBUTE[] pTemplate) throws PKCS11Exception {
+            if ((mysunpkcs11 != null) && isKey(pTemplate)) {
+                return mysunpkcs11.importKey(hSession, pTemplate);
+            }
+            return super.C_CreateObject(hSession, pTemplate);
+        }
+    }
+
     /**
      * Connects to the PKCS#11 driver given. The filename must contain the
      * path, if the driver is not in the system's search path.
@@ -183,7 +228,7 @@ public class PKCS11 {
         if (pkcs11 == null) {
             if ((pInitArgs != null)
                     && ((pInitArgs.flags & CKF_OS_LOCKING_OK) != 0)) {
-                pkcs11 = new PKCS11(pkcs11ModulePath, functionList);
+                pkcs11 = new InnerPKCS11(pkcs11ModulePath, functionList);
             } else {
                 pkcs11 = new SynchronizedPKCS11(pkcs11ModulePath, functionList);
             }
@@ -1758,6 +1803,9 @@ static class SynchronizedPKCS11 extends PKCS11 {
 
     public synchronized long C_CreateObject(long hSession,
             CK_ATTRIBUTE[] pTemplate) throws PKCS11Exception {
+        if ((mysunpkcs11 != null) && isKey(pTemplate)) {
+            return mysunpkcs11.importKey(hSession, pTemplate);
+        }
         return super.C_CreateObject(hSession, pTemplate);
     }
 
