@@ -24,7 +24,7 @@
  */
 /*
  * ===========================================================================
- * (c) Copyright IBM Corp. 2018, 2022 All Rights Reserved
+ * (c) Copyright IBM Corp. 2018, 2023 All Rights Reserved
  * ===========================================================================
  */
 
@@ -117,8 +117,8 @@ public final class RSACore {
      */
     public static byte[] rsa(byte[] msg, RSAPublicKey key)
             throws BadPaddingException {
-        if (useNativeRsa && key instanceof sun.security.rsa.RSAPublicKeyImpl) {
-            byte[] ret = NativeRSACore.rsa(msg, (sun.security.rsa.RSAPublicKeyImpl) key);
+        if (useNativeRsa && key instanceof sun.security.rsa.RSAPublicKeyImpl rsaKey && NativeCrypto.isAllowedAndLoaded()) {
+            byte[] ret = NativeRSACore.rsa(msg, rsaKey);
             if (ret != null) {
                 return ret;
             }
@@ -146,8 +146,8 @@ public final class RSACore {
     public static byte[] rsa(byte[] msg, RSAPrivateKey key, boolean verify)
             throws BadPaddingException {
         if (key instanceof RSAPrivateCrtKey) {
-            if (useNativeRsa && key instanceof sun.security.rsa.RSAPrivateCrtKeyImpl) {
-                byte[] ret = NativeRSACore.rsa(msg, (sun.security.rsa.RSAPrivateCrtKeyImpl) key, verify);
+            if (useNativeRsa && key instanceof sun.security.rsa.RSAPrivateCrtKeyImpl rsaKey && NativeCrypto.isAllowedAndLoaded()) {
+                byte[] ret = NativeRSACore.rsa(msg, rsaKey, verify);
                 if (ret != null) {
                     return ret;
                 }

@@ -24,7 +24,7 @@
  */
 /*
  * ===========================================================================
- * (c) Copyright IBM Corp. 2018, 2022 All Rights Reserved
+ * (c) Copyright IBM Corp. 2018, 2023 All Rights Reserved
  * ===========================================================================
  */
 
@@ -183,7 +183,7 @@ final class CipherCore {
              * Check whether native CBC is enabled and instantiate
              * the NativeCipherBlockChaining class.
              */
-            if (useNativeCBC && blockSize == 16) {
+            if (useNativeCBC && (blockSize == 16) && NativeCrypto.isAllowedAndLoaded()) {
                 cipher = new NativeCipherBlockChaining(rawImpl);
             } else {
                 cipher = new CipherBlockChaining(rawImpl);

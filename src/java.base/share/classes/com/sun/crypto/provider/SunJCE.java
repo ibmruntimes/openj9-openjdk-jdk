@@ -24,7 +24,7 @@
  */
 /*
  * ===========================================================================
- * (c) Copyright IBM Corp. 2018, 2022 All Rights Reserved
+ * (c) Copyright IBM Corp. 2018, 2023 All Rights Reserved
  * ===========================================================================
  */
 
@@ -90,8 +90,7 @@ public final class SunJCE extends Provider {
     /* The property 'jdk.nativeChaCha20' is used to control enablement of the native
      * ChaCha20 implementation. ChaCha20 is only supported in OpenSSL 1.1.0 and above.
      */
-    private static final boolean useNativeChaCha20Cipher = NativeCrypto.isAlgorithmEnabled("jdk.nativeChaCha20",
-            "NativeChaCha20Cipher", NativeCrypto.getVersion() >= 1, "Need OpenSSL 1.1.0 or above for ChaCha20 support.");
+    private static final boolean useNativeChaCha20Cipher = NativeCrypto.isAlgorithmEnabled("jdk.nativeChaCha20", "NativeChaCha20Cipher");
 
     /* The property 'jdk.nativeGCM' is used to control enablement of the native
      * GCM implementation.
@@ -292,7 +291,7 @@ public final class SunJCE extends Provider {
         attrs.put("SupportedModes", "GCM");
         attrs.put("SupportedKeyFormats", "RAW");
 
-        if (useNativeGaloisCounterMode) {
+        if (useNativeGaloisCounterMode && NativeCrypto.isAllowedAndLoaded()) {
             ps("Cipher", "AES/GCM/NoPadding",
                     "com.sun.crypto.provider.NativeGaloisCounterMode$AESGCM", null,
                     attrs);
@@ -337,7 +336,7 @@ public final class SunJCE extends Provider {
         attrs.clear();
         attrs.put("SupportedKeyFormats", "RAW");
 
-        if (useNativeChaCha20Cipher) {
+        if (useNativeChaCha20Cipher && (NativeCrypto.getVersionIfAvailable() >= 1)) {
             ps("Cipher", "ChaCha20",
                     "com.sun.crypto.provider.NativeChaCha20Cipher$ChaCha20Only",
                     null, attrs);
