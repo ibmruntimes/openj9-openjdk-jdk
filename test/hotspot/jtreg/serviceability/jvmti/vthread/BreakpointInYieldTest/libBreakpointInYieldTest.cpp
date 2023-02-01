@@ -20,6 +20,11 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
+/*
+ * ===========================================================================
+ * (c) Copyright IBM Corp. 2023, 2023 All Rights Reserved
+ * ===========================================================================
+ */
 
 #include <string.h>
 #include "jvmti.h"
@@ -250,13 +255,13 @@ Agent_OnLoad(JavaVM *jvm, char *options, void *reserved) {
     LOG("error in JVMTI SetEventNotificationMode: %d\n", err);
   }
 
-  err = jvmti->SetEventNotificationMode(JVMTI_ENABLE, EXT_EVENT_VIRTUAL_THREAD_MOUNT, NULL);
+  err = set_ext_event_notification_mode(jvmti, JVMTI_ENABLE, "VirtualThreadMount", NULL);
   if (err != JVMTI_ERROR_NONE) {
     LOG("error in JVMTI SetEventNotificationMode: %d\n", err);
     return JNI_ERR;
   }
 
-  err = jvmti->SetEventNotificationMode(JVMTI_ENABLE, EXT_EVENT_VIRTUAL_THREAD_UNMOUNT, NULL);
+  err = set_ext_event_notification_mode(jvmti, JVMTI_ENABLE, "VirtualThreadUnmount", NULL);
   if (err != JVMTI_ERROR_NONE) {
     LOG("error in JVMTI SetEventNotificationMode: %d\n", err);
     return JNI_ERR;
@@ -303,10 +308,10 @@ Java_BreakpointInYieldTest_check(JNIEnv *jni, jclass cls) {
   err = jvmti->SetEventNotificationMode(JVMTI_DISABLE, JVMTI_EVENT_VIRTUAL_THREAD_START, NULL);
   check_jvmti_status(jni, err, "check: error in JVMTI SetEventNotificationMode: disable VIRTUAL_THREAD_START");
 
-  err = jvmti->SetEventNotificationMode(JVMTI_DISABLE, EXT_EVENT_VIRTUAL_THREAD_MOUNT, NULL);
+  err = set_ext_event_notification_mode(jvmti, JVMTI_DISABLE, "VirtualThreadMount", NULL);
   check_jvmti_status(jni, err, "check: error in JVMTI SetEventNotificationMode: disable VIRTUAL_THREAD_MOUNT");
 
-  err = jvmti->SetEventNotificationMode(JVMTI_DISABLE, EXT_EVENT_VIRTUAL_THREAD_UNMOUNT, NULL);
+  err = set_ext_event_notification_mode(jvmti, JVMTI_DISABLE, "VirtualThreadUnmount", NULL);
   check_jvmti_status(jni, err, "check: error in JVMTI SetEventNotificationMode: disable VIRTUAL_THREAD_UNMOUNT");
 
   err = jvmti->SetEventNotificationMode(JVMTI_DISABLE, JVMTI_EVENT_BREAKPOINT, NULL);
