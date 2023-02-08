@@ -20,6 +20,11 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
+/*
+ * ===========================================================================
+ * (c) Copyright IBM Corp. 2023, 2023 All Rights Reserved
+ * ===========================================================================
+ */
 
 #ifndef JVMTI_COMMON_H
 #define JVMTI_COMMON_H
@@ -779,10 +784,6 @@ jthread find_thread_by_name(jvmtiEnv* jvmti, JNIEnv* jni, const char name[]) {
 /*
  * JVMTI Extension Mechanism
  */
-static const jvmtiEvent
-  EXT_EVENT_VIRTUAL_THREAD_MOUNT   = (jvmtiEvent)((int)JVMTI_MIN_EVENT_TYPE_VAL - 2),
-  EXT_EVENT_VIRTUAL_THREAD_UNMOUNT = (jvmtiEvent)((int)JVMTI_MIN_EVENT_TYPE_VAL - 3);
-
 static jvmtiExtensionFunction
 find_ext_function(jvmtiEnv* jvmti, JNIEnv* jni, const char* fname) {
   jint extCount = 0;
@@ -878,6 +879,16 @@ static void
 set_event_notification_mode(jvmtiEnv* jvmti, JNIEnv* jni, jvmtiEventMode mode, jvmtiEvent event_type, jthread event_thread) {
   jvmtiError err = jvmti->SetEventNotificationMode(mode, event_type, event_thread);
   check_jvmti_status(jni, err, "jvmti_common set_event_notification_mode: Error in JVMTI SetEventNotificationMode");
+}
+
+static jvmtiError
+set_ext_event_notification_mode(jvmtiEnv* jvmti, jvmtiEventMode mode, const char* ename, jthread event_thread) {
+  jvmtiExtensionEventInfo* info = find_ext_event(jvmti, ename);
+  if (NULL == info) {
+    LOG("jvmti_common set_ext_event_notification_mode: Extension event was not found: %s\n", ename);
+    return JVMTI_ERROR_NOT_AVAILABLE;
+  }
+  return jvmti->SetEventNotificationMode(mode, (jvmtiEvent)info->extension_event_index, event_thread);
 }
 
 int
