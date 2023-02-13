@@ -515,7 +515,8 @@ final class Config {
             default->
                 {
                     if ("tokenLabel".equalsIgnoreCase(st.sval)) {
-                        tokenLabel = parseStringEntry("tokenLabel");
+                        st.sval = "tokenLabel";
+                        tokenLabel = parseStringEntry(st.sval);
                     } else {
                         throw new ConfigurationException
                                 ("Unknown keyword '" + st.sval + "', line " +
