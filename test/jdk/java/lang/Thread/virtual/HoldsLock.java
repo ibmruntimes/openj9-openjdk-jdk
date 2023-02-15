@@ -20,6 +20,11 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
+/*
+ * ===========================================================================
+ * (c) Copyright IBM Corp. 2023, 2023 All Rights Reserved
+ * ===========================================================================
+ */
 
 /**
  * @test
@@ -112,6 +117,11 @@ public class HoldsLock {
         boolean foundCarrier = false;
         for (long tid : tids) {
             ThreadInfo info = bean.getThreadInfo(tid);
+
+            // Skip null ThreadInfo where the thread already exited.
+            if (null == info) {
+                continue;
+            }
             System.out.println(info); // System.out.format("%d\t%s%n", tid, info.getThreadName());
 
             LockInfo lock = info.getLockInfo();
