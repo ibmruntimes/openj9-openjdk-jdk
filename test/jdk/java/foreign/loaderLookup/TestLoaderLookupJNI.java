@@ -36,7 +36,7 @@ import static org.testng.Assert.*;
 /*
  * @test
  * @enablePreview
- * @requires ((os.arch == "amd64" | os.arch == "x86_64") & sun.arch.data.model == "64") | os.arch == "aarch64"
+ * @requires ((os.arch == "amd64" | os.arch == "x86_64") & sun.arch.data.model == "64") | os.arch == "aarch64" | os.arch == "riscv64"
  * | os.arch == "ppc64" | os.arch == "ppc64le" | os.arch == "s390x"
  * @run testng/othervm TestLoaderLookupJNI
  */
@@ -49,10 +49,10 @@ public class TestLoaderLookupJNI {
     @Test
     void testLoaderLookupJNI() {
         SymbolLookup loaderLookup = SymbolLookup.loaderLookup();
-        assertTrue(loaderLookup.lookup("Java_TestLoaderLookupJNI_loaderLookup0").isPresent());
+        assertTrue(loaderLookup.find("Java_TestLoaderLookupJNI_loaderLookup0").isPresent());
         // now try calling via JNI
         loaderLookup = loaderLookup0(); // lookup backed by application loader, so can see same symbols
-        assertTrue(loaderLookup.lookup("Java_TestLoaderLookupJNI_loaderLookup0").isPresent());
+        assertTrue(loaderLookup.find("Java_TestLoaderLookupJNI_loaderLookup0").isPresent());
     }
 
     static native SymbolLookup loaderLookup0();
