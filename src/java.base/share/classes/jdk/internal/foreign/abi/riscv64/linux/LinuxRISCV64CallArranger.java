@@ -24,6 +24,12 @@
  *
  */
 
+/*
+ * ===========================================================================
+ * (c) Copyright IBM Corp. 2022, 2023 All Rights Reserved
+ * ===========================================================================
+ */
+
 package jdk.internal.foreign.abi.riscv64.linux;
 
 import java.lang.foreign.FunctionDescriptor;
@@ -109,26 +115,11 @@ public class LinuxRISCV64CallArranger {
     }
 
     public static MethodHandle arrangeDowncall(MethodType mt, FunctionDescriptor cDesc, LinkerOptions options) {
-        Bindings bindings = getBindings(mt, cDesc, false, options);
-
-        MethodHandle handle = new DowncallLinker(CLinux, bindings.callingSequence).getBoundMethodHandle();
-
-        if (bindings.isInMemoryReturn) {
-            handle = SharedUtils.adaptDowncallForIMR(handle, cDesc, bindings.callingSequence);
-        }
-
-        return handle;
+        throw new InternalError("arrangeDowncall is not supported on RISC-V");
     }
 
     public static MemorySegment arrangeUpcall(MethodHandle target, MethodType mt, FunctionDescriptor cDesc, SegmentScope scope) {
-
-        Bindings bindings = getBindings(mt, cDesc, true);
-
-        if (bindings.isInMemoryReturn) {
-            target = SharedUtils.adaptUpcallForIMR(target, true /* drop return, since we don't have bindings for it */);
-        }
-
-        return UpcallLinker.make(CLinux, target, bindings.callingSequence, scope);
+    	throw new InternalError("arrangeUpcall is not supported on RISC-V");
     }
 
     private static boolean isInMemoryReturn(Optional<MemoryLayout> returnLayout) {
