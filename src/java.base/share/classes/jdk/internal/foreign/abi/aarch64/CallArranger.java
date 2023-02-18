@@ -155,7 +155,7 @@ public abstract class CallArranger {
 
     /* Replace DowncallLinker in OpenJDK with the implementation of DowncallLinker specific to OpenJ9 */
     public MethodHandle arrangeDowncall(MethodType mt, FunctionDescriptor cDesc, LinkerOptions options) {
-        // MethodHandle handle = DowncallLinker.getBoundMethodHandle(mt, cDesc);
+        // MethodHandle handle = DowncallLinker.getBoundMethodHandle(mt, cDesc, options);
         // return handle;
         return null;
     }

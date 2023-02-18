@@ -42,7 +42,6 @@ import java.lang.foreign.ValueLayout;
 import org.testng.annotations.Test;
 
 import static java.lang.foreign.ValueLayout.JAVA_BYTE;
-import static java.lang.foreign.ValueLayout.JAVA_INT;
 import static org.testng.Assert.*;
 
 // FYI this test is run on 64-bit platforms only for now,
@@ -69,7 +68,7 @@ public class TestClassLoaderFindNative {
     public void testVariableSymbolLookup() {
         MemorySegment segment = MemorySegment.ofAddress(
                 SymbolLookup.loaderLookup().find("c").get().address(),
-                JAVA_INT.byteSize(),
+                ValueLayout.JAVA_INT.byteSize(),
                 SegmentScope.global());
         /* JAVA_INT applies to both Little-Endian and Big-Endian
          * platforms given the one-byte int value is stored at the
@@ -77,6 +76,6 @@ public class TestClassLoaderFindNative {
          * the Big-Endian platforms.
          * See libLookupTest.c
          */
-        assertEquals(segment.get(JAVA_INT, 0), 42);
+        assertEquals(segment.get(ValueLayout.JAVA_INT, 0), 42);
     }
 }

@@ -24,7 +24,7 @@
 
 /*
  * ===========================================================================
- * (c) Copyright IBM Corp. 2022, 2022 All Rights Reserved
+ * (c) Copyright IBM Corp. 2022, 2023 All Rights Reserved
  * ===========================================================================
  */
 
@@ -45,9 +45,9 @@
  *          java.base/jdk.internal.foreign.abi.aarch64.windows
  *          java.base/jdk.internal.foreign.abi.ppc64.aix
  *          java.base/jdk.internal.foreign.abi.ppc64.sysv
- *          java.base/jdk.internal.foreign.abi.s390x.sysv
  *          java.base/jdk.internal.foreign.abi.riscv64
  *          java.base/jdk.internal.foreign.abi.riscv64.linux
+ *          java.base/jdk.internal.foreign.abi.s390x.sysv
  * @run testng/othervm --enable-native-access=ALL-UNNAMED VaListTest
  */
 
@@ -58,8 +58,8 @@ import jdk.internal.foreign.abi.aarch64.linux.LinuxAArch64Linker;
 import jdk.internal.foreign.abi.aarch64.macos.MacOsAArch64Linker;
 import jdk.internal.foreign.abi.ppc64.aix.AixPPC64Linker;
 import jdk.internal.foreign.abi.ppc64.sysv.SysVPPC64leLinker;
-import jdk.internal.foreign.abi.s390x.sysv.SysVS390xLinker;
 import jdk.internal.foreign.abi.riscv64.linux.LinuxRISCV64Linker;
+import jdk.internal.foreign.abi.s390x.sysv.SysVS390xLinker;
 import jdk.internal.foreign.abi.x64.sysv.SysVx64Linker;
 import jdk.internal.foreign.abi.x64.windows.Windowsx64Linker;
 import org.testng.annotations.DataProvider;
@@ -153,11 +153,11 @@ public class VaListTest extends NativeTestHelper {
     private static final Function<Consumer<VaList.Builder>, VaList> linuxRISCV64VaListFactory
             = actions -> LinuxRISCV64Linker.newVaList(actions, SegmentScope.auto());
     private static final Function<Consumer<VaList.Builder>, VaList> aixPPC64VaListFactory
-            = actions -> AixPPC64Linker.newVaList(actions, MemorySession.openImplicit());
+            = actions -> AixPPC64Linker.newVaList(actions, SegmentScope.auto());
     private static final Function<Consumer<VaList.Builder>, VaList> sysVPPC64leVaListFactory
-            = actions -> SysVPPC64leLinker.newVaList(actions, MemorySession.openImplicit());
+            = actions -> SysVPPC64leLinker.newVaList(actions, SegmentScope.auto());
     private static final Function<Consumer<VaList.Builder>, VaList> sysVS390xVaListFactory
-            = actions -> SysVS390xLinker.newVaList(actions, MemorySession.openImplicit());
+            = actions -> SysVS390xLinker.newVaList(actions, SegmentScope.auto());
     private static final Function<Consumer<VaList.Builder>, VaList> platformVaListFactory
             = (builder) -> VaList.make(builder, SegmentScope.auto());
 
@@ -169,15 +169,14 @@ public class VaListTest extends NativeTestHelper {
             = LinuxAArch64Linker::newVaList;
     private static final BiFunction<Consumer<VaList.Builder>, SegmentScope, VaList> macAArch64VaListScopedFactory
             = MacOsAArch64Linker::newVaList;
-    private static final BiFunction<Consumer<VaList.Builder>, MemorySession, VaList> aixPPC64VaListScopedFactory
-            = AixPPC64Linker::newVaList;
-    private static final BiFunction<Consumer<VaList.Builder>, MemorySession, VaList> sysVPPC64leVaListScopedFactory
-            = SysVPPC64leLinker::newVaList;
-    private static final BiFunction<Consumer<VaList.Builder>, MemorySession, VaList> sysVS390xVaListScopedFactory
-            = SysVS390xLinker::newVaList;
-    private static final BiFunction<Consumer<VaList.Builder>, MemorySession, VaList> platformVaListScopedFactory
     private static final BiFunction<Consumer<VaList.Builder>, SegmentScope, VaList> linuxRISCV64VaListScopedFactory
             = LinuxRISCV64Linker::newVaList;
+    private static final BiFunction<Consumer<VaList.Builder>, SegmentScope, VaList> aixPPC64VaListScopedFactory
+            = AixPPC64Linker::newVaList;
+    private static final BiFunction<Consumer<VaList.Builder>, SegmentScope, VaList> sysVPPC64leVaListScopedFactory
+            = SysVPPC64leLinker::newVaList;
+    private static final BiFunction<Consumer<VaList.Builder>, SegmentScope, VaList> sysVS390xVaListScopedFactory
+            = SysVS390xLinker::newVaList;
     private static final BiFunction<Consumer<VaList.Builder>, SegmentScope, VaList> platformVaListScopedFactory
             = VaList::make;
 
@@ -614,14 +613,14 @@ public class VaListTest extends NativeTestHelper {
                 { linuxAArch64VaListFactory.apply(b -> {}) },
                 { MacOsAArch64Linker.emptyVaList()         },
                 { macAArch64VaListFactory.apply(b -> {})   },
+                { LinuxRISCV64Linker.emptyVaList()         },
+                { linuxRISCV64VaListFactory.apply(b -> {}) },
                 { AixPPC64Linker.emptyVaList()             },
                 { aixPPC64VaListFactory.apply(b -> {})     },
                 { SysVPPC64leLinker.emptyVaList()          },
                 { sysVPPC64leVaListFactory.apply(b -> {})  },
                 { SysVS390xLinker.emptyVaList()            },
                 { sysVS390xVaListFactory.apply(b -> {})    },
-                { LinuxRISCV64Linker.emptyVaList()         },
-                { linuxRISCV64VaListFactory.apply(b -> {}) },
         };
     }
 

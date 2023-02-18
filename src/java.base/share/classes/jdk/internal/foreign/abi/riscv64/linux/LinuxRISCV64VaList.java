@@ -24,6 +24,12 @@
  *
  */
 
+/*
+ * ===========================================================================
+ * (c) Copyright IBM Corp. 2023, 2023 All Rights Reserved
+ * ===========================================================================
+ */
+
 package jdk.internal.foreign.abi.riscv64.linux;
 
 import java.lang.foreign.GroupLayout;
@@ -75,6 +81,7 @@ public non-sealed class LinuxRISCV64VaList implements VaList {
     public LinuxRISCV64VaList(MemorySegment segment, long offset) {
         this.segment = segment;
         this.offset = offset;
+        throw new InternalError("LinuxRISCV64VaList()/VaList is not implemented on RISC-V");
     }
 
     private static LinuxRISCV64VaList readFromAddress(long address, SegmentScope scope) {
@@ -114,6 +121,11 @@ public non-sealed class LinuxRISCV64VaList implements VaList {
 
     private Object read(MemoryLayout layout, SegmentAllocator allocator) {
         Objects.requireNonNull(layout);
+
+        if (layout != null) {
+            throw new InternalError("VaList is not implemented on RISC-V");
+        }
+
         TypeClass typeClass = TypeClass.classifyLayout(layout);
         preAlignStack(layout);
 
@@ -218,6 +230,7 @@ public non-sealed class LinuxRISCV64VaList implements VaList {
 
         Builder(SegmentScope scope) {
             this.scope = scope;
+            throw new InternalError("VaList is not implemented on RISC-V");
         }
 
         @Override

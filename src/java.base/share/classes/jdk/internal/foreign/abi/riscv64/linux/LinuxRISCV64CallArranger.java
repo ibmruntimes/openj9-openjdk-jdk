@@ -26,7 +26,7 @@
 
 /*
  * ===========================================================================
- * (c) Copyright IBM Corp. 2022, 2023 All Rights Reserved
+ * (c) Copyright IBM Corp. 2023, 2023 All Rights Reserved
  * ===========================================================================
  */
 
@@ -115,11 +115,11 @@ public class LinuxRISCV64CallArranger {
     }
 
     public static MethodHandle arrangeDowncall(MethodType mt, FunctionDescriptor cDesc, LinkerOptions options) {
-        throw new InternalError("arrangeDowncall is not supported on RISC-V");
+        throw new InternalError("arrangeDowncall is not implemented on RISC-V");
     }
 
     public static MemorySegment arrangeUpcall(MethodHandle target, MethodType mt, FunctionDescriptor cDesc, SegmentScope scope) {
-    	throw new InternalError("arrangeUpcall is not supported on RISC-V");
+        throw new InternalError("arrangeUpcall is not implemented on RISC-V");
     }
 
     private static boolean isInMemoryReturn(Optional<MemoryLayout> returnLayout) {

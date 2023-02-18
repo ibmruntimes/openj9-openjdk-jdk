@@ -26,7 +26,7 @@
 
 /*
  * ===========================================================================
- * (c) Copyright IBM Corp. 2022, 2022 All Rights Reserved
+ * (c) Copyright IBM Corp. 2022, 2023 All Rights Reserved
  * ===========================================================================
  */
 
@@ -41,8 +41,8 @@ import jdk.internal.foreign.abi.aarch64.linux.LinuxAArch64VaList;
 import jdk.internal.foreign.abi.aarch64.macos.MacOsAArch64VaList;
 import jdk.internal.foreign.abi.ppc64.aix.AixPPC64VaList;
 import jdk.internal.foreign.abi.ppc64.sysv.SysVPPC64leVaList;
-import jdk.internal.foreign.abi.s390x.sysv.SysVS390xVaList;
 import jdk.internal.foreign.abi.riscv64.linux.LinuxRISCV64VaList;
+import jdk.internal.foreign.abi.s390x.sysv.SysVS390xVaList;
 import jdk.internal.foreign.abi.x64.sysv.SysVVaList;
 import jdk.internal.foreign.abi.x64.windows.WinVaList;
 import jdk.internal.javac.PreviewFeature;
@@ -116,7 +116,7 @@ import jdk.internal.reflect.Reflection;
  */
 @PreviewFeature(feature=PreviewFeature.Feature.FOREIGN)
 public sealed interface VaList permits WinVaList, SysVVaList, LinuxAArch64VaList, MacOsAArch64VaList, LinuxRISCV64VaList,
-                               SysVPPC64leVaList, SysVS390xVaList, AixPPC64VaList, SharedUtils.EmptyVaList {
+                                       SysVPPC64leVaList, SysVS390xVaList, AixPPC64VaList, SharedUtils.EmptyVaList {
 
     /**
      * Reads the next value as an {@code int} and advances this variable argument list's position. The behavior of this
@@ -312,7 +312,7 @@ public sealed interface VaList permits WinVaList, SysVVaList, LinuxAArch64VaList
      */
     @PreviewFeature(feature=PreviewFeature.Feature.FOREIGN)
     sealed interface Builder permits WinVaList.Builder, SysVVaList.Builder, LinuxAArch64VaList.Builder, MacOsAArch64VaList.Builder, LinuxRISCV64VaList.Builder,
-                                     SysVPPC64leVaList.Builder, SysVS390xVaList.Builder, AixPPC64VaList.Builder {{
+                                     SysVPPC64leVaList.Builder, SysVS390xVaList.Builder, AixPPC64VaList.Builder {
 
         /**
          * Writes an {@code int} value to the variable argument list being constructed.
