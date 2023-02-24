@@ -26,7 +26,7 @@
 
 /*
  * ===========================================================================
- * (c) Copyright IBM Corp. 2022, 2022 All Rights Reserved
+ * (c) Copyright IBM Corp. 2022, 2023 All Rights Reserved
  * ===========================================================================
  */
 
@@ -36,7 +36,6 @@ import java.lang.invoke.VarHandle;
 import java.util.List;
 
 import java.lang.foreign.GroupLayout;
-import java.lang.foreign.MemoryAddress;
 import java.lang.foreign.MemoryLayout;
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
@@ -103,9 +102,7 @@ enum TypeClass {
 		) {
 			argHandle = JAVA_DOUBLE.varHandle();
 		/* VarHandle stores the address of struct which is greater than 8 bytes in size as per the ABI document */
-		} else if ((carrier == MemoryAddress.class)
-			|| (carrier == MemorySegment.class)
-		) {
+		} else if (carrier == MemorySegment.class) {
 			argHandle = ADDRESS.varHandle();
 		} else {
 			throw new IllegalStateException("Unspported carrier: " + carrier.getName());
@@ -148,7 +145,7 @@ enum TypeClass {
 			|| (carrier == double.class)
 		) {
 			layoutType = FLOAT;
-		} else if (carrier == MemoryAddress.class) {
+		} else if (carrier == MemorySegment.class) {
 			layoutType = POINTER;
 		} else {
 			throw new IllegalStateException("Unspported carrier: " + carrier.getName());

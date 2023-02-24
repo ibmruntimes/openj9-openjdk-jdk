@@ -23,6 +23,12 @@
  * questions.
  */
 
+/*
+ * ===========================================================================
+ * (c) Copyright IBM Corp. 2023, 2023 All Rights Reserved
+ * ===========================================================================
+ */
+
 package sun.security.pkcs11;
 
 import java.io.IOException;
@@ -32,10 +38,12 @@ import java.nio.ByteBuffer;
 import java.security.*;
 import java.security.interfaces.*;
 import java.security.spec.AlgorithmParameterSpec;
+
+import jdk.internal.access.JavaNioAccess;
+import jdk.internal.access.SharedSecrets;
 import sun.nio.ch.DirectBuffer;
 
 import sun.security.util.*;
-import sun.security.x509.AlgorithmId;
 
 import sun.security.rsa.RSAUtil;
 import sun.security.rsa.RSAPadding;
@@ -97,6 +105,8 @@ import sun.security.util.KeyUtil;
  * @since   1.5
  */
 final class P11Signature extends SignatureSpi {
+
+    private static final JavaNioAccess NIO_ACCESS = SharedSecrets.getJavaNioAccess();
 
     // token instance
     private final Token token;
@@ -162,6 +172,15 @@ final class P11Signature extends SignatureSpi {
     // than 1024 bits", but this is a little arbitrary
     private static final int RAW_ECDSA_MAX = 128;
 
+    // Check if running on z platform.
+    private static final boolean isZ;
+    static {
+        String arch = System.getProperty("os.arch");
+        isZ = "s390".equalsIgnoreCase(arch) || "s390x".equalsIgnoreCase(arch);
+    }
+
+    // Elliptic Curve key size in bits.
+    private int ecKeySize;
 
     P11Signature(Token token, String algorithm, long mechanism)
             throws NoSuchAlgorithmException, PKCS11Exception {
@@ -468,6 +487,14 @@ final class P11Signature extends SignatureSpi {
         if (publicKey == null) {
             throw new InvalidKeyException("Key must not be null");
         }
+
+        // Check if the public key is EC public key to keep its key size.
+        if (publicKey instanceof ECPublicKey ecPublicKey) {
+            ecKeySize = ecPublicKey.getParams().getCurve().getField().getFieldSize();
+        } else {
+            ecKeySize = 0; // Otherwise reset the ecKeySize parameter.
+        }
+
         // Need to check key length whenever a new key is set
         if (publicKey != p11Key) {
             checkKeySize(keyAlgorithm, publicKey);
@@ -575,14 +602,15 @@ final class P11Signature extends SignatureSpi {
         }
         switch (type) {
             case T_UPDATE -> {
-                if (!(byteBuffer instanceof DirectBuffer)) {
+                if (!(byteBuffer instanceof DirectBuffer dByteBuffer)) {
                     // cannot do better than default impl
                     super.engineUpdate(byteBuffer);
                     return;
                 }
-                long addr = ((DirectBuffer) byteBuffer).address();
                 int ofs = byteBuffer.position();
+                NIO_ACCESS.acquireSession(byteBuffer);
                 try {
+                    long addr = dByteBuffer.address();
                     if (mode == M_SIGN) {
                         token.p11.C_SignUpdate
                                 (session.id(), addr + ofs, null, 0, len);
@@ -595,6 +623,8 @@ final class P11Signature extends SignatureSpi {
                 } catch (PKCS11Exception e) {
                     reset(false);
                     throw new ProviderException("Update failed", e);
+                } finally {
+                    NIO_ACCESS.releaseSession(byteBuffer);
                 }
             }
             case T_DIGEST -> {
@@ -830,7 +860,7 @@ final class P11Signature extends SignatureSpi {
         }
     }
 
-    private static byte[] asn1ToECDSA(byte[] sig) throws SignatureException {
+    private byte[] asn1ToECDSA(byte[] sig) throws SignatureException {
         try {
             // Enforce strict DER checking for signatures
             DerInputStream in = new DerInputStream(sig, 0, sig.length, false);
@@ -848,7 +878,12 @@ final class P11Signature extends SignatureSpi {
             // trim leading zeroes
             byte[] br = KeyUtil.trimZeroes(r.toByteArray());
             byte[] bs = KeyUtil.trimZeroes(s.toByteArray());
-            int k = Math.max(br.length, bs.length);
+            int k;
+            if (isZ && (ecKeySize > 0)) {
+                k = (ecKeySize + 7) / 8;
+            } else {
+                k = Math.max(br.length, bs.length);
+            }
             // r and s each occupy half the array
             byte[] res = new byte[k << 1];
             System.arraycopy(br, 0, res, k - br.length, br.length);

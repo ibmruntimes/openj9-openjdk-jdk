@@ -153,10 +153,13 @@ grant codeBase "jrt:/jdk.crypto.cryptoki" {
     permission java.lang.RuntimePermission
                    "accessClassInPackage.com.sun.crypto.provider";
     permission java.lang.RuntimePermission "accessClassInPackage.jdk.internal.misc";
+    permission java.lang.RuntimePermission "accessClassInPackage.jdk.internal.access";
     permission java.lang.RuntimePermission
                    "accessClassInPackage.sun.security.*";
     permission java.lang.RuntimePermission "accessClassInPackage.sun.nio.ch";
     permission java.lang.RuntimePermission "loadLibrary.j2pkcs11";
+    permission java.lang.RuntimePermission
+                   "accessClassInPackage.openj9.internal.security";
     permission java.util.PropertyPermission "sun.security.pkcs11.allowSingleThreadedModules", "read";
     permission java.util.PropertyPermission "sun.security.pkcs11.disableKeyExtraction", "read";
     permission java.util.PropertyPermission "os.name", "read";

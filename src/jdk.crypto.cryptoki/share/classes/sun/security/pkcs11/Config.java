@@ -23,6 +23,12 @@
  * questions.
  */
 
+/*
+ * ===========================================================================
+ * (c) Copyright IBM Corp. 2023, 2023 All Rights Reserved
+ * ===========================================================================
+ */
+
 package sun.security.pkcs11;
 
 import java.io.*;
@@ -88,7 +94,7 @@ final class Config {
     private static final boolean DEBUG = false;
 
     // file name containing this configuration
-    private String filename;
+    private final String filename;
 
     // Reader and StringTokenizer used during parsing
     private Reader reader;
@@ -102,6 +108,9 @@ final class Config {
 
     // name of the PKCS#11 library
     private String library;
+
+    // name of the PKCS#11 token to use
+    private String tokenLabel;
 
     // description to pass to the provider class
     private String description;
@@ -225,6 +234,10 @@ final class Config {
 
     String getLibrary() {
         return library;
+    }
+
+    String getTokenLabel() {
+        return tokenLabel;
     }
 
     String getDescription() {
@@ -500,9 +513,16 @@ final class Config {
             case "nssOptimizeSpace"->
                 nssOptimizeSpace = parseBooleanEntry(st.sval);
             default->
-                throw new ConfigurationException
-                        ("Unknown keyword '" + st.sval + "', line " +
-                        st.lineno());
+                {
+                    if ("tokenLabel".equalsIgnoreCase(st.sval)) {
+                        st.sval = "tokenLabel";
+                        tokenLabel = parseStringEntry(st.sval);
+                    } else {
+                        throw new ConfigurationException
+                                ("Unknown keyword '" + st.sval + "', line " +
+                                        st.lineno());
+                    }
+                }
             }
             parsedKeywords.add(st.sval);
         }

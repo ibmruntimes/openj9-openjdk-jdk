@@ -51,7 +51,7 @@ import openj9.internal.security.FIPSConfigurator;
  *
  * <p>A cryptographically strong random number minimally complies with the
  * statistical random number generator tests specified in
- * <a href="http://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.140-2.pdf">
+ * <a href="https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.140-2.pdf">
  * <i>FIPS 140-2, Security Requirements for Cryptographic Modules</i></a>,
  * section 4.9.1.
  * Additionally, {@code SecureRandom} must produce non-deterministic output.

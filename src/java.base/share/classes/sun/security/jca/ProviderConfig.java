@@ -23,6 +23,12 @@
  * questions.
  */
 
+/*
+ * ===========================================================================
+ * (c) Copyright IBM Corp. 2023, 2023 All Rights Reserved
+ * ===========================================================================
+ */
+
 package sun.security.jca;
 
 import java.io.File;
@@ -313,6 +319,12 @@ final class ProviderConfig {
             }
         });
     }
+
+/*[IF CRIU_SUPPORT]*/
+    static void reloadServices() {
+        ProviderLoader.INSTANCE.services.reload();
+    }
+/*[ENDIF] CRIU_SUPPORT */
 
     // Inner class for loading security providers listed in java.security file
     private static final class ProviderLoader {

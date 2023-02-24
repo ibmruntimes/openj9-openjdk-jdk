@@ -20,6 +20,11 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
+/*
+ * ===========================================================================
+ * (c) Copyright IBM Corp. 2023, 2023 All Rights Reserved
+ * ===========================================================================
+ */
 
 #include <string.h>
 #include "jvmti.h"
@@ -215,12 +220,14 @@ breakpoint_hit2(jvmtiEnv *jvmti, JNIEnv* jni,
   // Enable VIRTUAL_THREAD_MOUNT events on the vthread.
   LOG("Hit #2: Breakpoint: %s: enabling VirtualThreadMount events on %s thread: %p\n",
           mname, is_virtual ? "virtual" : "carrier", (void*)thread);
-  set_event_notification_mode(jvmti, jni, JVMTI_ENABLE, EXT_EVENT_VIRTUAL_THREAD_MOUNT, thread);
+  err = set_ext_event_notification_mode(jvmti, JVMTI_ENABLE, "VirtualThreadMount", thread);
+  check_jvmti_status(jni, err, "check: error in JVMTI SetEventNotificationMode: enable VIRTUAL_THREAD_MOUNT");
 
   // Enable VIRTUAL_THREAD_UNMOUNT events on the vthread.
   LOG("Hit #2: Breakpoint: %s: enabling VirtualThreadUnmount events on %s thread: %p\n",
           mname, is_virtual ? "virtual" : "carrier", (void*)thread);
-  set_event_notification_mode(jvmti, jni, JVMTI_ENABLE, EXT_EVENT_VIRTUAL_THREAD_UNMOUNT, thread);
+  err = set_ext_event_notification_mode(jvmti, JVMTI_ENABLE, "VirtualThreadUnmount", thread);
+  check_jvmti_status(jni, err, "check: error in JVMTI SetEventNotificationMode: enable VIRTUAL_THREAD_UNMOUNT");
 
   // Test GetThreadLocalStorage for virtual thread.
   LOG("Hit #2: Breakpoint: %s: checking GetThreadLocalStorage on virtual thread: %p\n",
@@ -264,11 +271,13 @@ breakpoint_hit3(jvmtiEnv *jvmti, JNIEnv* jni,
 
   // Disable VIRTUAL_THREAD_MOUNT events on the vthread.
   LOG("Hit #3: Breakpoint: %s: disabling VirtualThreadMount events on virtual thread: %p\n", mname, (void*)thread);
-  set_event_notification_mode(jvmti, jni, JVMTI_DISABLE, EXT_EVENT_VIRTUAL_THREAD_MOUNT, thread);
+  err = set_ext_event_notification_mode(jvmti, JVMTI_DISABLE, "VirtualThreadMount", thread);
+  check_jvmti_status(jni, err, "check: error in JVMTI SetEventNotificationMode: disable VIRTUAL_THREAD_MOUNT");
 
   // Disable VIRTUAL_THREAD_UNMOUNT events on the vthread.
   LOG("Hit #3: Breakpoint: %s: disabling VirtualThreadUnmount events on virtual thread: %p\n", mname, (void*)thread);
-  set_event_notification_mode(jvmti, jni, JVMTI_DISABLE, EXT_EVENT_VIRTUAL_THREAD_UNMOUNT, thread);
+  err = set_ext_event_notification_mode(jvmti, JVMTI_DISABLE, "VirtualThreadUnmount", thread);
+  check_jvmti_status(jni, err, "check: error in JVMTI SetEventNotificationMode: disable VIRTUAL_THREAD_UNMOUNT");
 }
 
 static void JNICALL

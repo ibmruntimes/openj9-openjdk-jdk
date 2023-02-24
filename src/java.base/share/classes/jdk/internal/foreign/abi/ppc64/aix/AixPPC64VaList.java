@@ -26,7 +26,7 @@
 
 /*
  * ===========================================================================
- * (c) Copyright IBM Corp. 2022, 2022 All Rights Reserved
+ * (c) Copyright IBM Corp. 2022, 2023 All Rights Reserved
  * ===========================================================================
  */
 
@@ -43,7 +43,6 @@ import jdk.internal.foreign.abi.ppc64.TypeClass;
 import jdk.internal.foreign.abi.SharedUtils;
 import jdk.internal.foreign.abi.SharedUtils.SimpleVaArg;
 import jdk.internal.foreign.MemorySessionImpl;
-import jdk.internal.foreign.Scoped;
 import static jdk.internal.foreign.PlatformLayouts.AIX;
 
 /**
@@ -58,19 +57,18 @@ import static jdk.internal.foreign.PlatformLayouts.AIX;
  * with all supportted types of arugments, including struct (passed by value), pointer and
  * primitive types, which are aligned with 8 bytes.
  */
-public non-sealed class AixPPC64VaList implements VaList, Scoped {
-	public static final Class<?> CARRIER = MemoryAddress.class;
+public non-sealed class AixPPC64VaList implements VaList {
 
 	/* Every primitive/pointer occupies 8 bytes and structs are aligned
 	 * with 8 bytes in the total size when stacking the va_list buffer.
 	 */
 	private static final long VA_LIST_SLOT_BYTES = 8;
-	private static final VaList EMPTY = new SharedUtils.EmptyVaList(MemoryAddress.NULL);
+	private static final VaList EMPTY = new SharedUtils.EmptyVaList(MemorySegment.NULL);
 
 	private MemorySegment segment;
-	private final MemorySession session;
+	private final SegmentScope session;
 
-	private AixPPC64VaList(MemorySegment segment, MemorySession session) {
+	private AixPPC64VaList(MemorySegment segment, SegmentScope session) {
 		this.segment = segment;
 		this.session = session;
 	}
@@ -95,8 +93,8 @@ public non-sealed class AixPPC64VaList implements VaList, Scoped {
 	}
 
 	@Override
-	public MemoryAddress nextVarg(ValueLayout.OfAddress layout) {
-		return (MemoryAddress)readArg(layout);
+	public MemorySegment nextVarg(ValueLayout.OfAddress layout) {
+		return (MemorySegment)readArg(layout);
 	}
 
 	@Override
@@ -167,7 +165,7 @@ public non-sealed class AixPPC64VaList implements VaList, Scoped {
 	@Override
 	public void skip(MemoryLayout... layouts) {
 		Objects.requireNonNull(layouts);
-		sessionImpl().checkValidState();
+		((MemorySessionImpl)session).checkValidState();
 
 		for (MemoryLayout layout : layouts) {
 			Objects.requireNonNull(layout);
@@ -178,42 +176,38 @@ public non-sealed class AixPPC64VaList implements VaList, Scoped {
 		}
 	}
 
-	public static VaList ofAddress(MemoryAddress addr, MemorySession session) {
+	public static VaList ofAddress(long addr, SegmentScope session) {
 		MemorySegment segment = MemorySegment.ofAddress(addr, Long.MAX_VALUE, session);
 		return new AixPPC64VaList(segment, session);
 	}
 
 	@Override
-	public MemorySession session() {
-		return session;
-	}
-
-	@Override
 	public VaList copy() {
-		sessionImpl().checkValidState();
+		((MemorySessionImpl)session).checkValidState();
 		return new AixPPC64VaList(segment, session);
 	}
 
 	@Override
-	public MemoryAddress address() {
-		return segment.address();
+	public MemorySegment segment() {
+		/* The returned segment cannot be accessed. */
+		return segment.asSlice(0, 0);
 	}
 
 	@Override
 	public String toString() {
-		return "AixPPC64VaList{" + segment.address() + '}';
+		return "AixPPC64VaList{" + segment.asSlice(0, 0) + '}';
 	}
 
-	static Builder builder(MemorySession session) {
+	static Builder builder(SegmentScope session) {
 		return new Builder(session);
 	}
 
 	public static non-sealed class Builder implements VaList.Builder {
-		private final MemorySession session;
+		private final SegmentScope session;
 		private final List<SimpleVaArg> stackArgs = new ArrayList<>();
 
-		public Builder(MemorySession session) {
-			MemorySessionImpl.toSessionImpl(session).checkValidState();
+		public Builder(SegmentScope session) {
+			((MemorySessionImpl)session).checkValidState();
 			this.session = session;
 		}
 
@@ -240,8 +234,8 @@ public non-sealed class AixPPC64VaList implements VaList, Scoped {
 		}
 
 		@Override
-		public Builder addVarg(ValueLayout.OfAddress layout, Addressable value) {
-			return setArg(layout, value.address());
+		public Builder addVarg(ValueLayout.OfAddress layout, MemorySegment value) {
+			return setArg(layout, value);
 		}
 
 		@Override
@@ -261,7 +255,7 @@ public non-sealed class AixPPC64VaList implements VaList, Scoped {
 			 */
 			long totalArgsSize = stackArgs.stream().reduce(0L,
 					(accum, arg) -> accum + getAlignedArgSize(arg.layout), Long::sum);
-			SegmentAllocator allocator = SegmentAllocator.newNativeArena(session);
+			SegmentAllocator allocator = SegmentAllocator.nativeAllocator(session);
 			MemorySegment segment = allocator.allocate(totalArgsSize);
 			MemorySegment cursorSegment = segment;
 

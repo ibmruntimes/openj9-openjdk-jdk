@@ -30,7 +30,7 @@
 /*
  * @test
  * @enablePreview
- * @requires ((os.arch == "amd64" | os.arch == "x86_64") & sun.arch.data.model == "64") | os.arch == "aarch64"
+ * @requires ((os.arch == "amd64" | os.arch == "x86_64") & sun.arch.data.model == "64") | os.arch == "aarch64" | os.arch == "riscv64"
  * | os.arch == "ppc64" | os.arch == "ppc64le" | os.arch == "s390x"
  * @compile lookup/Lookup.java
  * @compile invoker/Invoker.java
@@ -49,11 +49,11 @@ public class TestLoaderLookup {
         ClassLoader loader1 = newClassLoader("lookup");
         Class<?> lookup = loader1.loadClass("lookup.Lookup");
         Method fooSymbol = lookup.getDeclaredMethod("fooSymbol");
-        Addressable foo = (Addressable)fooSymbol.invoke(null);
+        MemorySegment foo = (MemorySegment) fooSymbol.invoke(null);
 
         ClassLoader loader2 = newClassLoader("invoker");
         Class<?> invoker = loader2.loadClass("invoker.Invoker");
-        Method invoke = invoker.getDeclaredMethod("invoke", Addressable.class);
+        Method invoke = invoker.getDeclaredMethod("invoke", MemorySegment.class);
         invoke.invoke(null, foo);
 
         loader1 = null;

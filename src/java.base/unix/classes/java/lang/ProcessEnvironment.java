@@ -1,6 +1,6 @@
 /*[INCLUDE-IF JAVA_SPEC_VERSION >= 8]*/
 /*
- * Copyright (c) 2003, 2022, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2003, 2023, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -61,13 +61,12 @@
 
 package java.lang;
 
-import java.io.*;
-import java.nio.charset.Charset;
 import java.util.*;
-import jdk.internal.util.StaticProperty;
 /*[IF CRIU_SUPPORT]*/
 import openj9.internal.criu.InternalCRIUSupport;
 /*[ENDIF] CRIU_SUPPORT*/
+
+import static java.lang.ProcessImpl.JNU_CHARSET;
 
 
 final class ProcessEnvironment
@@ -228,11 +227,11 @@ final class ProcessEnvironment
 
         public boolean equals(Object o) {
             return o instanceof ExternalData
-                && arrayEquals(getBytes(), ((ExternalData) o).getBytes());
+                && Arrays.equals(getBytes(), ((ExternalData) o).getBytes());
         }
 
         public int hashCode() {
-            return arrayHash(getBytes());
+            return Arrays.hashCode(getBytes());
         }
     }
 
@@ -248,7 +247,7 @@ final class ProcessEnvironment
         }
 
         public static Variable valueOfQueryOnly(String str) {
-            return new Variable(str, str.getBytes(StaticProperty.jnuCharset()));
+            return new Variable(str, str.getBytes(JNU_CHARSET));
         }
 
         public static Variable valueOf(String str) {
@@ -257,11 +256,11 @@ final class ProcessEnvironment
         }
 
         public static Variable valueOf(byte[] bytes) {
-            return new Variable(new String(bytes, StaticProperty.jnuCharset()), bytes);
+            return new Variable(new String(bytes, JNU_CHARSET), bytes);
         }
 
         public int compareTo(Variable variable) {
-            return arrayCompare(getBytes(), variable.getBytes());
+            return Arrays.compare(getBytes(), variable.getBytes());
         }
 
         public boolean equals(Object o) {
@@ -281,7 +280,7 @@ final class ProcessEnvironment
         }
 
         public static Value valueOfQueryOnly(String str) {
-            return new Value(str, str.getBytes(StaticProperty.jnuCharset()));
+            return new Value(str, str.getBytes(JNU_CHARSET));
         }
 
         public static Value valueOf(String str) {
@@ -290,11 +289,11 @@ final class ProcessEnvironment
         }
 
         public static Value valueOf(byte[] bytes) {
-            return new Value(new String(bytes, StaticProperty.jnuCharset()), bytes);
+            return new Value(new String(bytes, JNU_CHARSET), bytes);
         }
 
         public int compareTo(Value value) {
-            return arrayCompare(getBytes(), value.getBytes());
+            return Arrays.compare(getBytes(), value.getBytes());
         }
 
         public boolean equals(Object o) {
@@ -493,33 +492,6 @@ final class ProcessEnvironment
         public boolean remove(Object o) {
             return s.remove(Variable.valueOfQueryOnly(o));
         }
-    }
-
-    // Replace with general purpose method someday
-    private static int arrayCompare(byte[]x, byte[] y) {
-        int min = x.length < y.length ? x.length : y.length;
-        for (int i = 0; i < min; i++)
-            if (x[i] != y[i])
-                return x[i] - y[i];
-        return x.length - y.length;
-    }
-
-    // Replace with general purpose method someday
-    private static boolean arrayEquals(byte[] x, byte[] y) {
-        if (x.length != y.length)
-            return false;
-        for (int i = 0; i < x.length; i++)
-            if (x[i] != y[i])
-                return false;
-        return true;
-    }
-
-    // Replace with general purpose method someday
-    private static int arrayHash(byte[] x) {
-        int hash = 0;
-        for (int i = 0; i < x.length; i++)
-            hash = 31 * hash + x[i];
-        return hash;
     }
 
 }

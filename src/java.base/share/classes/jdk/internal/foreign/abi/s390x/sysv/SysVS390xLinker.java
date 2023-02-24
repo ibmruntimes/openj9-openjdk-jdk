@@ -25,18 +25,18 @@
 
 /*
  * ===========================================================================
- * (c) Copyright IBM Corp. 2022, 2022 All Rights Reserved
+ * (c) Copyright IBM Corp. 2022, 2023 All Rights Reserved
  * ===========================================================================
  */
 
 package jdk.internal.foreign.abi.s390x.sysv;
 
 import jdk.internal.foreign.abi.AbstractLinker;
+import jdk.internal.foreign.abi.LinkerOptions;
 
 import java.lang.foreign.FunctionDescriptor;
-import java.lang.foreign.MemoryAddress;
 import java.lang.foreign.MemorySegment;
-import java.lang.foreign.MemorySession;
+import java.lang.foreign.SegmentScope;
 import java.lang.foreign.VaList;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodType;
@@ -59,23 +59,23 @@ public final class SysVS390xLinker extends AbstractLinker {
     }
 
     @Override
-    protected MethodHandle arrangeDowncall(MethodType inferredMethodType, FunctionDescriptor function) {
-        return CallArranger.arrangeDowncall(inferredMethodType, function);
+    protected MethodHandle arrangeDowncall(MethodType inferredMethodType, FunctionDescriptor function, LinkerOptions options) {
+        return CallArranger.arrangeDowncall(inferredMethodType, function, options);
     }
 
     @Override
-    protected MemorySegment arrangeUpcall(MethodHandle target, MethodType targetType, FunctionDescriptor function, MemorySession session) {
-        return CallArranger.arrangeUpcall(target, targetType, function, session);
+    protected MemorySegment arrangeUpcall(MethodHandle target, MethodType targetType, FunctionDescriptor function, SegmentScope scope) {
+        return CallArranger.arrangeUpcall(target, targetType, function, scope);
     }
 
-    public static VaList newVaList(Consumer<VaList.Builder> actions, MemorySession session) {
-        SysVS390xVaList.Builder builder = SysVS390xVaList.builder(session);
+    public static VaList newVaList(Consumer<VaList.Builder> actions, SegmentScope scope) {
+        SysVS390xVaList.Builder builder = SysVS390xVaList.builder(scope);
         actions.accept(builder);
         return builder.build();
     }
 
-    public static VaList newVaListOfAddress(MemoryAddress ma, MemorySession session) {
-        return SysVS390xVaList.ofAddress(ma, session);
+    public static VaList newVaListOfAddress(long address, SegmentScope scope) {
+        return SysVS390xVaList.ofAddress(address, scope);
     }
 
     public static VaList emptyVaList() {
