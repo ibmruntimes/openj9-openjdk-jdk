@@ -49,13 +49,17 @@ import java.util.function.Consumer;
  * on Linux/s390x and might be updated accordingly in terms of VaList in the future.
  */
 public final class SysVS390xLinker extends AbstractLinker {
-    private static SysVS390xLinker instance;
 
     public static SysVS390xLinker getInstance() {
-        if (instance == null) {
-            instance = new SysVS390xLinker();
+        final class Holder {
+            private static final SysVS390xLinker INSTANCE = new SysVS390xLinker();
         }
-        return instance;
+
+        return Holder.INSTANCE;
+    }
+
+    private SysVS390xLinker() {
+        /* Ensure there is only one instance */
     }
 
     @Override

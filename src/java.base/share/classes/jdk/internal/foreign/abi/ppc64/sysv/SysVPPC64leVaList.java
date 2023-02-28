@@ -68,9 +68,9 @@ public non-sealed class SysVPPC64leVaList implements VaList {
 	private MemorySegment segment;
 	private final SegmentScope session;
 
-	private SysVPPC64leVaList(MemorySegment segment, SegmentScope session) {
+	private SysVPPC64leVaList(MemorySegment segment) {
 		this.segment = segment;
-		this.session = session;
+		this.session = segment.scope();
 	}
 
 	public static final VaList empty() {
@@ -132,7 +132,7 @@ public non-sealed class SysVPPC64leVaList implements VaList {
 			default -> throw new IllegalStateException("Unsupported TypeClass: " + typeClass);
 		}
 
-		/* Move to the next argument in the va_list buffer */
+		/* Move to the next argument in the va_list buffer. */
 		segment = segment.asSlice(argByteSize);
 		return argument;
 	}
@@ -140,7 +140,7 @@ public non-sealed class SysVPPC64leVaList implements VaList {
 	private static long getAlignedArgSize(MemoryLayout argLayout) {
 		long argLayoutSize = VA_LIST_SLOT_BYTES; // Always aligned with 8 bytes for primitives/pointer by default
 
-		/* As with primitives, a struct should aligned with 8 bytes */
+		/* As with primitives, a struct should aligned with 8 bytes. */
 		if (argLayout instanceof GroupLayout) {
 			argLayoutSize = argLayout.byteSize();
 			if ((argLayoutSize % VA_LIST_SLOT_BYTES) > 0) {
@@ -151,7 +151,7 @@ public non-sealed class SysVPPC64leVaList implements VaList {
 		return argLayoutSize;
 	}
 
-	/* Check whether the argument to be skipped exceeds the existing memory size in the VaList */
+	/* Check whether the argument to be skipped exceeds the existing memory size in the VaList. */
 	private void checkNextArgument(MemoryLayout argLayout, long argByteSize) {
 		if (argByteSize > segment.byteSize()) {
 			throw SharedUtils.newVaListNSEE(argLayout);
@@ -171,20 +171,19 @@ public non-sealed class SysVPPC64leVaList implements VaList {
 			Objects.requireNonNull(layout);
 			long argByteSize = getAlignedArgSize(layout);
 			checkNextArgument(layout, argByteSize);
-			/* Skip to the next argument in the va_list buffer */
+			/* Skip to the next argument in the va_list buffer. */
 			segment = segment.asSlice(argByteSize);
 		}
 	}
 
-	public static VaList ofAddress(long addr, SegmentScope session) {
-		MemorySegment segment = MemorySegment.ofAddress(addr, Long.MAX_VALUE, session);
-		return new SysVPPC64leVaList(segment, session);
+	public static VaList ofAddress(long address, SegmentScope session) {
+		return new SysVPPC64leVaList(MemorySegment.ofAddress(address, Long.MAX_VALUE, session));
 	}
 
 	@Override
 	public VaList copy() {
 		((MemorySessionImpl)session).checkValidState();
-		return new SysVPPC64leVaList(segment, session);
+		return new SysVPPC64leVaList(segment);
 	}
 
 	@Override
@@ -284,7 +283,7 @@ public non-sealed class SysVPPC64leVaList implements VaList {
 				/* Move to the next argument by the aligned size of the current argument */
 				cursorSegment = cursorSegment.asSlice(argByteSize);
 			}
-			return new SysVPPC64leVaList(segment, session);
+			return new SysVPPC64leVaList(segment);
 		}
 	}
 }
