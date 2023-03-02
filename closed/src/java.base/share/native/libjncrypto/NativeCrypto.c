@@ -2374,13 +2374,14 @@ Java_jdk_crypto_jniprovider_NativeCrypto_ECCreatePrivateKey
 }
 
 /* Encode an EC Elliptic Curve over a Prime Field */
-EC_KEY* ECEncodeGFp(BIGNUM *aBN,
-                    BIGNUM *bBN,
-                    BIGNUM *pBN,
-                    BIGNUM *xBN,
-                    BIGNUM *yBN,
-                    BIGNUM *nBN,
-                    BIGNUM *hBN)
+static EC_KEY *
+ECEncodeGFp(BIGNUM *aBN,
+            BIGNUM *bBN,
+            BIGNUM *pBN,
+            BIGNUM *xBN,
+            BIGNUM *yBN,
+            BIGNUM *nBN,
+            BIGNUM *hBN)
 {
     EC_KEY *key = NULL;
     EC_GROUP *group = NULL;
@@ -2394,24 +2395,29 @@ EC_KEY* ECEncodeGFp(BIGNUM *aBN,
     }
 
     group = (*OSSL_EC_GROUP_new_curve_GFp)(pBN, aBN, bBN, ctx);
-    if (NULL == group)
+    if (NULL == group) {
         goto cleanup;
+    }
 
     generator = (*OSSL_EC_POINT_new)(group);
-    if (NULL == generator)
+    if (NULL == generator) {
         goto cleanup;
+    }
 
     ret = (*OSSL_EC_POINT_set_affine_coordinates_GFp)(group, generator, xBN, yBN, ctx);
-    if (0 == ret)
+    if (0 == ret) {
         goto cleanup;
+    }
 
     ret = (*OSSL_EC_GROUP_set_generator)(group, generator, nBN, hBN);
-    if (0 == ret)
+    if (0 == ret) {
         goto cleanup;
+    }
 
     key = (*OSSL_EC_KEY_new)();
-    if (NULL == key)
+    if (NULL == key) {
         goto cleanup;
+    }
 
     ret = (*OSSL_EC_KEY_set_group)(key, group);
     if (0 == ret) {
@@ -2420,26 +2426,30 @@ EC_KEY* ECEncodeGFp(BIGNUM *aBN,
     }
 
 cleanup:
-    if (NULL != generator)
+    if (NULL != generator) {
         (*OSSL_EC_POINT_free)(generator);
+    }
 
-    if (NULL != group)
+    if (NULL != group) {
         (*OSSL_EC_GROUP_free)(group);
+    }
 
-    if (NULL != ctx)
+    if (NULL != ctx) {
         (*OSSL_BN_CTX_free)(ctx);
+    }
 
     return key;
 }
 
 /* Encode an EC Elliptic Curve over a Binary Field */
-EC_KEY* ECEncodeGF2m(BIGNUM *aBN,
-                     BIGNUM *bBN,
-                     BIGNUM *pBN,
-                     BIGNUM *xBN,
-                     BIGNUM *yBN,
-                     BIGNUM *nBN,
-                     BIGNUM *hBN)
+static EC_KEY *
+ECEncodeGF2m(BIGNUM *aBN,
+             BIGNUM *bBN,
+             BIGNUM *pBN,
+             BIGNUM *xBN,
+             BIGNUM *yBN,
+             BIGNUM *nBN,
+             BIGNUM *hBN)
 {
     EC_KEY *key = NULL;
     EC_GROUP *group = NULL;
@@ -2447,32 +2457,39 @@ EC_KEY* ECEncodeGF2m(BIGNUM *aBN,
     BN_CTX *ctx = NULL;
     int ret = 0;
 
-    if (JNI_FALSE == OSSL_ECGF2M)
+    if (JNI_FALSE == OSSL_ECGF2M) {
         return NULL;
+    }
 
     ctx = (*OSSL_BN_CTX_new)();
-    if (NULL == ctx)
+    if (NULL == ctx) {
         goto cleanup;
+    }
 
     group = (*OSSL_EC_GROUP_new_curve_GF2m)(pBN, aBN, bBN, ctx);
-    if (NULL == group)
+    if (NULL == group) {
         goto cleanup;
+    }
 
     generator = (*OSSL_EC_POINT_new)(group);
-    if (NULL == generator)
+    if (NULL == generator) {
         goto cleanup;
+    }
 
     ret = (*OSSL_EC_POINT_set_affine_coordinates_GF2m)(group, generator, xBN, yBN, ctx);
-    if (0 == ret)
-        return NULL;
+    if (0 == ret) {
+        goto cleanup;
+    }
 
     ret = (*OSSL_EC_GROUP_set_generator)(group, generator, nBN, hBN);
-    if (0 == ret)
+    if (0 == ret) {
         goto cleanup;
+    }
 
     key = (*OSSL_EC_KEY_new)();
-    if (NULL == key)
+    if (NULL == key) {
         goto cleanup;
+    }
 
     ret = (*OSSL_EC_KEY_set_group)(key, group);
     if (0 == ret) {
@@ -2481,14 +2498,17 @@ EC_KEY* ECEncodeGF2m(BIGNUM *aBN,
     }
 
 cleanup:
-    if (NULL != generator)
+    if (NULL != generator) {
         (*OSSL_EC_POINT_free)(generator);
+    }
 
-    if (NULL != group)
+    if (NULL != group) {
         (*OSSL_EC_GROUP_free)(group);
+    }
 
-    if (NULL != ctx)
+    if (NULL != ctx) {
         (*OSSL_BN_CTX_free)(ctx);
+    }
 
     return key;
 }
@@ -2573,47 +2593,62 @@ Java_jdk_crypto_jniprovider_NativeCrypto_ECEncodeGFp
     key = ECEncodeGFp(aBN, bBN, pBN, xBN, yBN, nBN, hBN);
 
 cleanup:
-    if (NULL != nativeA)
+    if (NULL != nativeA) {
         (*env)->ReleasePrimitiveArrayCritical(env, a, nativeA, JNI_ABORT);
+    }
 
-    if (NULL != nativeB)
+    if (NULL != nativeB) {
         (*env)->ReleasePrimitiveArrayCritical(env, b, nativeB, JNI_ABORT);
+    }
 
-    if (NULL != nativeP)
+    if (NULL != nativeP) {
         (*env)->ReleasePrimitiveArrayCritical(env, p, nativeP, JNI_ABORT);
+    }
 
-    if (NULL != nativeX)
+    if (NULL != nativeX) {
         (*env)->ReleasePrimitiveArrayCritical(env, x, nativeX, JNI_ABORT);
+    }
 
-    if (NULL != nativeY)
+    if (NULL != nativeY) {
         (*env)->ReleasePrimitiveArrayCritical(env, y, nativeY, JNI_ABORT);
+    }
 
-    if (NULL != nativeN)
+    if (NULL != nativeN) {
         (*env)->ReleasePrimitiveArrayCritical(env, n, nativeN, JNI_ABORT);
+    }
 
-    if (NULL != nativeH)
+    if (NULL != nativeH) {
         (*env)->ReleasePrimitiveArrayCritical(env, h, nativeH, JNI_ABORT);
+    }
 
-    if (NULL != aBN)
+    if (NULL != aBN) {
         (*OSSL_BN_free)(aBN);
-    if (NULL != bBN)
+    }
+    if (NULL != bBN) {
         (*OSSL_BN_free)(bBN);
-    if (NULL != pBN)
+    }
+    if (NULL != pBN) {
         (*OSSL_BN_free)(pBN);
-    if (NULL != xBN)
+    }
+    if (NULL != xBN) {
         (*OSSL_BN_free)(xBN);
-    if (NULL != yBN)
+    }
+    if (NULL != yBN) {
         (*OSSL_BN_free)(yBN);
-    if (NULL != nBN)
+    }
+    if (NULL != nBN) {
         (*OSSL_BN_free)(nBN);
-    if (NULL != hBN)
+    }
+    if (NULL != hBN) {
         (*OSSL_BN_free)(hBN);
+    }
 
 
-    if (NULL == key)
+    if (NULL == key) {
         return -1;
-    else
+    } else {
         return (jlong)(intptr_t)key;
+    }
 }
 
 /* Encode an EC Elliptic Curve over a Binary Field
@@ -2696,47 +2731,62 @@ Java_jdk_crypto_jniprovider_NativeCrypto_ECEncodeGF2m
     key = ECEncodeGF2m(aBN, bBN, pBN, xBN, yBN, nBN, hBN);
 
 cleanup:
-    if (NULL != nativeA)
+    if (NULL != nativeA) {
         (*env)->ReleasePrimitiveArrayCritical(env, a, nativeA, JNI_ABORT);
+    }
 
-    if (NULL != nativeB)
+    if (NULL != nativeB) {
         (*env)->ReleasePrimitiveArrayCritical(env, b, nativeB, JNI_ABORT);
+    }
 
-    if (NULL != nativeP)
+    if (NULL != nativeP) {
         (*env)->ReleasePrimitiveArrayCritical(env, p, nativeP, JNI_ABORT);
+    }
 
-    if (NULL != nativeX)
+    if (NULL != nativeX) {
         (*env)->ReleasePrimitiveArrayCritical(env, x, nativeX, JNI_ABORT);
+    }
 
-    if (NULL != nativeY)
+    if (NULL != nativeY) {
         (*env)->ReleasePrimitiveArrayCritical(env, y, nativeY, JNI_ABORT);
+    }
 
-    if (NULL != nativeN)
+    if (NULL != nativeN) {
         (*env)->ReleasePrimitiveArrayCritical(env, n, nativeN, JNI_ABORT);
+    }
 
-    if (NULL != nativeH)
+    if (NULL != nativeH) {
         (*env)->ReleasePrimitiveArrayCritical(env, h, nativeH, JNI_ABORT);
+    }
 
-    if (NULL != aBN)
+    if (NULL != aBN) {
         (*OSSL_BN_free)(aBN);
-    if (NULL != bBN)
+    }
+    if (NULL != bBN) {
         (*OSSL_BN_free)(bBN);
-    if (NULL != pBN)
+    }
+    if (NULL != pBN) {
         (*OSSL_BN_free)(pBN);
-    if (NULL != xBN)
+    }
+    if (NULL != xBN) {
         (*OSSL_BN_free)(xBN);
-    if (NULL != yBN)
+    }
+    if (NULL != yBN) {
         (*OSSL_BN_free)(yBN);
-    if (NULL != nBN)
+    }
+    if (NULL != nBN) {
         (*OSSL_BN_free)(nBN);
-    if (NULL != hBN)
+    }
+    if (NULL != hBN) {
         (*OSSL_BN_free)(hBN);
+    }
 
 
-    if (NULL == key)
+    if (NULL == key) {
         return -1;
-    else
+    } else {
         return (jlong)(intptr_t)key;
+    }
 }
 
 /* Free EC Public/Private Key
