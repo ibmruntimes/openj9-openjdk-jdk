@@ -39,6 +39,7 @@ import java.util.function.Consumer;
 import jdk.internal.foreign.abi.SharedUtils;
 import jdk.internal.foreign.abi.aarch64.linux.LinuxAArch64VaList;
 import jdk.internal.foreign.abi.aarch64.macos.MacOsAArch64VaList;
+import jdk.internal.foreign.abi.aarch64.windows.WindowsAArch64VaList;
 import jdk.internal.foreign.abi.ppc64.aix.AixPPC64VaList;
 import jdk.internal.foreign.abi.ppc64.sysv.SysVPPC64leVaList;
 import jdk.internal.foreign.abi.riscv64.linux.LinuxRISCV64VaList;
@@ -115,7 +116,7 @@ import jdk.internal.reflect.Reflection;
  * @since 19
  */
 @PreviewFeature(feature=PreviewFeature.Feature.FOREIGN)
-public sealed interface VaList permits WinVaList, SysVVaList, LinuxAArch64VaList, MacOsAArch64VaList, LinuxRISCV64VaList,
+public sealed interface VaList permits WinVaList, SysVVaList, LinuxAArch64VaList, MacOsAArch64VaList, WindowsAArch64VaList, LinuxRISCV64VaList,
                                        SysVPPC64leVaList, SysVS390xVaList, AixPPC64VaList, SharedUtils.EmptyVaList {
 
     /**
@@ -311,7 +312,7 @@ public sealed interface VaList permits WinVaList, SysVVaList, LinuxAArch64VaList
      * @since 19
      */
     @PreviewFeature(feature=PreviewFeature.Feature.FOREIGN)
-    sealed interface Builder permits WinVaList.Builder, SysVVaList.Builder, LinuxAArch64VaList.Builder, MacOsAArch64VaList.Builder, LinuxRISCV64VaList.Builder,
+    sealed interface Builder permits WinVaList.Builder, SysVVaList.Builder, LinuxAArch64VaList.Builder, MacOsAArch64VaList.Builder, WindowsAArch64VaList.Builder, LinuxRISCV64VaList.Builder,
                                      SysVPPC64leVaList.Builder, SysVS390xVaList.Builder, AixPPC64VaList.Builder {
 
         /**
