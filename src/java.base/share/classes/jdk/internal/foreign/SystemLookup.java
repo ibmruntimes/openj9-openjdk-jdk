@@ -85,14 +85,27 @@ public final class SystemLookup implements SymbolLookup {
         NativeLibrary lib = NativeLibraries.defaultLibrary;
         return name -> {
             Objects.requireNonNull(name);
-            try {
-                long addr = lib.lookup(name);
-                return (addr == 0) ?
-                        Optional.empty() :
-                        Optional.of(MemorySegment.ofAddress(addr, 0, SegmentScope.global()));
-            } catch (NoSuchMethodException e) {
-                return Optional.empty();
+            MemorySegment funcAddr = null;
+            AixFuncSymbols symbol = AixFuncSymbols.valueOfOrNull(name);
+            if (symbol == null) {
+                try {
+                    /* Look up the libc functions in the default library. */
+                    funcAddr = MemorySegment.ofAddress(lib.lookup(name));
+                } catch (NoSuchMethodException e) {
+                    return Optional.empty();
+                }
+            } else {
+                /* Directly load the specified library with the libc functions
+                 * missing in the default library.
+                 */
+                SymbolLookup funcsLibLookup =
+                        libLookup(libs -> libs.load(jdkLibraryPath("syslookup")));
+                MemorySegment funcs = MemorySegment.ofAddress(funcsLibLookup.find("funcs").orElseThrow().address(),
+                    ADDRESS.byteSize() * AixFuncSymbols.values().length, SegmentScope.global());
+                funcAddr = funcs.getAtIndex(ADDRESS, symbol.ordinal());
             }
+
+            return Optional.of(MemorySegment.ofAddress(funcAddr.address(), 0L, SegmentScope.global()));
         };
     }
 
@@ -223,6 +236,22 @@ public final class SystemLookup implements SymbolLookup {
         gmtime;
 
         static WindowsFallbackSymbols valueOfOrNull(String name) {
+            try {
+                return valueOf(name);
+            } catch (IllegalArgumentException e) {
+                return null;
+            }
+        }
+    }
+
+    /* Inlined libc function symbols missing in the default library. */
+    public enum AixFuncSymbols {
+        bcopy, endfsent, getfsent, getfsfile, getfsspec, longjmp,
+        memcpy, memmove, setfsent, setjmp, siglongjmp, strcat,
+        strcpy, strncat, strncpy
+        ;
+
+        static AixFuncSymbols valueOfOrNull(String name) {
             try {
                 return valueOf(name);
             } catch (IllegalArgumentException e) {
