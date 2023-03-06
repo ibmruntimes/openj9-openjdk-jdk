@@ -2538,9 +2538,6 @@ Java_jdk_crypto_jniprovider_NativeCrypto_ECEncodeGFp
     BIGNUM *yBN = NULL;
     BIGNUM *nBN = NULL;
     BIGNUM *hBN = NULL;
-    EC_GROUP *group = NULL;
-    EC_POINT *generator = NULL;
-    BN_CTX *ctx = NULL;
     int ret = 0;
 
     nativeA = (unsigned char*)((*env)->GetPrimitiveArrayCritical(env, a, 0));
@@ -2676,9 +2673,6 @@ Java_jdk_crypto_jniprovider_NativeCrypto_ECEncodeGF2m
     BIGNUM *yBN = NULL;
     BIGNUM *nBN = NULL;
     BIGNUM *hBN = NULL;
-    EC_GROUP *group = NULL;
-    EC_POINT *generator = NULL;
-    BN_CTX *ctx = NULL;
     int ret = 0;
 
     nativeA = (unsigned char*)((*env)->GetPrimitiveArrayCritical(env, a, 0));
