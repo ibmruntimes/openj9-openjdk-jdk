@@ -297,7 +297,7 @@ static void *crypto_library = NULL;
 /*
  * Class:     jdk_crypto_jniprovider_NativeCrypto
  * Method:    loadCrypto
- * Signature: (Z)L
+ * Signature: (Z)J
  */
 JNIEXPORT jlong JNICALL Java_jdk_crypto_jniprovider_NativeCrypto_loadCrypto
   (JNIEnv *env, jclass thisObj, jboolean trace)
