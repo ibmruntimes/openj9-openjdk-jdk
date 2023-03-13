@@ -54,6 +54,7 @@ import sun.security.pkcs11.wrapper.*;
 import static sun.security.pkcs11.TemplateManager.O_GENERATE;
 import static sun.security.pkcs11.wrapper.PKCS11Constants.*;
 
+import sun.security.util.Debug;
 import sun.security.util.DerValue;
 import sun.security.util.Length;
 import sun.security.util.ECUtil;
@@ -77,6 +78,8 @@ abstract class P11Key implements Key, Length {
 
     @Serial
     private static final long serialVersionUID = -2575874101938349339L;
+
+    private static final Debug debug = Debug.getInstance("p11key");
 
     private static final String PUBLIC = "public";
     private static final String PRIVATE = "private";
@@ -411,6 +414,22 @@ abstract class P11Key implements Key, Length {
                 }
             } catch (PKCS11Exception | InvalidKeyException e) {
                 // Attempt failed, create a P11PrivateKey object.
+                if (debug != null) {
+                    debug.println("Attempt failed, creating a P11PrivateKey object for RSA");
+                }
+            }
+        }
+
+        if (keySensitive && (SunPKCS11.mysunpkcs11 != null) && "EC".equals(algorithm)) {
+            try {
+                byte[] key = SunPKCS11.mysunpkcs11.exportKey(session.id(), attrs, keyID);
+                ECPrivateKey ecPrivKey = ECUtil.decodePKCS8ECPrivateKey(key);
+                return new P11ECPrivateKeyFIPS(session, keyID, algorithm, keyLength, attrs, ecPrivKey);
+            } catch (PKCS11Exception | InvalidKeySpecException e) {
+                // Attempt failed, create a P11PrivateKey object.
+                if (debug != null) {
+                    debug.println("Attempt failed, creating a P11PrivateKey object for EC");
+                }
             }
         }
 
@@ -1280,6 +1299,39 @@ abstract class P11Key implements Key, Length {
         protected ECParameterSpec getParams() {
             fetchValues();
             return params;
+        }
+    }
+
+    // EC private key when in FIPS mode
+    private static final class P11ECPrivateKeyFIPS extends P11Key
+                                                implements ECPrivateKey {
+        private static final long serialVersionUID = -7786054399510515515L;
+        private final ECPrivateKey key;
+
+        P11ECPrivateKeyFIPS(Session session, long keyID, String algorithm,
+                int keyLength, CK_ATTRIBUTE[] attrs, ECPrivateKey key) {
+            super(PRIVATE, session, keyID, algorithm, keyLength, attrs);
+            this.key = key;
+        }
+
+        @Override
+        public String getFormat() {
+            return "PKCS#8";
+        }
+
+        @Override
+        synchronized byte[] getEncodedInternal() {
+            return key.getEncoded();
+        }
+
+        @Override
+        public BigInteger getS() {
+            return key.getS();
+        }
+
+        @Override
+        public ECParameterSpec getParams() {
+            return key.getParams();
         }
     }
 
