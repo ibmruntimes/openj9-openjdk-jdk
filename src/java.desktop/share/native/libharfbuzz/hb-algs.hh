@@ -26,6 +26,10 @@
  * Facebook Author(s): Behdad Esfahbod
  */
 
+/*
+ * Portions Copyright IBM Corporation, 2023. All Rights Reserved.
+ */
+
 #ifndef HB_ALGS_HH
 #define HB_ALGS_HH
 
@@ -875,7 +879,9 @@ hb_in_ranges (T u, T lo1, T hi1, Ts... ds)
 static inline bool
 hb_unsigned_mul_overflows (unsigned int count, unsigned int size, unsigned *result = nullptr)
 {
-#if (defined(__GNUC__) && (__GNUC__ >= 4)) || (defined(__clang__) && (__clang_major__ >= 8))
+#if defined(AIX)
+  /* __builtin_mul_overflow() is not supported on AIX */
+#elif (defined(__GNUC__) && (__GNUC__ >= 4)) || (defined(__clang__) && (__clang_major__ >= 8))
   unsigned stack_result;
   if (!result)
     result = &stack_result;
