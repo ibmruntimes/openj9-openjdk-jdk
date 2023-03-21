@@ -33,9 +33,13 @@ package sun.security.pkcs11;
 
 import java.io.*;
 import java.util.*;
+import java.math.BigInteger;
 
 import java.security.*;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
 import java.security.interfaces.*;
+import java.security.spec.InvalidKeySpecException;
 import java.util.function.Consumer;
 
 import javax.crypto.BadPaddingException;
@@ -56,7 +60,9 @@ import com.sun.crypto.provider.ChaCha20Poly1305Parameters;
 
 import jdk.internal.misc.InnocuousThread;
 import openj9.internal.security.FIPSConfigurator;
+import sun.security.rsa.RSAUtil.KeyType;
 import sun.security.util.Debug;
+import sun.security.util.ECUtil;
 import sun.security.util.ResourcesMgr;
 import static sun.security.util.SecurityConstants.PROVIDER_VER;
 import static sun.security.util.SecurityProviderConstants.getAliases;
@@ -64,6 +70,7 @@ import static sun.security.util.SecurityProviderConstants.getAliases;
 import sun.security.pkcs11.Secmod.*;
 import sun.security.pkcs11.TemplateManager;
 import sun.security.pkcs11.wrapper.*;
+import sun.security.rsa.RSAPrivateCrtKeyImpl;
 import static sun.security.pkcs11.wrapper.PKCS11Constants.*;
 import static sun.security.pkcs11.wrapper.PKCS11Exception.RV.*;
 
@@ -531,6 +538,9 @@ public final class SunPKCS11 extends AuthProvider {
         long keyClass = 0;
         long keyType = 0;
         byte[] keyBytes = null;
+        BigInteger tmp = null;
+        Map<Long, CK_ATTRIBUTE> ckAttrsMap = new HashMap<>();
+
         // Extract key information.
         for (CK_ATTRIBUTE attr : attributes) {
             if (attr.type == CKA_CLASS) {
@@ -539,12 +549,61 @@ public final class SunPKCS11 extends AuthProvider {
             if (attr.type == CKA_KEY_TYPE) {
                 keyType = attr.getLong();
             }
-            if (attr.type == CKA_VALUE) {
-                keyBytes = attr.getByteArray();
-            }
+            ckAttrsMap.put(attr.type, attr);
         }
 
-        if ((keyClass == CKO_SECRET_KEY) && (keyBytes != null) && (keyBytes.length > 0)) {
+        if (keyClass == CKO_PRIVATE_KEY) {
+            if (keyType == CKK_RSA) {
+                try {
+                    keyBytes = RSAPrivateCrtKeyImpl.newKey(
+                        KeyType.RSA,
+                        null,
+                        ((tmp = ckAttrsMap.get(CKA_MODULUS).getBigInteger()) != null)
+                                        ? tmp : BigInteger.ZERO,
+                        ((tmp = ckAttrsMap.get(CKA_PUBLIC_EXPONENT).getBigInteger()) != null)
+                                        ? tmp : BigInteger.ZERO,
+                        ((tmp = ckAttrsMap.get(CKA_PRIVATE_EXPONENT).getBigInteger()) != null)
+                                        ? tmp : BigInteger.ZERO,
+                        ((tmp = ckAttrsMap.get(CKA_PRIME_1).getBigInteger()) != null)
+                                        ? tmp : BigInteger.ZERO,
+                        ((tmp = ckAttrsMap.get(CKA_PRIME_2).getBigInteger()) != null)
+                                        ? tmp : BigInteger.ZERO,
+                        ((tmp = ckAttrsMap.get(CKA_EXPONENT_1).getBigInteger()) != null)
+                                        ? tmp : BigInteger.ZERO,
+                        ((tmp = ckAttrsMap.get(CKA_EXPONENT_2).getBigInteger()) != null)
+                                        ? tmp : BigInteger.ZERO,
+                        ((tmp = ckAttrsMap.get(CKA_COEFFICIENT).getBigInteger()) != null)
+                                        ? tmp : BigInteger.ZERO
+                    ).getEncoded();
+                } catch (InvalidKeyException e) {
+                    throw new PKCS11Exception(0x00000005L, null);
+                }
+            } else if (keyType == CKK_EC) {
+                try {
+                    keyBytes = ECUtil.generateECPrivateKey(
+                        ((tmp = ckAttrsMap.get(CKA_VALUE).getBigInteger()) != null)
+                                            ? tmp : BigInteger.ZERO,
+                        ECUtil.getECParameterSpec(Security.getProvider("SunEC"),
+                                            ckAttrsMap.get(CKA_EC_PARAMS).getByteArray())
+                    ).getEncoded();
+                    // If key is private and of EC type, NSS may require CKA_NETSCAPE_DB
+                    // attribute to unwrap it. Otherwise, C_UnwrapKey will produce an Exception.
+                    if (token.config.getNssNetscapeDbWorkaround() &&
+                            ckAttrsMap.get(CKA_NETSCAPE_DB) == null) {
+                        ckAttrsMap.put(CKA_NETSCAPE_DB,
+                                new CK_ATTRIBUTE(CKA_NETSCAPE_DB, BigInteger.ZERO));
+                    }
+                } catch (IOException | InvalidKeySpecException e) {
+                    throw new PKCS11Exception(0x00000005L, null);
+                }
+            }
+        } else if (keyClass == CKO_SECRET_KEY) {
+            keyBytes = ckAttrsMap.get(CKA_VALUE).getByteArray();
+        }
+
+        if ((((keyClass == CKO_PRIVATE_KEY) && (keyType == CKK_EC || keyType == CKK_RSA))
+           || (keyClass == CKO_SECRET_KEY))
+           && (keyBytes != null) && (keyBytes.length > 0)) {
             // Generate key used for wrapping and unwrapping of the secret key.
             CK_ATTRIBUTE[] wrapKeyAttributes = token.getAttributes(TemplateManager.O_GENERATE, CKO_SECRET_KEY, CKK_AES, new CK_ATTRIBUTE[] { new CK_ATTRIBUTE(CKA_CLASS, CKO_SECRET_KEY), new CK_ATTRIBUTE(CKA_VALUE_LEN, 256 >> 3)});
             Session wrapKeyGenSession = token.getObjSession();
@@ -568,8 +627,9 @@ public final class SunPKCS11 extends AuthProvider {
                 byte[] wrappedBytes = wrapCipher.doFinal(keyBytes);
 
                 // Unwrap the secret key.
-                CK_ATTRIBUTE[] unwrapAttributes = token.getAttributes(TemplateManager.O_IMPORT, keyClass, keyType, attributes);
-                return token.p11.C_UnwrapKey(hSession, wrapMechanism, wrapKeyId, wrappedBytes, unwrapAttributes);
+                // Need additional attributes for EC private key.
+                attributes = new CK_ATTRIBUTE[ckAttrsMap.size()];
+                CK_ATTRIBUTE[] unwrapAttributes = token.getAttributes(TemplateManager.O_IMPORT, keyClass, keyType, ckAttrsMap.values().toArray(attributes));                return token.p11.C_UnwrapKey(hSession, wrapMechanism, wrapKeyId, wrappedBytes, unwrapAttributes);
             } catch (PKCS11Exception | NoSuchPaddingException | NoSuchAlgorithmException | BadPaddingException | InvalidAlgorithmParameterException | InvalidKeyException | IllegalBlockSizeException e) {
                 throw new PKCS11Exception(0x00000005L, null);
             } finally {

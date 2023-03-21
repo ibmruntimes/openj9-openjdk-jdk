@@ -22,6 +22,11 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
+/*
+ * ===========================================================================
+ * (c) Copyright IBM Corp. 2022, 2023 All Rights Reserved
+ * ===========================================================================
+ */
 
 package com.sun.crypto.provider;
 
@@ -42,7 +47,10 @@ import javax.crypto.spec.PBEKeySpec;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
+import jdk.crypto.jniprovider.NativeCrypto;
 import jdk.internal.ref.CleanerFactory;
+
+import openj9.internal.security.FIPSConfigurator;
 
 /**
  * This class represents a PBE key derived using PBKDF2 defined
@@ -58,6 +66,15 @@ final class PBKDF2KeyImpl implements javax.crypto.interfaces.PBEKey {
 
     @java.io.Serial
     static final long serialVersionUID = -2234868909660948157L;
+
+    private static final NativeCrypto nativeCrypto = NativeCrypto.getNativeCrypto();
+    private static final boolean nativeCryptTrace = NativeCrypto.isTraceEnabled();
+
+    /*
+     * The property 'jdk.nativePBE2' is used to control enablement of the native
+     * PBE implementation.
+     */
+    private static final boolean useNativePBES2 = NativeCrypto.isAlgorithmEnabled("jdk.nativePBES2", "PBKDF2KeyImpl");
 
     private char[] passwd;
     private byte[] salt;
@@ -117,7 +134,11 @@ final class PBKDF2KeyImpl implements javax.crypto.interfaces.PBEKey {
             } else if (keyLength < 0) {
                 throw new InvalidKeySpecException("Key length is negative");
             }
-            this.prf = Mac.getInstance(prfAlgo, SunJCE.getInstance());
+            if (FIPSConfigurator.enableFIPS()) {
+                this.prf = Mac.getInstance(prfAlgo);
+            } else {
+                this.prf = Mac.getInstance(prfAlgo, SunJCE.getInstance());
+            }
             this.key = deriveKey(prf, passwdBytes, salt, iterCount, keyLength);
         } catch (NoSuchAlgorithmException nsae) {
             // not gonna happen; re-throw just in case
@@ -140,6 +161,55 @@ final class PBKDF2KeyImpl implements javax.crypto.interfaces.PBEKey {
             byte[] salt, int iterCount, int keyLengthInBit) {
         int keyLength = keyLengthInBit/8;
         byte[] key = new byte[keyLength];
+        if (FIPSConfigurator.enableFIPS()) {
+            if (!useNativePBES2) {
+                new RuntimeException(
+                        "The service of loading PKCS12 keystore in FIPS mode is enabled " +
+                        "in provider SUN. But the native cypto library for PBE key derive " +
+                        "is not loaded. Please check the loading of native cypto library, " +
+                        "or remove the service from provider SUN's constraints if loading " +
+                        "the PKCS12 keystore is not needed.").printStackTrace();
+                System.exit(1);
+            }
+            String HmacAlgo = prf.getAlgorithm();
+            String hashAlgo = HmacAlgo.substring(HmacAlgo.indexOf("Hmac") + 4, HmacAlgo.length());
+            boolean hashSupported = true;
+            int hashIndex = 0;
+            if (hashAlgo.equals("SHA") || hashAlgo.equals("SHA1") || hashAlgo.equals("SHA-1")) {
+                hashIndex = NativeCrypto.SHA1_160;
+            } else if (hashAlgo.equals("SHA224") || hashAlgo.equals("SHA-224")) {
+                hashIndex = NativeCrypto.SHA2_224;
+            } else if (hashAlgo.equals("SHA256") || hashAlgo.equals("SHA-256")) {
+                hashIndex = NativeCrypto.SHA2_256;
+            } else if (hashAlgo.equals("SHA384") || hashAlgo.equals("SHA-384")) {
+                hashIndex = NativeCrypto.SHA5_384;
+            } else if (hashAlgo.equals("SHA512") || hashAlgo.equals("SHA-512")) {
+                hashIndex = NativeCrypto.SHA5_512;
+            } else {
+                hashSupported = false;
+            }
+            if (hashSupported) {
+                if (nativeCrypto.PBES2Derive(password, password.length, salt, salt.length, iterCount, hashIndex, keyLength, key) != -1) {
+                    /*
+                     * The return value is 0 indicate that the FIPS mode of operation is not enabled.
+                     * Effectively, any non-zero value indicates FIPS mode.
+                     */
+                    if (nativeCrypto.FIPSMode() != 0) {
+                        return key;
+                    } else {
+                        // System.err.println("FIPS module is not enabled in OpenSSL, please enable. ");
+                        new RuntimeException(
+                            "Try to invoke a method from a non FIPS compliant OpenSSL. " +
+                            "Please enable FIPS module in the configuration  ").printStackTrace();
+                        System.exit(1);
+                    }
+                } else if (nativeCryptTrace) {
+                    System.err.println("Native PBE derive failed for algorithm " + hashAlgo + ", using Java implementation.");
+                }
+            } else if (nativeCryptTrace) {
+                System.err.println("The algorithm " + hashAlgo + " is not supported in native code, using Java implementation.");
+            }
+        }
         try {
             int hlen = prf.getMacLength();
             int intL = (keyLength + hlen - 1)/hlen; // ceiling

@@ -157,6 +157,12 @@ public final class SunEntries {
                 "sun.security.provider.certpath.PKIXCertPathValidator",
                 attrs);
 
+        /*
+         * KeyStore
+         */
+        add(p, "KeyStore", "PKCS12",
+                "sun.security.pkcs12.PKCS12KeyStore$DualFormatPKCS12");
+
         if (FIPSConfigurator.enableFIPS()) {
             return;
         }

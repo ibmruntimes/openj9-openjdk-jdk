@@ -1,6 +1,6 @@
 /*
  * ===========================================================================
- * (c) Copyright IBM Corp. 2022, 2022 All Rights Reserved
+ * (c) Copyright IBM Corp. 2022, 2023 All Rights Reserved
  * ===========================================================================
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -111,6 +111,7 @@ public final class FIPSConfigurator {
                 props.put("security.provider.2", "SUN");
                 props.put("security.provider.3", "SunEC");
                 props.put("security.provider.4", "SunJSSE");
+                props.put("security.provider.5", "SunJCE");
 
                 // Add FIPS security properties.
                 props.put("keystore.type", "PKCS11");

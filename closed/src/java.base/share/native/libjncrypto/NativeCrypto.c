@@ -28,6 +28,7 @@
 #include <openssl/rsa.h>
 #include <openssl/ecdh.h>
 #include <openssl/pkcs12.h>
+#include <openssl/crypto.h>
 
 #include <ctype.h>
 #include <jni.h>
@@ -119,6 +120,9 @@ typedef BIGNUM* OSSL_BN_bin2bn_t (const unsigned char *, int, BIGNUM *);
 typedef void OSSL_BN_set_negative_t (BIGNUM *, int);
 typedef void OSSL_BN_free_t (BIGNUM *);
 
+typedef int OSSL_FIPS_mode_t(void);
+typedef struct ossl_lib_ctx_st OSSL_LIB_CTX;
+typedef int OSSL_EVP_default_properties_is_fips_enabled_t(OSSL_LIB_CTX *);
 typedef void OSSL_EC_KEY_free_t(EC_KEY *);
 typedef int OSSL_ECDH_compute_key_t(void *, size_t, const EC_POINT *, EC_KEY *, void *(*KDF)(const void *, size_t, void *, size_t *));
 typedef const EC_POINT* OSSL_EC_KEY_get0_public_key_t(const EC_KEY *);
@@ -142,6 +146,7 @@ typedef int OSSL_EC_KEY_check_key_t(const EC_KEY *);
 typedef int EC_set_public_key_t(EC_KEY *, BIGNUM *, BIGNUM *, int);
 
 typedef int OSSL_PKCS12_key_gen_t(const char *, int, unsigned char *, int, int, int, int, unsigned char *, const EVP_MD *);
+typedef int OSSL_PKCS5_PBKDF2_HMAC_t(const char *, int, const unsigned char *, int, int, const EVP_MD *, int, unsigned char *);
 
 typedef int OSSL_CRYPTO_num_locks_t();
 typedef void OSSL_CRYPTO_THREADID_set_numeric_t(CRYPTO_THREADID *id, unsigned long val);
@@ -157,6 +162,10 @@ static void win32_locking_callback(int mode, int type, const char *file, int lin
 static void pthreads_thread_id(CRYPTO_THREADID *tid);
 static void pthreads_locking_callback(int mode, int type, const char *file, int line);
 #endif /* defined(WINDOWS) */
+
+/* Define pointers for OpenSSL functions to check if FIPS module is enabled in OpenSSL. */
+OSSL_FIPS_mode_t* OSSL_FIPS_mode;
+OSSL_EVP_default_properties_is_fips_enabled_t* OSSL_EVP_default_properties_is_fips_enabled;
 
 /* Define pointers for OpenSSL functions to handle Errors. */
 OSSL_error_string_n_t* OSSL_error_string_n;
@@ -247,6 +256,9 @@ EC_set_public_key_t* EC_set_public_key;
 /* Define pointers for OpenSSL functions to handle PBE algorithm. */
 OSSL_PKCS12_key_gen_t* OSSL_PKCS12_key_gen;
 
+/* Define pointers for OpenSSL functions to handle PBES2 algorithm. */
+OSSL_PKCS5_PBKDF2_HMAC_t* OSSL_PKCS5_PBKDF2_HMAC;
+
 /* Structure for OpenSSL Digest context. */
 typedef struct OpenSSLMDContext {
     EVP_MD_CTX *ctx;
@@ -294,6 +306,7 @@ static jlong extractVersionToJlong(const char *astring)
 }
 
 static void *crypto_library = NULL;
+jlong ossl_ver = 0;
 /*
  * Class:     jdk_crypto_jniprovider_NativeCrypto
  * Method:    loadCrypto
@@ -308,7 +321,6 @@ JNIEXPORT jlong JNICALL Java_jdk_crypto_jniprovider_NativeCrypto_loadCrypto
     /* Determine the version of OpenSSL. */
     OSSL_version_t* OSSL_version;
     const char * openssl_version;
-    jlong ossl_ver = 0;
 
     /* Load OpenSSL Crypto library */
     crypto_library = load_crypto_library(trace);
@@ -367,6 +379,41 @@ JNIEXPORT jlong JNICALL Java_jdk_crypto_jniprovider_NativeCrypto_loadCrypto
             unload_crypto_library(crypto_library);
             crypto_library = NULL;
             return -1;
+        }
+    }
+
+    /* Load the FIPS_mode() function for OpenSSL 1.x version. */
+    OSSL_FIPS_mode = (OSSL_FIPS_mode_t*)find_crypto_symbol(crypto_library, "FIPS_mode");
+
+    if(ossl_ver < OPENSSL_VERSION_2_0_0) {
+        /* Check if OpenSSL is FIPS compliant. */
+        int fips_compatible_build = -1;
+
+        /*
+        * The return value is either 0 to indicate that the FIPS mode of operation is not enabled,
+        * or the value used for the ONOFF parameter passed to an earlier successful call to FIPS_mode_set().
+        */
+        if ((fips_compatible_build = (*OSSL_FIPS_mode)()) == 0) {
+            if (trace) {
+                fprintf(stderr, "The current version of OpenSSL 1.x is not FIPS-capable.\n");
+                fflush(stderr);
+            }
+        }
+    }
+
+    /* Load the EVP_default_properties_is_fips_enabled() function for OpenSSL 3.x version. */
+    OSSL_EVP_default_properties_is_fips_enabled = (OSSL_EVP_default_properties_is_fips_enabled_t*)find_crypto_symbol(crypto_library, "EVP_default_properties_is_fips_enabled");
+
+    if(ossl_ver >= OPENSSL_VERSION_3_0_0) {
+        /*
+        * EVP_default_properties_is_fips_enabled() returns 1 if the 'fips=yes' default property is set for the given libctx.
+        * Otherwise it returns 0.
+        */
+        if ((*OSSL_EVP_default_properties_is_fips_enabled)(NULL) == 0) {
+            if (trace) {
+                fprintf(stderr, "The current version of OpenSSL 3.x is not FIPS-capable.\n");
+                fflush(stderr);
+            }
         }
     }
 
@@ -496,6 +543,9 @@ JNIEXPORT jlong JNICALL Java_jdk_crypto_jniprovider_NativeCrypto_loadCrypto
     /* Load the functions symbols for OpenSSL PBE algorithm. */
     OSSL_PKCS12_key_gen = (OSSL_PKCS12_key_gen_t*)find_crypto_symbol(crypto_library, "PKCS12_key_gen_uni");
 
+    /* Load the functions symbols for OpenSSL PBES2 algorithm. */
+    OSSL_PKCS5_PBKDF2_HMAC = (OSSL_PKCS5_PBKDF2_HMAC_t*)find_crypto_symbol(crypto_library, "PKCS5_PBKDF2_HMAC");
+
     if ((NULL == OSSL_error_string) ||
         (NULL == OSSL_error_string_n) ||
         (NULL == OSSL_get_error) ||
@@ -555,6 +605,7 @@ JNIEXPORT jlong JNICALL Java_jdk_crypto_jniprovider_NativeCrypto_loadCrypto
         (NULL == OSSL_EC_KEY_set_public_key) ||
         (NULL == OSSL_EC_KEY_check_key) ||
         (NULL == OSSL_PKCS12_key_gen) ||
+        (NULL == OSSL_PKCS5_PBKDF2_HMAC) ||
         /* Check symbols that are only available in OpenSSL 1.1.x and above */
         ((ossl_ver >= OPENSSL_VERSION_1_1_0) && ((NULL == OSSL_chacha20) || (NULL == OSSL_chacha20_poly1305))) ||
         /* Check symbols that are only available in OpenSSL 1.0.x and above */
@@ -2987,4 +3038,90 @@ cleanup:
     }
 
     return ret;
+}
+
+/* Password-Based Encryption Standard v2.0
+ *
+ * Class:     jdk_crypto_jniprovider_NativeCrypto
+ * Method:    PBES2Derive
+ * Signature: (J[BI[BI[BIIII)I
+ */
+JNIEXPORT jint JNICALL
+Java_jdk_crypto_jniprovider_NativeCrypto_PBES2Derive
+    (JNIEnv *env, jclass obj, jbyteArray password, jint passwordLength, jbyteArray salt, jint saltLength, jint iterations, jint hashAlgorithm, jint keyLength, jbyteArray key)
+{
+    const EVP_MD *digestAlgorithm = NULL;
+    char *nativePassword = NULL;
+    unsigned char *nativeSalt = NULL;
+    unsigned char *nativeKey = NULL;
+    jint ret = -1;
+
+    switch (hashAlgorithm) {
+        case jdk_crypto_jniprovider_NativeCrypto_SHA1_160:
+            digestAlgorithm = (*OSSL_sha1)();
+            break;
+        case jdk_crypto_jniprovider_NativeCrypto_SHA2_224:
+            digestAlgorithm = (*OSSL_sha224)();
+            break;
+        case jdk_crypto_jniprovider_NativeCrypto_SHA2_256:
+            digestAlgorithm = (*OSSL_sha256)();
+            break;
+        case jdk_crypto_jniprovider_NativeCrypto_SHA5_384:
+            digestAlgorithm = (*OSSL_sha384)();
+            break;
+        case jdk_crypto_jniprovider_NativeCrypto_SHA5_512:
+            digestAlgorithm = (*OSSL_sha512)();
+            break;
+        default:
+            goto cleanup;
+    }
+
+    nativePassword = (char*)((*env)->GetPrimitiveArrayCritical(env, password, 0));
+    if (NULL == nativePassword) {
+        goto cleanup;
+    }
+    nativeSalt = (unsigned char*)((*env)->GetPrimitiveArrayCritical(env, salt, 0));
+    if (NULL == nativeSalt) {
+        goto cleanup;
+    }
+    nativeKey = (unsigned char*)((*env)->GetPrimitiveArrayCritical(env, key, 0));
+    if (NULL == nativeKey) {
+        goto cleanup;
+    }
+
+    if (1 == (*OSSL_PKCS5_PBKDF2_HMAC)(nativePassword, passwordLength, nativeSalt, saltLength, iterations, digestAlgorithm, keyLength, nativeKey)) {
+        ret = 0;
+    }
+
+cleanup:
+    if (NULL != nativePassword) {
+        (*env)->ReleasePrimitiveArrayCritical(env, password, nativePassword, JNI_ABORT);
+    }
+    if (NULL != nativeSalt) {
+        (*env)->ReleasePrimitiveArrayCritical(env, salt, nativeSalt, JNI_ABORT);
+    }
+    if (NULL != nativeKey) {
+        (*env)->ReleasePrimitiveArrayCritical(env, key, nativeKey, JNI_ABORT);
+    }
+
+    return ret;
+}
+
+/* Check if the FIPS mode is enabled in OpenSSL.
+ *
+ * Class:     jdk_crypto_jniprovider_NativeCrypto
+ * Method:    FIPSMode
+ * Signature: ()I
+ */
+JNIEXPORT jint JNICALL
+Java_jdk_crypto_jniprovider_NativeCrypto_FIPSMode
+  (JNIEnv *env, jclass obj)
+{
+    if(ossl_ver >= OPENSSL_VERSION_3_0_0) {
+        return (*OSSL_EVP_default_properties_is_fips_enabled)(NULL);
+    } else if(ossl_ver >= OPENSSL_VERSION_1_0_0) {
+        return (*OSSL_FIPS_mode)();
+    } else {
+        return 0;
+    }
 }
