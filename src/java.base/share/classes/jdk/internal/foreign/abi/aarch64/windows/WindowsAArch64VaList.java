@@ -23,6 +23,13 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
+
+/*
+ * ===========================================================================
+ * (c) Copyright IBM Corp. 2023, 2023 All Rights Reserved
+ * ===========================================================================
+ */
+
 package jdk.internal.foreign.abi.aarch64.windows;
 
 import java.lang.foreign.GroupLayout;
@@ -64,6 +71,7 @@ public non-sealed class WindowsAArch64VaList implements VaList {
 
     private WindowsAArch64VaList(MemorySegment segment) {
         this.segment = segment;
+        throw new InternalError("WindowsAArch64VaList()/VaList is not implemented on Windows/Aarch64");
     }
 
     public static VaList empty() {
@@ -103,6 +111,11 @@ public non-sealed class WindowsAArch64VaList implements VaList {
     private Object read(MemoryLayout layout, SegmentAllocator allocator) {
         Objects.requireNonNull(layout);
         Object res;
+
+        if (layout != null) {
+            throw new InternalError("VaList is not implemented on Windows/Aarch64");
+        }
+
         if (layout instanceof GroupLayout) {
             TypeClass typeClass = TypeClass.classifyLayout(layout);
             res = switch (typeClass) {
@@ -189,6 +202,7 @@ public non-sealed class WindowsAArch64VaList implements VaList {
         public Builder(SegmentScope session) {
             ((MemorySessionImpl) session).checkValidState();
             this.session = session;
+            throw new InternalError("VaList is not implemented on Windows/Aarch64");
         }
 
         private Builder arg(MemoryLayout layout, Object value) {

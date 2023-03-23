@@ -128,15 +128,12 @@ public class CallArranger {
 
     /* Replace DowncallLinker in OpenJDK with the implementation of DowncallLinker specific to OpenJ9 */
     public static MethodHandle arrangeDowncall(MethodType mt, FunctionDescriptor cDesc, LinkerOptions options) {
-        // MethodHandle handle = DowncallLinker.getBoundMethodHandle(mt, cDesc, options);
-        // return handle;
-        return null;
+        return DowncallLinker.getBoundMethodHandle(mt, cDesc, options);
     }
 
     /* Replace UpcallLinker in OpenJDK with the implementation of UpcallLinker specific to OpenJ9 */
     public static MemorySegment arrangeUpcall(MethodHandle target, MethodType mt, FunctionDescriptor cDesc, SegmentScope session) {
-        // return UpcallLinker.make(target, mt, cDesc, session);
-        return null;
+        return UpcallLinker.make(target, mt, cDesc, session);
     }
 
     private static boolean isInMemoryReturn(Optional<MemoryLayout> returnLayout) {
