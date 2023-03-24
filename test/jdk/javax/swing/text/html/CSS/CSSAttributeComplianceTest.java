@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2023, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -20,13 +20,23 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
+/*
+ * @test
+ * @bug 6245410
+ * @summary  Verifies CSS.Attribute: BACKGROUND_POSITION is w3c spec compliant
+ * @run main CSSAttributeComplianceTest
+ */
 
-package q;
+import javax.swing.text.html.CSS.Attribute;
 
-import jdk.internal.perf.PerfCounter;
+public class CSSAttributeComplianceTest {
 
-public class Counter {
-     public static void create(String name) {
-         PerfCounter.newPerfCounter(name);
-     }
+    public static void main(String[] argv) {
+        String val = Attribute.BACKGROUND_POSITION.getDefaultValue();
+        if (!"0% 0%".equals(val)) {
+            System.out.println("Attribute.BACKGROUND_POSITION value : " + val);
+            throw new RuntimeException("Expected from w3c.background-position: " +
+                                       " Initial: 0% 0%");
+        }
+    }
 }
