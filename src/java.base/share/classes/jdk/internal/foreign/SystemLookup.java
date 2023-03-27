@@ -65,8 +65,8 @@ public final class SystemLookup implements SymbolLookup {
     private static SymbolLookup makeSystemLookup() {
         try {
             return switch (CABI.current()) {
-                case SYS_V, LINUX_AARCH_64, MAC_OS_AARCH_64, LINUX_RISCV_64, SysVPPC64le, SysVS390x -> libLookup(libs -> libs.load(jdkLibraryPath("syslookup")));
-                case AIX -> makeAixLookup();
+                case SYS_V, LINUX_AARCH_64, MAC_OS_AARCH_64, LINUX_RISCV_64, SYS_V_PPC_64LE, SYS_V_S390X -> libLookup(libs -> libs.load(jdkLibraryPath("syslookup")));
+                case AIX_PPC_64 -> makeAixLookup();
                 case WIN_64, WIN_AARCH_64 -> makeWindowsLookup(); // out of line to workaround javac crash
             };
         } catch (Throwable ex) {
@@ -159,7 +159,7 @@ public final class SystemLookup implements SymbolLookup {
     private static Path jdkLibraryPath(String name) {
         Path javahome = Path.of(GetPropertyAction.privilegedGetProperty("java.home"));
         String lib = switch (CABI.current()) {
-            case SYS_V, LINUX_AARCH_64, MAC_OS_AARCH_64, LINUX_RISCV_64, SysVPPC64le, SysVS390x, AIX -> "lib";
+            case SYS_V, LINUX_AARCH_64, MAC_OS_AARCH_64, LINUX_RISCV_64, SYS_V_PPC_64LE, SYS_V_S390X, AIX_PPC_64 -> "lib";
             case WIN_64, WIN_AARCH_64 -> "bin";
         };
         String libname = System.mapLibraryName(name);

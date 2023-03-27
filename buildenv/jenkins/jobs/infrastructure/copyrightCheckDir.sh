@@ -1,6 +1,6 @@
 #!/bin/sh
 # ===========================================================================
-# (c) Copyright IBM Corp. 2019, 2021 All Rights Reserved
+# (c) Copyright IBM Corp. 2019, 2023 All Rights Reserved
 # ===========================================================================
 #
 # This code is free software; you can redistribute it and/or modify it
@@ -582,10 +582,6 @@ echo "src/java.base/solaris/native/libjvm_db/libjvm_db.c" >>$TEMPFILE
 echo "src/java.base/solaris/native/libjvm_db/libjvm_db.h" >>$TEMPFILE
 echo "src/java.base/solaris/native/libjvm_dtrace/jvm_dtrace.c" >>$TEMPFILE
 echo "src/java.base/solaris/native/libjvm_dtrace/jvm_dtrace.h" >>$TEMPFILE
-echo "src/jdk.internal.le/windows/classes/jdk/internal/org/jline/terminal/impl/jna/win/IntByReference.java" >>$TEMPFILE
-echo "src/jdk.internal.le/windows/classes/jdk/internal/org/jline/terminal/impl/jna/win/Kernel32Impl.java" >>$TEMPFILE
-echo "src/jdk.internal.le/windows/classes/jdk/internal/org/jline/terminal/impl/jna/win/LastErrorException.java" >>$TEMPFILE
-echo "src/jdk.internal.le/windows/classes/jdk/internal/org/jline/terminal/impl/jna/win/Pointer.java" >>$TEMPFILE
 echo "src/jdk.internal.vm.compiler.management/share/classes/org.graalvm.compiler.hotspot.management/src/org/graalvm/compiler/hotspot/management/HotSpotGraalManagement.java" >>$TEMPFILE
 echo "src/jdk.internal.vm.compiler.management/share/classes/org.graalvm.compiler.hotspot.management/src/org/graalvm/compiler/hotspot/management/HotSpotGraalRuntimeMBean.java" >>$TEMPFILE
 echo "src/jdk.internal.vm.compiler.management/share/classes/org.graalvm.compiler.hotspot.management/src/org/graalvm/compiler/hotspot/management/JMXServiceProvider.java" >>$TEMPFILE

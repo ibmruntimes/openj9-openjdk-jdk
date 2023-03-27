@@ -49,13 +49,17 @@ import java.util.function.Consumer;
  * on AIX/ppc64 and might be updated accordingly in terms of VaList in the future.
  */
 public final class AixPPC64Linker extends AbstractLinker {
-    private static AixPPC64Linker instance;
 
     public static AixPPC64Linker getInstance() {
-        if (instance == null) {
-            instance = new AixPPC64Linker();
+        final class Holder {
+            private static final AixPPC64Linker INSTANCE = new AixPPC64Linker();
         }
-        return instance;
+
+        return Holder.INSTANCE;
+    }
+
+    private AixPPC64Linker() {
+        /* Ensure there is only one instance. */
     }
 
     @Override

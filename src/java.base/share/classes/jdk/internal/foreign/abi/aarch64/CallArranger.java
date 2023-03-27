@@ -57,6 +57,8 @@ import java.lang.invoke.MethodType;
 import java.util.List;
 import java.util.Optional;
 
+import sun.security.action.GetPropertyAction;
+
 import static jdk.internal.foreign.PlatformLayouts.*;
 import static jdk.internal.foreign.abi.aarch64.AArch64Architecture.*;
 import static jdk.internal.foreign.abi.aarch64.AArch64Architecture.Regs.*;
@@ -77,6 +79,8 @@ public abstract class CallArranger {
     public static final int MAX_REGISTER_ARGUMENTS = 8;
 
     private static final VMStorage INDIRECT_RESULT = r8;
+
+    private static final boolean isWinOS = GetPropertyAction.privilegedGetProperty("os.name").startsWith("Windows");
 
     // This is derived from the AAPCS64 spec, restricted to what's
     // possible when calling to/from C code.
@@ -186,15 +190,18 @@ public abstract class CallArranger {
 
     /* Replace DowncallLinker in OpenJDK with the implementation of DowncallLinker specific to OpenJ9 */
     public MethodHandle arrangeDowncall(MethodType mt, FunctionDescriptor cDesc, LinkerOptions options) {
-        // MethodHandle handle = DowncallLinker.getBoundMethodHandle(mt, cDesc, options);
-        // return handle;
-        return null;
+        if (isWinOS) {
+            throw new InternalError("arrangeDowncall is not implemented on Windows/Aarch64");
+        }
+        return DowncallLinker.getBoundMethodHandle(mt, cDesc, options);
     }
 
     /* Replace UpcallLinker in OpenJDK with the implementation of UpcallLinker specific to OpenJ9 */
     public MemorySegment arrangeUpcall(MethodHandle target, MethodType mt, FunctionDescriptor cDesc, SegmentScope session) {
-        // return UpcallLinker.make(target, mt, cDesc, session);
-        return null;
+        if (isWinOS) {
+            throw new InternalError("arrangeUpcall is not implemented on Windows/Aarch64");
+        }
+        return UpcallLinker.make(target, mt, cDesc, session);
     }
 
     private static boolean isInMemoryReturn(Optional<MemoryLayout> returnLayout) {
