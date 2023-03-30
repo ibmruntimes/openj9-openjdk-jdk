@@ -37,6 +37,7 @@ import java.lang.foreign.GroupLayout;
 import java.lang.foreign.MemoryLayout;
 import java.lang.foreign.MemorySegment;
 import jdk.internal.foreign.abi.ABIDescriptor;
+import jdk.internal.foreign.abi.AbstractLinker.UpcallStubFactory;
 import jdk.internal.foreign.abi.Binding;
 import jdk.internal.foreign.abi.CallingSequence;
 import jdk.internal.foreign.abi.CallingSequenceBuilder;
@@ -118,7 +119,7 @@ public class LinuxRISCV64CallArranger {
         throw new InternalError("arrangeDowncall is not implemented on RISC-V");
     }
 
-    public static MemorySegment arrangeUpcall(MethodHandle target, MethodType mt, FunctionDescriptor cDesc, SegmentScope scope) {
+    public static UpcallStubFactory arrangeUpcall(MethodType mt, FunctionDescriptor cDesc) {
         throw new InternalError("arrangeUpcall is not implemented on RISC-V");
     }
 

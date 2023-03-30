@@ -37,6 +37,7 @@ import java.lang.foreign.GroupLayout;
 import java.lang.foreign.MemoryLayout;
 import java.lang.foreign.MemorySegment;
 import jdk.internal.foreign.abi.ABIDescriptor;
+import jdk.internal.foreign.abi.AbstractLinker.UpcallStubFactory;
 import jdk.internal.foreign.abi.Binding;
 import jdk.internal.foreign.abi.CallingSequence;
 import jdk.internal.foreign.abi.CallingSequenceBuilder;
@@ -197,11 +198,14 @@ public abstract class CallArranger {
     }
 
     /* Replace UpcallLinker in OpenJDK with the implementation of UpcallLinker specific to OpenJ9 */
-    public MemorySegment arrangeUpcall(MethodHandle target, MethodType mt, FunctionDescriptor cDesc, SegmentScope session) {
+    public UpcallStubFactory arrangeUpcall(MethodType mt, FunctionDescriptor cDesc) {
         if (isWinOS) {
             throw new InternalError("arrangeUpcall is not implemented on Windows/Aarch64");
         }
-        return UpcallLinker.make(target, mt, cDesc, session);
+        Bindings bindings = getBindings(mt, cDesc, true);
+        final boolean dropReturn = true; /* drop return, since we don't have bindings for it */
+        return SharedUtils.arrangeUpcallHelper(mt, bindings.isInMemoryReturn, dropReturn, abiDescriptor(),
+                bindings.callingSequence);
     }
 
     private static boolean isInMemoryReturn(Optional<MemoryLayout> returnLayout) {

@@ -68,8 +68,8 @@ public final class SysVPPC64leLinker extends AbstractLinker {
     }
 
     @Override
-    protected MemorySegment arrangeUpcall(MethodHandle target, MethodType targetType, FunctionDescriptor function, SegmentScope scope) {
-        return CallArranger.arrangeUpcall(target, targetType, function, scope);
+    protected UpcallStubFactory arrangeUpcall(MethodType mt, FunctionDescriptor cDesc) {
+        return CallArranger.arrangeUpcall(mt, cDesc);
     }
 
     public static VaList newVaList(Consumer<VaList.Builder> actions, SegmentScope scope) {

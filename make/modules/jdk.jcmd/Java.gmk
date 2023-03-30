@@ -27,6 +27,8 @@
 # (c) Copyright IBM Corp. 2021, 2021 All Rights Reserved
 # ===========================================================================
 
+DISABLED_WARNINGS_java += this-escape
+
 COPY += _options
 
 # Hook to include the corresponding custom file, if present.
