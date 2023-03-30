@@ -63,6 +63,10 @@ public abstract sealed class AbstractLinker implements Linker permits LinuxAArch
         MemorySegment makeStub(MethodHandle target, SegmentScope arena);
     }
 
+    public interface UpcallStubFactory {
+        MemorySegment makeStub(MethodHandle target, SegmentScope arena);
+    }
+
     private record LinkRequest(FunctionDescriptor descriptor, LinkerOptions options) {}
     private final SoftReferenceCache<LinkRequest, MethodHandle> DOWNCALL_CACHE = new SoftReferenceCache<>();
     private final SoftReferenceCache<FunctionDescriptor, UpcallStubFactory> UPCALL_CACHE = new SoftReferenceCache<>();
