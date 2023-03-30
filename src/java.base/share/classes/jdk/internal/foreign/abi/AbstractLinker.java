@@ -57,6 +57,10 @@ import java.util.Objects;
 public abstract sealed class AbstractLinker implements Linker permits LinuxAArch64Linker, MacOsAArch64Linker, AixPPC64Linker,
                                                                       SysVPPC64leLinker, SysVS390xLinker, SysVx64Linker, WindowsAArch64Linker, Windowsx64Linker, LinuxRISCV64Linker {
 
+    public interface UpcallStubFactory {
+        MemorySegment makeStub(MethodHandle target, SegmentScope arena);
+    }
+
     private record LinkRequest(FunctionDescriptor descriptor, LinkerOptions options) {}
     private final SoftReferenceCache<LinkRequest, MethodHandle> DOWNCALL_CACHE = new SoftReferenceCache<>();
 
