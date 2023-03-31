@@ -23,6 +23,13 @@
  *  questions.
  *
  */
+
+/*
+ * ===========================================================================
+ * (c) Copyright IBM Corp. 2023, 2023 All Rights Reserved
+ * ===========================================================================
+ */
+
 package jdk.internal.foreign.layout;
 
 import jdk.internal.foreign.Utils;
@@ -32,6 +39,7 @@ import jdk.internal.reflect.Reflection;
 import jdk.internal.vm.annotation.ForceInline;
 import jdk.internal.vm.annotation.Stable;
 import sun.invoke.util.Wrapper;
+import sun.security.action.GetPropertyAction;
 
 import java.lang.foreign.MemoryLayout;
 import java.lang.foreign.MemorySegment;
@@ -64,6 +72,8 @@ public final class ValueLayouts {
     abstract sealed static class AbstractValueLayout<V extends AbstractValueLayout<V> & ValueLayout> extends AbstractLayout<V> {
 
         static final int ADDRESS_SIZE_BITS = Unsafe.ADDRESS_SIZE * 8;
+
+        static final boolean isAixOS = GetPropertyAction.privilegedGetProperty("os.name").equals("AIX");
 
         private final Class<?> carrier;
         private final ByteOrder order;
@@ -399,6 +409,10 @@ public final class ValueLayouts {
             return new OfDoubleImpl(order);
         }
 
+        @Override
+        public boolean hasNaturalAlignment() {
+            return isAixOS ? ((bitAlignment() % 32) == 0) : super.hasNaturalAlignment();
+        }
     }
 
     public static final class OfAddressImpl extends AbstractValueLayout<OfAddressImpl> implements ValueLayout.OfAddress {

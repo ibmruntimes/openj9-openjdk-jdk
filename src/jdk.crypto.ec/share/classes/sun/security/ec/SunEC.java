@@ -51,8 +51,6 @@ import sun.security.util.NamedCurve;
 import static sun.security.util.SecurityConstants.PROVIDER_VER;
 import static sun.security.util.SecurityProviderConstants.*;
 
-import openj9.internal.security.FIPSConfigurator;
-
 /**
  * Provider class for the Elliptic Curve provider.
  */
@@ -258,10 +256,6 @@ public final class SunEC extends Provider {
 
         putService(new ProviderServiceA(this, "AlgorithmParameters",
             "EC", "sun.security.util.ECParameters", apAttrs));
-
-        if (FIPSConfigurator.enableFIPS()) {
-            return;
-        }
 
         putXDHEntries();
         putEdDSAEntries();

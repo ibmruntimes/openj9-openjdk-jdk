@@ -39,6 +39,8 @@ import java.security.*;
 
 import sun.security.util.PropertyExpander;
 
+import openj9.internal.security.RestrictedSecurity;
+
 /**
  * Class representing a configured provider which encapsulates configuration
  * (provider name + optional argument), the provider loading logic, and
@@ -167,6 +169,11 @@ final class ProviderConfig {
      */
     @SuppressWarnings("deprecation")
     Provider getProvider() {
+        if (!RestrictedSecurity.isProviderAllowed(provName)) {
+            // We're in restricted security mode which does not allow this provider,
+            // return without loading.
+            return null;
+        }
         // volatile variable load
         Provider p = provider;
         if (p != null) {

@@ -35,6 +35,7 @@ package jdk.internal.foreign.abi.ppc64.aix;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodType;
 
+import jdk.internal.foreign.abi.AbstractLinker.UpcallStubFactory;
 import jdk.internal.foreign.abi.DowncallLinker;
 import jdk.internal.foreign.abi.LinkerOptions;
 import jdk.internal.foreign.abi.UpcallLinker;
@@ -50,14 +51,11 @@ public class CallArranger {
 
 	/* Replace DowncallLinker in OpenJDK with the implementation of DowncallLinker specific to OpenJ9 */
 	public static MethodHandle arrangeDowncall(MethodType mt, FunctionDescriptor cDesc, LinkerOptions options) {
-		// MethodHandle handle = DowncallLinker.getBoundMethodHandle(mt, cDesc, options);
-		// return handle;
-		return null;
+		return DowncallLinker.getBoundMethodHandle(mt, cDesc, options);
 	}
 
 	/* Replace UpcallLinker in OpenJDK with the implementation of UpcallLinker specific to OpenJ9 */
-	public static MemorySegment arrangeUpcall(MethodHandle target, MethodType mt, FunctionDescriptor cDesc, SegmentScope session) {
-		// return UpcallLinker.make(target, mt, cDesc, session);
-		return null;
+	public static UpcallStubFactory arrangeUpcall(MethodType mt, FunctionDescriptor cDesc) {
+		throw new InternalError("arrangeUpcall is not implemented");
 	}
 }

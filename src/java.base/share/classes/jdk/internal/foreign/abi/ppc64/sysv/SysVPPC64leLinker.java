@@ -49,13 +49,17 @@ import java.util.function.Consumer;
  * on Linux/ppc64le and might be updated accordingly in terms of VaList in the future.
  */
 public final class SysVPPC64leLinker extends AbstractLinker {
-    private static SysVPPC64leLinker instance;
 
     public static SysVPPC64leLinker getInstance() {
-        if (instance == null) {
-            instance = new SysVPPC64leLinker();
+        final class Holder {
+            private static final SysVPPC64leLinker INSTANCE = new SysVPPC64leLinker();
         }
-        return instance;
+
+        return Holder.INSTANCE;
+    }
+
+    private SysVPPC64leLinker() {
+        /* Ensure there is only one instance. */
     }
 
     @Override
@@ -64,8 +68,8 @@ public final class SysVPPC64leLinker extends AbstractLinker {
     }
 
     @Override
-    protected MemorySegment arrangeUpcall(MethodHandle target, MethodType targetType, FunctionDescriptor function, SegmentScope scope) {
-        return CallArranger.arrangeUpcall(target, targetType, function, scope);
+    protected UpcallStubFactory arrangeUpcall(MethodType mt, FunctionDescriptor cDesc) {
+        return CallArranger.arrangeUpcall(mt, cDesc);
     }
 
     public static VaList newVaList(Consumer<VaList.Builder> actions, SegmentScope scope) {
