@@ -22,6 +22,11 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
+/*
+ * ===========================================================================
+ * (c) Copyright IBM Corp. 2022, 2023 All Rights Reserved
+ * ===========================================================================
+ */
 package java.lang;
 
 import java.lang.ref.Reference;
@@ -176,6 +181,7 @@ final class VirtualThread extends BaseVirtualThread {
     private static class VThreadContinuation extends Continuation {
         VThreadContinuation(VirtualThread vthread, Runnable task) {
             super(VTHREAD_SCOPE, () -> vthread.run(task));
+            this.vthread = vthread;
         }
         @Override
         protected void onPinned(Continuation.Pinned reason) {
