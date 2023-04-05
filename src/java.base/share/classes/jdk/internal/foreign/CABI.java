@@ -80,12 +80,12 @@ public enum CABI {
                 ABI = null;
             }
         } else if (ARCH.startsWith("ppc64")) {
-            if (OS.startsWith("Linux")) {
+            if (OperatingSystem.isLinux()) {
                 ABI = SYS_V_PPC_64LE;
             } else {
                 ABI = AIX_PPC_64;
             }
-        } else if (ARCH.equals("s390x") && OS.startsWith("Linux")) {
+        } else if (ARCH.equals("s390x") && OperatingSystem.isLinux()) {
             ABI = SYS_V_S390X;
         } else {
             // unsupported
