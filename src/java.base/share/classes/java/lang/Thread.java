@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1994, 2022, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1994, 2023, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -233,8 +233,15 @@ public class Thread implements Runnable {
         registerNatives();
     }
 
-    /* Reserved for exclusive use by the JVM, maybe move to FieldHolder */
-    private long eetop;
+    /*
+     * Reserved for exclusive use by the JVM. Cannot be moved to the FieldHolder
+     * as it needs to be set by the VM for JNI attaching threads, before executing
+     * the constructor that will create the FieldHolder. The historically named
+     * `eetop` holds the address of the underlying VM JavaThread, and is set to
+     * non-zero when the thread is started, and reset to zero when the thread terminates.
+     * A non-zero value indicates this thread isAlive().
+     */
+    private volatile long eetop;
 
     // thread id
     private final long tid;
@@ -1867,13 +1874,7 @@ public class Thread implements Runnable {
      * This method is non-final so it can be overridden.
      */
     boolean alive() {
-        return isAlive0();
-    }
-
-    private boolean isAlive0() {
-        synchronized (interruptLock) {
-            return eetop != NO_REF;
-        }
+        return eetop != NO_REF;
     }
 
     /**
