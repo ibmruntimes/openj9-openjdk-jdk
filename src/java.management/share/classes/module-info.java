@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2022, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2014, 2023, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -23,19 +23,6 @@
  * questions.
  */
 
-/*
- * ===========================================================================
- * (c) Copyright IBM Corp. 2022, 2022 All Rights Reserved
- * ===========================================================================
- */
-
-/*
- * OpenJ9 contributes module-info.java.extra for this module which triggers use
- * of GenModuleInfoSource, but that tool has not yet been updated to handle this
- * import nor the annotation below. Comment them out for now.
- */
-//import jdk.internal.javac.ParticipatesInPreview;
-
 /**
  * Defines the Java Management Extensions (JMX) API.
  * <P>
@@ -48,7 +35,6 @@
  * @moduleGraph
  * @since 9
  */
-//@ParticipatesInPreview
 module java.management {
 
     exports java.lang.management;

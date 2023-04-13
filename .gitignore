@@ -56,3 +56,5 @@ NashornProfile.txt
 /.project
 /.classpath
 /.cproject
+/compile_commands.json
+/.cache

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2006, 2022, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2006, 2023, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -41,6 +41,8 @@ import java.util.Arrays;
 
 import jdk.crypto.jniprovider.NativeCrypto;
 
+import sun.security.ec.point.AffinePoint;
+import sun.security.ec.point.MutablePoint;
 import sun.security.util.*;
 import sun.security.x509.AlgorithmId;
 import sun.security.pkcs.PKCS8Key;
@@ -158,11 +160,15 @@ public final class ECPrivateKeyImpl extends PKCS8Key implements ECPrivateKey {
         return s;
     }
 
-    public byte[] getArrayS() {
+    private byte[] getArrayS0() {
         if (arrayS == null) {
             arrayS = ECUtil.sArray(getS(), params);
         }
-        return arrayS.clone();
+        return arrayS;
+    }
+
+    public byte[] getArrayS() {
+        return getArrayS0().clone();
     }
 
     // see JCA doc
@@ -203,6 +209,23 @@ public final class ECPrivateKeyImpl extends PKCS8Key implements ECPrivateKey {
             params = algParams.getParameterSpec(ECParameterSpec.class);
         } catch (IOException | InvalidParameterSpecException e) {
             throw new InvalidKeyException("Invalid EC private key", e);
+        }
+    }
+
+    @Override
+    public PublicKey calculatePublicKey() {
+        ECParameterSpec ecParams = getParams();
+        ECOperations ops = ECOperations.forParameters(ecParams)
+                .orElseThrow(ProviderException::new);
+        MutablePoint pub = ops.multiply(ecParams.getGenerator(), getArrayS0());
+        AffinePoint affPub = pub.asAffine();
+        ECPoint w = new ECPoint(affPub.getX().asBigInteger(),
+                affPub.getY().asBigInteger());
+        try {
+            return new ECPublicKeyImpl(w, ecParams);
+        } catch (InvalidKeyException e) {
+            throw new ProviderException(
+                    "Unexpected error calculating public key", e);
         }
     }
 
