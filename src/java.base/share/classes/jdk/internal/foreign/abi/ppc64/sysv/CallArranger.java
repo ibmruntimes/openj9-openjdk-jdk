@@ -56,6 +56,6 @@ public class CallArranger {
 
 	/* Replace UpcallLinker in OpenJDK with the implementation of UpcallLinker specific to OpenJ9 */
 	public static UpcallStubFactory arrangeUpcall(MethodType mt, FunctionDescriptor cDesc) {
-		throw new InternalError("arrangeUpcall is not implemented");
+		return UpcallLinker.makeFactory(mt, cDesc);
 	}
 }

@@ -202,10 +202,7 @@ public abstract class CallArranger {
         if (isWinOS) {
             throw new InternalError("arrangeUpcall is not implemented on Windows/Aarch64");
         }
-        Bindings bindings = getBindings(mt, cDesc, true);
-        final boolean dropReturn = true; /* drop return, since we don't have bindings for it */
-        return SharedUtils.arrangeUpcallHelper(mt, bindings.isInMemoryReturn, dropReturn, abiDescriptor(),
-                bindings.callingSequence);
+        return UpcallLinker.makeFactory(mt, cDesc);
     }
 
     private static boolean isInMemoryReturn(Optional<MemoryLayout> returnLayout) {

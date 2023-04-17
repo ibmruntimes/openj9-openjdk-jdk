@@ -134,10 +134,7 @@ public class CallArranger {
 
     /* Replace UpcallLinker in OpenJDK with the implementation of UpcallLinker specific to OpenJ9 */
     public static UpcallStubFactory arrangeUpcall(MethodType mt, FunctionDescriptor cDesc) {
-        Bindings bindings = getBindings(mt, cDesc, true);
-        final boolean dropReturn = true; /* drop return, since we don't have bindings for it */
-        return SharedUtils.arrangeUpcallHelper(mt, bindings.isInMemoryReturn, dropReturn, CSysV,
-                bindings.callingSequence);
+        return UpcallLinker.makeFactory(mt, cDesc);
     }
 
     private static boolean isInMemoryReturn(Optional<MemoryLayout> returnLayout) {
