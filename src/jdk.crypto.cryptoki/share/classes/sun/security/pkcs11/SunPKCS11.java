@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2003, 2022, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2003, 2023, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -396,8 +396,8 @@ public final class SunPKCS11 extends AuthProvider {
                         }
                     } else {
                         System.out.println("All slots: " + toString(slots));
-                        slots = p11.C_GetSlotList(true);
-                        System.out.println("Slots with tokens: " + toString(slots));
+                        System.out.println("Slots with tokens: " +
+                                toString(p11.C_GetSlotList(true)));
                     }
                 }
                 /* TokenLabel is only supported on Z architecture platforms. It is null otherwise. */
