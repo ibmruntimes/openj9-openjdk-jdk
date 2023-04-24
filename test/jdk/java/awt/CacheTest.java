@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, 2022, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2001, 2023, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -21,21 +21,28 @@
  * questions.
  */
 
-
 /*
  * @test
- * @key stress randomness
- *
- * @summary converted from VM Testbase gc/ArrayJuggle/Juggle04.
- * VM Testbase keywords: [gc, stress, stressopt, nonconcurrent]
- *
- * @library /vmTestbase
- *          /test/lib
- * @run main/othervm
- *      -XX:+HeapDumpOnOutOfMemoryError
- *      -Xlog:gc=debug:gc.log
- *      gc.ArrayJuggle.Juggle01.Juggle01
- *      -gp booleanArr
- *      -ms low
- */
+ * @bug 4429261
+ * @summary Checks AWTKeyStroke is cached
+ * @run main CacheTest
+*/
 
+import java.awt.AWTKeyStroke;
+import java.awt.EventQueue;
+import java.awt.event.KeyEvent;
+import java.awt.event.InputEvent;
+
+public class CacheTest {
+
+    public static void main(String[] args) throws Exception {
+        EventQueue.invokeAndWait(() -> {
+            if (AWTKeyStroke.getAWTKeyStroke(KeyEvent.VK_X,
+                                             InputEvent.ALT_DOWN_MASK) !=
+                AWTKeyStroke.getAWTKeyStroke(KeyEvent.VK_X,
+                                             InputEvent.ALT_DOWN_MASK)) {
+                throw new RuntimeException("KeyStroke is not cached");
+            }
+        });
+    }
+}// class CacheTest
