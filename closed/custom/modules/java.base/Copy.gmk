@@ -30,6 +30,17 @@ $(call openj9_copy_files,, \
 	$(OPENJ9_VM_BUILD_DIR)/include/jvmti.h \
 	$(INCLUDE_TARGET_DIR)/jvmti.h)
 
+ifeq (true,$(OPENJ9_ENABLE_CMAKE))
+  CONFIG_HEADERS := j9cfg.h omr/omrcfg.h
+else
+  CONFIG_HEADERS := include/j9cfg.h omr/include_core/omrcfg.h
+endif
+
+$(foreach file, $(CONFIG_HEADERS), \
+	$(call openj9_copy_files,, \
+		$(OPENJ9_VM_BUILD_DIR)/$(file) \
+		$(SUPPORT_OUTPUTDIR)/modules_include/java.base/$(notdir $(file))))
+
 ifeq (zos,$(OPENJDK_TARGET_OS))
 $(call openj9_copy_files,, \
 	$(OPENJ9_TOPDIR)/runtime/include/jni_convert.h \
