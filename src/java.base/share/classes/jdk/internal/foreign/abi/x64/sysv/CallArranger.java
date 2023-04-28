@@ -139,7 +139,7 @@ public class CallArranger {
 
     /* Replace UpcallLinker in OpenJDK with the implementation of UpcallLinker specific to OpenJ9 */
     public static UpcallStubFactory arrangeUpcall(MethodType mt, FunctionDescriptor cDesc, LinkerOptions options) {
-        return UpcallLinker.makeFactory(mt, cDesc);
+        return UpcallLinker.makeFactory(mt, cDesc, options);
     }
 
     private static boolean isInMemoryReturn(Optional<MemoryLayout> returnLayout) {

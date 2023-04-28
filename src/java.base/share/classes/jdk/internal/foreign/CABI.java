@@ -86,14 +86,14 @@ public enum CABI {
                 if (OperatingSystem.isLinux()) {
                     return LINUX_RISCV_64;
                 }
-            } else if (ARCH.startsWith("ppc64")) {
+            } else if (arch.startsWith("ppc64")) {
                 if (OperatingSystem.isLinux()) {
-                    ABI = SYS_V_PPC_64LE;
+                    return SYS_V_PPC_64LE;
                 } else {
-                    ABI = AIX_PPC_64;
+                    return AIX_PPC_64;
                 }
-            } else if (ARCH.equals("s390x") && OperatingSystem.isLinux()) {
-                ABI = SYS_V_S390X;
+            } else if (arch.equals("s390x") && OperatingSystem.isLinux()) {
+                return SYS_V_S390X;
             }
         } else if (FallbackLinker.isSupported()) {
             return FALLBACK; // fallback linker

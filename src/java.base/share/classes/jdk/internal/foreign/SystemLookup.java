@@ -65,10 +65,10 @@ public final class SystemLookup implements SymbolLookup {
 
     private static SymbolLookup makeSystemLookup() {
         try {
-            if (Utils.IS_AIX) {
-                return makeAixLookup();
-            } else if (Utils.IS_WINDOWS) {
+            if (Utils.IS_WINDOWS) {
                 return makeWindowsLookup();
+            } else if (Utils.IS_AIX) {
+                return makeAixLookup();
             } else {
                 return libLookup(libs -> libs.load(jdkLibraryPath("syslookup")));
             }
@@ -103,12 +103,14 @@ public final class SystemLookup implements SymbolLookup {
                  */
                 SymbolLookup funcsLibLookup =
                         libLookup(libs -> libs.load(jdkLibraryPath("syslookup")));
-                MemorySegment funcs = MemorySegment.ofAddress(funcsLibLookup.find("funcs").orElseThrow().address(),
-                    ADDRESS.byteSize() * AixFuncSymbols.values().length, SegmentScope.global());
+
+                MemorySegment funcs = funcsLibLookup.find("funcs").orElseThrow()
+                        .reinterpret(AixFuncSymbols.LAYOUT.byteSize());
+
                 funcAddr = funcs.getAtIndex(ADDRESS, symbol.ordinal());
             }
 
-            return Optional.of(MemorySegment.ofAddress(funcAddr.address(), 0L, SegmentScope.global()));
+            return Optional.of(MemorySegment.ofAddress(funcAddr.address()));
         };
     }
 
@@ -263,5 +265,8 @@ public final class SystemLookup implements SymbolLookup {
                 return null;
             }
         }
+
+        static final SequenceLayout LAYOUT = MemoryLayout.sequenceLayout(
+                values().length, ADDRESS);
     }
 }
