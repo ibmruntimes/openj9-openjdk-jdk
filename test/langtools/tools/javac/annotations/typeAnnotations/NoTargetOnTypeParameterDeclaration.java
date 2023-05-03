@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, 2022, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2023, Alphabet LLC. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -23,9 +23,22 @@
 
 /*
  * @test
- * @enablePreview
- * @requires jdk.foreign.linker != "UNSUPPORTED"
- * @build invoker_module/* lookup_module/*
- * @run testng/othervm --enable-native-access=invoker_module
- *                     lookup_module/handle.lookup.MethodHandleLookup
+ * @bug 8303784
+ * @summary no-@Target annotations should be applicable to type parameter declarations
+ * @compile/fail/ref=NoTargetOnTypeParameterDeclaration.out --release 13 -XDrawDiagnostics NoTargetOnTypeParameterDeclaration.java
+ * @compile --release 14 NoTargetOnTypeParameterDeclaration.java
+ * @compile NoTargetOnTypeParameterDeclaration.java
  */
+
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Retention;
+
+class NoTargetOnTypeParameterDeclaration {
+
+  @Retention(RetentionPolicy.RUNTIME)
+  @interface A {}
+
+  class B<@A X> {
+    <@A Y> void f() {}
+  }
+}
