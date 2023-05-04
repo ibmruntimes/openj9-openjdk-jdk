@@ -138,7 +138,7 @@ public class KDCRep {
                         " req type is " + req_type);
 
                 System.out.println(">>> KDCRep: Message in bytes is =>");
-                byte[] dataBytes = encoding.getDataBytes();
+                byte[] dataBytes = encoding.data().toByteArray();
                 StringBuilder sb = new StringBuilder();
                 for (int i = 0; i < dataBytes.length; i++) {
                     if ((i % 16) == 0) {
