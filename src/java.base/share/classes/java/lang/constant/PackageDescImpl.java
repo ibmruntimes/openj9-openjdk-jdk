@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2006, 2022, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2023, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -22,43 +22,16 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
+package java.lang.constant;
 
-package javax.tools;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-
-/**
- * Provides an easy way to collect diagnostics in a list.
- *
- * @param <S> the type of source objects used by diagnostics received
- * by this object
- *
- * @since 1.6
+/*
+ * Implementation of {@code PackageDesc}
+ * @param internalName must have been validated
  */
-public final class DiagnosticCollector<S> implements DiagnosticListener<S> {
-    private List<Diagnostic<? extends S>> diagnostics =
-            Collections.synchronizedList(new ArrayList<Diagnostic<? extends S>>());
-
-    /**
-     * Creates a new instance of DiagnosticCollector.
-     */
-    public DiagnosticCollector() {}
+record PackageDescImpl(String internalName) implements PackageDesc {
 
     @Override
-    public void report(Diagnostic<? extends S> diagnostic) {
-        Objects.requireNonNull(diagnostic);
-        diagnostics.add(diagnostic);
-    }
-
-    /**
-     * Returns a list view of diagnostics collected by this object.
-     *
-     * @return a list view of diagnostics
-     */
-    public List<Diagnostic<? extends S>> getDiagnostics() {
-        return Collections.unmodifiableList(diagnostics);
+    public String toString() {
+        return String.format("PackageDesc[%s]", name());
     }
 }
