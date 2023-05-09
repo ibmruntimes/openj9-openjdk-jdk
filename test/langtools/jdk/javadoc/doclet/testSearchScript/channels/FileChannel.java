@@ -1,12 +1,10 @@
 /*
- * Copyright (c) 2017, 2018, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2022, 2023, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License version 2 only, as
- * published by the Free Software Foundation.  Oracle designates this
- * particular file as subject to the "Classpath" exception as provided
- * by Oracle in the LICENSE file that accompanied this code.
+ * published by the Free Software Foundation.
  *
  * This code is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
@@ -23,16 +21,22 @@
  * questions.
  */
 
-package jdk.internal.access;
-
-import java.io.ObjectStreamException;
-import java.io.ObjectInputStream;
+package channels;
 
 /**
- * Interface to specify methods for accessing {@code ObjectInputStream}.
+ * Test case for parameter type "masking" the method name and then getting dropped.
  */
-@FunctionalInterface
-public interface JavaObjectInputStreamAccess {
-    void checkArray(ObjectInputStream ois, Class<?> arrayType, int arrayLength)
-        throws ObjectStreamException;
+public class FileChannel {
+
+    /**
+     * Type name "FileChanne.Map masks method below
+     */
+    public static class Map {}
+
+    /**
+     * Method "FileChannel.map" is masked by the type of its first parameter
+     */
+    public FileChannel map(Map map, int i) {
+        return this;
+    }
 }

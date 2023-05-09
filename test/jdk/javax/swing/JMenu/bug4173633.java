@@ -1,12 +1,10 @@
 /*
- * Copyright (c) 2017, 2018, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1999, 2023, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License version 2 only, as
- * published by the Free Software Foundation.  Oracle designates this
- * particular file as subject to the "Classpath" exception as provided
- * by Oracle in the LICENSE file that accompanied this code.
+ * published by the Free Software Foundation.
  *
  * This code is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
@@ -23,16 +21,22 @@
  * questions.
  */
 
-package jdk.internal.access;
 
-import java.io.ObjectStreamException;
-import java.io.ObjectInputStream;
+/*
+  @test
+  @bug 4173633
+  @summary Test for infinite recursion when JMenu with separator
+  @run main bug4173633
+*/
 
-/**
- * Interface to specify methods for accessing {@code ObjectInputStream}.
- */
-@FunctionalInterface
-public interface JavaObjectInputStreamAccess {
-    void checkArray(ObjectInputStream ois, Class<?> arrayType, int arrayLength)
-        throws ObjectStreamException;
+import javax.swing.JMenu;
+
+public class bug4173633 {
+    public static void main(String[] args) {
+        JMenu m = new JMenu("bug4173633");
+        m.addSeparator();
+        if (m.getItem(0) == m) {
+            throw new RuntimeException("BUG 4173633 FAILED");
+        }
+    }
 }
