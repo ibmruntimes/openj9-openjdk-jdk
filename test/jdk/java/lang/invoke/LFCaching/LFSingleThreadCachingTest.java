@@ -36,7 +36,7 @@
  * @build LambdaFormTestCase
  * @build LFCachingTestCase
  * @build LFSingleThreadCachingTest
- * @run main/othervm -XX:ReservedCodeCacheSize=128m LFSingleThreadCachingTest
+ * @run main/othervm -XX:ReservedCodeCacheSize=128m -Xdump:system+java:events=catch,filter=java/lang/AssertionError LFSingleThreadCachingTest
  */
 
 import java.lang.invoke.MethodHandle;
