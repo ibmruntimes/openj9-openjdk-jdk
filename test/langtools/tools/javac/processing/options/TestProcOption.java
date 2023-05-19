@@ -1,12 +1,10 @@
 /*
- * Copyright (c) 2022, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2023, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License version 2 only, as
- * published by the Free Software Foundation.  Oracle designates this
- * particular file as subject to the "Classpath" exception as provided
- * by Oracle in the LICENSE file that accompanied this code.
+ * published by the Free Software Foundation.
  *
  * This code is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
@@ -22,24 +20,22 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-package jdk.internal.classfile.impl;
 
-import java.lang.constant.MethodTypeDesc;
-import jdk.internal.classfile.constantpool.Utf8Entry;
+/*
+ * @test
+ * @bug 8308245
+ * @summary Test trivial handling of -proc:full option
+ * @compile -proc:full TestProcOption.java
+ * @run main TestProcOption
+ */
 
-import static jdk.internal.classfile.Classfile.ACC_STATIC;
+/*
+ * The test verifies that compilation takes place when -proc:full is used.
+ */
+public class TestProcOption {
+    private TestProcOption(){};
 
-public interface MethodInfo {
-    Utf8Entry methodName();
-    Utf8Entry methodType();
-    MethodTypeDesc methodTypeSymbol();
-    int methodFlags();
-
-    default int receiverSlot() {
-        if ((methodFlags() & ACC_STATIC) != 0)
-            throw new IllegalStateException("not an instance method");
-        return 0;
+    public static void main(String... args) {
+        ; // do nothing
     }
-
-    int parameterSlot(int paramNo);
 }
