@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, 2023, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2018, 2023, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -22,14 +22,24 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-package jdk.jfr.internal.dcmd;
 
-record Argument(
-    String name,
-    String description,
-    String type,
-    boolean mandatory,
-    boolean option,
-    String defaultValue,
-    boolean allowMultiple
-) { }
+package jdk.jfr.internal.util;
+
+/**
+ * Exception that is thrown if options don't follow the syntax of the command.
+ */
+public final class UserSyntaxException extends Exception {
+    private static final long serialVersionUID = 3437009454344160933L;
+
+    /**
+     * The error message.
+     *
+     * The first letter should not be capitalized, so a context can be printed prior
+     * to the error message.
+     *
+     * @param errorMessage message
+     */
+    public UserSyntaxException(String errorMessage) {
+        super(errorMessage);
+    }
+}
