@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, 2023, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2023, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -22,14 +22,37 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-package jdk.jfr.internal.dcmd;
+package jdk.jfr.internal.query;
 
-record Argument(
-    String name,
-    String description,
-    String type,
-    boolean mandatory,
-    boolean option,
-    String defaultValue,
-    boolean allowMultiple
-) { }
+import java.util.Arrays;
+
+final class Row {
+    private final Object[] values;
+    private final String[] texts;
+
+    public Row(int size) {
+        values = new Object[size];
+        texts = new String[size];
+    }
+
+    public Object getValue(int index) {
+        return values[index];
+    }
+
+    public void putValue(int index, Object o) {
+        values[index] = o;
+    }
+
+    public String getText(int index) {
+        return texts[index];
+    }
+
+    public void putText(int index, String text) {
+        texts[index] = text;
+    }
+
+    @Override
+    public String toString() {
+        return Arrays.asList(values).toString();
+    }
+}
