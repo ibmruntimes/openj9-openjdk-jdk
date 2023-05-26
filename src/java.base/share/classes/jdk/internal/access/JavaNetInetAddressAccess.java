@@ -23,6 +23,12 @@
  * questions.
  */
 
+/*
+ * ===========================================================================
+ * (c) Copyright IBM Corp. 2023, 2023 All Rights Reserved
+ * ===========================================================================
+ */
+
 package jdk.internal.access;
 
 import java.net.Inet4Address;
@@ -45,4 +51,11 @@ public interface JavaNetInetAddressAccess {
      * Returns a reference to the byte[] with the IPv6 address.
      */
     byte[] addressBytes(Inet6Address inet6Address);
+
+    /*[IF CRIU_SUPPORT]*/
+    /**
+     * To be invoked by CRIU post-restore hook, clear the cache.
+     */
+    void clearInetAddressCache();
+    /*[ENDIF] CRIU_SUPPORT */
 }
