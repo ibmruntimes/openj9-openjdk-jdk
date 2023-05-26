@@ -137,11 +137,54 @@ RestrictedSecurity1.jce.provider.2 = SUN [{CertificateFactory, X.509, Implemente
     {CertStore, com.sun.security.IndexedCollection, ImplementedIn=Software}, \
     {Policy, JavaPolicy, *}, {Configuration, JavaLoginConfig, *}, \
     {CertPathBuilder, PKIX, ValidationAlgorithm=RFC5280:ImplementedIn=Software}, \
-    {CertPathValidator, PKIX, ValidationAlgorithm=RFC5280:ImplementedIn=Software}]
+    {CertPathValidator, PKIX, ValidationAlgorithm=RFC5280:ImplementedIn=Software}, \
+    {KeyStore, PKCS12, *}]
 RestrictedSecurity1.jce.provider.3 = SunEC [{KeyFactory, EC, ImplementedIn=Software: \
     SupportedKeyClasses=java.security.interfaces.ECPublicKey|java.security.interfaces.ECPrivateKey: \
     KeySize=256}, {AlgorithmParameters, EC, *}]
 RestrictedSecurity1.jce.provider.4 = SunJSSE
+RestrictedSecurity1.jce.provider.5 = SunJCE [{AlgorithmParameters, PBES2, *}, \
+    {AlgorithmParameters, PBEWithHmacSHA1AndAES_128, *}, \
+    {AlgorithmParameters, PBEWithHmacSHA1AndAES_256, *}, \
+    {AlgorithmParameters, PBEWithHmacSHA224AndAES_128, *}, \
+    {AlgorithmParameters, PBEWithHmacSHA224AndAES_256, *}, \
+    {AlgorithmParameters, PBEWithHmacSHA256AndAES_128, *}, \
+    {AlgorithmParameters, PBEWithHmacSHA256AndAES_256, *}, \
+    {AlgorithmParameters, PBEWithHmacSHA384AndAES_128, *}, \
+    {AlgorithmParameters, PBEWithHmacSHA384AndAES_256, *}, \
+    {AlgorithmParameters, PBEWithHmacSHA512AndAES_128, *}, \
+    {AlgorithmParameters, PBEWithHmacSHA512AndAES_256, *}, \
+    {Cipher, PBEWithHmacSHA1AndAES_128, *}, \
+    {Cipher, PBEWithHmacSHA1AndAES_256, *}, \
+    {Cipher, PBEWithHmacSHA224AndAES_128, *}, \
+    {Cipher, PBEWithHmacSHA224AndAES_256, *}, \
+    {Cipher, PBEWithHmacSHA256AndAES_128, *}, \
+    {Cipher, PBEWithHmacSHA256AndAES_256, *}, \
+    {Cipher, PBEWithHmacSHA384AndAES_128, *}, \
+    {Cipher, PBEWithHmacSHA384AndAES_256, *}, \
+    {Cipher, PBEWithHmacSHA512AndAES_128, *}, \
+    {Cipher, PBEWithHmacSHA512AndAES_256, *}, \
+    {Mac, HmacPBESHA1, *}, \
+    {Mac, HmacPBESHA224, *}, \
+    {Mac, HmacPBESHA256, *}, \
+    {Mac, HmacPBESHA384, *}, \
+    {Mac, HmacPBESHA512, *}, \
+    {Mac, PBEWithHmacSHA1, *}, \
+    {Mac, PBEWithHmacSHA224, *}, \
+    {Mac, PBEWithHmacSHA256, *}, \
+    {Mac, PBEWithHmacSHA384, *}, \
+    {Mac, PBEWithHmacSHA512, *}, \
+    {SecretKeyFactory, PBEWithHmacSHA1AndAES_128, *}, \
+    {SecretKeyFactory, PBEWithHmacSHA1AndAES_256, *}, \
+    {SecretKeyFactory, PBEWithHmacSHA224AndAES_128, *}, \
+    {SecretKeyFactory, PBEWithHmacSHA224AndAES_256, *}, \
+    {SecretKeyFactory, PBEWithHmacSHA256AndAES_128, *}, \
+    {SecretKeyFactory, PBEWithHmacSHA256AndAES_256, *}, \
+    {SecretKeyFactory, PBEWithHmacSHA384AndAES_128, *}, \
+    {SecretKeyFactory, PBEWithHmacSHA384AndAES_256, *}, \
+    {SecretKeyFactory, PBEWithHmacSHA512AndAES_128, *}, \
+    {SecretKeyFactory, PBEWithHmacSHA512AndAES_256, *}, \
+    {SecretKeyFactory, PBEWithMD5AndDES, *}]
 
 RestrictedSecurity1.keystore.type = PKCS11
 RestrictedSecurity1.javax.net.ssl.keyStore = NONE
