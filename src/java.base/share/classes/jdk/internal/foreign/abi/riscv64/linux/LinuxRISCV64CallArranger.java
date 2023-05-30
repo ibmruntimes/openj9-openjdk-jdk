@@ -32,6 +32,7 @@
 
 package jdk.internal.foreign.abi.riscv64.linux;
 
+import java.lang.foreign.AddressLayout;
 import java.lang.foreign.FunctionDescriptor;
 import java.lang.foreign.GroupLayout;
 import java.lang.foreign.MemoryLayout;
@@ -48,7 +49,7 @@ import jdk.internal.foreign.abi.SharedUtils;
 import jdk.internal.foreign.abi.VMStorage;
 import jdk.internal.foreign.Utils;
 
-import java.lang.foreign.SegmentScope;
+import java.lang.foreign.ValueLayout;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodType;
 import java.util.List;
@@ -58,7 +59,6 @@ import java.util.Optional;
 import static jdk.internal.foreign.abi.riscv64.linux.TypeClass.*;
 import static jdk.internal.foreign.abi.riscv64.RISCV64Architecture.*;
 import static jdk.internal.foreign.abi.riscv64.RISCV64Architecture.Regs.*;
-import static jdk.internal.foreign.PlatformLayouts.*;
 
 /**
  * For the RISCV64 C ABI specifically, this class uses CallingSequenceBuilder
@@ -97,7 +97,7 @@ public class LinuxRISCV64CallArranger {
         boolean returnInMemory = isInMemoryReturn(cDesc.returnLayout());
         if (returnInMemory) {
             Class<?> carrier = MemorySegment.class;
-            MemoryLayout layout = RISCV64.C_POINTER;
+            MemoryLayout layout = SharedUtils.C_POINTER;
             csb.addArgumentBindings(carrier, layout, argCalc.getBindings(carrier, layout, false));
         } else if (cDesc.returnLayout().isPresent()) {
             Class<?> carrier = mt.returnType();
@@ -119,7 +119,7 @@ public class LinuxRISCV64CallArranger {
         throw new InternalError("arrangeDowncall is not implemented on RISC-V");
     }
 
-    public static UpcallStubFactory arrangeUpcall(MethodType mt, FunctionDescriptor cDesc) {
+    public static UpcallStubFactory arrangeUpcall(MethodType mt, FunctionDescriptor cDesc, LinkerOptions options) {
         throw new InternalError("arrangeUpcall is not implemented on RISC-V");
     }
 
@@ -386,9 +386,10 @@ public class LinuxRISCV64CallArranger {
                     bindings.vmLoad(storage, carrier);
                 }
                 case POINTER -> {
+                    AddressLayout addressLayout = (AddressLayout) layout;
                     VMStorage storage = storageCalculator.getStorage(StorageType.INTEGER);
                     bindings.vmLoad(storage, long.class)
-                            .boxAddressRaw(Utils.pointeeSize(layout));
+                            .boxAddressRaw(Utils.pointeeByteSize(addressLayout), Utils.pointeeByteAlign(addressLayout));
                 }
                 case STRUCT_REGISTER_X -> {
                     assert carrier == MemorySegment.class;
