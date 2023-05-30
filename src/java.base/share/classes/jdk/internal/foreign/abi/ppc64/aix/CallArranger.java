@@ -41,8 +41,6 @@ import jdk.internal.foreign.abi.LinkerOptions;
 import jdk.internal.foreign.abi.UpcallLinker;
 
 import java.lang.foreign.FunctionDescriptor;
-import java.lang.foreign.MemorySegment;
-import java.lang.foreign.SegmentScope;
 
 /**
  * PPC64 CallArranger specialized for AIX C ABI
@@ -55,7 +53,7 @@ public class CallArranger {
 	}
 
 	/* Replace UpcallLinker in OpenJDK with the implementation of UpcallLinker specific to OpenJ9 */
-	public static UpcallStubFactory arrangeUpcall(MethodType mt, FunctionDescriptor cDesc) {
-		return UpcallLinker.makeFactory(mt, cDesc);
+	public static UpcallStubFactory arrangeUpcall(MethodType mt, FunctionDescriptor cDesc, LinkerOptions options) {
+		return UpcallLinker.makeFactory(mt, cDesc, options);
 	}
 }

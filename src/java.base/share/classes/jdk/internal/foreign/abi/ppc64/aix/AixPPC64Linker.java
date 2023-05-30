@@ -35,18 +35,14 @@ import jdk.internal.foreign.abi.AbstractLinker;
 import jdk.internal.foreign.abi.LinkerOptions;
 
 import java.lang.foreign.FunctionDescriptor;
-import java.lang.foreign.MemorySegment;
-import java.lang.foreign.SegmentScope;
-import java.lang.foreign.VaList;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodType;
-import java.util.function.Consumer;
 
 /**
  * ABI implementation based on 64-bit PowerPC ELF ABI
  *
- * Note: This file is copied from x86/sysv with modification to accommodate the specifics
- * on AIX/ppc64 and might be updated accordingly in terms of VaList in the future.
+ * Note: This file is copied from x86/sysv with modification to accommodate
+ * the specifics on AIX/ppc64.
  */
 public final class AixPPC64Linker extends AbstractLinker {
 
@@ -68,21 +64,7 @@ public final class AixPPC64Linker extends AbstractLinker {
     }
 
     @Override
-    protected UpcallStubFactory arrangeUpcall(MethodType mt, FunctionDescriptor cDesc) {
-        return CallArranger.arrangeUpcall(mt, cDesc);
-    }
-
-    public static VaList newVaList(Consumer<VaList.Builder> actions, SegmentScope scope) {
-        AixPPC64VaList.Builder builder = AixPPC64VaList.builder(scope);
-        actions.accept(builder);
-        return builder.build();
-    }
-
-    public static VaList newVaListOfAddress(long address, SegmentScope scope) {
-        return AixPPC64VaList.ofAddress(address, scope);
-    }
-
-    public static VaList emptyVaList() {
-        return AixPPC64VaList.empty();
+    protected UpcallStubFactory arrangeUpcall(MethodType targetType, FunctionDescriptor function, LinkerOptions options) {
+        return CallArranger.arrangeUpcall(targetType, function, options);
     }
 }

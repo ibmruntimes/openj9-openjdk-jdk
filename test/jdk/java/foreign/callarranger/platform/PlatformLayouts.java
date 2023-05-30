@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2020, 2022, Oracle and/or its affiliates. All rights reserved.
+ *  Copyright (c) 2020, 2023, Oracle and/or its affiliates. All rights reserved.
  *  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  *  This code is free software; you can redistribute it and/or modify it
@@ -30,23 +30,25 @@
  * ===========================================================================
  */
 
-package jdk.internal.foreign;
+package platform;
 
+import jdk.internal.foreign.abi.SharedUtils;
+
+import java.lang.foreign.AddressLayout;
 import java.lang.foreign.ValueLayout;
 
 public final class PlatformLayouts {
 
-    private PlatformLayouts() {
-        //just the one
-    }
+    // Suppresses default constructor, ensuring non-instantiability.
+    private PlatformLayouts() {}
 
     /**
      * This class defines layout constants modelling standard primitive types supported by the x64 SystemV ABI.
      */
     public static final class SysV {
-        private SysV() {
-            //just the one
-        }
+
+        // Suppresses default constructor, ensuring non-instantiability.
+        private SysV() {}
 
         /**
          * The {@code bool} native type.
@@ -61,42 +63,38 @@ public final class PlatformLayouts {
         /**
          * The {@code short} native type.
          */
-        public static final ValueLayout.OfShort C_SHORT = ValueLayout.JAVA_SHORT.withBitAlignment(16);
+        public static final ValueLayout.OfShort C_SHORT = ValueLayout.JAVA_SHORT;
 
         /**
          * The {@code int} native type.
          */
-        public static final ValueLayout.OfInt C_INT = ValueLayout.JAVA_INT.withBitAlignment(32);
+        public static final ValueLayout.OfInt C_INT = ValueLayout.JAVA_INT;
 
         /**
          * The {@code long} native type.
          */
-        public static final ValueLayout.OfLong C_LONG = ValueLayout.JAVA_LONG.withBitAlignment(64);
+        public static final ValueLayout.OfLong C_LONG = ValueLayout.JAVA_LONG;
 
         /**
          * The {@code long long} native type.
          */
-        public static final ValueLayout.OfLong C_LONG_LONG = ValueLayout.JAVA_LONG.withBitAlignment(64);
+        public static final ValueLayout.OfLong C_LONG_LONG = ValueLayout.JAVA_LONG;
 
         /**
          * The {@code float} native type.
          */
-        public static final ValueLayout.OfFloat C_FLOAT = ValueLayout.JAVA_FLOAT.withBitAlignment(32);
+        public static final ValueLayout.OfFloat C_FLOAT = ValueLayout.JAVA_FLOAT;
 
         /**
          * The {@code double} native type.
          */
-        public static final ValueLayout.OfDouble C_DOUBLE = ValueLayout.JAVA_DOUBLE.withBitAlignment(64);
+        public static final ValueLayout.OfDouble C_DOUBLE = ValueLayout.JAVA_DOUBLE;
 
         /**
          * The {@code T*} native type.
          */
-        public static final ValueLayout.OfAddress C_POINTER = ValueLayout.ADDRESS.withBitAlignment(64).asUnbounded();
+        public static final AddressLayout C_POINTER = SharedUtils.C_POINTER;;
 
-        /**
-         * The {@code va_list} native type, as it is passed to a function.
-         */
-        public static final ValueLayout.OfAddress C_VA_LIST = SysV.C_POINTER;
     }
 
     /**
@@ -104,9 +102,8 @@ public final class PlatformLayouts {
      */
     public static final class Win64 {
 
-        private Win64() {
-            //just the one
-        }
+        // Suppresses default constructor, ensuring non-instantiability.
+        private Win64() {}
 
         /**
          * The {@code bool} native type.
@@ -121,41 +118,37 @@ public final class PlatformLayouts {
         /**
          * The {@code short} native type.
          */
-        public static final ValueLayout.OfShort C_SHORT = ValueLayout.JAVA_SHORT.withBitAlignment(16);
+        public static final ValueLayout.OfShort C_SHORT = ValueLayout.JAVA_SHORT;
 
         /**
          * The {@code int} native type.
          */
-        public static final ValueLayout.OfInt C_INT = ValueLayout.JAVA_INT.withBitAlignment(32);
+        public static final ValueLayout.OfInt C_INT = ValueLayout.JAVA_INT;
         /**
          * The {@code long} native type.
          */
-        public static final ValueLayout.OfInt C_LONG = ValueLayout.JAVA_INT.withBitAlignment(32);
+        public static final ValueLayout.OfInt C_LONG = ValueLayout.JAVA_INT;
 
         /**
          * The {@code long long} native type.
          */
-        public static final ValueLayout.OfLong C_LONG_LONG = ValueLayout.JAVA_LONG.withBitAlignment(64);
+        public static final ValueLayout.OfLong C_LONG_LONG = ValueLayout.JAVA_LONG;
 
         /**
          * The {@code float} native type.
          */
-        public static final ValueLayout.OfFloat C_FLOAT = ValueLayout.JAVA_FLOAT.withBitAlignment(32);
+        public static final ValueLayout.OfFloat C_FLOAT = ValueLayout.JAVA_FLOAT;
 
         /**
          * The {@code double} native type.
          */
-        public static final ValueLayout.OfDouble C_DOUBLE = ValueLayout.JAVA_DOUBLE.withBitAlignment(64);
+        public static final ValueLayout.OfDouble C_DOUBLE = ValueLayout.JAVA_DOUBLE;
 
         /**
          * The {@code T*} native type.
          */
-        public static final ValueLayout.OfAddress C_POINTER = ValueLayout.ADDRESS.withBitAlignment(64).asUnbounded();
+        public static final AddressLayout C_POINTER = SharedUtils.C_POINTER;
 
-        /**
-         * The {@code va_list} native type, as it is passed to a function.
-         */
-        public static final ValueLayout.OfAddress C_VA_LIST = Win64.C_POINTER;
     }
 
     /**
@@ -163,9 +156,8 @@ public final class PlatformLayouts {
      */
     public static final class AArch64 {
 
-        private AArch64() {
-            //just the one
-        }
+        // Suppresses default constructor, ensuring non-instantiability.
+        private AArch64() {}
 
         /**
          * The {@code bool} native type.
@@ -180,48 +172,44 @@ public final class PlatformLayouts {
         /**
          * The {@code short} native type.
          */
-        public static final ValueLayout.OfShort C_SHORT = ValueLayout.JAVA_SHORT.withBitAlignment(16);
+        public static final ValueLayout.OfShort C_SHORT = ValueLayout.JAVA_SHORT;
 
         /**
          * The {@code int} native type.
          */
-        public static final ValueLayout.OfInt C_INT = ValueLayout.JAVA_INT.withBitAlignment(32);
+        public static final ValueLayout.OfInt C_INT = ValueLayout.JAVA_INT;
 
         /**
          * The {@code long} native type.
          */
-        public static final ValueLayout.OfLong C_LONG = ValueLayout.JAVA_LONG.withBitAlignment(64);
+        public static final ValueLayout.OfLong C_LONG = ValueLayout.JAVA_LONG;
 
         /**
          * The {@code long long} native type.
          */
-        public static final ValueLayout.OfLong C_LONG_LONG = ValueLayout.JAVA_LONG.withBitAlignment(64);
+        public static final ValueLayout.OfLong C_LONG_LONG = ValueLayout.JAVA_LONG;
 
         /**
          * The {@code float} native type.
          */
-        public static final ValueLayout.OfFloat C_FLOAT = ValueLayout.JAVA_FLOAT.withBitAlignment(32);
+        public static final ValueLayout.OfFloat C_FLOAT = ValueLayout.JAVA_FLOAT;
 
         /**
          * The {@code double} native type.
          */
-        public static final ValueLayout.OfDouble C_DOUBLE = ValueLayout.JAVA_DOUBLE.withBitAlignment(64);
+        public static final ValueLayout.OfDouble C_DOUBLE = ValueLayout.JAVA_DOUBLE;
 
         /**
          * The {@code T*} native type.
          */
-        public static final ValueLayout.OfAddress C_POINTER = ValueLayout.ADDRESS.withBitAlignment(64).asUnbounded();
+        public static final AddressLayout C_POINTER = SharedUtils.C_POINTER;
 
-        /**
-         * The {@code va_list} native type, as it is passed to a function.
-         */
-        public static final ValueLayout.OfAddress C_VA_LIST = AArch64.C_POINTER;
     }
 
     public static final class RISCV64 {
-        private RISCV64() {
-            //just the one
-        }
+
+        // Suppresses default constructor, ensuring non-instantiability.
+        private RISCV64() {}
 
         /**
          * The {@code bool} native type.
@@ -236,51 +224,47 @@ public final class PlatformLayouts {
         /**
          * The {@code short} native type.
          */
-        public static final ValueLayout.OfShort C_SHORT = ValueLayout.JAVA_SHORT.withBitAlignment(16);
+        public static final ValueLayout.OfShort C_SHORT = ValueLayout.JAVA_SHORT;
 
         /**
          * The {@code int} native type.
          */
-        public static final ValueLayout.OfInt C_INT = ValueLayout.JAVA_INT.withBitAlignment(32);
+        public static final ValueLayout.OfInt C_INT = ValueLayout.JAVA_INT;
 
         /**
          * The {@code long} native type.
          */
-        public static final ValueLayout.OfLong C_LONG = ValueLayout.JAVA_LONG.withBitAlignment(64);
+        public static final ValueLayout.OfLong C_LONG = ValueLayout.JAVA_LONG;
 
         /**
          * The {@code long long} native type.
          */
-        public static final ValueLayout.OfLong C_LONG_LONG = ValueLayout.JAVA_LONG.withBitAlignment(64);
+        public static final ValueLayout.OfLong C_LONG_LONG = ValueLayout.JAVA_LONG;
 
         /**
          * The {@code float} native type.
          */
-        public static final ValueLayout.OfFloat C_FLOAT = ValueLayout.JAVA_FLOAT.withBitAlignment(32);
+        public static final ValueLayout.OfFloat C_FLOAT = ValueLayout.JAVA_FLOAT;
 
         /**
          * The {@code double} native type.
          */
-        public static final ValueLayout.OfDouble C_DOUBLE = ValueLayout.JAVA_DOUBLE.withBitAlignment(64);
+        public static final ValueLayout.OfDouble C_DOUBLE = ValueLayout.JAVA_DOUBLE;
 
         /**
          * The {@code T*} native type.
          */
-        public static final ValueLayout.OfAddress C_POINTER = ValueLayout.ADDRESS.withBitAlignment(64).asUnbounded();
+        public static final AddressLayout C_POINTER = SharedUtils.C_POINTER;
 
-        /**
-         * The {@code va_list} native type, as it is passed to a function.
-         */
-        public static final ValueLayout.OfAddress C_VA_LIST = RISCV64.C_POINTER;
     }
 
     /**
      * This class defines layout constants modelling standard primitive types supported by the PPC64LE SystemV ABI.
      */
     public static final class SysVPPC64le {
-        private SysVPPC64le() {
-            //just the one
-        }
+
+        // Suppresses default constructor, ensuring non-instantiability.
+        private SysVPPC64le() {}
 
         /**
          * The {@code bool} native type.
@@ -295,51 +279,47 @@ public final class PlatformLayouts {
         /**
          * The {@code short} native type.
          */
-        public static final ValueLayout.OfShort C_SHORT = ValueLayout.JAVA_SHORT.withBitAlignment(16);
+        public static final ValueLayout.OfShort C_SHORT = ValueLayout.JAVA_SHORT;
 
         /**
          * The {@code int} native type.
          */
-        public static final ValueLayout.OfInt C_INT = ValueLayout.JAVA_INT.withBitAlignment(32);
+        public static final ValueLayout.OfInt C_INT = ValueLayout.JAVA_INT;
 
         /**
          * The {@code long} native type.
          */
-        public static final ValueLayout.OfLong C_LONG = ValueLayout.JAVA_LONG.withBitAlignment(64);
+        public static final ValueLayout.OfLong C_LONG = ValueLayout.JAVA_LONG;
 
         /**
          * The {@code long long} native type.
          */
-        public static final ValueLayout.OfLong C_LONG_LONG = ValueLayout.JAVA_LONG.withBitAlignment(64);
+        public static final ValueLayout.OfLong C_LONG_LONG = ValueLayout.JAVA_LONG;
 
         /**
          * The {@code float} native type.
          */
-        public static final ValueLayout.OfFloat C_FLOAT = ValueLayout.JAVA_FLOAT.withBitAlignment(32);
+        public static final ValueLayout.OfFloat C_FLOAT = ValueLayout.JAVA_FLOAT;
 
         /**
          * The {@code double} native type.
          */
-        public static final ValueLayout.OfDouble C_DOUBLE = ValueLayout.JAVA_DOUBLE.withBitAlignment(64);
+        public static final ValueLayout.OfDouble C_DOUBLE = ValueLayout.JAVA_DOUBLE;
 
         /**
          * The {@code T*} native type.
          */
-        public static final ValueLayout.OfAddress C_POINTER = ValueLayout.ADDRESS.withBitAlignment(64).asUnbounded();
+        public static final AddressLayout C_POINTER = SharedUtils.C_POINTER;
 
-        /**
-         * The {@code va_list} native type, as it is passed to a function.
-         */
-        public static final ValueLayout.OfAddress C_VA_LIST = SysVPPC64le.C_POINTER;
     }
 
     /**
      * This class defines layout constants modelling standard primitive types supported by the s390x SystemV ABI.
      */
     public static final class SysVS390x {
-        private SysVS390x() {
-            //just the one
-        }
+
+        // Suppresses default constructor, ensuring non-instantiability.
+        private SysVS390x() {}
 
         /**
          * The {@code bool} native type.
@@ -354,51 +334,47 @@ public final class PlatformLayouts {
         /**
          * The {@code short} native type.
          */
-        public static final ValueLayout.OfShort C_SHORT = ValueLayout.JAVA_SHORT.withBitAlignment(16);
+        public static final ValueLayout.OfShort C_SHORT = ValueLayout.JAVA_SHORT;
 
         /**
          * The {@code int} native type.
          */
-        public static final ValueLayout.OfInt C_INT = ValueLayout.JAVA_INT.withBitAlignment(32);
+        public static final ValueLayout.OfInt C_INT = ValueLayout.JAVA_INT;
 
         /**
          * The {@code long} native type.
          */
-        public static final ValueLayout.OfLong C_LONG = ValueLayout.JAVA_LONG.withBitAlignment(64);
+        public static final ValueLayout.OfLong C_LONG = ValueLayout.JAVA_LONG;
 
         /**
          * The {@code long long} native type.
          */
-        public static final ValueLayout.OfLong C_LONG_LONG = ValueLayout.JAVA_LONG.withBitAlignment(64);
+        public static final ValueLayout.OfLong C_LONG_LONG = ValueLayout.JAVA_LONG;
 
         /**
          * The {@code float} native type.
          */
-        public static final ValueLayout.OfFloat C_FLOAT = ValueLayout.JAVA_FLOAT.withBitAlignment(32);
+        public static final ValueLayout.OfFloat C_FLOAT = ValueLayout.JAVA_FLOAT;
 
         /**
          * The {@code double} native type.
          */
-        public static final ValueLayout.OfDouble C_DOUBLE = ValueLayout.JAVA_DOUBLE.withBitAlignment(64);
+        public static final ValueLayout.OfDouble C_DOUBLE = ValueLayout.JAVA_DOUBLE;
 
         /**
          * The {@code T*} native type.
          */
-        public static final ValueLayout.OfAddress C_POINTER = ValueLayout.ADDRESS.withBitAlignment(64).asUnbounded();
+        public static final AddressLayout C_POINTER = SharedUtils.C_POINTER;
 
-        /**
-         * The {@code va_list} native type, as it is passed to a function.
-         */
-        public static final ValueLayout.OfAddress C_VA_LIST = SysVS390x.C_POINTER;
     }
 
     /**
      * This class defines layout constants modelling standard primitive types supported by the AIX PPC64 ABI.
      */
     public static final class AIX {
-        private AIX() {
-            //just the one
-        }
+
+        // Suppresses default constructor, ensuring non-instantiability.
+        private AIX() {}
 
         /**
          * The {@code bool} native type.
@@ -413,41 +389,37 @@ public final class PlatformLayouts {
         /**
          * The {@code short} native type.
          */
-        public static final ValueLayout.OfShort C_SHORT = ValueLayout.JAVA_SHORT.withBitAlignment(16);
+        public static final ValueLayout.OfShort C_SHORT = ValueLayout.JAVA_SHORT;
 
         /**
          * The {@code int} native type.
          */
-        public static final ValueLayout.OfInt C_INT = ValueLayout.JAVA_INT.withBitAlignment(32);
+        public static final ValueLayout.OfInt C_INT = ValueLayout.JAVA_INT;
 
         /**
          * The {@code long} native type.
          */
-        public static final ValueLayout.OfInt C_LONG = ValueLayout.JAVA_INT.withBitAlignment(32);
+        public static final ValueLayout.OfInt C_LONG = ValueLayout.JAVA_INT;
 
         /**
          * The {@code long long} native type.
          */
-        public static final ValueLayout.OfLong C_LONG_LONG = ValueLayout.JAVA_LONG.withBitAlignment(64);
+        public static final ValueLayout.OfLong C_LONG_LONG = ValueLayout.JAVA_LONG;
 
         /**
          * The {@code float} native type.
          */
-        public static final ValueLayout.OfFloat C_FLOAT = ValueLayout.JAVA_FLOAT.withBitAlignment(32);
+        public static final ValueLayout.OfFloat C_FLOAT = ValueLayout.JAVA_FLOAT;
 
         /**
          * The {@code double} native type.
          */
-        public static final ValueLayout.OfDouble C_DOUBLE = ValueLayout.JAVA_DOUBLE.withBitAlignment(32);
+        public static final ValueLayout.OfDouble C_DOUBLE = ValueLayout.JAVA_DOUBLE;
 
         /**
          * The {@code T*} native type.
          */
-        public static final ValueLayout.OfAddress C_POINTER = ValueLayout.ADDRESS.withBitAlignment(64).asUnbounded();
+        public static final AddressLayout C_POINTER = SharedUtils.C_POINTER;
 
-        /**
-         * The {@code va_list} native type, as it is passed to a function.
-         */
-        public static final ValueLayout.OfAddress C_VA_LIST = AIX.C_POINTER;
     }
 }

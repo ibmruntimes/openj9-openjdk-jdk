@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2023, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -21,21 +21,25 @@
  * questions.
  */
 
-#include <stdarg.h>
+/*
+ * @test
+ * @bug 8306927
+ * @modules jdk.localedata
+ * @summary Tests Swedish collation involving 'v' and 'w'.
+ */
 
-#ifdef _WIN64
-#define EXPORT __declspec(dllexport)
-#else
-#define EXPORT
-#endif
+import java.text.Collator;
+import java.util.Arrays;
+import java.util.Locale;
 
-EXPORT void vaList(int argCount, va_list list) {
-    //...
-}
+public class SwedishTest {
+    private static final String[] src = {"wb", "va", "vc"};
+    private static final String[] expected = {"va", "vc", "wb"};
 
-EXPORT void ellipsis(int argCount, ...) {
-    va_list list;
-    va_start(list, argCount);
-    vaList(argCount, list);
-    va_end(list);
+    public static void main (String[] args) {
+        Arrays.sort(src, Collator.getInstance(Locale.of("sv")));
+        if (!Arrays.equals(src, expected)) {
+            throw new RuntimeException("Swedish collation failed");
+        }
+    }
 }

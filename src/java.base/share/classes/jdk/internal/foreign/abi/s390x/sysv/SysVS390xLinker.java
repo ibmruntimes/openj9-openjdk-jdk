@@ -35,18 +35,14 @@ import jdk.internal.foreign.abi.AbstractLinker;
 import jdk.internal.foreign.abi.LinkerOptions;
 
 import java.lang.foreign.FunctionDescriptor;
-import java.lang.foreign.MemorySegment;
-import java.lang.foreign.SegmentScope;
-import java.lang.foreign.VaList;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodType;
-import java.util.function.Consumer;
 
 /**
  * ABI implementation based on System V ABI s390x
  *
- * Note: This file is copied from x64/sysv with modification to accommodate the specifics
- * on Linux/s390x and might be updated accordingly in terms of VaList in the future.
+ * Note: This file is copied from x64/sysv with modification to accommodate
+ * the specifics on Linux/s390x.
  */
 public final class SysVS390xLinker extends AbstractLinker {
 
@@ -68,21 +64,7 @@ public final class SysVS390xLinker extends AbstractLinker {
     }
 
     @Override
-    protected UpcallStubFactory arrangeUpcall(MethodType mt, FunctionDescriptor cDesc) {
-        return CallArranger.arrangeUpcall(mt, cDesc);
-    }
-
-    public static VaList newVaList(Consumer<VaList.Builder> actions, SegmentScope scope) {
-        SysVS390xVaList.Builder builder = SysVS390xVaList.builder(scope);
-        actions.accept(builder);
-        return builder.build();
-    }
-
-    public static VaList newVaListOfAddress(long address, SegmentScope scope) {
-        return SysVS390xVaList.ofAddress(address, scope);
-    }
-
-    public static VaList emptyVaList() {
-        return SysVS390xVaList.empty();
+    protected UpcallStubFactory arrangeUpcall(MethodType targetType, FunctionDescriptor function, LinkerOptions options) {
+        return CallArranger.arrangeUpcall(targetType, function, options);
     }
 }

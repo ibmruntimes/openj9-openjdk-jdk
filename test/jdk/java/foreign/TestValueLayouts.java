@@ -22,6 +22,12 @@
  */
 
 /*
+ * ===========================================================================
+ * (c) Copyright IBM Corp. 2023, 2023 All Rights Reserved
+ * ===========================================================================
+ */
+
+/*
  * @test
  * @enablePreview
  * @modules java.base/jdk.internal.misc
@@ -38,6 +44,8 @@ import static java.lang.foreign.ValueLayout.*;
 import static org.testng.Assert.*;
 
 public class TestValueLayouts {
+
+    static final boolean isAixOS = System.getProperty("os.name").equals("AIX");
 
     @Test
     public void testByte() {
@@ -138,7 +146,7 @@ public class TestValueLayouts {
         assertEquals(layout.carrier(), carrier);
         assertEquals(layout.bitSize(), bitSize);
         assertEquals(layout.order(), ByteOrder.nativeOrder());
-        assertEquals(layout.bitAlignment(), bitAlignment);
+        assertEquals(layout.bitAlignment(), (isAixOS && (layout == JAVA_DOUBLE)) ? 32 : bitAlignment);
         assertTrue(layout.name().isEmpty());
         assertEquals(layout.byteSize(), layout.bitSize() / 8);
         assertEquals(layout.byteAlignment(), layout.bitAlignment() / 8);

@@ -32,6 +32,7 @@
 
 package jdk.internal.foreign.abi.aarch64;
 
+import java.lang.foreign.AddressLayout;
 import java.lang.foreign.FunctionDescriptor;
 import java.lang.foreign.GroupLayout;
 import java.lang.foreign.MemoryLayout;
@@ -51,16 +52,12 @@ import jdk.internal.foreign.abi.aarch64.macos.MacOsAArch64CallArranger;
 import jdk.internal.foreign.abi.aarch64.windows.WindowsAArch64CallArranger;
 import jdk.internal.foreign.Utils;
 
-import java.lang.foreign.SegmentScope;
 import java.lang.foreign.ValueLayout;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodType;
 import java.util.List;
 import java.util.Optional;
 
-import sun.security.action.GetPropertyAction;
-
-import static jdk.internal.foreign.PlatformLayouts.*;
 import static jdk.internal.foreign.abi.aarch64.AArch64Architecture.*;
 import static jdk.internal.foreign.abi.aarch64.AArch64Architecture.Regs.*;
 
@@ -81,8 +78,6 @@ public abstract class CallArranger {
 
     private static final VMStorage INDIRECT_RESULT = r8;
 
-    private static final boolean isWinOS = GetPropertyAction.privilegedGetProperty("os.name").startsWith("Windows");
-
     // This is derived from the AAPCS64 spec, restricted to what's
     // possible when calling to/from C code.
     //
@@ -93,7 +88,7 @@ public abstract class CallArranger {
     //
     // Although the AAPCS64 says r0-7 and v0-7 are all valid return
     // registers, it's not possible to generate a C function that uses
-    // r2-7 and v4-7 so they are omitted here.
+    // r2-7 and v4-7 so, they are omitted here.
     protected static final ABIDescriptor C = abiFor(
         new VMStorage[] { r0, r1, r2, r3, r4, r5, r6, r7, INDIRECT_RESULT},
         new VMStorage[] { v0, v1, v2, v3, v4, v5, v6, v7 },
@@ -169,7 +164,7 @@ public abstract class CallArranger {
 
         boolean returnInMemory = isInMemoryReturn(cDesc.returnLayout());
         if (returnInMemory) {
-            csb.addArgumentBindings(MemorySegment.class, AArch64.C_POINTER,
+            csb.addArgumentBindings(MemorySegment.class, SharedUtils.C_POINTER,
                     argCalc.getIndirectBindings());
         } else if (cDesc.returnLayout().isPresent()) {
             Class<?> carrier = mt.returnType();
@@ -191,18 +186,19 @@ public abstract class CallArranger {
 
     /* Replace DowncallLinker in OpenJDK with the implementation of DowncallLinker specific to OpenJ9 */
     public MethodHandle arrangeDowncall(MethodType mt, FunctionDescriptor cDesc, LinkerOptions options) {
-        if (isWinOS) {
+        if (Utils.IS_WINDOWS) {
             throw new InternalError("arrangeDowncall is not implemented on Windows/Aarch64");
         }
         return DowncallLinker.getBoundMethodHandle(mt, cDesc, options);
     }
 
     /* Replace UpcallLinker in OpenJDK with the implementation of UpcallLinker specific to OpenJ9 */
-    public UpcallStubFactory arrangeUpcall(MethodType mt, FunctionDescriptor cDesc) {
-        if (isWinOS) {
+    public UpcallStubFactory arrangeUpcall(MethodType mt, FunctionDescriptor cDesc,
+                                                          LinkerOptions options) {
+        if (Utils.IS_WINDOWS) {
             throw new InternalError("arrangeUpcall is not implemented on Windows/Aarch64");
         }
-        return UpcallLinker.makeFactory(mt, cDesc);
+        return UpcallLinker.makeFactory(mt, cDesc, options);
     }
 
     private static boolean isInMemoryReturn(Optional<MemoryLayout> returnLayout) {
@@ -437,7 +433,7 @@ public abstract class CallArranger {
                     assert carrier == MemorySegment.class;
                     bindings.copy(layout)
                             .unboxAddress();
-                    VMStorage storage = storageCalculator.nextStorage(StorageType.INTEGER, AArch64.C_POINTER);
+                    VMStorage storage = storageCalculator.nextStorage(StorageType.INTEGER, SharedUtils.C_POINTER);
                     bindings.vmStore(storage, long.class);
                 }
                 case POINTER -> {
@@ -472,7 +468,7 @@ public abstract class CallArranger {
         List<Binding> getIndirectBindings() {
             return Binding.builder()
                 .vmLoad(INDIRECT_RESULT, long.class)
-                .boxAddressRaw(Long.MAX_VALUE)
+                .boxAddressRaw(Long.MAX_VALUE, 1)
                 .build();
         }
 
@@ -488,22 +484,25 @@ public abstract class CallArranger {
                     StorageCalculator.StructStorage[] structStorages
                             = storageCalculator.structStorages((GroupLayout) layout, forHFA);
 
-                    for (StorageCalculator.StructStorage structStorage : structStorages) {
+                    for (StorageCalculator.StructStorage(
+                            long offset, Class<?> ca, int byteWidth, VMStorage storage
+                    ) : structStorages) {
                         bindings.dup();
-                        bindings.vmLoad(structStorage.storage(), structStorage.carrier())
-                                .bufferStore(structStorage.offset(), structStorage.carrier(), structStorage.byteWidth());
+                        bindings.vmLoad(storage, ca)
+                                .bufferStore(offset, ca, byteWidth);
                     }
                 }
                 case STRUCT_REFERENCE -> {
                     assert carrier == MemorySegment.class;
-                    VMStorage storage = storageCalculator.nextStorage(StorageType.INTEGER, AArch64.C_POINTER);
+                    VMStorage storage = storageCalculator.nextStorage(StorageType.INTEGER, SharedUtils.C_POINTER);
                     bindings.vmLoad(storage, long.class)
                             .boxAddress(layout);
                 }
                 case POINTER -> {
-                    VMStorage storage = storageCalculator.nextStorage(StorageType.INTEGER, (ValueLayout) layout);
+                    AddressLayout addressLayout = (AddressLayout) layout;
+                    VMStorage storage = storageCalculator.nextStorage(StorageType.INTEGER, addressLayout);
                     bindings.vmLoad(storage, long.class)
-                            .boxAddressRaw(Utils.pointeeSize(layout));
+                            .boxAddressRaw(Utils.pointeeByteSize(addressLayout), Utils.pointeeByteAlign(addressLayout));
                 }
                 case INTEGER -> {
                     VMStorage storage = storageCalculator.nextStorage(StorageType.INTEGER, (ValueLayout) layout);
