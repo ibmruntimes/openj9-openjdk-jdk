@@ -22,10 +22,17 @@
  */
 
 /*
+ * ===========================================================================
+ * (c) Copyright IBM Corp. 2023, 2023 All Rights Reserved
+ * ===========================================================================
+ */
+
+/*
  * @test
  * @enablePreview
  * @library ../ /test/lib
  * @requires ((os.arch == "amd64" | os.arch == "x86_64") & sun.arch.data.model == "64") | os.arch == "aarch64" | os.arch == "riscv64"
+ * | os.arch == "ppc64" | os.arch == "ppc64le" | os.arch == "s390x"
  * @requires vm.flavor != "zero"
  * @run testng/othervm --enable-native-access=ALL-UNNAMED TestTrivialUpcall
  */
