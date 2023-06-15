@@ -32,19 +32,23 @@
 /* Load the crypto library (return NULL on error) */
 void * load_crypto_library(jboolean traceEnabled) {
     void * result = NULL;
-    
+
+    const char *libname3 = "libcrypto.3.dylib";
     const char *libname = "libcrypto.1.1.dylib";
     const char *oldname = "libcrypto.1.0.0.dylib";
     const char *symlink = "libcrypto.dylib";
 
-    result = dlopen (libname,  RTLD_NOW);
+    result = dlopen (libname3,  RTLD_NOW);
     if (result == NULL) {
-        result = dlopen (oldname,  RTLD_NOW);
+        result = dlopen (libname,  RTLD_NOW);
         if (result == NULL) {
-            result = dlopen (symlink,  RTLD_NOW);
+            result = dlopen (oldname,  RTLD_NOW);
+            if (result == NULL) {
+                result = dlopen (symlink,  RTLD_NOW);
+            }
         }
     }
-
+    
     return result;
 }
 

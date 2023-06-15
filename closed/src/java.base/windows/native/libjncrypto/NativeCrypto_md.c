@@ -29,13 +29,16 @@
 /* Load the crypto library (return NULL on error) */
 void * load_crypto_library(jboolean traceEnabled) {
     void * result = NULL;
+    const char *libname3 = "libcrypto-3-x64.dll";
     const char *libname = "libcrypto-1_1-x64.dll";
     const char *oldname = "libeay32.dll";
 
-    result = LoadLibrary(libname);
-    
+    result = LoadLibrary(libname3);
     if (result == NULL) {
-        result = LoadLibrary(oldname);
+        result = LoadLibrary(libname);
+        if (result == NULL) {
+            result = LoadLibrary(oldname);
+        }
     }
 
     return result;
