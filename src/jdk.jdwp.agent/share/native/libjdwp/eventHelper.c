@@ -22,6 +22,11 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
+/*
+ * ===========================================================================
+ * (c) Copyright IBM Corp. 2023, 2023 All Rights Reserved
+ * ===========================================================================
+ */
 
 #include "util.h"
 #include "outStream.h"
@@ -29,6 +34,7 @@
 #include "threadControl.h"
 #include "invoker.h"
 #include "signature.h"
+#include "j9cfg.h"
 
 
 #define COMMAND_LOOP_THREAD_NAME "JDWP Event Helper Thread"
@@ -40,6 +46,9 @@
 #define COMMAND_REPORT_INVOKE_DONE              2
 #define COMMAND_REPORT_VM_INIT                  3
 #define COMMAND_SUSPEND_THREAD                  4
+#if defined(J9VM_OPT_CRIU_SUPPORT)
+#define COMMAND_REPORT_VM_RESTORE               5
+#endif /* defined(J9VM_OPT_CRIU_SUPPORT) */
 
 /*
  * Event helper thread command singleKinds
@@ -90,6 +99,13 @@ typedef struct ReportVMInitCommand {
     jthread thread;
 } ReportVMInitCommand;
 
+#if defined(J9VM_OPT_CRIU_SUPPORT)
+typedef struct ReportVMRestoreCommand {
+    jbyte suspendPolicy; /* NOTE: Must be the first field */
+    jthread thread;
+} ReportVMRestoreCommand;
+#endif /* defined(J9VM_OPT_CRIU_SUPPORT) */
+
 typedef struct SuspendThreadCommand {
     jthread thread;
 } SuspendThreadCommand;
@@ -112,6 +128,9 @@ typedef struct HelperCommand {
         ReportInvokeDoneCommand     reportInvokeDone;
         ReportVMInitCommand         reportVMInit;
         SuspendThreadCommand        suspendThread;
+#if defined(J9VM_OPT_CRIU_SUPPORT)
+        ReportVMRestoreCommand reportVMRestore;
+#endif /* defined(J9VM_OPT_CRIU_SUPPORT) */
     } u;
     /* composite array expand out, put nothing after */
 } HelperCommand;
@@ -605,6 +624,35 @@ handleReportVMInitCommand(JNIEnv* env, ReportVMInitCommand *command)
     /* Why aren't we tossing this: tossGlobalRef(env, &(command->thread)); */
 }
 
+#if defined(J9VM_OPT_CRIU_SUPPORT)
+static void
+handleReportVMRestoreCommand(JNIEnv *env, ReportVMRestoreCommand *command)
+{
+    PacketOutputStream out;
+    jbyte suspendPolicy = command->suspendPolicy;
+
+    if (JDWP_SUSPEND_POLICY(ALL) == suspendPolicy) {
+        (void)threadControl_suspendAll();
+    } else if (JDWP_SUSPEND_POLICY(EVENT_THREAD) == suspendPolicy) {
+        (void)threadControl_suspendThread(command->thread, JNI_FALSE);
+    }
+
+    outStream_initCommand(&out, uniqueID(), 0x0,
+                          JDWP_COMMAND_SET(Event),
+                          JDWP_COMMAND(Event, Composite));
+    (void)outStream_writeByte(&out, suspendPolicy);
+    (void)outStream_writeInt(&out, 1); /* Always one component */
+    (void)outStream_writeByte(&out, JDWP_EVENT(VM_RESTORE));
+    (void)outStream_writeInt(&out, 0); /* Not in response to an event req. */
+
+    (void)outStream_writeObjectRef(env, &out, command->thread);
+
+    outStream_sendCommand(&out);
+    outStream_destroy(&out);
+    tossGlobalRef(env, &command->thread);
+}
+#endif /* defined(J9VM_OPT_CRIU_SUPPORT) */
+
 static void
 handleSuspendThreadCommand(JNIEnv* env, SuspendThreadCommand *command)
 {
@@ -633,6 +681,11 @@ handleCommand(JNIEnv *env, HelperCommand *command)
         case COMMAND_SUSPEND_THREAD:
             handleSuspendThreadCommand(env, &command->u.suspendThread);
             break;
+#if defined(J9VM_OPT_CRIU_SUPPORT)
+        case COMMAND_REPORT_VM_RESTORE:
+            handleReportVMRestoreCommand(env, &command->u.reportVMRestore);
+            break;
+#endif /* defined(J9VM_OPT_CRIU_SUPPORT) */
         default:
             EXIT_ERROR(AGENT_ERROR_INVALID_EVENT_TYPE,"Event Helper Command");
             break;
@@ -1166,6 +1219,23 @@ eventHelper_reportVMInit(JNIEnv *env, jbyte sessionID, jthread thread, jbyte sus
     command->u.reportVMInit.suspendPolicy = suspendPolicy;
     enqueueCommand(command, JNI_TRUE, JNI_FALSE);
 }
+
+#if defined(J9VM_OPT_CRIU_SUPPORT)
+void
+eventHelper_reportVMRestore(JNIEnv *env, jbyte sessionID, jthread thread, jbyte suspendPolicy)
+{
+    HelperCommand *command = jvmtiAllocate(sizeof(*command));
+    if (NULL == command) {
+        EXIT_ERROR(AGENT_ERROR_OUT_OF_MEMORY, "HelperCommmand");
+    }
+    memset(command, 0, sizeof(*command));
+    command->commandKind = COMMAND_REPORT_VM_RESTORE;
+    command->sessionID = sessionID;
+    saveGlobalRef(env, thread, &command->u.reportVMRestore.thread);
+    command->u.reportVMRestore.suspendPolicy = suspendPolicy;
+    enqueueCommand(command, JNI_TRUE, JNI_FALSE);
+}
+#endif /* defined(J9VM_OPT_CRIU_SUPPORT) */
 
 void
 eventHelper_suspendThread(jbyte sessionID, jthread thread)

@@ -23,6 +23,11 @@
  * questions.
  */
 /*
+ * ===========================================================================
+ * (c) Copyright IBM Corp. 2023, 2023 All Rights Reserved
+ * ===========================================================================
+ */
+/*
  * eventFilter
  *
  * This module handles event filteration and the enabling/disabling
@@ -40,6 +45,7 @@
 #include "threadControl.h"
 #include "SDE.h"
 #include "jvmti.h"
+#include "j9cfg.h"
 
 typedef struct ClassFilter {
     jclass clazz;
@@ -1268,6 +1274,9 @@ enableEvents(HandlerNode *node)
         case EI_CLASS_UNLOAD:
         case EI_VIRTUAL_THREAD_START:
         case EI_VIRTUAL_THREAD_END:
+#if defined(J9VM_OPT_CRIU_SUPPORT)
+        case EI_VM_RESTORE:
+#endif /* defined(J9VM_OPT_CRIU_SUPPORT) */
             return error;
 
         case EI_FIELD_ACCESS:
@@ -1328,6 +1337,9 @@ disableEvents(HandlerNode *node)
         case EI_CLASS_UNLOAD:
         case EI_VIRTUAL_THREAD_START:
         case EI_VIRTUAL_THREAD_END:
+#if defined(J9VM_OPT_CRIU_SUPPORT)
+        case EI_VM_RESTORE:
+#endif /* defined(J9VM_OPT_CRIU_SUPPORT) */
             return error;
 
         case EI_FIELD_ACCESS:
