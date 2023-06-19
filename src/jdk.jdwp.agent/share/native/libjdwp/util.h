@@ -23,6 +23,12 @@
  * questions.
  */
 
+/*
+ * ===========================================================================
+ * (c) Copyright IBM Corp. 2023, 2024 All Rights Reserved
+ * ===========================================================================
+ */
+
 #ifndef JDWP_UTIL_H
 #define JDWP_UTIL_H
 
@@ -58,6 +64,7 @@
 #include "util_md.h"
 #include "error_messages.h"
 #include "debugInit.h"
+#include "j9cfg.h"
 
 /* Definition of a CommonRef tracked by the backend for the frontend */
 typedef struct RefNode {
@@ -176,8 +183,13 @@ typedef enum {
         EI_VM_DEATH             = 20,
         EI_VIRTUAL_THREAD_START = 21,
         EI_VIRTUAL_THREAD_END   = 22,
+#if defined(J9VM_OPT_CRIU_SUPPORT)
+        EI_VM_RESTORE           = 23,
 
+        EI_max                  = 23
+#else /* defined(J9VM_OPT_CRIU_SUPPORT) */
         EI_max                  = 22
+#endif /* defined(J9VM_OPT_CRIU_SUPPORT) */
 } EventIndex;
 
 /* Agent errors that might be in a jvmtiError for JDWP or internal.
