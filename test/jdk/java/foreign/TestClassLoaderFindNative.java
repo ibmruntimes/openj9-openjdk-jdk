@@ -30,13 +30,14 @@
 /*
  * @test
  * @enablePreview
- * @requires ((os.arch == "amd64" | os.arch == "x86_64") & sun.arch.data.model == "64") | os.arch == "aarch64" | os.arch == "riscv64"
- * | os.arch == "ppc64" | os.arch == "ppc64le" | os.arch == "s390x"
+ * @requires jdk.foreign.linker != "UNSUPPORTED"
  * @run testng/othervm --enable-native-access=ALL-UNNAMED TestClassLoaderFindNative
  */
 
+import java.lang.foreign.Arena;
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.SymbolLookup;
+import java.lang.foreign.ValueLayout;
 import org.testng.annotations.Test;
 
 import static java.lang.foreign.ValueLayout.JAVA_BYTE;
@@ -64,13 +65,15 @@ public class TestClassLoaderFindNative {
 
     @Test
     public void testVariableSymbolLookup() {
-        MemorySegment segment = SymbolLookup.loaderLookup().find("c").get().reinterpret(1);
-        /* JAVA_INT applies to both Little-Endian and Big-Endian
-         * platforms given the one-byte int value is stored at the
-         * highest address(offset 3) of the int type in native on
-         * the Big-Endian platforms.
-         * See libLookupTest.c
+        MemorySegment segment = SymbolLookup.loaderLookup().find("c").get();
+        /* The variable is 'int c;', so JAVA_INT is a better choice than JAVA_BYTE.
+         * See libLookupTest.c.
          */
         assertEquals(segment.get(ValueLayout.JAVA_INT, 0), 42);
+    }
+
+    @Test
+    void testLoadLibraryBadLookupName() {
+        assertTrue(SymbolLookup.loaderLookup().find("f\u0000foobar").isEmpty());
     }
 }

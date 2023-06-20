@@ -37,6 +37,7 @@ import jdk.internal.foreign.abi.LinkerOptions;
 import java.lang.foreign.FunctionDescriptor;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodType;
+import java.nio.ByteOrder;
 
 /**
  * ABI implementation based on 64-bit PowerPC ELF ABI
@@ -66,5 +67,10 @@ public final class AixPPC64Linker extends AbstractLinker {
     @Override
     protected UpcallStubFactory arrangeUpcall(MethodType targetType, FunctionDescriptor function, LinkerOptions options) {
         return CallArranger.arrangeUpcall(targetType, function, options);
+    }
+
+    @Override
+    protected ByteOrder linkerByteOrder() {
+        return ByteOrder.BIG_ENDIAN;
     }
 }
