@@ -61,13 +61,21 @@ import java.util.concurrent.locks.ReentrantLock;
  * will fail.
  */
 public final class NativeLibraries {
-    private static final boolean loadLibraryOnlyIfPresent = ClassLoaderHelper.loadLibraryOnlyIfPresent();
+    private static boolean loadLibraryOnlyIfPresent;
     private final Map<String, NativeLibraryImpl> libraries = new ConcurrentHashMap<>();
     private final ClassLoader loader;
     // caller, if non-null, is the fromClass parameter for NativeLibraries::loadLibrary
     // unless specified
     private final Class<?> caller;      // may be null
     private final boolean searchJavaLibraryPath;
+
+    // The loadLibraryOnlyIfPresent is lazily initialized to avoid OpenJ9 bootstrap issue.
+    // This lazy initialization is only required by macOS.
+    private static boolean loadLibraryOnlyIfPresentInitialized;
+    private static void initLoadLibraryOnlyIfPresent() {
+        loadLibraryOnlyIfPresent = ClassLoaderHelper.loadLibraryOnlyIfPresent();
+        loadLibraryOnlyIfPresentInitialized = true;
+    }
 
     /**
      * Creates a NativeLibraries instance for loading JNI native libraries
@@ -130,6 +138,9 @@ public final class NativeLibraries {
             name = AccessController.doPrivileged(new PrivilegedAction<>() {
                     public String run() {
                         try {
+                            if (!loadLibraryOnlyIfPresentInitialized) {
+                                initLoadLibraryOnlyIfPresent();
+                            }
                             if (loadLibraryOnlyIfPresent && !file.exists()) {
                                 return null;
                             }
@@ -340,6 +351,9 @@ public final class NativeLibraries {
 
         @SuppressWarnings("removal")
         private boolean throwExceptionIfFail() {
+            if (!loadLibraryOnlyIfPresentInitialized) {
+                initLoadLibraryOnlyIfPresent();
+            }
             if (loadLibraryOnlyIfPresent) return true;
 
             // If the file exists but fails to load, UnsatisfiedLinkException thrown by the VM
