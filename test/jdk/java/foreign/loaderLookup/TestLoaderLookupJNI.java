@@ -21,12 +21,6 @@
  *  questions.
  */
 
-/*
- * ===========================================================================
- * (c) Copyright IBM Corp. 2022, 2022 All Rights Reserved
- * ===========================================================================
- */
-
 import org.testng.annotations.Test;
 
 import java.lang.foreign.SymbolLookup;
@@ -36,8 +30,7 @@ import static org.testng.Assert.*;
 /*
  * @test
  * @enablePreview
- * @requires ((os.arch == "amd64" | os.arch == "x86_64") & sun.arch.data.model == "64") | os.arch == "aarch64" | os.arch == "riscv64"
- * | os.arch == "ppc64" | os.arch == "ppc64le" | os.arch == "s390x"
+ * @requires jdk.foreign.linker != "UNSUPPORTED"
  * @run testng/othervm TestLoaderLookupJNI
  */
 public class TestLoaderLookupJNI {

@@ -23,16 +23,9 @@
  */
 
 /*
- * ===========================================================================
- * (c) Copyright IBM Corp. 2022, 2022 All Rights Reserved
- * ===========================================================================
- */
-
-/*
  * @test
  * @enablePreview
- * @requires ((os.arch == "amd64" | os.arch == "x86_64") & sun.arch.data.model == "64") | os.arch == "aarch64" | os.arch == "riscv64"
- * | os.arch == "ppc64" | os.arch == "ppc64le" | os.arch == "s390x"
+ * @requires jdk.foreign.linker != "UNSUPPORTED"
  * @modules java.base/jdk.internal.foreign
  * @build NativeTestHelper CallGeneratorHelper TestUpcallHighArity
  *
@@ -62,7 +55,7 @@ public class TestUpcallHighArity extends CallGeneratorHelper {
         C_POINTER.withName("p0"),
         C_DOUBLE.withName("p1"),
         C_INT.withName("p2"),
-        MemoryLayout.paddingLayout(32)
+        MemoryLayout.paddingLayout(4)
     );
 
     static {

@@ -513,15 +513,11 @@ public class Thread implements Runnable {
             if (currentThread() instanceof VirtualThread vthread) {
                 vthread.sleepNanos(nanos);
             } else {
-                sleep0(millis);
+                sleepImpl(millis, 0);
             }
         } finally {
             afterSleep(event);
         }
-    }
-
-    private static void sleep0(long millis) throws InterruptedException {
-        sleepImpl(millis, 0);
     }
 
     private static native void sleepImpl(long millis, int nanos);
@@ -566,11 +562,7 @@ public class Thread implements Runnable {
             if (currentThread() instanceof VirtualThread vthread) {
                 vthread.sleepNanos(totalNanos);
             } else {
-                // millisecond precision
-                if (nanos > 0 && millis < Long.MAX_VALUE) {
-                    millis++;
-                }
-                sleep0(millis);
+                sleepImpl(millis, nanos);
             }
         } finally {
             afterSleep(event);
@@ -604,12 +596,7 @@ public class Thread implements Runnable {
             if (currentThread() instanceof VirtualThread vthread) {
                 vthread.sleepNanos(nanos);
             } else {
-                // millisecond precision
-                long millis = NANOSECONDS.toMillis(nanos);
-                if (nanos > MILLISECONDS.toNanos(millis)) {
-                    millis += 1L;
-                }
-                sleep0(millis);
+                sleepImpl(nanos / 1_000_000L, (int)(nanos % 1_000_000L));
             }
         } finally {
             afterSleep(event);
