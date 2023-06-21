@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2023, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -21,30 +21,33 @@
  * questions.
  */
 
-/* @test
- * @bug 4422044
- * @summary Ensure that keys in available-charset map
- *          are identical to canonical names
- * @run junit AvailableCharsetNames
+/*
+ * @test
+ * @bug 8309266
+ * @summary Integer overflow in LoopLimit::Value during PhaseCCP::analyze, triggered by the Phi Node from "flag ? Integer.MAX_VALUE : 1000"
+ * @run main/othervm -Xbatch -XX:CompileOnly=compiler.loopopts.TestLoopLimitOverflowDuringCCP::* compiler.loopopts.TestLoopLimitOverflowDuringCCP
  */
 
-import java.nio.charset.Charset;
+package compiler.loopopts;
 
-import org.junit.jupiter.api.Test;
+public class TestLoopLimitOverflowDuringCCP {
+    static boolean flag;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+    public static void main(String[] strArr) {
+        for (int i = 0; i < 10000; i++) {
+            flag = !flag;
+            test();
+        }
+    }
 
-public class AvailableCharsetNames {
-
-    /**
-     * Test that the keys in Charset.availableCharsets()
-     * are equal to the associated Charset.name() value.
-     */
-    @Test
-    public void canonicalNamesTest() {
-        for (String charsetName : Charset.availableCharsets().keySet()) {
-            Charset charset = Charset.forName(charsetName);
-            assertEquals(charset.name(), charsetName, "Charset name mismatch");
+    public static void test() {
+        int limit = flag ? Integer.MAX_VALUE : 1000;
+        int i = 0;
+        while (i < limit) {
+            i += 3;
+            if (flag) {
+                return;
+            }
         }
     }
 }

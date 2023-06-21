@@ -1,10 +1,12 @@
 /*
- * Copyright (c) 2010, 2023, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2023, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License version 2 only, as
- * published by the Free Software Foundation.
+ * published by the Free Software Foundation.  Oracle designates this
+ * particular file as subject to the "Classpath" exception as provided
+ * by Oracle in the LICENSE file that accompanied this code.
  *
  * This code is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
@@ -20,31 +22,16 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
+package jdk.internal.net.http.common;
 
-/* @test
- * @bug 4422044
- * @summary Ensure that keys in available-charset map
- *          are identical to canonical names
- * @run junit AvailableCharsetNames
+/**
+ * A static class to define ALPN constant strings used
+ * internally by the HttpClient
  */
+public final class Alpns {
+    private Alpns() { throw new InternalError(); }
 
-import java.nio.charset.Charset;
-
-import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
-public class AvailableCharsetNames {
-
-    /**
-     * Test that the keys in Charset.availableCharsets()
-     * are equal to the associated Charset.name() value.
-     */
-    @Test
-    public void canonicalNamesTest() {
-        for (String charsetName : Charset.availableCharsets().keySet()) {
-            Charset charset = Charset.forName(charsetName);
-            assertEquals(charset.name(), charsetName, "Charset name mismatch");
-        }
-    }
+    public static final String HTTP_1_1 = "http/1.1";
+    public static final String H2 = "h2";
+    public static final String H2C = "h2c";
 }
