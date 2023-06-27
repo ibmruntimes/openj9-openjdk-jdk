@@ -23,12 +23,6 @@
  */
 
 /*
- * ===========================================================================
- * (c) Copyright IBM Corp. 2022, 2022 All Rights Reserved
- * ===========================================================================
- */
-
-/*
  * @test
  * @enablePreview
  * @requires jdk.foreign.linker != "UNSUPPORTED"
@@ -53,13 +47,10 @@ import java.lang.invoke.VarHandle;
 import java.util.ArrayList;
 import java.util.List;
 
-import java.lang.foreign.ValueLayout;
-import static java.lang.foreign.ValueLayout.*;
 import static java.lang.foreign.MemoryLayout.PathElement.*;
 
 public class TestVarArgs extends CallGeneratorHelper {
 
-    private static boolean isAixOS = System.getProperty("os.name").toLowerCase().contains("aix");
     static final VarHandle VH_IntArray = C_INT.arrayElementVarHandle();
     static final MethodHandle MH_CHECK;
 
@@ -190,14 +181,6 @@ public class TestVarArgs extends CallGeneratorHelper {
         try (Arena arena = Arena.ofConfined()) {
             MemorySegment seg = ptr.asSlice(0, layout)
                     .reinterpret(arena, null);
-            /* Vararg float is promoted to double (8 bytes) in native (See libVarArgs.c)
-             * in which case float must be converted back from double at the same memory
-             * address in java on the Big-Endian(BE) platforms such as AIX.
-             */
-            if (isAixOS && (layout instanceof ValueLayout) && (((ValueLayout)layout).carrier() == float.class)) {
-                MemorySegment doubleSegmt = MemorySegment.ofAddress(ptr, JAVA_DOUBLE.byteSize(), session);
-                seg.set(JAVA_FLOAT, 0, (float)doubleSegmt.get(JAVA_DOUBLE, 0));
-            }
             Object obj = getter.invoke(seg);
             varArg.check(obj);
         } catch (Throwable e) {
