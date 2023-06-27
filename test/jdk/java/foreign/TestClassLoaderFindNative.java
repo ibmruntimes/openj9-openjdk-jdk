@@ -23,7 +23,7 @@
 
 /*
  * ===========================================================================
- * (c) Copyright IBM Corp. 2022, 2022 All Rights Reserved
+ * (c) Copyright IBM Corp. 2022, 2023 All Rights Reserved
  * ===========================================================================
  */
 
@@ -37,10 +37,10 @@
 import java.lang.foreign.Arena;
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.SymbolLookup;
-import java.lang.foreign.ValueLayout;
 import org.testng.annotations.Test;
 
 import static java.lang.foreign.ValueLayout.JAVA_BYTE;
+import static java.lang.foreign.ValueLayout.JAVA_INT;
 import static org.testng.Assert.*;
 
 // FYI this test is run on 64-bit platforms only for now,
@@ -65,11 +65,11 @@ public class TestClassLoaderFindNative {
 
     @Test
     public void testVariableSymbolLookup() {
-        MemorySegment segment = SymbolLookup.loaderLookup().find("c").get();
+        MemorySegment segment = SymbolLookup.loaderLookup().find("c").get().reinterpret(JAVA_INT.byteSize());
         /* The variable is 'int c;', so JAVA_INT is a better choice than JAVA_BYTE.
          * See libLookupTest.c.
          */
-        assertEquals(segment.get(ValueLayout.JAVA_INT, 0), 42);
+        assertEquals(segment.get(JAVA_INT, 0), 42);
     }
 
     @Test
