@@ -40,6 +40,7 @@ AC_DEFUN_ONCE([CUSTOM_EARLY_HOOK],
   OPENJ9_PLATFORM_SETUP
   OPENJ9_CONFIGURE_CMAKE
   OPENJ9_CONFIGURE_COMPILERS
+  OPENJ9_CONFIGURE_CONTINUATION_PROFILE
   OPENJ9_CONFIGURE_CRIU_SUPPORT
   OPENJ9_CONFIGURE_CUDA
   OPENJ9_CONFIGURE_DDR
@@ -413,6 +414,25 @@ AC_DEFUN([OPENJ9_CONFIGURE_JITSERVER],
   fi
 
   AC_SUBST(OPENJ9_ENABLE_JITSERVER)
+])
+
+AC_DEFUN([OPENJ9_CONFIGURE_CONTINUATION_PROFILE],
+[
+  AC_MSG_CHECKING([for Continuation profiling])
+  AC_ARG_ENABLE([continuation-profiling], [AS_HELP_STRING([--enable-continuation-profiling], [enable Continuation allocation profiling @<:@disabled@:>@])])
+  OPENJ9_ENABLE_CONTINUATION_ALLOCATION_PROFILING=false
+
+  if test "x$enable_continuation_profiling" = xyes ; then
+    AC_MSG_RESULT([yes (explicitly enabled)])
+    OPENJ9_ENABLE_CONTINUATION_ALLOCATION_PROFILING=true
+  elif test "x$enable_continuation_profiling" = xno ; then
+    AC_MSG_RESULT([no (explicitly disabled)])
+  elif test "x$enable_continuation_profiling" = x ; then
+    AC_MSG_RESULT([no (default)])
+  else
+    AC_MSG_ERROR([--enable-continuation-profiling accepts no argument])
+  fi
+  AC_SUBST(OPENJ9_ENABLE_CONTINUATION_ALLOCATION_PROFILING)
 ])
 
 AC_DEFUN([OPENJ9_PLATFORM_SETUP],
