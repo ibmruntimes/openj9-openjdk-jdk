@@ -358,6 +358,24 @@ abstract class P11Key implements Key, Length {
                     new CK_ATTRIBUTE(CKA_SENSITIVE),
                     new CK_ATTRIBUTE(CKA_EXTRACTABLE),
         });
+
+        if ((SunPKCS11.mysunpkcs11 != null) && !SunPKCS11.isExportWrapKey.get()
+            && ("AES".equals(algorithm) || "TripleDES".equals(algorithm))
+        ) {
+            if (attrs[0].getBoolean() || attrs[1].getBoolean() || (attrs[2].getBoolean() == false)) {
+                try {
+                    byte[] key = SunPKCS11.mysunpkcs11.exportKey(session.id(), attrs, keyID);
+                    SecretKey secretKey = new SecretKeySpec(key, algorithm);
+                    return new P11SecretKeyFIPS(session, keyID, algorithm, keyLength, attrs, secretKey);
+                } catch (PKCS11Exception e) {
+                    // Attempt failed, create a P11SecretKey object.
+                    if (debug != null) {
+                        debug.println("Attempt failed, creating a SecretKey object for " + algorithm);
+                    }
+                }
+            }
+        }
+
         return new P11SecretKey(session, keyID, algorithm, keyLength, attrs);
     }
 
@@ -478,6 +496,29 @@ abstract class P11Key implements Key, Length {
             token.ensureValid();
             return null;
         }
+    }
+
+    private static final class P11SecretKeyFIPS extends P11Key implements SecretKey {
+        @Serial
+        private static final long serialVersionUID = -9186806495402041696L;
+        private final SecretKey key;
+
+        P11SecretKeyFIPS(Session session, long keyID, String algorithm,
+                int keyLength, CK_ATTRIBUTE[] attributes, SecretKey key) {
+            super(SECRET, session, keyID, algorithm, keyLength, attributes);
+            this.key = key;
+        }
+
+        @Override
+        public String getFormat() {
+            return "RAW";
+        }
+
+        @Override
+        byte[] getEncodedInternal() {
+            return key.getEncoded();
+        }
+
     }
 
     private static class P11SecretKey extends P11Key implements SecretKey {
