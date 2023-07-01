@@ -295,6 +295,13 @@ endif # OPENJ9_ENABLE_CRIU_SUPPORT
 FEATURE_SED_SCRIPT += $(call SedDisable,opt_methodHandle)
 FEATURE_SED_SCRIPT += $(call SedEnable,opt_openjdkMethodhandle)
 
+# Adjust Contination Allocation Profiling enablement flags.
+ifeq (true,$(OPENJ9_ENABLE_CONTINUATION_ALLOCATION_PROFILING))
+  FEATURE_SED_SCRIPT += $(call SedEnable,prof_continuationAllocation)
+else # OPENJ9_ENABLE_CONTINUATION_ALLOCATION_PROFILING
+  FEATURE_SED_SCRIPT += $(call SedDisable,prof_continuationAllocation)
+endif # OPENJ9_ENABLE_CONTINUATION_ALLOCATION_PROFILING
+
 # Disable windows rebase.
 SPEC_SED_SCRIPT += $(call SedDisable,uma_windowsRebase)
 
@@ -456,6 +463,12 @@ ifeq (true,$(OPENJ9_ENABLE_CMAKE))
 
   CMAKE_ARGS += -DJ9VM_OPT_METHOD_HANDLE=OFF
   CMAKE_ARGS += -DJ9VM_OPT_OPENJDK_METHODHANDLE=ON
+
+  ifeq (true,$(OPENJ9_ENABLE_CONTINUATION_ALLOCATION_PROFILING))
+    CMAKE_ARGS += -DJ9VM_PROF_CONTINUATION_ALLOCATION=ON
+  else # OPENJ9_ENABLE_CONTINUATION_ALLOCATION_PROFILING
+    CMAKE_ARGS += -DJ9VM_PROF_CONTINUATION_ALLOCATION=OFF
+  endif # OPENJ9_ENABLE_CONTINUATION_ALLOCATION_PROFILING
 
   # Propagate configure option '--disable-warnings-as-errors-omr' to OMR.
   ifeq (false,$(WARNINGS_AS_ERRORS_OMR))
