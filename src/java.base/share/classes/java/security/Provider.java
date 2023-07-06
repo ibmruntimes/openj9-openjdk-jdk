@@ -1293,8 +1293,10 @@ public abstract class Provider extends Properties {
         Service s = serviceMap.get(key);
         if (s == null) {
             s = legacyMap.get(key);
-            if (s != null && !s.isValid()) {
+            if (s != null && (!s.isValid() || !RestrictedSecurity.isServiceAllowed(s))) {
                 legacyMap.remove(key, s);
+                // don't return invalid or disallowed legacy services
+                s = null;
             }
         }
 
@@ -1336,7 +1338,7 @@ public abstract class Provider extends Properties {
             }
             if (!legacyMap.isEmpty()) {
                 legacyMap.entrySet().forEach(entry -> {
-                    if (!entry.getValue().isValid()) {
+                    if (!entry.getValue().isValid() || !RestrictedSecurity.isServiceAllowed(entry.getValue())) {
                         legacyMap.remove(entry.getKey(), entry.getValue());
                     } else {
                         set.add(entry.getValue());

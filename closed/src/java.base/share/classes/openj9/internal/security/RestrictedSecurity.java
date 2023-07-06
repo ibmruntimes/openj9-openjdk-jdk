@@ -585,10 +585,10 @@ public final class RestrictedSecurity {
                 // Provider with argument (provider name + optional argument).
                 providers.add(pNum - 1, providerName);
 
-                // Remove the provider's optional arguments if there are.
+                // Remove the provider's optional arguments if present.
                 pos = providerName.indexOf(' ');
                 providerName = (pos < 0) ? providerName.trim() : providerName.substring(0, pos).trim();
-                // Remove the provider's class package names if there are.
+                // Remove the provider's class package names if present.
                 pos = providerName.lastIndexOf('.');
                 providerName = (pos < 0) ? providerName : providerName.substring(pos + 1, providerName.length());
                 // Provider without arguments and package names.
@@ -673,7 +673,7 @@ public final class RestrictedSecurity {
                     continue;
                 }
 
-                // Remove the whitespaces in the format separator if there are.
+                // Remove the whitespaces in the format separator if present.
                 providerInfo = providerInfo.trim()
                         .replaceAll("\\[\\s+\\{", "[{")
                         .replaceAll("\\}\\s+\\]", "}]")
@@ -759,6 +759,10 @@ public final class RestrictedSecurity {
 
             if (constraints == null) {
                 // Disallow unknown providers.
+                if (debug != null) {
+                    debug.println("Security constraints check."
+                            + " Disallow unknown provider: " + providerName);
+                }
                 return false;
             } else if (constraints.length == 0) {
                 // Allow this provider with no constraints.
@@ -779,7 +783,7 @@ public final class RestrictedSecurity {
                     continue;
                 }
                 if (!isAsterisk(cAlgorithm) && !algorithm.equalsIgnoreCase(cAlgorithm)) {
-                    // The constraint doesn't apply to the service algorith.
+                    // The constraint doesn't apply to the service algorithm.
                     continue;
                 }
 
@@ -789,7 +793,7 @@ public final class RestrictedSecurity {
                         debug.println("Security constraints check."
                                 + " Service type: " + type
                                 + " Algorithm: " + algorithm
-                                + " is allowed in provider " + providerName);
+                                + " is allowed in provider: " + providerName);
                     }
                     return true;
                 }
@@ -832,7 +836,7 @@ public final class RestrictedSecurity {
                 debug.println("Security constraints check."
                         + " Service type: " + type
                         + " Algorithm: " + algorithm
-                        + " is NOT allowed in provider " + providerName);
+                        + " is NOT allowed in provider: " + providerName);
             }
             // No match for any constraint, return NOT allowed.
             return false;
@@ -849,11 +853,11 @@ public final class RestrictedSecurity {
                 debug.println("Checking the provider " + providerName + " in restricted security mode.");
             }
 
-            // Remove argument, e.g. -NSS-FIPS, if there is.
+            // Remove argument, e.g. -NSS-FIPS, if present.
             int pos = providerName.indexOf('-');
             providerName = (pos < 0) ? providerName : providerName.substring(0, pos);
 
-            // Remove the provider class package name if there is.
+            // Remove the provider class package name if present.
             pos = providerName.lastIndexOf('.');
             providerName = (pos < 0) ? providerName : providerName.substring(pos + 1, providerName.length());
 
