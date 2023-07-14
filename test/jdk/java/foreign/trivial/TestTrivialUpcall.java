@@ -22,6 +22,12 @@
  */
 
 /*
+ * ===========================================================================
+ * (c) Copyright IBM Corp. 2023, 2023 All Rights Reserved
+ * ===========================================================================
+ */
+
+/*
  * @test
  * @enablePreview
  * @library ../ /test/lib
@@ -45,7 +51,7 @@ public class TestTrivialUpcall extends UpcallTestHelper {
     @Test
     public void testUpcallFailure() throws IOException, InterruptedException {
         // test to see if we catch a trivial downcall doing an upcall
-        runInNewProcess(Runner.class, true).assertStdOutContains("wrong thread state for upcall");
+        runInNewProcess(Runner.class, true).assertStdErrContains("wrong thread state for upcall");
     }
 
     public static class Runner extends NativeTestHelper {
