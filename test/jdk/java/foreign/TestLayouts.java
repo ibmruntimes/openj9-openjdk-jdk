@@ -22,12 +22,6 @@
  */
 
 /*
- * ===========================================================================
- * (c) Copyright IBM Corp. 2023, 2023 All Rights Reserved
- * ===========================================================================
- */
-
-/*
  * @test
  * @enablePreview
  * @run testng TestLayouts
@@ -266,11 +260,13 @@ public class TestLayouts {
 
     @Test
     public void testStructToString() {
-        StructLayout padding = MemoryLayout.structLayout(JAVA_INT).withName("struct");
-        String basicLayoutString = (JAVA_INT.order() == ByteOrder.LITTLE_ENDIAN) ? "[i4](struct)" : "[I4](struct)";
-        assertEquals(padding.toString(), basicLayoutString);
-        var toStringUnaligned = padding.withByteAlignment(8).toString();
-        assertEquals(toStringUnaligned, "8%" + basicLayoutString);
+        for (ByteOrder order : List.of(ByteOrder.LITTLE_ENDIAN, ByteOrder.BIG_ENDIAN)) {
+            String intRepresentation = (order == ByteOrder.LITTLE_ENDIAN ? "i" : "I");
+            StructLayout padding = MemoryLayout.structLayout(JAVA_INT.withOrder(order)).withName("struct");
+            assertEquals(padding.toString(), "[" + intRepresentation + "4](struct)");
+            var toStringUnaligned = padding.withByteAlignment(8).toString();
+            assertEquals(toStringUnaligned, "8%[" + intRepresentation + "4](struct)");
+        }
     }
 
     @Test(dataProvider = "layoutKinds")
