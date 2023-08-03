@@ -21,6 +21,12 @@
  * questions.
  */
 
+/*
+ * ===========================================================================
+ * (c) Copyright IBM Corp. 2023, 2023 All Rights Reserved
+ * ===========================================================================
+ */
+
 #include <string.h>
 #include "jvmti.h"
 #include "jvmti_common.h"
@@ -137,8 +143,8 @@ test_unsupported_jvmti_functions(jvmtiEnv *jvmti, JNIEnv *jni, jthread vthread, 
   err = jvmti->GetAllStackTraces(MAX_FRAMES, &stack_info, &thread_cnt);
   check_jvmti_status(jni, err, "test_unsupported_jvmti_functions: error in JVMTI GetAllStackTraces");
   for (int idx = 0; idx < thread_cnt; idx++) {
-    jthread thread = threads_ptr[idx];
-    if (jni->IsVirtualThread(thread)) {
+    jvmtiStackInfo *info = &stack_info[idx];
+    if (jni->IsVirtualThread(info->thread)) {
       fatal(jni, "GetAllStackTraces should not include virtual threads");
     }
   }
