@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2023, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -21,24 +21,23 @@
  * questions.
  */
 
-#include "jni.h"
-#include "testlib_threads.h"
+/*
+ * @test
+ * @bug 8313809
+ * @summary String template fails with java.lang.StringIndexOutOfBoundsException if last fragment is UTF16
+.
+ * @enablePreview true
+ */
 
-void call(void* ctxt) {
-    JavaVM* jvm = (JavaVM*) ctxt;
-    JNIEnv* env;
-    jvm->AttachCurrentThread((void**)&env, NULL);
-    jclass linkerClass = env->FindClass("java/lang/foreign/Linker");
-    jmethodID nativeLinkerMethod = env->GetStaticMethodID(linkerClass, "nativeLinker", "()Ljava/lang/foreign/Linker;");
-    env->CallStaticVoidMethod(linkerClass, nativeLinkerMethod);
-    jvm->DetachCurrentThread();
-}
+import static java.util.FormatProcessor.FMT;
 
-extern "C" {
-    JNIEXPORT void JNICALL
-    Java_org_openjdk_foreigntest_PanamaMainUnnamedModule_nativeLinker0(JNIEnv *env, jclass cls) {
-        JavaVM* jvm;
-        env->GetJavaVM(&jvm);
-        run_in_new_thread_and_join(call, jvm);
+public class T8313809 {
+    public static void main(final String[] args) throws Exception {
+        double sum = 12.34;
+        final String message = FMT."The sum is : %f\{sum} €"; // this fails
+        if (!message.equals("The sum is : 12.340000 €")) {
+            throw new RuntimeException("Incorrect result");
+        }
     }
 }
+
