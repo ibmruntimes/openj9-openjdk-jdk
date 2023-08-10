@@ -140,6 +140,7 @@ final class ProviderConfig {
         return (provider != null);
     }
 
+    @Override
     public boolean equals(Object obj) {
         if (this == obj) {
             return true;
@@ -152,8 +153,9 @@ final class ProviderConfig {
 
     }
 
+    @Override
     public int hashCode() {
-        return provName.hashCode() + argument.hashCode();
+        return Objects.hash(provName, argument);
     }
 
     public String toString() {
