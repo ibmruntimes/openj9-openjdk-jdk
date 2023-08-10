@@ -22,6 +22,12 @@
  */
 
 /*
+ * ===========================================================================
+ * (c) Copyright IBM Corp. 2023, 2023 All Rights Reserved
+ * ===========================================================================
+ */
+
+/*
  * @test
  * @bug 8307478
  * @summary Test that a warning is printed when an agent is dynamically loaded
@@ -127,8 +133,18 @@ class DynamicLoadWarningTest {
         // test behavior on platforms that can detect if an agent library was previously loaded
         if (!Platform.isAix()) {
             // start loadJvmtiAgent1 via the command line, then dynamically load loadJvmtiAgent1
+
+            // load agent with the attach API
+            // JVMTI_AGENT1_LIB and jvmtiAgentPath1 might not be the same agent.
+            OnAttachAction loadJvmtiAgent = (pid, vm) -> vm.loadAgentLibrary(JVMTI_AGENT1_LIB);
             test().withOpts("-agentpath:" + jvmtiAgentPath1)
-                    .whenRunning(loadJvmtiAgent1)
+                    .whenRunning(loadJvmtiAgent)
+                    .stderrShouldContain(JVMTI_AGENT_WARNING);
+
+            // jcmd <pid> JVMTI.agent_load <agent>
+            OnAttachAction jcmdAgentLoad = jcmdAgentLoad(jvmtiAgentPath1);
+            test().withOpts("-agentpath:" + jvmtiAgentPath1)
+                    .whenRunning(jcmdAgentLoad)
                     .stderrShouldNotContain(JVMTI_AGENT_WARNING);
 
             // dynamically load loadJvmtiAgent1 twice, should be one warning
