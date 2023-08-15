@@ -33,6 +33,7 @@ package jdk.internal.foreign.abi.ppc64.aix;
 
 import jdk.internal.foreign.abi.AbstractLinker;
 import jdk.internal.foreign.abi.LinkerOptions;
+import jdk.internal.foreign.abi.ppc64.CallArranger;
 
 import java.lang.foreign.FunctionDescriptor;
 import java.lang.invoke.MethodHandle;
@@ -61,12 +62,12 @@ public final class AixPPC64Linker extends AbstractLinker {
 
     @Override
     protected MethodHandle arrangeDowncall(MethodType inferredMethodType, FunctionDescriptor function, LinkerOptions options) {
-        return CallArranger.arrangeDowncall(inferredMethodType, function, options);
+        return CallArranger.ABIv2.arrangeDowncall(inferredMethodType, function, options);
     }
 
     @Override
     protected UpcallStubFactory arrangeUpcall(MethodType targetType, FunctionDescriptor function, LinkerOptions options) {
-        return CallArranger.arrangeUpcall(targetType, function, options);
+        return CallArranger.ABIv2.arrangeUpcall(targetType, function, options);
     }
 
     @Override
