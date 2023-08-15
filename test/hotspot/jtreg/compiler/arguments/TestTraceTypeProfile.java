@@ -1,10 +1,10 @@
 /*
- * Copyright (c) 2008, 2023, Oracle and/or its affiliates. All rights reserved.
+ * Copyright Amazon.com Inc. or its affiliates. All Rights Reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License version 2 only, as
- * published by the Free Software Foundation.  Oracle designates this
+ * published by the Free Software Foundation. Amazon designates this
  * particular file as subject to the "Classpath" exception as provided
  * by Oracle in the LICENSE file that accompanied this code.
  *
@@ -17,32 +17,21 @@
  * You should have received a copy of the GNU General Public License version
  * 2 along with this work; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
- *
- * Please contact Oracle, 500 Oracle Parkway, Redwood Shores, CA 94065 USA
- * or visit www.oracle.com if you need additional information or have any
- * questions.
  */
 
-package sun.nio.ch;
-
-/**
- * Represents the level/name of a socket option
+/*
+ * @test
+ * @summary Test running TraceTypeProfile enabled.
+ * @run main/othervm -XX:+IgnoreUnrecognizedVMOptions -XX:+UnlockDiagnosticVMOptions
+ *                   -XX:+TraceTypeProfile compiler.arguments.TestTraceTypeProfile
  */
 
-class OptionKey {
-    private final int level;
-    private final int name;
+package compiler.arguments;
 
-    OptionKey(int level, int name) {
-        this.level = level;
-        this.name = name;
-    }
+public class TestTraceTypeProfile {
 
-    int level() {
-        return level;
-    }
-
-    int name() {
-        return name;
+    static public void main(String[] args) {
+        System.out.println("Passed");
     }
 }
+
