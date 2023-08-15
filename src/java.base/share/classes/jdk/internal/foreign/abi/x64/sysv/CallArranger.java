@@ -123,7 +123,7 @@ public class CallArranger {
             csb.addArgumentBindings(carrier, layout, argCalc.getBindings(carrier, layout));
         }
 
-        if (!forUpcall) {
+        if (!forUpcall && options.isVariadicFunction()) {
             //add extra binding for number of used vector registers (used for variadic calls)
             csb.addArgumentBindings(long.class, C_LONG,
                     List.of(vmStore(rax, long.class)));
