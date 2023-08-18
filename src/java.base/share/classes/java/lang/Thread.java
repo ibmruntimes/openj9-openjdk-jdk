@@ -3160,6 +3160,9 @@ public class Thread implements Runnable {
             setNameImpl(eetop, "main");
             System.completeInitialization();
         }
+
+        // special value to indicate this is a newly-created Thread
+        this.scopedValueBindings = NEW_THREAD_BINDINGS;
     }
 
     private boolean isDead() {
