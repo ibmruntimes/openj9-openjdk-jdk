@@ -48,7 +48,7 @@ public enum CABI {
     WIN_AARCH_64,
     LINUX_PPC_64_LE,
     LINUX_RISCV_64,
-    SYS_V_S390X,
+    LINUX_S390,
     AIX_PPC_64,
     FALLBACK,
     UNSUPPORTED;
@@ -96,9 +96,9 @@ public enum CABI {
                 }
             } else if (arch.equals("s390x")) {
                 if (OperatingSystem.isLinux()) {
-                    return SYS_V_S390X;
+                    return LINUX_S390;
                 }
-            }
+        }
         } else if (FallbackLinker.isSupported()) {
             return FALLBACK; // fallback linker
         }

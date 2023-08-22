@@ -1,5 +1,6 @@
 /*
- * Copyright (c) 2020, 2022, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2022, 2023, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2023 IBM Corp. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -22,14 +23,7 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-
-/*
- * ===========================================================================
- * (c) Copyright IBM Corp. 2022, 2023 All Rights Reserved
- * ===========================================================================
- */
-
-package jdk.internal.foreign.abi.s390x.sysv;
+package jdk.internal.foreign.abi.s390.linux;
 
 import jdk.internal.foreign.abi.AbstractLinker;
 import jdk.internal.foreign.abi.LinkerOptions;
@@ -39,34 +33,28 @@ import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodType;
 import java.nio.ByteOrder;
 
-/**
- * ABI implementation based on System V ABI s390x
- *
- * Note: This file is copied from x64/sysv with modification to accommodate
- * the specifics on Linux/s390x.
- */
-public final class SysVS390xLinker extends AbstractLinker {
+public final class LinuxS390Linker extends AbstractLinker {
 
-    public static SysVS390xLinker getInstance() {
+    public static LinuxS390Linker getInstance() {
         final class Holder {
-            private static final SysVS390xLinker INSTANCE = new SysVS390xLinker();
+            private static final LinuxS390Linker INSTANCE = new LinuxS390Linker();
         }
 
         return Holder.INSTANCE;
     }
 
-    private SysVS390xLinker() {
-        /* Ensure there is only one instance */
+    private LinuxS390Linker() {
+        // Ensure there is only one instance
     }
 
     @Override
     protected MethodHandle arrangeDowncall(MethodType inferredMethodType, FunctionDescriptor function, LinkerOptions options) {
-        return CallArranger.arrangeDowncall(inferredMethodType, function, options);
+        return LinuxS390CallArranger.arrangeDowncall(inferredMethodType, function, options);
     }
 
     @Override
     protected UpcallStubFactory arrangeUpcall(MethodType targetType, FunctionDescriptor function, LinkerOptions options) {
-        return CallArranger.arrangeUpcall(targetType, function, options);
+        return LinuxS390CallArranger.arrangeUpcall(targetType, function, options);
     }
 
     @Override

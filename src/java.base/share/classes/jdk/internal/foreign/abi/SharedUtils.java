@@ -43,7 +43,7 @@ import jdk.internal.foreign.abi.fallback.FallbackLinker;
 import jdk.internal.foreign.abi.ppc64.aix.AixPPC64Linker;
 import jdk.internal.foreign.abi.ppc64.linux.LinuxPPC64leLinker;
 import jdk.internal.foreign.abi.riscv64.linux.LinuxRISCV64Linker;
-import jdk.internal.foreign.abi.s390x.sysv.SysVS390xLinker;
+import jdk.internal.foreign.abi.s390.linux.LinuxS390Linker;
 import jdk.internal.foreign.abi.x64.sysv.SysVx64Linker;
 import jdk.internal.foreign.abi.x64.windows.Windowsx64Linker;
 import jdk.internal.vm.annotation.ForceInline;
@@ -251,7 +251,7 @@ public final class SharedUtils {
             case WIN_AARCH_64 -> WindowsAArch64Linker.getInstance();
             case LINUX_PPC_64_LE -> LinuxPPC64leLinker.getInstance();
             case LINUX_RISCV_64 -> LinuxRISCV64Linker.getInstance();
-            case SYS_V_S390X -> SysVS390xLinker.getInstance();
+            case LINUX_S390 -> LinuxS390Linker.getInstance();
             case AIX_PPC_64 -> AixPPC64Linker.getInstance();
             case FALLBACK -> FallbackLinker.getInstance();
             case UNSUPPORTED -> throw new UnsupportedOperationException("Platform does not support native linker");
