@@ -56,7 +56,7 @@ public class OpenJ9PropsExt implements Callable<Map<String, String>> {
             map.put("vm.jvmti", "true");
             map.put("vm.musl", "false");
             map.put("vm.openj9", "true");
-            map.put("vm.opt.final.ClassUnloading", "false");
+            map.put("vm.opt.final.ClassUnloading", "true");
             map.put("vm.opt.final.ZGenerational", "false");
         }
         catch (Exception e) {
