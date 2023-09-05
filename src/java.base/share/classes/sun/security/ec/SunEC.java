@@ -42,6 +42,7 @@ import java.util.List;
 
 import jdk.crypto.jniprovider.NativeCrypto;
 
+import sun.security.action.GetPropertyAction;
 import sun.security.ec.ed.EdDSAKeyFactory;
 import sun.security.ec.ed.EdDSAKeyPairGenerator;
 import sun.security.ec.ed.EdDSASignature;
@@ -61,7 +62,7 @@ public final class SunEC extends Provider {
     private static final boolean nativeCryptTrace = NativeCrypto.isTraceEnabled();
 
     // Flag indicating whether the operating system is AIX.
-    private static final boolean isAIX = "AIX".equals(System.getProperty("os.name"));
+    private static final boolean isAIX = "AIX".equals(GetPropertyAction.privilegedGetProperty("os.name"));
 
     /* The property 'jdk.nativeEC' is used to control enablement of the native
      * ECDH implementation.
