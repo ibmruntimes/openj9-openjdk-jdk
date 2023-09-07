@@ -24,30 +24,44 @@
  */
 /*
  * ===========================================================================
- * (c) Copyright IBM Corp. 2018, 2021 All Rights Reserved
+ * (c) Copyright IBM Corp. 2018, 2023 All Rights Reserved
  * ===========================================================================
  */
 
 package com.sun.crypto.provider;
 
-import java.util.Arrays;
-import java.io.*;
-import java.security.*;
-import javax.crypto.*;
 import com.sun.crypto.provider.AESCrypt;
-import sun.security.jca.JCAUtil;
-import sun.security.util.ArrayUtil;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.lang.ref.Cleaner;
+import java.nio.ByteBuffer;
+import java.security.AlgorithmParameters;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
+import java.security.Key;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.ProviderException;
+import java.security.SecureRandom;
 import java.security.spec.AlgorithmParameterSpec;
 import java.security.spec.InvalidParameterSpecException;
-import java.nio.ByteBuffer;
-import jdk.crypto.jniprovider.NativeCrypto;
+import java.util.Arrays;
 
-import sun.nio.ch.DirectBuffer;
-import java.lang.invoke.MethodHandles;
-import java.lang.invoke.VarHandle;
-import java.nio.ByteOrder;
+import javax.crypto.AEADBadTagException;
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.CipherSpi;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.ShortBufferException;
+import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.spec.GCMParameterSpec;
+
+import jdk.crypto.jniprovider.NativeCrypto;
+import jdk.internal.ref.CleanerFactory;
+
+import sun.security.jca.JCAUtil;
+import sun.security.util.ArrayUtil;
 
 /**
  * This class represents ciphers in GaloisCounter (GCM) mode.
@@ -68,6 +82,7 @@ abstract class NativeGaloisCounterMode extends CipherSpi {
 
     private byte[] key;
     private boolean encryption = true;
+    private final long context;
 
     private static final int DEFAULT_TAG_LEN = 16; // in bytes
     private static final int DEFAULT_IV_LEN = 12; // in bytes
@@ -97,10 +112,35 @@ abstract class NativeGaloisCounterMode extends CipherSpi {
     byte[] lastKey = EMPTY_BUF;
     byte[] lastIv = EMPTY_BUF;
 
+    private boolean newIVLen;
+    private boolean newKeyLen;
+
     byte[] iv;
     SecureRandom random;
 
     private static final NativeCrypto nativeCrypto = NativeCrypto.getNativeCrypto();
+    private static final Cleaner contextCleaner = CleanerFactory.cleaner();
+
+    private static final class GCMCleanerRunnable implements Runnable {
+        private final long nativeContext;
+
+        public GCMCleanerRunnable(long nativeContext) {
+            this.nativeContext = nativeContext;
+        }
+
+        @Override
+        public void run() {
+            /*
+             * Release the GCM context.
+             */
+            synchronized (NativeGaloisCounterMode.class) {
+                long ret = nativeCrypto.DestroyContext(nativeContext);
+                if (ret == -1) {
+                    throw new ProviderException("Error in destroying context in NativeGaloisCounterMode.");
+                }
+            }
+        }
+    }
 
     /*
      * Constructor
@@ -109,6 +149,12 @@ abstract class NativeGaloisCounterMode extends CipherSpi {
         tagLenBytes = DEFAULT_TAG_LEN;
         blockCipher = embeddedCipher;
         this.keySize = keySize;
+
+        context = nativeCrypto.CreateContext();
+        if (context == -1) {
+            throw new ProviderException("Error in creating context for NativeGaloisCounterMode.");
+        }
+        contextCleaner.register(this, new GCMCleanerRunnable(context));
     }
 
     /**
@@ -144,6 +190,19 @@ abstract class NativeGaloisCounterMode extends CipherSpi {
                     keySize + " bytes");
             }
             this.key = keyValue.clone();
+
+            /*
+             * Check whether cipher and IV need to be set,
+             * whether because something changed here or
+             * a call to set them in context hasn't been
+             * made yet.
+             */
+            if (lastIv.length != this.iv.length) {
+                newIVLen = true;
+            }
+            if (lastKey.length != this.key.length) {
+                newKeyLen = true;
+            }
 
             // Check for reuse
             if (encryption) {
@@ -767,15 +826,23 @@ abstract class NativeGaloisCounterMode extends CipherSpi {
                 byte[] aad = ((aadBuffer == null) || (aadBuffer.size() == 0)) ? EMPTY_BUF : aadBuffer.toByteArray();
                 aadBuffer = null;
 
-                ret = nativeCrypto.GCMEncrypt(key, key.length,
+                ret = nativeCrypto.GCMEncrypt(context,
+                        key, key.length,
                         iv, iv.length,
                         in, inOfs, inLen,
                         out, outOfs,
-                        aad, aad.length, localTagLenBytes);
+                        aad, aad.length,
+                        localTagLenBytes,
+                        newIVLen,
+                        newKeyLen);
             }
             if (ret == -1) {
                 throw new ProviderException("Error in Native GaloisCounterMode");
             }
+
+            /* Cipher and IV length were set, since call to GCMEncrypt succeeded. */
+            newKeyLen = false;
+            newIVLen = false;
 
             reInit = true;
             return inLen + localTagLenBytes;
@@ -959,17 +1026,27 @@ abstract class NativeGaloisCounterMode extends CipherSpi {
                 inOfs = 0;
                 inLen = in.length;
                 ibuffer.reset();
-                ret = nativeCrypto.GCMDecrypt(key, key.length,
+
+                ret = nativeCrypto.GCMDecrypt(context,
+                        key, key.length,
                         iv, iv.length,
                         in, inOfs, inLen,
                         out, outOfs,
-                        aad, aad.length, tagLenBytes);
+                        aad, aad.length,
+                        tagLenBytes,
+                        newIVLen,
+                        newKeyLen);
             }
             if (ret == -2) {
                 throw new AEADBadTagException("Tag mismatch!");
             } else if (ret == -1) {
                 throw new ProviderException("Error in Native GaloisCounterMode");
             }
+
+            /* Cipher and IV length were set, since call to GCMDecrypt succeeded. */
+            newKeyLen = false;
+            newIVLen = false;
+
             return ret;
         }
 
