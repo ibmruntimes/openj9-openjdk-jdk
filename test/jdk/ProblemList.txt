@@ -175,6 +175,7 @@ java/awt/Mixing/AWT_Mixing/JTextFieldOverlapping.java 8158801 windows-all
 java/awt/Mixing/AWT_Mixing/JToggleButtonInGlassPaneOverlapping.java 8158801 windows-all
 java/awt/Mixing/AWT_Mixing/JToggleButtonOverlapping.java 8158801 windows-all
 java/awt/Mixing/NonOpaqueInternalFrame.java 7124549 macosx-all
+java/awt/Mouse/EnterExitEvents/DragWindowTest.java 8298823 macosx-all
 java/awt/Focus/ActualFocusedWindowTest/ActualFocusedWindowRetaining.java 6829264 generic-all
 java/awt/datatransfer/DragImage/MultiResolutionDragImageTest.java 8080982 generic-all
 java/awt/datatransfer/SystemFlavorMap/AddFlavorTest.java 8079268 linux-all
@@ -728,8 +729,6 @@ sun/tools/jstat/jstatLineCounts1.sh                             8268211 linux-aa
 sun/tools/jstat/jstatLineCounts2.sh                             8268211 linux-aarch64
 sun/tools/jstat/jstatLineCounts3.sh                             8268211 linux-aarch64
 sun/tools/jstat/jstatLineCounts4.sh                             8268211 linux-aarch64
-
-sun/tools/jhsdb/JStackStressTest.java                           8276210 linux-aarch64
 
 ############################################################################
 
