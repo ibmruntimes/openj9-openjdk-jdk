@@ -382,18 +382,18 @@ CreateExecutionEnvironment(int *pargc, char ***pargv,
          */
 
 #ifdef AIX
-        int argc = *pargc - 1; // skip the launcher name
-        char **argv = *pargv + 1;
-        const char *arg = NULL;
+        int aixargc = *pargc - 1; // skip the launcher name
+        char **aixargv = *pargv + 1;
+        const char *aixarg = NULL;
         jboolean useZlibNX = JNI_TRUE;
-        while (argc > 0 && *(arg = *argv) == '-') {
-            if (JLI_StrCmp(arg, "-XX:+UseZlibNX") == 0) {
+        while (aixargc > 0 && *(aixarg = *aixargv) == '-') {
+            if (JLI_StrCmp(aixarg, "-XX:+UseZlibNX") == 0) {
                 useZlibNX = JNI_TRUE;
-            } else if (JLI_StrCmp(arg, "-XX:-UseZlibNX") == 0) {
+            } else if (JLI_StrCmp(aixarg, "-XX:-UseZlibNX") == 0) {
                 useZlibNX = JNI_FALSE;
             }
-            argc--;
-            argv++;
+            aixargc--;
+            aixargv++;
         }
         useZlibNX = useZlibNX && power_9_andup() && power_nx_gzip();
         if (JLI_IsTraceLauncher()) {
