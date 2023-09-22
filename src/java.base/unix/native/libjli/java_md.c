@@ -412,7 +412,7 @@ CreateExecutionEnvironment(int *pargc, char ***pargv,
             new_runpath_size = ((runpath != NULL) ? JLI_StrLen(runpath) : 0) +
                     2 * JLI_StrLen(jrepath) +
 #ifdef AIX
-                    /* On AIX P9 or newer with NX accelerator enabled, add the accelerated zlibNX to LIBPATH */
+                    /* On AIX P9 or newer with NX accelerator enabled, add the accelerated zlibNX to LIBPATH. */
                     (useZlibNX ? JLI_StrLen(":" ZLIBNX_PATH) : 0) +
 #endif
                     JLI_StrLen(new_jvmpath) + 52;
