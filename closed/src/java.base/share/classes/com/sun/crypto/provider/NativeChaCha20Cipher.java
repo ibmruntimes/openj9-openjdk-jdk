@@ -92,9 +92,24 @@ abstract class NativeChaCha20Cipher extends CipherSpi {
     private static final NativeCrypto nativeCrypto;
     private static final Cleaner contextCleaner;
     private final long context;
+    // The initialization state of the OpenSSL context.
+    private boolean opensslInitialized;
 
-    // The previous mode, initialized to an illegal value.
-    private int prevMode = Cipher.WRAP_MODE;
+    // ossl_mode:
+    // 0 : ChaCha20-Poly1305 decrypt
+    // 1 : ChaCha20-Poly1305 encrypt
+    // 2 : ChaCha20 streaming
+    private int ossl_mode = -1;
+
+    // openssl_iv is only used by OpenSSL, here is the format:
+    // Streaming mode: 16 bytes
+    //                 first 4 bytes is the block counter (little-endian unsigned 32 bit int)
+    //                 the last 12 bytes is the nonce
+    // Poly1305 mode:  12 bytes nonce
+    private byte[] openssl_iv;
+
+    // The previous OpenSSL mode, initialized to an illegal value.
+    private int prevMode = -1;
 
     private final ByteArrayOutputStream aadBuf;
 
@@ -557,25 +572,18 @@ abstract class NativeChaCha20Cipher extends CipherSpi {
             throw new InvalidKeyException("Unknown opmode: " + opmode);
         }
 
-        // Make sure that the provided key and nonce are unique before
-        // assigning them to the object.
         byte[] newKeyBytes = getEncodedKey(key);
-        checkKeyAndNonce(newKeyBytes, newNonce);
+        if (opmode == Cipher.ENCRYPT_MODE) {
+            // Make sure that the provided key and nonce are unique before
+            // assigning them to the object.  Key and nonce uniqueness
+            // protection is for encryption operations only.
+            checkKeyAndNonce(newKeyBytes, newNonce);
+        }
+        if (this.keyBytes != null) {
+            Arrays.fill(this.keyBytes, (byte)0);
+        }
         this.keyBytes = newKeyBytes;
         nonce = newNonce;
-
-        // ossl_mode:
-        // 0 : ChaCha20-Poly1305 decrypt
-        // 1 : ChaCha20-Poly1305 encrypt
-        // 2 : ChaCha20 streaming
-        int ossl_mode = -1;
-
-        // openssl_iv is only used by OpenSSL, here is the format:
-        // Streaming mode: 16 bytes
-        //                 first 4 bytes is the block counter (little-endian unsigned 32 bit int)
-        //                 the last 12 bytes is the nonce
-        // Poly1305 mode:  12 bytes nonce
-        byte[] openssl_iv = null;
 
         if (mode == MODE_NONE) {
             engine = new EngineStreamOnly();
@@ -585,7 +593,6 @@ abstract class NativeChaCha20Cipher extends CipherSpi {
             openssl_iv = new byte[16];
             System.arraycopy(counter_byte, 0, openssl_iv, 0, counter_byte.length /* 4 */);
             System.arraycopy(nonce, 0, openssl_iv, 4, nonce.length /* 12 */);
-
         } else if (mode == MODE_AEAD) {
             openssl_iv = nonce;
             if (opmode == Cipher.ENCRYPT_MODE) {
@@ -599,27 +606,23 @@ abstract class NativeChaCha20Cipher extends CipherSpi {
             }
         }
 
+        boolean modeChanged = false;
+        if (prevMode != ossl_mode) {
+            modeChanged = true;
+            prevMode = ossl_mode;
+        }
+
+        ChaCha20Init(modeChanged);
+
         direction = opmode;
         aadDone = false;
         initialized = true;
-
-        // Optimize the initialization of chacha20-poly1305 when they have the same ossl_mode
-        // otherwise, we have to reinitialize based upon the ossl_mode.
-        int ret;
-        if (prevMode == ossl_mode) {
-            ret = nativeCrypto.ChaCha20Init(context, ossl_mode, openssl_iv, openssl_iv.length, keyBytes, keyBytes.length, true);
-        } else {
-            ret = nativeCrypto.ChaCha20Init(context, ossl_mode, openssl_iv, openssl_iv.length, keyBytes, keyBytes.length, false);
-            prevMode = ossl_mode;
-        }
-        if (ret == -1) {
-            throw new ProviderException("Error in Native ChaCha20Cipher");
-        }
     }
 
     /**
      * Check the key and nonce bytes to make sure that they do not repeat
-     * across reinitialization.
+     * across reinitialization. This method is only useful for encryption
+     * mode.
      *
      * @param newKeyBytes the byte encoding for the newly provided key
      * @param newNonce the new nonce to be used with this initialization
@@ -743,9 +746,8 @@ abstract class NativeChaCha20Cipher extends CipherSpi {
         } catch (ShortBufferException | KeyException exc) {
             throw new RuntimeException(exc);
         } finally {
-            // Regardless of what happens, the cipher cannot be used for
-            // further processing until it has been freshly initialized.
-            initialized = false;
+            // Reset the cipher's state to appropriate values.
+            resetStartState();
         }
         return output;
     }
@@ -781,9 +783,8 @@ abstract class NativeChaCha20Cipher extends CipherSpi {
         } catch (KeyException ke) {
             throw new RuntimeException(ke);
         } finally {
-            // Regardless of what happens, the cipher cannot be used for
-            // further processing until it has been freshly initialized.
-            initialized = false;
+            // Reset the cipher's state to appropriate values.
+            resetStartState();
         }
         return bytesUpdated;
     }
@@ -857,6 +858,33 @@ abstract class NativeChaCha20Cipher extends CipherSpi {
         return ret;
     }
 
+    private void ChaCha20Init(boolean modeChanged) {
+        // Optimize the initialization of chacha20-poly1305 when they have the same ossl_mode
+        // otherwise, we have to reinitialize based upon the ossl_mode.
+        int ret = nativeCrypto.ChaCha20Init(context, ossl_mode, openssl_iv, openssl_iv.length, keyBytes, keyBytes.length, !modeChanged);
+
+        if (ret == -1) {
+            throw new ProviderException("Error in Native ChaCha20Cipher");
+        }
+        opensslInitialized = true;
+    }
+
+    /**
+     * Reset the cipher's state to the appropriate values.
+     *
+     * Note: The cipher's internal "initialized" field is set differently
+     * for ENCRYPT_MODE and DECRYPT_MODE in order to allow DECRYPT_MODE
+     * ciphers to reuse the key/nonce/counter values.  This kind of reuse
+     * is disallowed in ENCRYPT_MODE.
+     */
+    private void resetStartState() {
+        aadDone = false;
+        if (direction != Cipher.DECRYPT_MODE) {
+            initialized = false;
+        }
+        opensslInitialized = false;
+    }
+
     /**
      * Interface for the underlying processing engines for ChaCha20
      */
@@ -917,7 +945,11 @@ abstract class NativeChaCha20Cipher extends CipherSpi {
         public synchronized int doUpdate(byte[] in, int inOff, int inLen, byte[] out,
                 int outOff) throws ShortBufferException, KeyException {
             if (initialized) {
-               try {
+                if (!opensslInitialized) {
+                    ChaCha20Init(false);
+                }
+
+                try {
                     if (out != null) {
                         Objects.checkFromIndexSize(outOff, inLen, out.length);
                     } else {
@@ -928,10 +960,12 @@ abstract class NativeChaCha20Cipher extends CipherSpi {
                     throw new ShortBufferException("Output buffer too small");
                 }
 
-                Objects.checkFromIndexSize(inOff, inLen, in.length);
-                int ret = nativeCrypto.ChaCha20Update(context, in, inOff, inLen, out, outOff, /*aadArray*/ null, /*aadArray.length*/ 0);
-                if (ret == -1) {
-                    throw new ProviderException("Error in Native ChaCha20Cipher");
+                if (in != null) {
+                    Objects.checkFromIndexSize(inOff, inLen, in.length);
+                    int ret = nativeCrypto.ChaCha20Update(context, in, inOff, inLen, out, outOff, /*aadArray*/ null, /*aadArray.length*/ 0);
+                    if (ret == -1) {
+                        throw new ProviderException("Error in Native ChaCha20Cipher");
+                    }
                 }
                 return inLen;
             } else {
@@ -943,11 +977,7 @@ abstract class NativeChaCha20Cipher extends CipherSpi {
         @Override
         public int doFinal(byte[] in, int inOff, int inLen, byte[] out,
                 int outOff) throws ShortBufferException, KeyException {
-            if (in != null) {
-                return doUpdate(in, inOff, inLen, out, outOff);
-            } else {
-                return inLen;
-            }
+            return doUpdate(in, inOff, inLen, out, outOff);
         }
 
         @Override
@@ -966,8 +996,12 @@ abstract class NativeChaCha20Cipher extends CipherSpi {
         public synchronized int doUpdate(byte[] in, int inOff, int inLen, byte[] out,
                 int outOff) throws ShortBufferException, KeyException {
             if (initialized) {
+                if (!opensslInitialized) {
+                    ChaCha20Init(false);
+                }
+
                 // If this is the first update since AAD updates, signal that
-                // we're done processing AAD info
+                // we're done processing AAD info.
                 if (!aadDone) {
                     aadDone = true;
                 }
@@ -982,15 +1016,16 @@ abstract class NativeChaCha20Cipher extends CipherSpi {
                     throw new ShortBufferException("Output buffer too small");
                 }
 
-                Objects.checkFromIndexSize(inOff, inLen, in.length);
+                if (in != null) {
+                    Objects.checkFromIndexSize(inOff, inLen, in.length);
 
-                byte aadArray[] = aadBuf.toByteArray();
-                aadBuf.reset();
-                int ret = nativeCrypto.ChaCha20Update(context, in, inOff, inLen, out, outOff, aadArray, aadArray.length);
-                if (ret == -1) {
-                    throw new ProviderException("Error in Native CipherBlockChaining");
+                    byte[] aadArray = aadBuf.toByteArray();
+                    aadBuf.reset();
+                    int ret = nativeCrypto.ChaCha20Update(context, in, inOff, inLen, out, outOff, aadArray, aadArray.length);
+                    if (ret == -1) {
+                        throw new ProviderException("Error in Native CipherBlockChaining");
+                    }
                 }
-
                 return inLen;
             } else {
                 throw new IllegalStateException(
@@ -1007,9 +1042,7 @@ abstract class NativeChaCha20Cipher extends CipherSpi {
                 throw new ShortBufferException("Output buffer too small");
             }
 
-            if (in != null) {
-                doUpdate(in, inOff, inLen, out, outOff);
-            }
+            doUpdate(in, inOff, inLen, out, outOff);
 
             int ret = nativeCrypto.ChaCha20FinalEncrypt(context, out, outOff + inLen , TAG_LENGTH);
             if (ret == -1) {
@@ -1040,6 +1073,10 @@ abstract class NativeChaCha20Cipher extends CipherSpi {
         public int doUpdate(byte[] in, int inOff, int inLen, byte[] out,
                 int outOff) {
             if (initialized) {
+                if (!opensslInitialized) {
+                    ChaCha20Init(false);
+                }
+
                 // If this is the first update since AAD updates, signal that
                 // we're done processing AAD info and pad the AAD to a multiple
                 // of 16 bytes.
@@ -1099,7 +1136,7 @@ abstract class NativeChaCha20Cipher extends CipherSpi {
                 throw new ShortBufferException("Output buffer too small");
             }
 
-            byte aadArray[] = aadBuf.toByteArray();
+            byte[] aadArray = aadBuf.toByteArray();
             aadBuf.reset();
 
             // inOff of ctPlusTag is always 0
