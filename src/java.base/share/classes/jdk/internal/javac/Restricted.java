@@ -1,10 +1,12 @@
 /*
- * Copyright (c) 1998, 2023, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2023, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License version 2 only, as
- * published by the Free Software Foundation.
+ * published by the Free Software Foundation.  Oracle designates this
+ * particular file as subject to the "Classpath" exception as provided
+ * by Oracle in the LICENSE file that accompanied this code.
  *
  * This code is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
@@ -20,33 +22,18 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
+package jdk.internal.javac;
 
-/*
- * @test
- * @bug 4100311
- * @summary Ensure set(DAY_OF_YEAR, 1) works.
- * @run junit bug4100311
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
+/**
+ * This annotation is used to mark <em>restricted</em> methods in the Java SE API
+ * (e.g. {@link java.lang.foreign.MemorySegment#reinterpret(long)}).
  */
-
-import java.util.Calendar;
-import java.util.GregorianCalendar;
-import java.util.Date;
-
-import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
-public class bug4100311 {
-
-    // GregorianCalendar should be able to date to january 1st properly
-    @SuppressWarnings("deprecation")
-    @Test
-    public void dayOfYearIsOneTest() {
-        GregorianCalendar cal = new GregorianCalendar();
-        cal.set(Calendar.YEAR, 1997);
-        cal.set(Calendar.DAY_OF_YEAR, 1);
-        Date d = cal.getTime();
-        assertEquals(0, d.getMonth(), "Date: "+d+" isn't January 1st");
-        assertEquals(1, d.getDate(),"Date: "+d+" isn't January 1st");
-    }
+@Target({ElementType.METHOD})
+@Retention(RetentionPolicy.RUNTIME)
+public @interface Restricted {
 }
