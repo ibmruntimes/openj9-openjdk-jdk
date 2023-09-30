@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012, 2020, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2012, 2023, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -176,10 +176,10 @@ abstract class IntPipeline<E_IN>
     }
 
     private <U> Stream<U> mapToObj(IntFunction<? extends U> mapper, int opFlags) {
-        return new ReferencePipeline.StatelessOp<Integer, U>(this, StreamShape.INT_VALUE, opFlags) {
+        return new ReferencePipeline.StatelessOp<>(this, StreamShape.INT_VALUE, opFlags) {
             @Override
             Sink<Integer> opWrapSink(int flags, Sink<U> sink) {
-                return new Sink.ChainedInt<U>(sink) {
+                return new Sink.ChainedInt<>(sink) {
                     @Override
                     public void accept(int t) {
                         downstream.accept(mapper.apply(t));
@@ -205,10 +205,10 @@ abstract class IntPipeline<E_IN>
 
     @Override
     public final LongStream asLongStream() {
-        return new LongPipeline.StatelessOp<Integer>(this, StreamShape.INT_VALUE, 0) {
+        return new LongPipeline.StatelessOp<>(this, StreamShape.INT_VALUE, 0) {
             @Override
             Sink<Integer> opWrapSink(int flags, Sink<Long> sink) {
-                return new Sink.ChainedInt<Long>(sink) {
+                return new Sink.ChainedInt<>(sink) {
                     @Override
                     public void accept(int t) {
                         downstream.accept((long) t);
@@ -220,10 +220,10 @@ abstract class IntPipeline<E_IN>
 
     @Override
     public final DoubleStream asDoubleStream() {
-        return new DoublePipeline.StatelessOp<Integer>(this, StreamShape.INT_VALUE, 0) {
+        return new DoublePipeline.StatelessOp<>(this, StreamShape.INT_VALUE, 0) {
             @Override
             Sink<Integer> opWrapSink(int flags, Sink<Double> sink) {
-                return new Sink.ChainedInt<Double>(sink) {
+                return new Sink.ChainedInt<>(sink) {
                     @Override
                     public void accept(int t) {
                         downstream.accept((double) t);
@@ -241,11 +241,11 @@ abstract class IntPipeline<E_IN>
     @Override
     public final IntStream map(IntUnaryOperator mapper) {
         Objects.requireNonNull(mapper);
-        return new StatelessOp<Integer>(this, StreamShape.INT_VALUE,
-                                        StreamOpFlag.NOT_SORTED | StreamOpFlag.NOT_DISTINCT) {
+        return new StatelessOp<>(this, StreamShape.INT_VALUE,
+                StreamOpFlag.NOT_SORTED | StreamOpFlag.NOT_DISTINCT) {
             @Override
             Sink<Integer> opWrapSink(int flags, Sink<Integer> sink) {
-                return new Sink.ChainedInt<Integer>(sink) {
+                return new Sink.ChainedInt<>(sink) {
                     @Override
                     public void accept(int t) {
                         downstream.accept(mapper.applyAsInt(t));
@@ -264,11 +264,11 @@ abstract class IntPipeline<E_IN>
     @Override
     public final LongStream mapToLong(IntToLongFunction mapper) {
         Objects.requireNonNull(mapper);
-        return new LongPipeline.StatelessOp<Integer>(this, StreamShape.INT_VALUE,
-                                                     StreamOpFlag.NOT_SORTED | StreamOpFlag.NOT_DISTINCT) {
+        return new LongPipeline.StatelessOp<>(this, StreamShape.INT_VALUE,
+                StreamOpFlag.NOT_SORTED | StreamOpFlag.NOT_DISTINCT) {
             @Override
             Sink<Integer> opWrapSink(int flags, Sink<Long> sink) {
-                return new Sink.ChainedInt<Long>(sink) {
+                return new Sink.ChainedInt<>(sink) {
                     @Override
                     public void accept(int t) {
                         downstream.accept(mapper.applyAsLong(t));
@@ -281,11 +281,11 @@ abstract class IntPipeline<E_IN>
     @Override
     public final DoubleStream mapToDouble(IntToDoubleFunction mapper) {
         Objects.requireNonNull(mapper);
-        return new DoublePipeline.StatelessOp<Integer>(this, StreamShape.INT_VALUE,
-                                                       StreamOpFlag.NOT_SORTED | StreamOpFlag.NOT_DISTINCT) {
+        return new DoublePipeline.StatelessOp<>(this, StreamShape.INT_VALUE,
+                StreamOpFlag.NOT_SORTED | StreamOpFlag.NOT_DISTINCT) {
             @Override
             Sink<Integer> opWrapSink(int flags, Sink<Double> sink) {
-                return new Sink.ChainedInt<Double>(sink) {
+                return new Sink.ChainedInt<>(sink) {
                     @Override
                     public void accept(int t) {
                         downstream.accept(mapper.applyAsDouble(t));
@@ -298,11 +298,11 @@ abstract class IntPipeline<E_IN>
     @Override
     public final IntStream flatMap(IntFunction<? extends IntStream> mapper) {
         Objects.requireNonNull(mapper);
-        return new StatelessOp<Integer>(this, StreamShape.INT_VALUE,
-                                        StreamOpFlag.NOT_SORTED | StreamOpFlag.NOT_DISTINCT | StreamOpFlag.NOT_SIZED) {
+        return new StatelessOp<>(this, StreamShape.INT_VALUE,
+                StreamOpFlag.NOT_SORTED | StreamOpFlag.NOT_DISTINCT | StreamOpFlag.NOT_SIZED) {
             @Override
             Sink<Integer> opWrapSink(int flags, Sink<Integer> sink) {
-                return new Sink.ChainedInt<Integer>(sink) {
+                return new Sink.ChainedInt<>(sink) {
                     // true if cancellationRequested() has been called
                     boolean cancellationRequestedCalled;
 
@@ -320,10 +320,10 @@ abstract class IntPipeline<E_IN>
                             if (result != null) {
                                 if (!cancellationRequestedCalled) {
                                     result.sequential().forEach(downstreamAsInt);
-                                }
-                                else {
+                                } else {
                                     var s = result.sequential().spliterator();
-                                    do { } while (!downstream.cancellationRequested() && s.tryAdvance(downstreamAsInt));
+                                    do {
+                                    } while (!downstream.cancellationRequested() && s.tryAdvance(downstreamAsInt));
                                 }
                             }
                         }
@@ -371,7 +371,7 @@ abstract class IntPipeline<E_IN>
     public IntStream unordered() {
         if (!isOrdered())
             return this;
-        return new StatelessOp<Integer>(this, StreamShape.INT_VALUE, StreamOpFlag.NOT_ORDERED) {
+        return new StatelessOp<>(this, StreamShape.INT_VALUE, StreamOpFlag.NOT_ORDERED) {
             @Override
             Sink<Integer> opWrapSink(int flags, Sink<Integer> sink) {
                 return sink;
@@ -382,11 +382,11 @@ abstract class IntPipeline<E_IN>
     @Override
     public final IntStream filter(IntPredicate predicate) {
         Objects.requireNonNull(predicate);
-        return new StatelessOp<Integer>(this, StreamShape.INT_VALUE,
-                                        StreamOpFlag.NOT_SIZED) {
+        return new StatelessOp<>(this, StreamShape.INT_VALUE,
+                StreamOpFlag.NOT_SIZED) {
             @Override
             Sink<Integer> opWrapSink(int flags, Sink<Integer> sink) {
-                return new Sink.ChainedInt<Integer>(sink) {
+                return new Sink.ChainedInt<>(sink) {
                     @Override
                     public void begin(long size) {
                         downstream.begin(-1);
@@ -405,11 +405,11 @@ abstract class IntPipeline<E_IN>
     @Override
     public final IntStream peek(IntConsumer action) {
         Objects.requireNonNull(action);
-        return new StatelessOp<Integer>(this, StreamShape.INT_VALUE,
-                                        0) {
+        return new StatelessOp<>(this, StreamShape.INT_VALUE,
+                0) {
             @Override
             Sink<Integer> opWrapSink(int flags, Sink<Integer> sink) {
-                return new Sink.ChainedInt<Integer>(sink) {
+                return new Sink.ChainedInt<>(sink) {
                     @Override
                     public void accept(int t) {
                         action.accept(t);
