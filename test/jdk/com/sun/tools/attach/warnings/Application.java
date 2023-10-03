@@ -21,9 +21,17 @@
  * questions.
  */
 
+/*
+ * ===========================================================================
+ * (c) Copyright IBM Corp. 2023, 2023 All Rights Reserved
+ * ===========================================================================
+ */
+
 import java.io.DataOutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
+
+import openj9.internal.tools.attach.target.AttachHandler;
 
 /**
  * The "application" launched by DyamicLoadWarningTest.
@@ -39,6 +47,10 @@ public class Application {
 
             // send pid
             long pid = ProcessHandle.current().pid();
+            while (!AttachHandler.isAttachApiInitialized()) {
+                // delay 2s to allow AttachAPI initialization
+                Thread.currentThread().sleep(100);
+            }
             out.writeLong(pid);
 
             // wait for shutdown

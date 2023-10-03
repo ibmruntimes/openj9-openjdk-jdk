@@ -22,13 +22,20 @@
  */
 
 /*
+ * ===========================================================================
+ * (c) Copyright IBM Corp. 2023, 2023 All Rights Reserved
+ * ===========================================================================
+ */
+
+/*
  * @test
  * @bug 8307478
  * @summary Test that a warning is printed when an agent is dynamically loaded
  * @requires vm.jvmti
  * @modules jdk.attach jdk.jcmd
  * @library /test/lib /test/jdk
- * @build Application JavaAgent
+ * @build JavaAgent
+ * @compile --add-exports java.base/openj9.internal.tools.attach.target=ALL-UNNAMED Application.java
  * @run junit/othervm/native DynamicLoadWarningTest
  */
 
@@ -268,7 +275,8 @@ class DynamicLoadWarningTest {
 
                 // launch application with the given VM options, waiting for it to terminate
                 Stream<String> s1 = Stream.of(vmopts);
-                Stream<String> s2 = Stream.of("Application", Integer.toString(listener.getLocalPort()));
+                String addExports = "--add-exports=java.base/openj9.internal.tools.attach.target=ALL-UNNAMED";
+                Stream<String> s2 = Stream.of(addExports, "Application", Integer.toString(listener.getLocalPort()));
                 String[] opts = Stream.concat(s1, s2).toArray(String[]::new);
                 OutputAnalyzer outputAnalyzer = ProcessTools
                         .executeTestJava(opts)
