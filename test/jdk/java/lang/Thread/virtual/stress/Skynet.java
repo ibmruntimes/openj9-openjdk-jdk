@@ -22,11 +22,17 @@
  */
 
 /*
+ * ===========================================================================
+ * (c) Copyright IBM Corp. 2023, 2023 All Rights Reserved
+ * ===========================================================================
+ */
+
+/*
  * @test id=default
  * @summary Stress test virtual threads with a variation of the Skynet 1M benchmark
  * @requires vm.continuations
  * @requires !vm.debug | vm.gc != "Z"
- * @run main/othervm/timeout=300 -Xmx1g Skynet
+ * @run main/othervm/timeout=300 -Xmx1g -Xnocompressedrefs Skynet
  */
 
 /*
