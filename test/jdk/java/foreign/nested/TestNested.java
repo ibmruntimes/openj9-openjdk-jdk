@@ -22,6 +22,12 @@
  */
 
 /*
+ * ===========================================================================
+ * (c) Copyright IBM Corp. 2023, 2023 All Rights Reserved
+ * ===========================================================================
+ */
+
+/*
  * @test
  * @enablePreview
  * @library ../ /test/lib
@@ -175,10 +181,10 @@ public class TestNested extends NativeTestHelper {
     ).withName("S8");
     static final StructLayout S9 = MemoryLayout.structLayout(
             C_CHAR.withName("f0"),
-            MemoryLayout.paddingLayout(7),
+            MemoryLayout.paddingLayout(C_DOUBLE.byteAlignment() - 1),
             MemoryLayout.sequenceLayout(2, C_DOUBLE).withName("f1"),
             C_CHAR.withName("f2"),
-            MemoryLayout.paddingLayout(7),
+            MemoryLayout.paddingLayout(C_DOUBLE.byteAlignment() - 1),
             S8.withName("f3")
     ).withName("S9");
     static final UnionLayout U8 = MemoryLayout.unionLayout(
