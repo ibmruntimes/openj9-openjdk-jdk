@@ -33,12 +33,17 @@ package jdk.internal.foreign.abi.ppc64.aix;
 
 import jdk.internal.foreign.abi.AbstractLinker;
 import jdk.internal.foreign.abi.LinkerOptions;
+import jdk.internal.foreign.abi.SharedUtils;
 import jdk.internal.foreign.abi.ppc64.CallArranger;
 
 import java.lang.foreign.FunctionDescriptor;
+import java.lang.foreign.MemoryLayout;
+import java.lang.foreign.ValueLayout;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodType;
 import java.nio.ByteOrder;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * ABI implementation based on 64-bit PowerPC ELF ABI
@@ -47,6 +52,15 @@ import java.nio.ByteOrder;
  * the specifics on AIX/ppc64.
  */
 public final class AixPPC64Linker extends AbstractLinker {
+
+    private static final Map<String, MemoryLayout> CANONICAL_LAYOUTS;
+
+    static {
+        Map<String, MemoryLayout> layouts = new HashMap<>(
+            SharedUtils.canonicalLayouts(ValueLayout.JAVA_LONG, ValueLayout.JAVA_LONG, ValueLayout.JAVA_INT));
+        layouts.put("double", ValueLayout.JAVA_DOUBLE.withByteAlignment(4));
+        CANONICAL_LAYOUTS = Map.copyOf(layouts);
+    }
 
     public static AixPPC64Linker getInstance() {
         final class Holder {
@@ -73,5 +87,10 @@ public final class AixPPC64Linker extends AbstractLinker {
     @Override
     protected ByteOrder linkerByteOrder() {
         return ByteOrder.BIG_ENDIAN;
+    }
+
+    @Override
+    public Map<String, MemoryLayout> canonicalLayouts() {
+        return CANONICAL_LAYOUTS;
     }
 }
