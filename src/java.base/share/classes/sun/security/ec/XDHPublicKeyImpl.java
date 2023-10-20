@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, 2021, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2018, 2023, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -30,6 +30,9 @@
 
 package sun.security.ec;
 
+import java.io.IOException;
+import java.io.InvalidObjectException;
+import java.io.ObjectInputStream;
 import java.math.BigInteger;
 import java.security.InvalidKeyException;
 import java.security.KeyRep;
@@ -44,6 +47,7 @@ import sun.security.x509.X509Key;
 
 public final class XDHPublicKeyImpl extends X509Key implements XECPublicKey {
 
+    @java.io.Serial
     private static final long serialVersionUID = 1L;
 
     private final BigInteger u;
@@ -116,7 +120,8 @@ public final class XDHPublicKeyImpl extends X509Key implements XECPublicKey {
         return getKey().toByteArray();
     }
 
-    protected Object writeReplace() throws java.io.ObjectStreamException {
+    @java.io.Serial
+    private Object writeReplace() throws java.io.ObjectStreamException {
         return new KeyRep(KeyRep.Type.PUBLIC,
             getAlgorithm(),
             getFormat(),
@@ -138,6 +143,22 @@ public final class XDHPublicKeyImpl extends X509Key implements XECPublicKey {
             i++;
             j--;
         }
+    }
+
+    /**
+     * Restores the state of this object from the stream.
+     * <p>
+     * Deserialization of this object is not supported.
+     *
+     * @param  stream the {@code ObjectInputStream} from which data is read
+     * @throws IOException if an I/O error occurs
+     * @throws ClassNotFoundException if a serialized class cannot be loaded
+     */
+    @java.io.Serial
+    private void readObject(ObjectInputStream stream)
+            throws IOException, ClassNotFoundException {
+        throw new InvalidObjectException(
+                "XDHPublicKeyImpl keys are not directly deserializable");
     }
 }
 
