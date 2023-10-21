@@ -111,7 +111,7 @@ final class VirtualThread extends BaseVirtualThread {
      *  TIMED_PINNED -> RUNNING         // unparked, continue execution on same carrier
      *
      * RUNNABLE -> RUNNING         // continue execution
-
+     *
      *  RUNNING -> YIELDING        // Thread.yield
      * YIELDING -> RUNNABLE        // yield successful
      * YIELDING -> RUNNING         // yield failed
@@ -234,9 +234,6 @@ final class VirtualThread extends BaseVirtualThread {
             return;
         }
 
-        // notify JVMTI before mount
-        notifyJvmtiMount(/*hide*/true);
-
         mount();
         try {
             cont.run();
@@ -309,7 +306,6 @@ final class VirtualThread extends BaseVirtualThread {
     /**
      * Runs a task in the context of this virtual thread.
      */
-    @ChangesCurrentThread
     private void run(Runnable task) {
         assert Thread.currentThread() == this && state == RUNNING;
 
@@ -354,6 +350,9 @@ final class VirtualThread extends BaseVirtualThread {
     @ChangesCurrentThread
     @ReservedStackAccess
     private void mount() {
+        // notify JVMTI before mount
+        notifyJvmtiMount(/*hide*/true);
+
         // sets the carrier thread
         Thread carrier = Thread.currentCarrierThread();
         setCarrierThread(carrier);
@@ -390,6 +389,9 @@ final class VirtualThread extends BaseVirtualThread {
             setCarrierThread(null);
         }
         carrier.clearInterrupt();
+
+        // notify JVMTI after unmount
+        notifyJvmtiUnmount(/*hide*/false);
     }
 
     /**
@@ -454,12 +456,11 @@ final class VirtualThread extends BaseVirtualThread {
         assert carrierThread == null;
 
         int s = state();
+
+        // LockSupport.park/parkNanos
         if (s == PARKING || s == TIMED_PARKING) {
             int newState = (s == PARKING) ? PARKED : TIMED_PARKED;
             setState(newState);
-
-            // notify JVMTI that unmount has completed, thread is parked
-            notifyJvmtiUnmount(/*hide*/false);
 
             // may have been unparked while parking
             if (parkPermit && compareAndSetState(newState, RUNNABLE)) {
@@ -471,11 +472,12 @@ final class VirtualThread extends BaseVirtualThread {
                 }
 
             }
-        } else if (s == YIELDING) {   // Thread.yield
-            setState(RUNNABLE);
+            return;
+        }
 
-            // notify JVMTI that unmount has completed, thread is runnable
-            notifyJvmtiUnmount(/*hide*/false);
+        // Thread.yield
+        if (s == YIELDING) {
+            setState(RUNNABLE);
 
             // external submit if there are no tasks in the local task queue
             if (currentThread() instanceof CarrierThread ct && ct.getQueuedTaskCount() == 0) {
@@ -483,16 +485,17 @@ final class VirtualThread extends BaseVirtualThread {
             } else {
                 submitRunContinuation();
             }
-        } else {
-            assert false;
+            return;
         }
+
+        assert false;
     }
 
     /**
      * Invoked after the continuation completes.
      */
     private void afterDone() {
-        afterDone(true, true);
+        afterDone(true);
     }
 
     /**
@@ -500,15 +503,10 @@ final class VirtualThread extends BaseVirtualThread {
      * state to TERMINATED and notifies anyone waiting for the thread to terminate.
      *
      * @param notifyContainer true if its container should be notified
-     * @param executed true if the thread executed, false if it failed to start
      */
-    private void afterDone(boolean notifyContainer, boolean executed) {
+    private void afterDone(boolean notifyContainer) {
         assert carrierThread == null;
         setState(TERMINATED);
-
-        if (executed) {
-            notifyJvmtiUnmount(/*hide*/false);
-        }
 
         // notify anyone waiting for this virtual thread to terminate
         CountDownLatch termination = this.termination;
@@ -558,7 +556,7 @@ final class VirtualThread extends BaseVirtualThread {
             started = true;
         } finally {
             if (!started) {
-                afterDone(addedToContainer, /*executed*/false);
+                afterDone(addedToContainer);
             }
         }
     }

@@ -139,12 +139,6 @@ abstract class AbstractPipeline<E_IN, E_OUT, S extends BaseStream<E_OUT, S>>
      */
     private boolean linkedOrConsumed;
 
-    /**
-     * True if there are any stateful ops in the pipeline; only valid for the
-     * source stage.
-     */
-    private boolean sourceAnyStateful;
-
     private Runnable sourceCloseAction;
 
     /**
@@ -213,8 +207,6 @@ abstract class AbstractPipeline<E_IN, E_OUT, S extends BaseStream<E_OUT, S>>
         this.sourceOrOpFlags = opFlags & StreamOpFlag.OP_MASK;
         this.combinedFlags = StreamOpFlag.combineOpFlags(opFlags, previousStage.combinedFlags);
         this.sourceStage = previousStage.sourceStage;
-        if (opIsStateful())
-            sourceStage.sourceAnyStateful = true;
         this.depth = previousStage.depth + 1;
     }
 
@@ -275,8 +267,9 @@ abstract class AbstractPipeline<E_IN, E_OUT, S extends BaseStream<E_OUT, S>>
      * @throws IllegalStateException if this pipeline stage is not the source
      *         stage.
      */
-    @SuppressWarnings("unchecked")
+
     final Spliterator<E_OUT> sourceStageSpliterator() {
+        // Ensures that this method is only ever called on the sourceStage
         if (this != sourceStage)
             throw new IllegalStateException();
 
@@ -284,16 +277,16 @@ abstract class AbstractPipeline<E_IN, E_OUT, S extends BaseStream<E_OUT, S>>
             throw new IllegalStateException(MSG_STREAM_LINKED);
         linkedOrConsumed = true;
 
-        if (sourceStage.sourceSpliterator != null) {
+        if (sourceSpliterator != null) {
             @SuppressWarnings("unchecked")
-            Spliterator<E_OUT> s = sourceStage.sourceSpliterator;
-            sourceStage.sourceSpliterator = null;
+            Spliterator<E_OUT> s = (Spliterator<E_OUT>)sourceSpliterator;
+            sourceSpliterator = null;
             return s;
         }
-        else if (sourceStage.sourceSupplier != null) {
+        else if (sourceSupplier != null) {
             @SuppressWarnings("unchecked")
-            Spliterator<E_OUT> s = (Spliterator<E_OUT>) sourceStage.sourceSupplier.get();
-            sourceStage.sourceSupplier = null;
+            Spliterator<E_OUT> s = (Spliterator<E_OUT>)sourceSupplier.get();
+            sourceSupplier = null;
             return s;
         }
         else {
@@ -322,8 +315,8 @@ abstract class AbstractPipeline<E_IN, E_OUT, S extends BaseStream<E_OUT, S>>
         linkedOrConsumed = true;
         sourceSupplier = null;
         sourceSpliterator = null;
-        if (sourceStage.sourceCloseAction != null) {
-            Runnable closeAction = sourceStage.sourceCloseAction;
+        Runnable closeAction = sourceStage.sourceCloseAction;
+        if (closeAction != null) {
             sourceStage.sourceCloseAction = null;
             closeAction.run();
         }
@@ -400,6 +393,21 @@ abstract class AbstractPipeline<E_IN, E_OUT, S extends BaseStream<E_OUT, S>>
     }
 
     /**
+     * Returns whether any of the stages of the current segment is stateful
+     * or not.
+     * @return {@code true} if any stage in this segment is stateful,
+     *         {@code false} if not.
+     */
+    protected final boolean hasAnyStateful() {
+         var result = false;
+         for (var u = sourceStage.nextStage;
+              u != null && !(result = u.opIsStateful()) && u != this;
+              u = u.nextStage) {
+         }
+         return result;
+     }
+
+    /**
      * Get the source spliterator for this pipeline stage.  For a sequential or
      * stateless parallel pipeline, this is the source spliterator.  For a
      * stateful parallel pipeline, this is a spliterator describing the results
@@ -422,7 +430,7 @@ abstract class AbstractPipeline<E_IN, E_OUT, S extends BaseStream<E_OUT, S>>
             throw new IllegalStateException(MSG_CONSUMED);
         }
 
-        if (isParallel() && sourceStage.sourceAnyStateful) {
+        if (isParallel() && hasAnyStateful()) {
             // Adapt the source spliterator, evaluating each stateful op
             // in the pipeline up to and including this pipeline stage.
             // The depth and flags of each pipeline stage are adjusted accordingly.
