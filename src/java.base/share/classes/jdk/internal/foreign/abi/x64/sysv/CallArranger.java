@@ -41,6 +41,7 @@ import jdk.internal.foreign.abi.CallingSequenceBuilder;
 import jdk.internal.foreign.abi.DowncallLinker;
 import jdk.internal.foreign.abi.LinkerOptions;
 import jdk.internal.foreign.abi.SharedUtils;
+import jdk.internal.foreign.abi.UpcallLinker;
 import jdk.internal.foreign.abi.VMStorage;
 import jdk.internal.foreign.abi.x64.X86_64Architecture;
 
@@ -131,12 +132,12 @@ public class CallArranger {
         return new Bindings(csb.build(), returnInMemory, argCalc.storageCalculator.nVectorReg);
     }
 
-    /* Replace DowncallLinker in OpenJDK with the implementation of DowncallLinker specific to OpenJ9 */
+    /* Replace DowncallLinker in OpenJDK with the implementation of DowncallLinker specific to OpenJ9. */
     public static MethodHandle arrangeDowncall(MethodType mt, FunctionDescriptor cDesc, LinkerOptions options) {
         return DowncallLinker.getBoundMethodHandle(mt, cDesc, options);
     }
 
-    /* Replace UpcallLinker in OpenJDK with the implementation of UpcallLinker specific to OpenJ9 */
+    /* Replace UpcallLinker in OpenJDK with the implementation of UpcallLinker specific to OpenJ9. */
     public static UpcallStubFactory arrangeUpcall(MethodType mt, FunctionDescriptor cDesc, LinkerOptions options) {
         return UpcallLinker.makeFactory(mt, cDesc, options);
     }
