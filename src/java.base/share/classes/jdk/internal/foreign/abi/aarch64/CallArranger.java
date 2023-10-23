@@ -45,6 +45,7 @@ import jdk.internal.foreign.abi.CallingSequenceBuilder;
 import jdk.internal.foreign.abi.DowncallLinker;
 import jdk.internal.foreign.abi.LinkerOptions;
 import jdk.internal.foreign.abi.SharedUtils;
+import jdk.internal.foreign.abi.UpcallLinker;
 import jdk.internal.foreign.abi.VMStorage;
 import jdk.internal.foreign.abi.aarch64.linux.LinuxAArch64CallArranger;
 import jdk.internal.foreign.abi.aarch64.macos.MacOsAArch64CallArranger;
@@ -183,7 +184,7 @@ public abstract class CallArranger {
         return new Bindings(csb.build(), returnInMemory);
     }
 
-    /* Replace DowncallLinker in OpenJDK with the implementation of DowncallLinker specific to OpenJ9 */
+    /* Replace DowncallLinker in OpenJDK with the implementation of DowncallLinker specific to OpenJ9. */
     public MethodHandle arrangeDowncall(MethodType mt, FunctionDescriptor cDesc, LinkerOptions options) {
         if (Utils.IS_WINDOWS) {
             throw new InternalError("arrangeDowncall is not implemented on Windows/Aarch64");
@@ -191,7 +192,7 @@ public abstract class CallArranger {
         return DowncallLinker.getBoundMethodHandle(mt, cDesc, options);
     }
 
-    /* Replace UpcallLinker in OpenJDK with the implementation of UpcallLinker specific to OpenJ9 */
+    /* Replace UpcallLinker in OpenJDK with the implementation of UpcallLinker specific to OpenJ9. */
     public UpcallStubFactory arrangeUpcall(MethodType mt, FunctionDescriptor cDesc,
                                                           LinkerOptions options) {
         if (Utils.IS_WINDOWS) {
