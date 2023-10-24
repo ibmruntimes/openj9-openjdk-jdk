@@ -1,10 +1,12 @@
 /*
- * Copyright (c) 2024, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2023, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License version 2 only, as
- * published by the Free Software Foundation.
+ * published by the Free Software Foundation.  Oracle designates this
+ * particular file as subject to the "Classpath" exception as provided
+ * by Oracle in the LICENSE file that accompanied this code.
  *
  * This code is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
@@ -21,22 +23,19 @@
  * questions.
  */
 
-/*
- * @test TestEventWriterLog
- * @summary Test that log message of JFR when handle bytecodes
- * @key jfr
- * @requires vm.hasJFR
- * @library /test/lib /test/jdk
- * @run main/othervm TestEventWriterLog
- */
+/**
+  * JVMCI compiler implementation for the JVM.
+  *
+  * This is an empty and upgradeable module that is a placeholder for an
+  * external implementation of a JVMCI compiler. It must be upgradeable so
+  * that it can be replaced when jlinking a new JDK image without failing
+  * the hash check for the qualified exports in jdk.internal.vm.ci's
+  * module descriptor.
+  *
+  * @moduleGraph
+  * @since 22
+  */
 
-import jdk.test.lib.process.ProcessTools;
-import jdk.test.lib.process.OutputAnalyzer;
-
-public class TestEventWriterLog {
-    public static void main(String[] args) throws Exception {
-        ProcessBuilder pb = ProcessTools.createJavaProcessBuilder("-Xlog:jfr+system+bytecode=trace", "-XX:StartFlightRecording", "-version");
-        OutputAnalyzer output = new OutputAnalyzer(pb.start());
-        output.shouldContain("superclass: jdk/jfr/events/AbstractJDKEvent");
-    }
+module jdk.graal.compiler {
+    requires jdk.internal.vm.ci;
 }
