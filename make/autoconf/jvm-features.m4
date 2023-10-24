@@ -22,6 +22,9 @@
 # or visit www.oracle.com if you need additional information or have any
 # questions.
 #
+# ===========================================================================
+# (c) Copyright IBM Corp. 2023, 2023 All Rights Reserved
+# ===========================================================================
 
 ###############################################################################
 # Terminology used in this file:
@@ -277,7 +280,10 @@ AC_DEFUN_ONCE([JVM_FEATURES_CHECK_JVMCI],
 [
   JVM_FEATURES_CHECK_AVAILABILITY(jvmci, [
     AC_MSG_CHECKING([if platform is supported by JVMCI])
-    if test "x$OPENJDK_TARGET_CPU" = "xx86_64"; then
+    if true; then
+      AC_MSG_RESULT([no, OpenJ9])
+      AVAILABLE=false
+    elif test "x$OPENJDK_TARGET_CPU" = "xx86_64"; then
       AC_MSG_RESULT([yes])
     elif test "x$OPENJDK_TARGET_CPU" = "xaarch64"; then
       AC_MSG_RESULT([yes])
