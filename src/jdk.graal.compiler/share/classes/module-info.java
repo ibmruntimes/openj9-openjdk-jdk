@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, 2022, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2023, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -23,17 +23,19 @@
  * questions.
  */
 
-package sun.java2d.marlin;
+/**
+  * JVMCI compiler implementation for the JVM.
+  *
+  * This is an empty and upgradeable module that is a placeholder for an
+  * external implementation of a JVMCI compiler. It must be upgradeable so
+  * that it can be replaced when jlinking a new JDK image without failing
+  * the hash check for the qualified exports in jdk.internal.vm.ci's
+  * module descriptor.
+  *
+  * @moduleGraph
+  * @since 22
+  */
 
-public final class Version {
-
-    private static final String VERSION = "marlin-0.9.4.6.1-Unsafe-OpenJDK";
-
-    public static String getVersion() {
-        return VERSION;
-    }
-
-    private Version() {
-    }
-
+module jdk.graal.compiler {
+    requires jdk.internal.vm.ci;
 }
