@@ -23,6 +23,12 @@
  * questions.
  */
 
+/*
+ * ===========================================================================
+ * (c) Copyright IBM Corp. 2022, 2023 All Rights Reserved
+ * ===========================================================================
+ */
+
 package sun.security.provider;
 
 import java.security.MessageDigestSpi;
@@ -33,6 +39,11 @@ import java.util.Objects;
 
 import jdk.internal.util.Preconditions;
 import jdk.internal.vm.annotation.IntrinsicCandidate;
+
+/*[IF CRIU_SUPPORT]*/
+import openj9.internal.criu.CRIUSECProvider;
+import openj9.internal.criu.InternalCRIUSupport;
+/*[ENDIF] CRIU_SUPPORT */
 
 /**
  * Common base message digest implementation for the Sun provider.
@@ -85,6 +96,12 @@ abstract class DigestBase extends MessageDigestSpi implements Cloneable {
         this.digestLength = digestLength;
         this.blockSize = blockSize;
         buffer = new byte[blockSize];
+
+        /*[IF CRIU_SUPPORT]*/
+        if (InternalCRIUSupport.enableCRIUSecProvider()) {
+            CRIUSECProvider.doOnRestart(this, digest -> digest.engineReset());
+        }
+        /*[ENDIF] CRIU_SUPPORT */
     }
 
     // return digest length. See JCA doc.
