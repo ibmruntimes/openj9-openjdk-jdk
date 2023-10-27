@@ -517,7 +517,7 @@ run-preprocessors-j9 : stage-j9
 			OMR_DIR=$(OUTPUTDIR)/vm/omr \
 			SOURCETOOLS_DIR=$(call MixedPath,$(OPENJ9_TOPDIR))/sourcetools \
 			SPEC=$(OPENJ9_BUILDSPEC) \
-			UMA_OPTIONS_EXTRA="-buildDate $(shell date +'%Y%m%d')" \
+			UMA_OPTIONS_EXTRA="-buildDate $(shell $(JAVA_SMALL) $(TOPDIR)/make/src/classes/DateUtil.java --format=YYYYMMdd)" \
 			VERSION_MAJOR=$(VERSION_FEATURE) \
 			tools
 
