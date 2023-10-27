@@ -1614,32 +1614,35 @@ public class Thread implements Runnable {
      * a chance to clean up before it actually exits.
      */
     void exit() {
-        /* Refresh interrupted value so it is accurate when thread reference is removed. */
-        interrupted = interrupted();
-
         try {
-            // pop any remaining scopes from the stack, this may block
-            if (headStackableScopes != null) {
-                StackableScope.popAll();
+            /* Refresh interrupted value so it is accurate when thread reference is removed. */
+            interrupted = interrupted();
+
+            try {
+                // pop any remaining scopes from the stack, this may block
+                if (headStackableScopes != null) {
+                    StackableScope.popAll();
+                }
+            } finally {
+                // notify container that thread is exiting
+                ThreadContainer container = threadContainer();
+                if (container != null) {
+                    container.onExit(this);
+                }
+            }
+
+            try {
+                if (threadLocals != null && TerminatingThreadLocal.REGISTRY.isPresent()) {
+                    TerminatingThreadLocal.threadTerminated();
+                }
+            } finally {
+                clearReferences();
             }
         } finally {
-            // notify container that thread is exiting
-            ThreadContainer container = threadContainer();
-            if (container != null) {
-                container.onExit(this);
+            synchronized (interruptLock) {
+                // so that isAlive() can work
+                eetop = Thread.NO_REF;
             }
-        }
-
-        try {
-            if (threadLocals != null && TerminatingThreadLocal.REGISTRY.isPresent()) {
-                TerminatingThreadLocal.threadTerminated();
-            }
-        } finally {
-            clearReferences();
-        }
-        synchronized (interruptLock) {
-            // so that isAlive() can work
-            eetop = Thread.NO_REF;
         }
     }
 
