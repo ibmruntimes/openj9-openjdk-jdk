@@ -24,7 +24,7 @@
 #
 
 # ===========================================================================
-# (c) Copyright IBM Corp. 2022, 2022 All Rights Reserved
+# (c) Copyright IBM Corp. 2022, 2023 All Rights Reserved
 # ===========================================================================
 
 ###############################################################################
@@ -748,7 +748,7 @@ AC_DEFUN_ONCE([JDKOPT_SETUP_REPRODUCIBLE_BUILD],
       AC_MSG_RESULT([$SOURCE_DATE, from SOURCE_DATE_EPOCH])
     else
       # Tell makefiles to take the time from configure
-      SOURCE_DATE=$($DATE +"%s")
+      SOURCE_DATE=$($JAVA $TOPDIR/make/src/classes/DateUtil.java)
       AC_MSG_RESULT([$SOURCE_DATE, from 'current' (default)])
     fi
   elif test "x$with_source_date" = xupdated; then

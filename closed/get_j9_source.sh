@@ -126,10 +126,7 @@ for i in "$@" ; do
 	esac
 done
 
-# clone OpenJ9 repos
-date '+[%F %T] Get OpenJ9 sources'
-START_TIME=$(date +%s)
-
+# Extract the various source repositories.
 for i in "${!git_urls[@]}" ; do
 	branch=${branches[$i]}
 
@@ -172,9 +169,6 @@ if [ ${pflag} = true ] ; then
 	# wait for all subprocesses to complete
 	wait
 fi
-
-END_TIME=$(date +%s)
-date "+[%F %T] OpenJ9 clone repositories finished in $(($END_TIME - $START_TIME)) seconds"
 
 for i in "${!git_urls[@]}" ; do
 	if [ -e /tmp/${i}.pid.rc ] ; then
