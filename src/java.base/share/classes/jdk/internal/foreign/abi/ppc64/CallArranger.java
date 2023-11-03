@@ -43,6 +43,9 @@ import jdk.internal.foreign.abi.LinkerOptions;
 import jdk.internal.foreign.abi.SharedUtils;
 import jdk.internal.foreign.abi.UpcallLinker;
 import jdk.internal.foreign.abi.VMStorage;
+import jdk.internal.foreign.abi.ppc64.aix.AixCallArranger;
+import jdk.internal.foreign.abi.ppc64.linux.ABIv1CallArranger;
+import jdk.internal.foreign.abi.ppc64.linux.ABIv2CallArranger;
 
 import java.lang.foreign.AddressLayout;
 import java.lang.foreign.FunctionDescriptor;
@@ -70,6 +73,7 @@ import static jdk.internal.foreign.abi.ppc64.PPC64Architecture.Regs.*;
  */
 public abstract class CallArranger {
     final boolean useABIv2 = useABIv2();
+    final boolean isAIX = isAIX();
 
     private static final int STACK_SLOT_SIZE = 8;
     private static final int MAX_COPY_SIZE = 8;
@@ -99,11 +103,13 @@ public abstract class CallArranger {
 
     public static final CallArranger ABIv1 = new ABIv1CallArranger();
     public static final CallArranger ABIv2 = new ABIv2CallArranger();
+    public static final CallArranger AIX = new AixCallArranger();
 
     /**
      * Select ABI version
      */
     protected abstract boolean useABIv2();
+    protected abstract boolean isAIX();
 
     public Bindings getBindings(MethodType mt, FunctionDescriptor cDesc, boolean forUpcall) {
         return getBindings(mt, cDesc, forUpcall, LinkerOptions.empty());
@@ -204,7 +210,7 @@ public abstract class CallArranger {
             // offset for the next argument which will really use the stack.
             // The reserved space for the Parameter Save Area is determined by the DowncallStubGenerator.
             VMStorage stack;
-            if (!useABIv2 && is32Bit) {
+            if (!useABIv2 && !isAIX && is32Bit) {
                 stackAlloc(4, STACK_SLOT_SIZE); // Skip first half of stack slot.
                 stack = stackAlloc(4, 4);
             } else {
@@ -341,13 +347,14 @@ public abstract class CallArranger {
 
         @Override
         List<Binding> getBindings(Class<?> carrier, MemoryLayout layout) {
-            TypeClass argumentClass = TypeClass.classifyLayout(layout, useABIv2);
+            TypeClass argumentClass = TypeClass.classifyLayout(layout, useABIv2, isAIX);
             Binding.Builder bindings = Binding.builder();
             switch (argumentClass) {
                 case STRUCT_REGISTER -> {
                     assert carrier == MemorySegment.class;
                     VMStorage[] regs = storageCalculator.structAlloc(layout);
-                    final boolean isLargeABIv1Struct = !useABIv2 && layout.byteSize() > MAX_COPY_SIZE;
+                    final boolean isLargeABIv1Struct = !useABIv2 &&
+                        (isAIX || layout.byteSize() > MAX_COPY_SIZE);
                     long offset = 0;
                     for (VMStorage storage : regs) {
                         // Last slot may be partly used.
@@ -428,14 +435,15 @@ public abstract class CallArranger {
 
         @Override
         List<Binding> getBindings(Class<?> carrier, MemoryLayout layout) {
-            TypeClass argumentClass = TypeClass.classifyLayout(layout, useABIv2);
+            TypeClass argumentClass = TypeClass.classifyLayout(layout, useABIv2, isAIX);
             Binding.Builder bindings = Binding.builder();
             switch (argumentClass) {
                 case STRUCT_REGISTER -> {
                     assert carrier == MemorySegment.class;
                     bindings.allocate(layout);
                     VMStorage[] regs = storageCalculator.structAlloc(layout);
-                    final boolean isLargeABIv1Struct = !useABIv2 && layout.byteSize() > MAX_COPY_SIZE;
+                    final boolean isLargeABIv1Struct = !useABIv2 &&
+                        (isAIX || layout.byteSize() > MAX_COPY_SIZE);
                     long offset = 0;
                     for (VMStorage storage : regs) {
                         // Last slot may be partly used.

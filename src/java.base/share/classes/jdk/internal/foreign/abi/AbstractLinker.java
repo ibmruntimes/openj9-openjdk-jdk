@@ -22,13 +22,6 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-
-/*
- * ===========================================================================
- * (c) Copyright IBM Corp. 2022, 2023 All Rights Reserved
- * ===========================================================================
- */
-
 package jdk.internal.foreign.abi;
 
 import jdk.internal.foreign.SystemLookup;
@@ -69,9 +62,8 @@ import java.util.Objects;
 import java.util.Set;
 
 public abstract sealed class AbstractLinker implements Linker permits LinuxAArch64Linker, MacOsAArch64Linker,
-                                                                      AixPPC64Linker,
                                                                       SysVx64Linker, WindowsAArch64Linker,
-                                                                      Windowsx64Linker,
+                                                                      Windowsx64Linker, AixPPC64Linker,
                                                                       LinuxPPC64Linker, LinuxPPC64leLinker,
                                                                       LinuxRISCV64Linker, LinuxS390Linker,
                                                                       FallbackLinker {
@@ -188,6 +180,11 @@ public abstract sealed class AbstractLinker implements Linker permits LinuxAArch
         }
     }
 
+    // some ABIs have special handling for struct members
+    protected void checkStructMember(MemoryLayout member, long offset) {
+        checkLayoutRecursive(member);
+    }
+
     private void checkLayoutRecursive(MemoryLayout layout) {
         if (layout instanceof ValueLayout vl) {
             checkSupported(vl);
@@ -199,7 +196,7 @@ public abstract sealed class AbstractLinker implements Linker permits LinuxAArch
                 // check element offset before recursing so that an error points at the
                 // outermost layout first
                 checkMemberOffset(sl, member, lastUnpaddedOffset, offset);
-                checkLayoutRecursive(member);
+                checkStructMember(member, offset);
 
                 offset += member.byteSize();
                 if (!(member instanceof PaddingLayout)) {
