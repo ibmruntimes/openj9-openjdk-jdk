@@ -1744,6 +1744,7 @@ public sealed class InetAddress implements Serializable permits Inet4Address, In
      * @throws NullPointerException if the {@code ipAddressLiteral} is {@code null}.
      * @see Inet4Address#ofLiteral(String)
      * @see Inet6Address#ofLiteral(String)
+     * @since 22
      */
     public static InetAddress ofLiteral(String ipAddressLiteral) {
         Objects.requireNonNull(ipAddressLiteral);
