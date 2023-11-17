@@ -39,6 +39,7 @@ $(eval $(call SetupCopyFiles,COPY_OVERLAY_FILES, \
 	SRC := $(TOPDIR), \
 	DEST := $(SUPPORT_OUTPUTDIR)/overlay, \
 	FILES := \
+		src/java.base/share/classes/java/io/PrintStream.java \
 		src/java.base/share/classes/java/lang/ClassValue.java \
 		src/java.base/share/classes/java/lang/invoke/ClassSpecializer.java \
 		src/java.base/share/classes/java/net/InetAddress.java \
