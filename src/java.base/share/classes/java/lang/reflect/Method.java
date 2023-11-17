@@ -23,6 +23,12 @@
  * questions.
  */
 
+ /*
+ * ===========================================================================
+ * (c) Copyright IBM Corp. 2023, 2023 All Rights Reserved
+ * ===========================================================================
+ */
+
 package java.lang.reflect;
 
 import jdk.internal.access.SharedSecrets;
@@ -771,8 +777,7 @@ public final class Method extends Executable {
             getReturnType());
         Object result = AnnotationParser.parseMemberValue(
             memberType, ByteBuffer.wrap(annotationDefault),
-            SharedSecrets.getJavaLangAccess().
-                getConstantPool(getDeclaringClass()),
+            com.ibm.oti.vm.VM.getConstantPoolFromAnnotationBytes(getDeclaringClass(), annotationDefault),
             getDeclaringClass());
         if (result instanceof ExceptionProxy) {
             if (result instanceof TypeNotPresentExceptionProxy proxy) {

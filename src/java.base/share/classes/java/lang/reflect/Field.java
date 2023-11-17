@@ -23,6 +23,12 @@
  * questions.
  */
 
+ /*
+ * ===========================================================================
+ * (c) Copyright IBM Corp. 2023, 2023 All Rights Reserved
+ * ===========================================================================
+ */
+
 package java.lang.reflect;
 
 import jdk.internal.access.SharedSecrets;
@@ -1280,8 +1286,7 @@ class Field extends AccessibleObject implements Member {
                     } else {
                         declAnnos = AnnotationParser.parseAnnotations(
                                 annotations,
-                                SharedSecrets.getJavaLangAccess()
-                                        .getConstantPool(getDeclaringClass()),
+                                com.ibm.oti.vm.VM.getConstantPoolFromAnnotationBytes(getDeclaringClass(), annotations),
                                 getDeclaringClass());
                     }
                     declaredAnnotations = declAnnos;
