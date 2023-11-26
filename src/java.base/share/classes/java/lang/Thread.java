@@ -1615,9 +1615,6 @@ public class Thread implements Runnable {
      */
     void exit() {
         try {
-            /* Refresh interrupted value so it is accurate when thread reference is removed. */
-            interrupted = interrupted();
-
             try {
                 // pop any remaining scopes from the stack, this may block
                 if (headStackableScopes != null) {
