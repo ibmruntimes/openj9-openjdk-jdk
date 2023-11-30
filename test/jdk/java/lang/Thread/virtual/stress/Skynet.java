@@ -32,7 +32,7 @@
  * @summary Stress test virtual threads with a variation of the Skynet 1M benchmark
  * @requires vm.continuations
  * @requires !vm.debug | vm.gc != "Z"
- * @run main/othervm/timeout=300 -Xmx1g -Xnocompressedrefs Skynet
+ * @run main/othervm/timeout=300 -Xmx1g -Xssi2K -Xnocompressedrefs Skynet
  */
 
 /*
