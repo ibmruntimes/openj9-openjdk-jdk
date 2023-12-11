@@ -1,5 +1,5 @@
 # ===========================================================================
-# (c) Copyright IBM Corp. 2020, 2023 All Rights Reserved
+# (c) Copyright IBM Corp. 2023, 2023 All Rights Reserved
 # ===========================================================================
 # This code is free software; you can redistribute it and/or modify it
 # under the terms of the GNU General Public License version 2 only, as
@@ -18,11 +18,32 @@
 # 2 along with this work; if not, see <http://www.gnu.org/licenses/>.
 # ===========================================================================
 
-JRE_MODULES += \
-	$(if $(call equals, $(OPENJ9_ENABLE_CRIU_SUPPORT), true), openj9.criu) \
-	openj9.cuda \
-	openj9.dataaccess \
-	openj9.dtfj \
-	openj9.gpu \
-	$(if $(call equals, $(BUILD_OPENJCEPLUS), true), openjceplus) \
-	#
+include $(TOPDIR)/closed/CopySupport.gmk
+
+ifeq (true,$(BUILD_OPENJCEPLUS))
+  # Copy OpenJCEPlus native libraries.
+  $(eval $(call SetupCopyFiles, OPENJCEPLUS_JGSKIT_LIBS_COPY, \
+      SRC := $(OPENJCEPLUS_TOPDIR)/target, \
+      FILES := $(filter %.dll %.so %.x, $(call FindFiles, $(OPENJCEPLUS_TOPDIR)/target)), \
+      FLATTEN := true, \
+      DEST := $(LIB_DST_DIR), \
+  ))
+
+  TARGETS += $(OPENJCEPLUS_JGSKIT_LIBS_COPY)
+
+  # Bundle GSKIT library.
+  OPENJCEPLUS_OCK_DIR := $(OPENJCEPLUS_TOPDIR)/ock/jgsk_sdk/lib64
+  ifeq ($(call isTargetOs, windows), true)
+    OPENJCEPLUS_OCK_SUB_DIR := modules_cmds
+  else
+    OPENJCEPLUS_OCK_SUB_DIR := modules_libs
+  endif
+
+  $(eval $(call SetupCopyFiles, OPENJCEPLUS_OCK_COPY, \
+      SRC := $(OPENJCEPLUS_OCK_DIR), \
+      DEST := $(SUPPORT_OUTPUTDIR)/$(OPENJCEPLUS_OCK_SUB_DIR)/$(MODULE), \
+      FILES := $(call FindFiles, $(OPENJCEPLUS_OCK_DIR)), \
+  ))
+
+  TARGETS += $(OPENJCEPLUS_OCK_COPY)
+endif # BUILD_OPENJCEPLUS

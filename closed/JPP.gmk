@@ -34,6 +34,10 @@ ifeq (true,$(OPENJ9_ENABLE_INLINE_TYPES))
   JPP_TAGS += INLINE-TYPES
 endif # OPENJ9_ENABLE_INLINE_TYPES
 
+ifeq (true,$(BUILD_OPENJCEPLUS))
+  JPP_TAGS += OPENJCEPLUS_SUPPORT
+endif # BUILD_OPENJCEPLUS
+
 # invoke JPP to preprocess java source files
 # $1 - configuration
 # $2 - source directory

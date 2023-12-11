@@ -21,6 +21,7 @@
 # exclude all source directories
 /omr
 /openj9
+/OpenJCEPlus
 /openssl
 
 # openjdk gitignore
