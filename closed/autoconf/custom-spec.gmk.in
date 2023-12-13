@@ -52,6 +52,7 @@ WARNING_MODULES := \
 	openj9.dtfj \
 	openj9.dtfjview \
 	openj9.traceformat \
+	openjceplus \
 	#
 
 ifneq (,$(filter $(WARNING_MODULES),$(MODULE)))
@@ -183,3 +184,7 @@ J9JCL_SOURCES_DONEFILE := $(MAKESUPPORT_OUTPUTDIR)/j9jcl.done
 
 # Disable all hotspot features.
 JVM_FEATURES_server :=
+
+# Required by OpenJCEPlus.
+BUILD_OPENJCEPLUS  := @BUILD_OPENJCEPLUS@
+OPENJCEPLUS_TOPDIR := $(TOPDIR)/OpenJCEPlus
