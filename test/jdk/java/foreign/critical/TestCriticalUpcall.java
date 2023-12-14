@@ -49,7 +49,9 @@ public class TestCriticalUpcall extends UpcallTestHelper {
     @Test
     public void testUpcallFailure() throws IOException, InterruptedException {
         // test to see if we catch a trivial downcall doing an upcall
-        runInNewProcess(Runner.class, true).assertFailed().assertStdErrContains("wrong thread state for upcall");
+        runInNewProcess(Runner.class, true)
+            .shouldNotHaveExitValue(0)
+            .stderrShouldContain("wrong thread state for upcall");
     }
 
     public static class Runner extends NativeTestHelper {
