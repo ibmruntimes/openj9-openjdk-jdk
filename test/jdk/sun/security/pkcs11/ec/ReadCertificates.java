@@ -22,6 +22,12 @@
  */
 
 /*
+ * ===========================================================================
+ * (c) Copyright IBM Corp. 2024, 2024 All Rights Reserved
+ * ===========================================================================
+ */
+
+/*
  * @test
  * @bug 6405536 6414980 8051972
  * @summary Make sure that we can parse certificates using various named curves
@@ -41,6 +47,7 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.Provider;
+import java.security.ProviderException;
 import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.security.SignatureException;
@@ -182,6 +189,16 @@ public class ReadCertificates extends PKCS11Test {
                 }
             } catch (SignatureException | InvalidKeyException e) {
                 System.out.println("OK: " + e);
+            } catch (ProviderException pe) {
+                if (pe.getMessage().contains("cancel failed")
+                    && "s390x".equals(System.getProperty("os.arch"))
+                ) {
+                    System.out.println("NSS error code is different in s390x.");
+                    pe.printStackTrace();
+                    return;
+                }
+
+                throw pe;
             }
         }
 
