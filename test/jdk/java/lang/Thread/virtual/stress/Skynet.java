@@ -32,7 +32,7 @@
  * @summary Stress test virtual threads with a variation of the Skynet 1M benchmark
  * @requires vm.continuations
  * @requires !vm.debug | vm.gc != "Z"
- * @run main/othervm/timeout=300 -Xmx1g -Xssi2K -Xnocompressedrefs Skynet
+ * @run main/othervm/timeout=300 -Xmx1500m -Xssi2K -Xnocompressedrefs Skynet
  */
 
 /*
@@ -41,7 +41,7 @@
  * @requires vm.gc.ZSinglegen
  * @run main/othervm/timeout=300 -XX:+UnlockDiagnosticVMOptions
  *     -XX:+UseZGC -XX:-ZGenerational
- *     -XX:+ZVerifyOops -XX:ZCollectionInterval=0.01 -Xmx1g Skynet
+ *     -XX:+ZVerifyOops -XX:ZCollectionInterval=0.01 -Xmx1500m Skynet
  */
 
 /*
@@ -50,7 +50,7 @@
  * @requires vm.gc.ZGenerational
  * @run main/othervm/timeout=300 -XX:+UnlockDiagnosticVMOptions
  *     -XX:+UseZGC -XX:+ZGenerational
- *     -XX:+ZVerifyOops -XX:ZCollectionInterval=0.01 -Xmx1g Skynet
+ *     -XX:+ZVerifyOops -XX:ZCollectionInterval=0.01 -Xmx1500m Skynet
  */
 
 import java.util.concurrent.BlockingQueue;
