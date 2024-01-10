@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1994, 2023, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1994, 2024, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -352,15 +352,20 @@ public class Thread implements Runnable {
      * operation, if any.  The blocker's interrupt method should be invoked
      * after setting this thread's interrupt status.
      */
-    volatile Interruptible nioBlocker;
+    private Interruptible nioBlocker;
+
+    Interruptible nioBlocker() {
+        //assert Thread.holdsLock(interruptLock);
+        return nioBlocker;
+    }
 
     /* Set the blocker field; invoked via jdk.internal.access.SharedSecrets
      * from java.nio code
      */
-    static void blockedOn(Interruptible b) {
-        Thread me = Thread.currentThread();
-        synchronized (me.interruptLock) {
-            me.nioBlocker = b;
+    void blockedOn(Interruptible b) {
+        //assert Thread.currentThread() == this;
+        synchronized (interruptLock) {
+            nioBlocker = b;
         }
     }
 
@@ -1718,15 +1723,19 @@ public class Thread implements Runnable {
             checkAccess();
         }
 
+        Interruptible blocker;
         synchronized (interruptLock) {
             interrupted = true;
             interrupt0();  // inform VM of interrupt
 
             // thread may be blocked in an I/O operation
-            Interruptible b = nioBlocker;
-            if (b != null) {
-                b.interrupt(this);
+            blocker = nioBlocker;
+            if (blocker != null) {
+                blocker.interrupt(this);
             }
+        }
+        if (blocker != null) {
+            blocker.postInterrupt();
         }
     }
 
