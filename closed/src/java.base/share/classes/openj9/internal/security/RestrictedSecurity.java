@@ -1,6 +1,6 @@
 /*
  * ===========================================================================
- * (c) Copyright IBM Corp. 2022, 2023 All Rights Reserved
+ * (c) Copyright IBM Corp. 2022, 2024 All Rights Reserved
  * ===========================================================================
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -687,11 +687,19 @@ public final class RestrictedSecurity {
 
                 // Remove the provider's optional arguments if present.
                 pos = providerName.indexOf(' ');
-                providerName = (pos < 0) ? providerName.trim() : providerName.substring(0, pos).trim();
-                // Remove the provider's class package names if present.
-                pos = providerName.lastIndexOf('.');
-                providerName = (pos < 0) ? providerName : providerName.substring(pos + 1, providerName.length());
-                // Provider without arguments and package names.
+                if (pos >= 0) {
+                    providerName = providerName.substring(0, pos);
+                }
+                providerName = providerName.trim();
+
+                // Remove argument, e.g. -NSS-FIPS, if present.
+                pos = providerName.indexOf('-');
+                if (pos >= 0) {
+                    providerName = providerName.substring(0, pos);
+                }
+
+                // Provider name defined in provider construction method.
+                providerName = getProvidersSimpleName(providerName);
                 providersSimpleName.add(pNum - 1, providerName);
             }
 
@@ -963,11 +971,12 @@ public final class RestrictedSecurity {
 
             // Remove argument, e.g. -NSS-FIPS, if present.
             int pos = providerName.indexOf('-');
-            providerName = (pos < 0) ? providerName : providerName.substring(0, pos);
+            if (pos >= 0) {
+                providerName = providerName.substring(0, pos);
+            }
 
-            // Remove the provider class package name if present.
-            pos = providerName.lastIndexOf('.');
-            providerName = (pos < 0) ? providerName : providerName.substring(pos + 1, providerName.length());
+            // Provider name defined in provider construction method.
+            providerName = getProvidersSimpleName(providerName);
 
             // Check if the provider is in restricted security provider list.
             // If not, the provider won't be registered.
@@ -990,6 +999,27 @@ public final class RestrictedSecurity {
                 }
             }
             return false;
+        }
+
+        /**
+         * Get the provider name defined in provider construction method.
+         *
+         * @param providerName provider name or provider with packages
+         * @return provider name defined in provider construction method
+         */
+        private static String getProvidersSimpleName(String providerName) {
+            if (providerName.equals("com.sun.security.sasl.Provider")) {
+                // The main class for the SunSASL provider is com.sun.security.sasl.Provider.
+                return "SunSASL";
+            } else {
+                // Remove the provider's class package names if present.
+                int pos = providerName.lastIndexOf('.');
+                if (pos >= 0) {
+                    providerName = providerName.substring(pos + 1);
+                }
+                // Provider without package names.
+                return providerName;
+            }
         }
 
         /**
