@@ -23,12 +23,6 @@
  * questions.
  */
 
-/*
- * ===========================================================================
- * (c) Copyright IBM Corp. 2024, 2024 All Rights Reserved
- * ===========================================================================
- */
-
 package jdk.javadoc.internal.tool;
 
 import java.io.File;
@@ -687,7 +681,7 @@ public class Start {
                 .toList();
         switch (suggestions.size()) {
             case 0 -> { }
-            case 1 -> showLinesUsingKey("main.did-you-mean", suggestions.get(0));
+            case 1 -> showLinesUsingKey("main.did-you-mean", suggestions.getFirst());
             default -> showLinesUsingKey("main.did-you-mean-one-of", String.join(" ", suggestions));
         }
         showLinesUsingKey("main.for-more-details-see-usage");
