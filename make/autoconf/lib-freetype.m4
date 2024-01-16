@@ -23,6 +23,10 @@
 # questions.
 #
 
+# ===========================================================================
+# (c) Copyright IBM Corp. 2024, 2024 All Rights Reserved
+# ===========================================================================
+
 ################################################################################
 # Check if a potential freeype library match is correct and usable
 ################################################################################
@@ -101,11 +105,6 @@ AC_DEFUN_ONCE([LIB_SETUP_FREETYPE],
   fi
 
   FREETYPE_TO_USE=bundled
-  if test "x$OPENJDK_TARGET_OS" != "xwindows" && \
-      test "x$OPENJDK_TARGET_OS" != "xmacosx" && \
-      test "x$OPENJDK_TARGET_OS" != "xaix"; then
-    FREETYPE_TO_USE=system
-  fi
   if test "x$with_freetype" != "x" ; then
     if test "x$with_freetype" = "xsystem" ; then
       FREETYPE_TO_USE=system
