@@ -1,5 +1,5 @@
 # ===========================================================================
-# (c) Copyright IBM Corp. 2023, 2023 All Rights Reserved
+# (c) Copyright IBM Corp. 2023, 2024 All Rights Reserved
 # ===========================================================================
 # This code is free software; you can redistribute it and/or modify it
 # under the terms of the GNU General Public License version 2 only, as
@@ -21,6 +21,15 @@
 include $(TOPDIR)/closed/CopySupport.gmk
 
 ifeq (true,$(BUILD_OPENJCEPLUS))
+  # Copy OpenJCEPlus legal files.
+  $(call openj9_copy_files,, \
+      $(OPENJCEPLUS_TOPDIR)/LICENSE \
+      $(LEGAL_DST_DIR)/OPENJCEPLUS_LICENSE)
+
+  $(call openj9_copy_files,, \
+      $(OPENJCEPLUS_TOPDIR)/NOTICES.md \
+      $(LEGAL_DST_DIR)/NOTICES.md)
+
   # Copy OpenJCEPlus native libraries.
   $(eval $(call SetupCopyFiles, OPENJCEPLUS_JGSKIT_LIBS_COPY, \
       SRC := $(OPENJCEPLUS_TOPDIR)/target, \
