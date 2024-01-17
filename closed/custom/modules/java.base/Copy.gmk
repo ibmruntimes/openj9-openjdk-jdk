@@ -1,5 +1,5 @@
 # ===========================================================================
-# (c) Copyright IBM Corp. 2017, 2023 All Rights Reserved
+# (c) Copyright IBM Corp. 2017, 2024 All Rights Reserved
 # ===========================================================================
 # This code is free software; you can redistribute it and/or modify it
 # under the terms of the GNU General Public License version 2 only, as
@@ -130,7 +130,7 @@ endif # zos
 
 # static libraries that are needed on some platforms
 
-ifneq (,$(filter windows zos,$(OPENJDK_TARGET_OS)))
+ifeq ($(call isTargetOs, windows), true)
 
 $(call openj9_copy_files,, \
 	$(addsuffix /$(call STATIC_LIBRARY,jsig), \
@@ -141,7 +141,7 @@ $(call openj9_copy_files,, \
 	$(OPENJ9_VM_BUILD_DIR)/redirector/$(call STATIC_LIBRARY,redirector_jvm) \
 	$(LIB_DST_DIR)/$(call STATIC_LIBRARY,jvm))
 
-endif # OPENJDK_TARGET_OS
+endif # windows
 
 # properties files, etc.
 
