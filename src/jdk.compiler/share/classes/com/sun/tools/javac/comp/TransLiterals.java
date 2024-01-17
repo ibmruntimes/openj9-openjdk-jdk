@@ -23,12 +23,6 @@
  * questions.
  */
 
-/*
- * ===========================================================================
- * (c) Copyright IBM Corp. 2023, 2023 All Rights Reserved
- * ===========================================================================
- */
-
 package com.sun.tools.javac.comp;
 
 import com.sun.tools.javac.code.Flags;
@@ -260,12 +254,11 @@ public final class TransLiterals extends TreeTranslator {
         }
 
         boolean isNamedProcessor(Name name) {
-            Symbol sym = null;
-            if (processor instanceof JCIdent ident) {
-                sym = ident.sym;
-            } else if (processor instanceof JCFieldAccess access) {
-                sym = access.sym;
-            }
+            Symbol sym = switch (processor) {
+                case JCIdent ident -> ident.sym;
+                case JCFieldAccess access -> access.sym;
+                default -> null;
+            };
             if (sym instanceof VarSymbol varSym) {
                 if (varSym.flags() == (Flags.PUBLIC | Flags.FINAL | Flags.STATIC) &&
                         varSym.name == name &&
