@@ -85,10 +85,12 @@ security.provider.tbd=Apple
 #endif
 security.provider.tbd=SunPKCS11
 
-#if defined linux-x86 || defined linux-ppc || defined linux-s390
+#if defined aix-ppc || defined linux-ppc || defined linux-s390 || defined linux-x86 || defined windows
 #
 # Java Restricted Security Mode
 #
+#endif
+#if defined linux-ppc || defined linux-s390 || defined linux-x86
 RestrictedSecurity.NSS.140-2.desc.name = Red Hat Enterprise Linux 8 NSS Cryptographic Module FIPS 140-2
 RestrictedSecurity.NSS.140-2.desc.default = true
 RestrictedSecurity.NSS.140-2.desc.fips = true
