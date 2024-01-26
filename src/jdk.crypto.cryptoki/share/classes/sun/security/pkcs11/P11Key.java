@@ -25,7 +25,7 @@
 
 /*
  * ===========================================================================
- * (c) Copyright IBM Corp. 2022, 2023 All Rights Reserved
+ * (c) Copyright IBM Corp. 2022, 2024 All Rights Reserved
  * ===========================================================================
  */
 
@@ -381,6 +381,21 @@ abstract class P11Key implements Key, Length {
             new CK_ATTRIBUTE(CKA_SENSITIVE),
             new CK_ATTRIBUTE(CKA_EXTRACTABLE),
         });
+        if ((SunPKCS11.mysunpkcs11 != null)
+            && (attrs[0].getBoolean()
+                || attrs[1].getBoolean()
+                || (attrs[2].getBoolean() == false))
+        ) {
+            try {
+                byte[] key = SunPKCS11.mysunpkcs11.exportKey(session.id(), attrs, keyID);
+                SecretKey secretKey = new SecretKeySpec(key, algorithm);
+                return new P11PBEKey(session, keyID, algorithm, keyLength, attrs, password, salt, iterationCount, secretKey);
+            } catch (PKCS11Exception e) {
+                if (debug != null) {
+                    debug.println("Attempt failed, creating a regular P11PBEKey for " + algorithm);
+                }
+            }
+        }
         return new P11PBEKey(session, keyID, algorithm, keyLength,
                 attrs, password, salt, iterationCount);
     }
@@ -521,14 +536,23 @@ abstract class P11Key implements Key, Length {
 
         private volatile byte[] encoded; // guard by double-checked locking
 
+        private final SecretKey key;
+
         P11SecretKey(Session session, long keyID, String algorithm,
                 int keyLength, CK_ATTRIBUTE[] attrs) {
             super(SECRET, session, keyID, algorithm, keyLength, attrs);
+            this.key = null;
+        }
+
+        P11SecretKey(Session session, long keyID, String algorithm,
+                int keyLength, CK_ATTRIBUTE[] attrs, SecretKey key) {
+            super(SECRET, session, keyID, algorithm, keyLength, attrs);
+            this.key = key;
         }
 
         public String getFormat() {
             token.ensureValid();
-            if (sensitive || !extractable || (isNSS && tokenObject)) {
+            if ((key == null) && (sensitive || !extractable || (isNSS && tokenObject))) {
                 return null;
             } else {
                 return "RAW";
@@ -539,6 +563,10 @@ abstract class P11Key implements Key, Length {
             token.ensureValid();
             if (getFormat() == null) {
                 return null;
+            }
+
+            if (key != null) {
+                return key.getEncoded();
             }
 
             byte[] b = encoded;
@@ -581,6 +609,16 @@ abstract class P11Key implements Key, Length {
                 int keyLength, CK_ATTRIBUTE[] attributes,
                 char[] password, byte[] salt, int iterationCount) {
             super(session, keyID, algorithm, keyLength, attributes);
+            this.password = password.clone();
+            this.salt = salt.clone();
+            this.iterationCount = iterationCount;
+        }
+
+        // fips
+        P11PBEKey(Session session, long keyID, String algorithm,
+                int keyLength, CK_ATTRIBUTE[] attributes,
+                char[] password, byte[] salt, int iterationCount, SecretKey key) {
+            super(session, keyID, algorithm, keyLength, attributes, key);
             this.password = password.clone();
             this.salt = salt.clone();
             this.iterationCount = iterationCount;
