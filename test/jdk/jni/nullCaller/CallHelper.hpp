@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2022, 2024, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -44,9 +44,9 @@
 class CallHelper {
 public:
     CallHelper(JNIEnv* e, const std::string& cname, const std::string& mname, const std::string& sig) :
-        classname(cname), method(mname), signature(sig), m(NULL), env(e) {
+        classname(cname), method(mname), signature(sig), m(nullptr), env(e) {
         c = env->FindClass(classname.c_str());
-        assert (c != NULL);
+        assert (c != nullptr);
     }
 
 protected:
@@ -60,7 +60,7 @@ protected:
 
     // check the given object which is expected to be null
     void checkReturnNull(jobject obj) {
-        if (obj != NULL) {
+        if (obj != nullptr) {
             emitErrorMessage("Null return expected");
             ::exit(-1);
         }
@@ -68,7 +68,7 @@ protected:
 
     // check the given object which is expected to NOT be null
     void checkReturnNotNull(jobject obj) {
-        if (obj == NULL) {
+        if (obj == nullptr) {
             emitErrorMessage("Non-Null return expected");
             ::exit(-1);
         }
@@ -76,7 +76,7 @@ protected:
 
     // check if any unexpected exceptions were thrown
     void checkException() {
-        if (env->ExceptionOccurred() != NULL) {
+        if (env->ExceptionOccurred() != nullptr) {
             emitErrorMessage("Exception was thrown");
             env->ExceptionDescribe();
             ::exit(-1);
@@ -89,7 +89,7 @@ protected:
          // unless the exception is cleared before calling FindClass, OpenJ9 will return NULL from FindClass, which will assert below
          env->ExceptionClear();
          jclass expected = env->FindClass(exception.c_str());
-         assert(expected != NULL);
+         assert(expected != nullptr);
          if (env->IsInstanceOf(t, expected) == JNI_FALSE) {
             emitErrorMessage("Didn't get the expected " + exception);
             ::exit(-1);
@@ -114,7 +114,7 @@ public:
         : CallHelper(e, cname, mname, sig) {
 
         m = env->GetMethodID(c, method.c_str(), signature.c_str());
-        assert(m != NULL);
+        assert(m != nullptr);
     }
 
     // call on the given object, checking for exceptions and that the return is not null
@@ -176,7 +176,7 @@ public:
         : CallHelper(e, cname, mname, sig) {
 
         m = env->GetStaticMethodID(c, method.c_str(), signature.c_str());
-        assert(m != NULL);
+        assert(m != nullptr);
     }
 
     // call a method returning an object checking for exceptions and
