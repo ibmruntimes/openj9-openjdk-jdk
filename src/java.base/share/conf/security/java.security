@@ -155,7 +155,7 @@ RestrictedSecurity.NSS.140-2.securerandom.provider = SunPKCS11-NSS-FIPS
 RestrictedSecurity.NSS.140-2.securerandom.algorithm = PKCS11
 #endif
 
-#if defined aix-ppc || defined linux-ppc || defined linux-x86 || defined windows
+#if defined aix-ppc || defined linux-ppc || defined linux-s390 || defined linux-x86 || defined windows
 RestrictedSecurity.OpenJCEPlusFIPS.FIPS140-3.desc.name = OpenJCEPlusFIPS Cryptographic Module FIPS 140-3
 RestrictedSecurity.OpenJCEPlusFIPS.FIPS140-3.desc.default = true
 RestrictedSecurity.OpenJCEPlusFIPS.FIPS140-3.desc.fips = true

@@ -1,5 +1,5 @@
 # ===========================================================================
-# (c) Copyright IBM Corp. 2023, 2023 All Rights Reserved
+# (c) Copyright IBM Corp. 2023, 2024 All Rights Reserved
 # ===========================================================================
 # This code is free software; you can redistribute it and/or modify it
 # under the terms of the GNU General Public License version 2 only, as
@@ -35,6 +35,8 @@ ifeq ($(call isTargetOs, aix), true)
 else ifeq ($(call isTargetOs, linux), true)
   ifeq ($(call isTargetCpu, ppc64le), true)
     OPENJCEPLUS_JGSKIT_PLATFORM := ppcle-linux64
+  else ifeq ($(call isTargetCpu, s390x), true)
+    OPENJCEPLUS_JGSKIT_PLATFORM := s390-linux64
   else ifeq ($(call isTargetCpu, x86_64), true)
     OPENJCEPLUS_JGSKIT_PLATFORM := x86-linux64
   endif
