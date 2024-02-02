@@ -23,6 +23,12 @@
  * questions.
  */
 
+/*
+ * ===========================================================================
+ * (c) Copyright IBM Corp. 2023, 2024 All Rights Reserved
+ * ===========================================================================
+ */
+
 package jdk.internal.access;
 
 import jdk.internal.foreign.abi.NativeEntryPoint;
@@ -121,7 +127,7 @@ public interface JavaLangInvokeAccess {
      * @param nep the native entry point
      * @return the native method handle
      */
-    MethodHandle nativeMethodHandle(NativeEntryPoint nep);
+    MethodHandle nativeMethodHandle(MethodHandle nep);
 
     /**
      * Produces a method handle unreflecting from a {@code Constructor} with
