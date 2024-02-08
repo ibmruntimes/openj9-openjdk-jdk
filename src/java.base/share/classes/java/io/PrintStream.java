@@ -177,6 +177,7 @@ public class PrintStream extends FilterOutputStream
      * @see java.io.PrintWriter#PrintWriter(java.io.OutputStream, boolean)
      * @see Charset#defaultCharset()
      */
+    @SuppressWarnings("this-escape")
     public PrintStream(OutputStream out, boolean autoFlush) {
         this(autoFlush, requireNonNull(out, "Null output stream"));
     }
@@ -222,6 +223,7 @@ public class PrintStream extends FilterOutputStream
      *
      * @since  10
      */
+    @SuppressWarnings("this-escape")
     public PrintStream(OutputStream out, boolean autoFlush, Charset charset) {
         super(out);
         this.autoFlush = autoFlush;
@@ -265,6 +267,7 @@ public class PrintStream extends FilterOutputStream
      *
      * @since  1.5
      */
+    @SuppressWarnings("this-escape")
     public PrintStream(String fileName) throws FileNotFoundException {
         this(false, new FileOutputStream(fileName));
     }
@@ -366,6 +369,7 @@ public class PrintStream extends FilterOutputStream
      *
      * @since  1.5
      */
+    @SuppressWarnings("this-escape")
     public PrintStream(File file) throws FileNotFoundException {
         this(false, new FileOutputStream(file));
     }
