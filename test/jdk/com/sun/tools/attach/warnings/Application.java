@@ -23,7 +23,7 @@
 
 /*
  * ===========================================================================
- * (c) Copyright IBM Corp. 2023, 2023 All Rights Reserved
+ * (c) Copyright IBM Corp. 2023, 2024 All Rights Reserved
  * ===========================================================================
  */
 
@@ -48,8 +48,8 @@ public class Application {
             // send pid
             long pid = ProcessHandle.current().pid();
             while (!AttachHandler.isAttachApiInitialized()) {
-                // delay 2s to allow AttachAPI initialization
-                Thread.currentThread().sleep(100);
+                // delay to allow AttachAPI initialization
+                Thread.sleep(100);
             }
             out.writeLong(pid);
 
