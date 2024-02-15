@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2003, 2024, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2017, 2024, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -20,21 +20,32 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
+package org.openjdk.bench.vm.gc.systemgc;
 
-#include <stdio.h>
-#include "nsk_strace.hpp"
+import org.openjdk.jmh.annotations.Benchmark;
+import org.openjdk.jmh.annotations.BenchmarkMode;
+import org.openjdk.jmh.annotations.Fork;
+import org.openjdk.jmh.annotations.Mode;
+import org.openjdk.jmh.annotations.OutputTimeUnit;
 
-extern "C" {
+import java.util.concurrent.TimeUnit;
 
-JNIEXPORT void JNICALL
-Java_nsk_stress_strace_strace015Thread_recursiveMethod2(JNIEnv *env, jobject obj)
-{
-    jclass threadClass;
-    jmethodID method;
+@BenchmarkMode(Mode.SingleShotTime)
+@Fork(value=25, jvmArgsAppend={"-Xmx5g", "-Xms5g", "-Xmn3g", "-XX:+AlwaysPreTouch"})
+@OutputTimeUnit(TimeUnit.MILLISECONDS)
+public class NoObjects {
 
-    GET_OBJECT_CLASS(threadClass, obj);
+    /*
+     * Test the System GC when there are no additionally allocate
+     * objects.
+     *
+     * The heap settings provided are the same as for the other
+     * test for consistency.
+     */
 
-    CALL_VOID_NOPARAM(obj, threadClass, "recursiveMethod1");
-}
+    @Benchmark
+    public void gc() {
+        System.gc();
+    }
 
 }
