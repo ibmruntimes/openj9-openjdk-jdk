@@ -1719,23 +1719,26 @@ public class Thread implements Runnable {
      *          if the current thread cannot modify this thread
      */
     public void interrupt() {
-        if (currentThread() != this) {
+        if (this != Thread.currentThread()) {
             checkAccess();
         }
 
-        Interruptible blocker;
-        synchronized (interruptLock) {
-            interrupted = true;
-            interrupt0();  // inform VM of interrupt
+        // Setting the interrupt status must be done before reading nioBlocker.
+        interrupted = true;
+        interrupt0();  // inform VM of interrupt
 
-            // thread may be blocked in an I/O operation
-            blocker = nioBlocker;
-            if (blocker != null) {
-                blocker.interrupt(this);
+        // thread may be blocked in an I/O operation
+        if (this != Thread.currentThread()) {
+            Interruptible blocker;
+            synchronized (interruptLock) {
+                blocker = nioBlocker;
+                if (blocker != null) {
+                    blocker.interrupt(this);
+                }
             }
-        }
-        if (blocker != null) {
-            blocker.postInterrupt();
+            if (blocker != null) {
+                blocker.postInterrupt();
+            }
         }
     }
 
@@ -1792,14 +1795,15 @@ public class Thread implements Runnable {
         if (com.ibm.oti.vm.VM.isJVMInSingleThreadedMode()) {
             return interruptedImpl();
         }
-        synchronized (interruptLock) {
-            boolean oldValue = interrupted;
-            if (oldValue) {
-                interrupted = false;
-                clearInterruptEvent();
-            }
-            return oldValue;
+        boolean oldValue = interrupted;
+        // We may have been interrupted the moment after we read the field,
+        // so only clear the field if we saw that it was set and will return
+        // true; otherwise we could lose an interrupt.
+        if (oldValue) {
+            interrupted = false;
+            clearInterruptEvent();
         }
+        return oldValue;
     }
 
     /**
