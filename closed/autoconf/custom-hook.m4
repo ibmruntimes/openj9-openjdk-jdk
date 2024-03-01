@@ -1,5 +1,5 @@
 # ===========================================================================
-# (c) Copyright IBM Corp. 2017, 2023 All Rights Reserved
+# (c) Copyright IBM Corp. 2017, 2024 All Rights Reserved
 # ===========================================================================
 # This code is free software; you can redistribute it and/or modify it
 # under the terms of the GNU General Public License version 2 only, as
@@ -832,7 +832,7 @@ AC_DEFUN([OPENJ9_GENERATE_TOOL_WRAPPERS],
   OPENJ9_GENERATE_TOOL_WRAPPER([jar], [$JAR])
   OPENJ9_GENERATE_TOOL_WRAPPER([java], [$JAVA])
   OPENJ9_GENERATE_TOOL_WRAPPER([javac], [$JAVAC])
-  OPENJ9_GENERATE_TOOL_WRAPPER([lib], [$AR])
+  OPENJ9_GENERATE_TOOL_WRAPPER([lib], [$LIB])
   OPENJ9_GENERATE_TOOL_WRAPPER([link], [$LD])
   OPENJ9_GENERATE_TOOL_WRAPPER([mc], [$MC])
   OPENJ9_GENERATE_TOOL_WRAPPER([ml], [$AS])
