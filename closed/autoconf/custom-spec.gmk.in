@@ -1,5 +1,5 @@
 # ===========================================================================
-# (c) Copyright IBM Corp. 2017, 2023 All Rights Reserved
+# (c) Copyright IBM Corp. 2017, 2024 All Rights Reserved
 # ===========================================================================
 # This code is free software; you can redistribute it and/or modify it
 # under the terms of the GNU General Public License version 2 only, as
@@ -111,7 +111,7 @@ ifeq ($(OPENJDK_TARGET_OS), windows)
   # Set environment variables for Microsoft Visual Studio toolchain.
   # Note that PATH is set in spec.gmk.
   export INCLUDE := @OPENJ9_VS_INCLUDE@
-  export LIB := @OPENJ9_VS_LIB@
+  OPENJ9_VS_LIB := @OPENJ9_VS_LIB@
   export MSVC_VERSION := @TOOLCHAIN_VERSION@
 endif
 
