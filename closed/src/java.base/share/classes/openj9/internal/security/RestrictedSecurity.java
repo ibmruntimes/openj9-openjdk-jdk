@@ -472,6 +472,12 @@ public final class RestrictedSecurity {
         propsMapping.put("jdk.tls.legacyAlgorithms", restricts.jdkTlsLegacyAlgorithms);
         propsMapping.put("jdk.certpath.disabledAlgorithms", restricts.jdkCertpathDisabledAlgorithms);
         propsMapping.put("jdk.security.legacyAlgorithm", restricts.jdkSecurityLegacyAlgorithm);
+        String fipsMode = System.getProperty("com.ibm.fips.mode");
+        if (fipsMode == null) {
+            System.setProperty("com.ibm.fips.mode", restricts.jdkFipsMode);
+        } else if (!fipsMode.equals(restricts.jdkFipsMode)) {
+            printStackTraceAndExit("Property com.ibm.fips.mode is incompatible with semeru.customprofile and semeru.fips properties");
+        }
 
         for (Map.Entry<String, String> entry : propsMapping.entrySet()) {
             String jdkPropsName = entry.getKey();
@@ -592,6 +598,8 @@ public final class RestrictedSecurity {
         // For SecureRandom.
         String jdkSecureRandomProvider;
         String jdkSecureRandomAlgorithm;
+
+        String jdkFipsMode;
 
         // Provider with argument (provider name + optional argument).
         private final List<String> providers;
@@ -749,6 +757,8 @@ public final class RestrictedSecurity {
                     securityProps.getProperty(profileID + ".securerandom.provider"));
             jdkSecureRandomAlgorithm = parseProperty(
                     securityProps.getProperty(profileID + ".securerandom.algorithm"));
+            jdkFipsMode = parseProperty(
+                    securityProps.getProperty(profileID + ".fips.mode"));
 
             if (debug != null) {
                 debug.println("\tProperties of restricted security profile successfully loaded.");
@@ -1068,6 +1078,8 @@ public final class RestrictedSecurity {
                     securityProps.getProperty(profileToPrint + ".desc.default"));
             printProperty(profileToPrint + ".desc.fips: ",
                     securityProps.getProperty(profileToPrint + ".desc.fips"));
+            printProperty(profileToPrint + ".fips.mode: ",
+                    securityProps.getProperty(profileToPrint + ".fips.mode"));
             printProperty(profileToPrint + ".desc.number: ",
                     parseProperty(securityProps.getProperty(profileToPrint + ".desc.number")));
             printProperty(profileToPrint + ".desc.policy: ",
