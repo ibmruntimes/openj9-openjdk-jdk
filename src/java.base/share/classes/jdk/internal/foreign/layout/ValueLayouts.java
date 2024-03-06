@@ -285,7 +285,7 @@ public final class ValueLayouts {
         }
 
         public static OfLong of(ByteOrder order) {
-            return new OfLongImpl(order, ADDRESS_SIZE_BYTES, Optional.empty());
+            return new OfLongImpl(order, Long.BYTES, Optional.empty());
         }
     }
 
@@ -301,7 +301,7 @@ public final class ValueLayouts {
         }
 
         public static OfDouble of(ByteOrder order) {
-            return new OfDoubleImpl(order, Utils.IS_AIX ? 4 : ADDRESS_SIZE_BYTES, Optional.empty());
+            return new OfDoubleImpl(order, Utils.IS_AIX ? 4 : Double.BYTES, Optional.empty());
         }
 
         @Override

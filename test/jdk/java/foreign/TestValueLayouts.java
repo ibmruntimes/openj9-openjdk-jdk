@@ -78,7 +78,7 @@ public class TestValueLayouts {
 
     @Test
     public void testLong() {
-        testAligned(JAVA_LONG, long.class, Long.BYTES, ADDRESS.byteSize());
+        testAligned(JAVA_LONG, long.class, Long.BYTES, Long.BYTES);
     }
 
     @Test
@@ -98,7 +98,7 @@ public class TestValueLayouts {
 
     @Test
     public void testDouble() {
-        testAligned(JAVA_DOUBLE, double.class, Double.BYTES, ADDRESS.byteSize());
+        testAligned(JAVA_DOUBLE, double.class, Double.BYTES, Double.BYTES);
     }
 
     @Test
