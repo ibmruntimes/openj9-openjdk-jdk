@@ -136,6 +136,11 @@ public class VThreadEventTest {
     public static void main(String[] args) throws Exception {
         if (Runtime.getRuntime().availableProcessors() < 8) {
             log("WARNING: test expects at least 8 processors.");
+            if (System.getProperty("os.name").startsWith("Windows") && (Runtime.getRuntime().availableProcessors() < 16)) {
+                // On Windows platform, ensure sufficient processor available to avoid deadlock.
+                log("WARNING: Insufficient processors, test expects at least 16 processors on Windows Platform.\nTest not executed.");
+                return;
+            }
         }
         try (ExecutorService executorService = Executors.newVirtualThreadPerTaskExecutor()) {
             for (int i = 0; i < TCNT1; i++) {
