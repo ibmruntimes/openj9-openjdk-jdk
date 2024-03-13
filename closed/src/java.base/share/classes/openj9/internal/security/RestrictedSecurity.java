@@ -593,9 +593,11 @@ public final class RestrictedSecurity {
         String jdkSecureRandomProvider;
         String jdkSecureRandomAlgorithm;
 
+        private final Map<String, String> providerClassNameMap;
+
         // Provider with argument (provider name + optional argument).
         private final List<String> providers;
-        // Provider without argument.
+        // Provider name defined in construction method.
         private final List<String> providersSimpleName;
         // The map is keyed by provider name.
         private final Map<String, Constraint[]> providerConstraints;
@@ -623,6 +625,8 @@ public final class RestrictedSecurity {
             providersSimpleName = new ArrayList<>();
             providerConstraints = new HashMap<>();
 
+            providerClassNameMap = new HashMap<>();
+
             // Initialize the properties.
             init();
         }
@@ -642,6 +646,8 @@ public final class RestrictedSecurity {
                 initProperties();
                 // Load restricted security provider constraints from java.security properties.
                 initConstraints();
+                // Load restricted security profile attributes from java.security properties.
+                initProfileAttributes();
             } catch (Exception e) {
                 if (debug != null) {
                     debug.println("Unable to initialize restricted security mode.");
@@ -857,6 +863,63 @@ public final class RestrictedSecurity {
             }
         }
 
+        private void initProfileAttributes() {
+            if (debug != null) {
+                debug.println("\tLoading profile attributes.");
+            }
+
+            String pAttributes = parseProperty(
+                    securityProps.getProperty(profileID + ".attributes"));
+
+            if ((pAttributes == null) || pAttributes.isBlank()) {
+                if (debug != null) {
+                    debug.println("\tNo profile attributes.");
+                }
+                return;
+            }
+
+            try {
+                // Locate and parse providerattributes section.
+                pAttributes = pAttributes.replaceAll("\\s", "");
+                int startIndex = pAttributes.indexOf("<providerattributes>");
+                int endIndex = pAttributes.indexOf("</providerattributes>");
+
+                if (startIndex != -1 && endIndex != -1) {
+                    String providerAttributesSection = pAttributes.substring(startIndex, endIndex);
+
+                    // Parse provider elements within providerattributes section.
+                    int providerIndex = 0;
+                    while ((providerIndex = providerAttributesSection.indexOf("<provider>", providerIndex)) != -1) {
+                        int providerEndIndex = providerAttributesSection.indexOf("</provider>", providerIndex);
+                        String providerElement = providerAttributesSection.substring(providerIndex, providerEndIndex);
+
+                        // Locate shortname and classname within provider element.
+                        int shortnameIndex = providerElement.indexOf("<shortname>");
+                        int shortnameEndIndex = providerElement.indexOf("</shortname>", shortnameIndex);
+                        String shortname = providerElement.substring(shortnameIndex + "<shortname>".length(),
+                                shortnameEndIndex);
+
+                        int classnameIndex = providerElement.indexOf("<classname>");
+                        int classnameEndIndex = providerElement.indexOf("</classname>", classnameIndex);
+                        String classname = providerElement.substring(classnameIndex + "<classname>".length(),
+                                classnameEndIndex);
+
+                        // Store shortname and classname in the providerClassNameMap.
+                        providerClassNameMap.put(classname, shortname);
+
+                        // Move to the next provider element.
+                        providerIndex = providerEndIndex + "</provider>".length();
+                    }
+                    if (debug != null) {
+                        debug.println("\tProfile attribute successfully loaded.");
+                    }
+                }
+            } catch (Exception e) {
+                printStackTraceAndExit("\tProfile attribute format is incorrect: " + pAttributes);
+                e.printStackTrace();
+            }
+        }
+
         /**
          * Check if the Service is allowed in restricted security mode.
          *
@@ -1007,17 +1070,22 @@ public final class RestrictedSecurity {
          * @param providerName provider name or provider with packages
          * @return provider name defined in provider construction method
          */
-        private static String getProvidersSimpleName(String providerName) {
+        private String getProvidersSimpleName(String providerName) {
             if (providerName.equals("com.sun.security.sasl.Provider")) {
                 // The main class for the SunSASL provider is com.sun.security.sasl.Provider.
                 return "SunSASL";
             } else {
+                // Get provider name from the provider class name map
+                String pName = providerClassNameMap.get(providerName);
+                if ((pName != null) && !pName.isBlank()) {
+                    return pName;
+                }
+
                 // Remove the provider's class package names if present.
                 int pos = providerName.lastIndexOf('.');
                 if (pos >= 0) {
                     providerName = providerName.substring(pos + 1);
                 }
-                // Provider without package names.
                 return providerName;
             }
         }
