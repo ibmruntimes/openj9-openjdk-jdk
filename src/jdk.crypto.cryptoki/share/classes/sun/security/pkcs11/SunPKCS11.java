@@ -56,8 +56,10 @@ import javax.security.auth.callback.PasswordCallback;
 
 import com.sun.crypto.provider.ChaCha20Poly1305Parameters;
 
+import com.sun.crypto.provider.DHParameters;
 import jdk.internal.misc.InnocuousThread;
 import openj9.internal.security.RestrictedSecurity;
+import sun.security.rsa.PSSParameters;
 import sun.security.rsa.RSAUtil.KeyType;
 import sun.security.util.Debug;
 import sun.security.util.ECUtil;
@@ -584,9 +586,7 @@ public final class SunPKCS11 extends AuthProvider {
                 try {
                     keyBytes = ECUtil.generateECPrivateKey(
                         getBigIntegerOrZero(ckAttrsMap, CKA_VALUE),
-                        ECUtil.getECParameterSpec(
-                            Security.getProvider("SunEC"),
-                            ckaECParams.getByteArray())
+                        ECUtil.getECParameterSpec(ckaECParams.getByteArray())
                     ).getEncoded();
                     // If key is private and of EC type, NSS may require CKA_NETSCAPE_DB
                     // attribute to unwrap it. Otherwise, C_UnwrapKey will produce an Exception.
@@ -941,6 +941,14 @@ public final class SunPKCS11 extends AuthProvider {
         dA(AGP, "ChaCha20-Poly1305",
                 "com.sun.crypto.provider.ChaCha20Poly1305Parameters",
                 m(CKM_CHACHA20_POLY1305));
+
+        dA(AGP, "RSASSA-PSS",
+                "sun.security.rsa.PSSParameters",
+                m(CKM_RSA_PKCS_PSS));
+
+        dA(AGP, "DiffieHellman",
+                "com.sun.crypto.provider.DHParameters",
+                m(CKM_DH_PKCS_DERIVE));
 
         d(KA, "DH",             P11KeyAgreement,
                 dhAlias,
@@ -1731,6 +1739,10 @@ public final class SunPKCS11 extends AuthProvider {
                     return new sun.security.util.GCMParameters();
                 } else if (algorithm == "ChaCha20-Poly1305") {
                     return new ChaCha20Poly1305Parameters(); // from SunJCE
+                } else if (algorithm == "RSASSA-PSS") {
+                    return new PSSParameters(); // from SunRsaSign
+                } else if (algorithm == "DiffieHellman") {
+                    return new DHParameters(); // from SunJCE
                 } else {
                     throw new NoSuchAlgorithmException("Unsupported algorithm: "
                             + algorithm);
