@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2002, 2008, 2024 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2024, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -21,34 +21,39 @@
  * questions.
  */
 
-import javax.swing.JColorChooser;
-import javax.swing.JPanel;
-
 /*
  * @test
- * @bug 4759306
- * @library /java/awt/regtesthelpers
- * @build PassFailJFrame
- * @summary Checks if JColorChooser.setPreviewPanel removes the old one
- * @run main/manual Test4759306
+ * @bug 8326204
+ * @summary yield statements doesn't allow cast expressions with more than 1 type arguments
+ * @compile T8326204a.java
  */
-public class Test4759306 {
+import java.util.*;
 
-    public static void main(String[] args) throws Exception {
-        PassFailJFrame.builder()
-                .title("Test4759306")
-                .instructions("Check that there is no panel titled \"Preview\" in the JColorChooser.")
-                .rows(5)
-                .columns(40)
-                .testTimeOut(10)
-                .splitUIRight(Test4759306::createColorChooser)
-                .build()
-                .awaitAndCheck();
+public class T8326204a {
+    void testOneParam() {
+        Object value = new ArrayList<String>();
+        Object returnedValue = switch (1) {
+            default -> {
+                yield (List<String>) value;
+            }
+        };
     }
 
-    private static JColorChooser createColorChooser() {
-        JColorChooser chooser = new JColorChooser();
-        chooser.setPreviewPanel(new JPanel());
-        return chooser;
+    void testTwoParams() {
+        Object value = new HashMap<String, String>();
+        Object returnedValue = switch (1) {
+            default -> {
+                yield (Map<String, String>) value;
+            }
+        };
+    }
+
+    void testTwoParamsInParens() {
+        Object value = new HashMap<String, String>();
+        Object returnedValue = switch (1) {
+            default -> {
+                yield ((Map<String, String>) value);
+            }
+        };
     }
 }

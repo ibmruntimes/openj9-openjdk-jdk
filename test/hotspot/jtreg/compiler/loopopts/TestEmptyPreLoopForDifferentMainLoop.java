@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2002, 2008, 2024 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2024, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -21,34 +21,37 @@
  * questions.
  */
 
-import javax.swing.JColorChooser;
-import javax.swing.JPanel;
-
 /*
  * @test
- * @bug 4759306
- * @library /java/awt/regtesthelpers
- * @build PassFailJFrame
- * @summary Checks if JColorChooser.setPreviewPanel removes the old one
- * @run main/manual Test4759306
+ * @bug 8327423
+ * @summary Test empty loop removal of pre-loop, with different main-loop after it.
+ * @run main/othervm -Xcomp
+ *      -XX:CompileCommand=compileonly,compiler.loopopts.TestEmptyPreLoopForDifferentMainLoop::test
+ *      compiler.loopopts.TestEmptyPreLoopForDifferentMainLoop
+ * @run main compiler.loopopts.TestEmptyPreLoopForDifferentMainLoop
  */
-public class Test4759306 {
 
-    public static void main(String[] args) throws Exception {
-        PassFailJFrame.builder()
-                .title("Test4759306")
-                .instructions("Check that there is no panel titled \"Preview\" in the JColorChooser.")
-                .rows(5)
-                .columns(40)
-                .testTimeOut(10)
-                .splitUIRight(Test4759306::createColorChooser)
-                .build()
-                .awaitAndCheck();
+package compiler.loopopts;
+
+public class TestEmptyPreLoopForDifferentMainLoop {
+    static int sink;
+
+    public static void main(String args[]) {
+        test(false);
     }
 
-    private static JColorChooser createColorChooser() {
-        JColorChooser chooser = new JColorChooser();
-        chooser.setPreviewPanel(new JPanel());
-        return chooser;
+    static void test(boolean flag) {
+        int x = 8;
+        for (int j = 0; j < 100; j++) {
+            for (int k = 0; k < 100; k++) {
+                if (flag) {
+                    x += k;
+                    sink = 42;
+                }
+            }
+            if (flag) {
+                break;
+            }
+        }
     }
 }
