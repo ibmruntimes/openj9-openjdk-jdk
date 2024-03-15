@@ -130,7 +130,7 @@ public final class NativeECKeyPairGenerator extends KeyPairGeneratorSpi {
                 ("Key size must be at most " + KEY_SIZE_MAX + " bits");
         }
         this.keySize = keySize;
-        this.params = ECUtil.getECParameterSpec(null, keySize);
+        this.params = ECUtil.getECParameterSpec(keySize);
         if (this.params == null) {
             throw new InvalidParameterException(
                 "No EC parameters available for key size " + keySize + " bits");
@@ -174,14 +174,14 @@ public final class NativeECKeyPairGenerator extends KeyPairGeneratorSpi {
         ECParameterSpec ecSpec = null;
 
         if (params instanceof ECParameterSpec ecParams) {
-            ecSpec = ECUtil.getECParameterSpec(null, ecParams);
+            ecSpec = ECUtil.getECParameterSpec(ecParams);
             if (ecSpec == null) {
                 throw new InvalidAlgorithmParameterException(
                     "Unsupported curve: " + params);
             }
         } else if (params instanceof ECGenParameterSpec ecGenParams) {
             String name = ecGenParams.getName();
-            ecSpec = ECUtil.getECParameterSpec(null, name);
+            ecSpec = ECUtil.getECParameterSpec(name);
             if (ecSpec == null) {
                 throw new InvalidAlgorithmParameterException(
                     "Unknown curve name: " + name);
