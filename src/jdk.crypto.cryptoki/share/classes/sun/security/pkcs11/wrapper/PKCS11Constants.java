@@ -45,6 +45,12 @@
  *  POSSIBILITY  OF SUCH DAMAGE.
  */
 
+/*
+ * ===========================================================================
+ * (c) Copyright IBM Corp. 2024, 2024 All Rights Reserved
+ * ===========================================================================
+ */
+
 package sun.security.pkcs11.wrapper;
 
 /**
@@ -999,6 +1005,10 @@ public interface PKCS11Constants {
 
     // NSS private
     public static final long  CKM_NSS_TLS_PRF_GENERAL        = 0x80000373L;
+    public static final long  CKM_NSS_TLS_EXTENDED_MASTER_KEY_DERIVE
+                                        /* (CKM_NSS + 25) */ = 0xCE534369L;
+    public static final long  CKM_NSS_TLS_EXTENDED_MASTER_KEY_DERIVE_DH
+                                        /* (CKM_NSS + 26) */ = 0xCE53436AL;
     // Additional PKCS #12 PBE key derivation algorithms defined in NSS v3.29
     public static final long  CKM_NSS_PKCS12_PBE_SHA224_HMAC_KEY_GEN
                                         /* (CKM_NSS + 29) */ = 0xCE53436DL;
