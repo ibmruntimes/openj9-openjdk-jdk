@@ -280,6 +280,13 @@ else
   FEATURE_SED_SCRIPT += $(call SedDisable,opt_jitserver)
 endif
 
+# Adjust JFR enablement flags.
+ifeq (true,$(OPENJ9_ENABLE_JFR))
+  FEATURE_SED_SCRIPT += $(call SedEnable,opt_jfr)
+else
+  FEATURE_SED_SCRIPT += $(call SedDisable,opt_jfr)
+endif
+
 # Adjust Inline-Types enablement flags.
 ifeq (true,$(OPENJ9_ENABLE_INLINE_TYPES))
   SPEC_SED_SCRIPT += $(call SedEnable,opt_valhallaValueTypes)
@@ -462,12 +469,18 @@ ifeq (true,$(OPENJ9_ENABLE_CMAKE))
   else # OPENJ9_ENABLE_INLINE_TYPES
     CMAKE_ARGS += -DJ9VM_OPT_VALHALLA_VALUE_TYPES=OFF
   endif # OPENJ9_ENABLE_INLINE_TYPES
-  
+
   ifeq (true,$(OPENJ9_ENABLE_CRAC_SUPPORT))
     CMAKE_ARGS += -DJ9VM_OPT_CRAC_SUPPORT=ON
   else # OPENJ9_ENABLE_CRAC_SUPPORT
     CMAKE_ARGS += -DJ9VM_OPT_CRAC_SUPPORT=OFF
   endif # OPENJ9_ENABLE_CRAC_SUPPORT
+
+  ifeq (true,$(OPENJ9_ENABLE_JFR))
+    CMAKE_ARGS += -DJ9VM_OPT_JFR=ON
+  else # OPENJ9_ENABLE_JFR
+    CMAKE_ARGS += -DJ9VM_OPT_JFR=OFF
+  endif # OPENJ9_ENABLE_JFR
 
   ifeq (true,$(OPENJ9_ENABLE_CRIU_SUPPORT))
     CMAKE_ARGS += -DJ9VM_OPT_CRIU_SUPPORT=ON
