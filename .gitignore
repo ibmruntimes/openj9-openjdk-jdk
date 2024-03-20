@@ -43,7 +43,7 @@ NashornProfile.txt
 **/JTreport/**
 **/JTwork/**
 /src/utils/LogCompilation/target/
-/.project/
+/.project
 /.settings/
 /compile_commands.json
 /.cache
