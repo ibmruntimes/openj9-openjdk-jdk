@@ -23,6 +23,12 @@
  * questions.
  */
 
+/*
+ * ===========================================================================
+ * (c) Copyright IBM Corp. 2024, 2024 All Rights Reserved
+ * ===========================================================================
+ */
+
 package java.lang.invoke;
 
 import sun.invoke.util.VerifyAccess;
@@ -1002,6 +1008,13 @@ final class MemberName implements Member, Cloneable {
             if (result != null && result.isResolved())
                 return result;
             return null;
+        }
+    }
+
+    @Override
+    protected void finalize() {
+        if (null != clazz) {
+            MethodHandleNatives.markClassForMemberNamePruning(clazz);
         }
     }
 }
