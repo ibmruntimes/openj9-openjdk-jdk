@@ -22,9 +22,10 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
+
 /*
  * ===========================================================================
- * (c) Copyright IBM Corp. 2023, 2023 All Rights Reserved
+ * (c) Copyright IBM Corp. 2024, 2024 All Rights Reserved
  * ===========================================================================
  */
 
@@ -436,7 +437,7 @@ cbEarlyVMRestore(jvmtiEnv *jvmti_env, ...)
         EXIT_ERROR(AGENT_ERROR_INTERNAL, "VM dead at restore time");
     }
     if (suspendOnRestore) {
-        initialize(env, thread, EI_VM_RESTORE);
+        initialize(env, thread, EI_VM_RESTORE, NULL);
     }
     LOG_MISC(("END cbEarlyVMRestore"));
 }
@@ -712,8 +713,9 @@ initialize(JNIEnv *env, jthread thread, EventIndex triggering_ei, EventInfo *opt
     if (error != JVMTI_ERROR_NONE) {
         EXIT_ERROR(error, "unable to clear JVMTI callbacks");
     }
-    /* Remove initial extension event callbacks and disable the events. */
+
 #if defined(J9VM_OPT_CRIU_SUPPORT)
+    /* Remove initial extension event callbacks and disable the events. */
     error = JVMTI_FUNC_PTR(gdata->jvmti, SetExtensionEventCallback)
                 (gdata->jvmti, eventIndex2jvmti(EI_VM_RESTORE), NULL);
     if (JVMTI_ERROR_NONE != error) {
@@ -1272,6 +1274,9 @@ parseOptions(char *options)
                 goto syntax_error;
             }
 #if defined(J9VM_OPT_CRIU_SUPPORT)
+            if (suspendOnInit) {
+                suspendOnRestore = JNI_TRUE;
+            }
         } else if (0 == strcmp(buf, "suspendOnRestore")) {
             if (!get_boolean(&str, &suspendOnRestore)) {
                 goto syntax_error;

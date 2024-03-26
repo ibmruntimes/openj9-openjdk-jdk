@@ -22,11 +22,13 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
+
 /*
  * ===========================================================================
- * (c) Copyright IBM Corp. 2023, 2023 All Rights Reserved
+ * (c) Copyright IBM Corp. 2024, 2024 All Rights Reserved
  * ===========================================================================
  */
+
 /*
  * eventHandler
  *
@@ -1319,8 +1321,9 @@ cbVMDeath(jvmtiEnv *jvmti_env, JNIEnv *env)
     if (error != JVMTI_ERROR_NONE) {
         EXIT_ERROR(error,"Can't clear event callbacks on vm death");
     }
-    /* clear extension event callbacks */
+
 #if defined(J9VM_OPT_CRIU_SUPPORT)
+    /* clear extension event callbacks */
     error = JVMTI_FUNC_PTR(gdata->jvmti, SetExtensionEventCallback)
                 (gdata->jvmti, eventIndex2jvmti(EI_VM_RESTORE), NULL);
     if (JVMTI_ERROR_NONE != error) {

@@ -22,9 +22,10 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
+
 /*
  * ===========================================================================
- * (c) Copyright IBM Corp. 2023, 2023 All Rights Reserved
+ * (c) Copyright IBM Corp. 2024, 2024 All Rights Reserved
  * ===========================================================================
  */
 
@@ -2081,7 +2082,7 @@ eventIndex2EventName(EventIndex ei)
             return "EI_VIRTUAL_THREAD_END";
 #if defined(J9VM_OPT_CRIU_SUPPORT)
         case EI_VM_RESTORE:
-            return "EI_VM_RESTORE":
+            return "EI_VM_RESTORE";
 #endif /* defined(J9VM_OPT_CRIU_SUPPORT) */
         default:
             JDI_ASSERT(JNI_FALSE);
