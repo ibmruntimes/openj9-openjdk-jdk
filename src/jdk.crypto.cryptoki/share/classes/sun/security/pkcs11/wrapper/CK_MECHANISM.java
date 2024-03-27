@@ -45,6 +45,12 @@
  *  POSSIBILITY  OF SUCH DAMAGE.
  */
 
+/*
+ * ===========================================================================
+ * (c) Copyright IBM Corp. 2024, 2024 All Rights Reserved
+ * ===========================================================================
+ */
+
 package sun.security.pkcs11.wrapper;
 
 import java.math.BigInteger;
@@ -108,6 +114,10 @@ public class CK_MECHANISM {
     }
 
     public CK_MECHANISM(long mechanism, CK_TLS12_MASTER_KEY_DERIVE_PARAMS params) {
+        init(mechanism, params);
+    }
+
+    public CK_MECHANISM(long mechanism, CK_NSS_TLS_EXTENDED_MASTER_KEY_DERIVE_PARAMS params) {
         init(mechanism, params);
     }
 
