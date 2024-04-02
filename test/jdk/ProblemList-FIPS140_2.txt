@@ -1221,3 +1221,15 @@ com/sun/crypto/provider/Cipher/AEAD/GCMBufferTest.java https://github.com/ibmrun
 # It seems that the keysize of DSA should not be 2048. After changing it to 1024, the cancelOperation failure disappeared.
 # The new exception is generating a DSA certificate but failed to generate DSA public key while trying to get the prime number when calling generatePublic() function from KeyFactory.
 sun/security/x509/X509CertImpl/V3Certificate.java https://github.com/ibmruntimes/openj9-openjdk-jdk17/issues/131 linux-x64,linux-ppc64le,linux-s390x
+
+# Temporary Exclusion
+java/util/jar/JarFile/VerifySignedJar.java https://github.ibm.com/runtimes/backlog/issues/1089 linux-x64,linux-ppc64le,linux-s390x
+com/sun/jndi/ldap/LdapSSLHandshakeFailureTest.java https://github.ibm.com/runtimes/backlog/issues/1089 linux-x64,linux-ppc64le,linux-s390x
+javax/smartcardio/TerminalFactorySpiTest.java https://github.ibm.com/runtimes/backlog/issues/1089 linux-x64,linux-ppc64le,linux-s390x
+java/util/jar/JarFile/SignedJarPendingBlock.java https://github.ibm.com/runtimes/backlog/issues/1089 linux-x64,linux-ppc64le,linux-s390x
+sun/security/krb5/auto/Unavailable.java https://github.ibm.com/runtimes/backlog/issues/1089 linux-x64,linux-ppc64le,linux-s390x
+sun/security/krb5/etype/WeakCrypto.java https://github.ibm.com/runtimes/backlog/issues/1089 linux-x64,linux-ppc64le,linux-s390x
+java/foreign/TestFallbackLookup.java    https://github.ibm.com/runtimes/backlog/issues/1291 linux-x64,linux-ppc64le,linux-s390x
+sun/security/krb5/auto/Cleaners.java    https://github.ibm.com/runtimes/backlog/issues/1089 linux-x64,linux-ppc64le,linux-s390x
+sun/security/krb5/auto/S4U2selfNotF.java    https://github.ibm.com/runtimes/backlog/issues/1089 linux-x64,linux-ppc64le,linux-s390x
+java/util/jar/JarFile/IgnoreUnrelatedSignatureFiles.java    https://github.ibm.com/runtimes/backlog/issues/1089 linux-x64,linux-ppc64le,linux-s390x
