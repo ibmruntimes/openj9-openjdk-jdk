@@ -25,6 +25,7 @@
  * @test
  * @bug 4482187
  * @summary HttpsClient tests are failing for build 71
+ * @library /test/lib
  * @run main/othervm GetResponseCode
  *
  *     SunJSSE does not support dynamic system properties, no way to re-use
@@ -36,6 +37,8 @@ import java.io.*;
 import java.net.*;
 import javax.net.ssl.*;
 import java.security.cert.Certificate;
+
+import jdk.test.lib.Utils;
 
 public class GetResponseCode implements HostnameVerifier {
     /*
@@ -148,6 +151,11 @@ public class GetResponseCode implements HostnameVerifier {
         String trustFilename =
             System.getProperty("test.src", "./") + "/" + pathToStores +
                 "/" + trustStoreFile;
+
+        if (Utils.isFIPS()) {
+            keyFilename = Utils.revertJKSToPKCS12(keyFilename, passwd);
+            trustFilename = Utils.revertJKSToPKCS12(trustFilename, passwd);
+        }
 
         System.setProperty("javax.net.ssl.keyStore", keyFilename);
         System.setProperty("javax.net.ssl.keyStorePassword", passwd);

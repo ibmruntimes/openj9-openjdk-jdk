@@ -37,6 +37,9 @@ import javax.net.ssl.SSLServerSocket;
 import javax.net.ssl.SSLSocket;
 import java.security.Security;
 
+import jdk.test.lib.Utils;
+import jdk.test.lib.security.SecurityUtils;
+
 public class SignatureSchemes extends SSLSocketTemplate {
     private final String[] serverSignatureSchemes;
     private final String[] clientSignatureSchemes;
@@ -91,7 +94,9 @@ public class SignatureSchemes extends SSLSocketTemplate {
     }
 
     public static void main(String[] args) throws Exception {
-        Security.setProperty("jdk.tls.disabledAlgorithms", "");
+        if (!(Utils.isFIPS())) {
+            Security.setProperty("jdk.tls.disabledAlgorithms", "");
+        }
 
         runTest(new String[] {
                         "ecdsa_secp256r1_sha256",
