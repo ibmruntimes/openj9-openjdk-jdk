@@ -38,6 +38,7 @@
  * @author Brad Wetmore
  */
 
+import jdk.test.lib.Utils;
 import jdk.test.lib.security.SecurityUtils;
 
 import javax.net.ssl.*;
@@ -89,7 +90,25 @@ public class TestAllSuites {
     }
 
     private void test() throws Exception {
-        String [] suites = clientEngine.getEnabledCipherSuites();
+        List<String> tmpCipherSuites = new ArrayList<>();
+        String [] suites;
+        if (SecurityUtils.isFIPS()) {
+            for (String ciphersuite : clientEngine.getEnabledCipherSuites()) {
+                if (!SecurityUtils.TLS_CIPHERSUITES.containsKey(ciphersuite)) {
+                    continue;
+                }
+                if (!SecurityUtils.TLS_CIPHERSUITES.get(ciphersuite).equals(PROTOCOL)) {
+                    continue;
+                }
+                tmpCipherSuites.add(ciphersuite);
+            }
+            if (tmpCipherSuites.size() == 0) {
+                return;
+            }
+            suites = tmpCipherSuites.toArray(new String[0]);
+        } else {
+            suites = clientEngine.getEnabledCipherSuites();
+        }
         System.out.println("Enabled cipher suites for protocol " + PROTOCOL +
                 ": " + Arrays.toString(suites));
         for (String suite: suites){
@@ -224,11 +243,17 @@ public class TestAllSuites {
         if (args.length < 1) {
             throw new RuntimeException("Missing TLS protocol parameter.");
         }
-
-        switch(args[0]) {
-            case "TLSv1.1" -> SecurityUtils.removeFromDisabledTlsAlgs("TLSv1.1");
-            case "TLSv1.3" -> SecurityUtils.addToDisabledTlsAlgs("TLSv1.2");
-        }
+        if (!(SecurityUtils.isFIPS())) {
+            switch(args[0]) {
+                case "TLSv1.1" -> SecurityUtils.removeFromDisabledTlsAlgs("TLSv1.1");
+                case "TLSv1.3" -> SecurityUtils.addToDisabledTlsAlgs("TLSv1.2");
+            }
+        } 
+        // else {
+        //     if (!SecurityUtils.TLS_PROTOCOLS.contains(args[0])) {
+        //         return;
+        //     }
+        // }
 
         TestAllSuites testAllSuites = new TestAllSuites(args[0]);
         testAllSuites.createSSLEngines();

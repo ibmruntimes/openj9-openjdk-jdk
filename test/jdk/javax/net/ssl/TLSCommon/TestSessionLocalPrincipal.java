@@ -44,35 +44,63 @@ import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManagerFactory;
 
+import jdk.test.lib.Utils;
+import jdk.test.lib.security.SecurityUtils;
+
 /*
  * @test
  * @bug 8206355 8225438
+ * @library /test/lib
  * @summary Test principal that was sent to the peer during handshake.
  * @run main/othervm TestSessionLocalPrincipal
  */
 public class TestSessionLocalPrincipal {
 
     public static void main(String[] args) throws Exception {
-
-        Security.setProperty("jdk.tls.disabledAlgorithms", "");
-        for (String tlsProtocol : new String[]{
-            "TLSv1.3", "TLSv1.2", "TLSv1.1", "TLSv1"}) {
+        String[] protocols = new String[]{"TLSv1.3", "TLSv1.2", "TLSv1.1", "TLSv1"};
+        if (!(SecurityUtils.isFIPS())) {
+            Security.setProperty("jdk.tls.disabledAlgorithms", "");
+        } 
+        for (String tlsProtocol : protocols) {
             for (boolean clientAuth : new boolean[]{true, false}) {
-                System.out.printf("Protocol %s: Client side auth enabled: %s%n",
-                        tlsProtocol, clientAuth);
-                CountDownLatch serverReady = new CountDownLatch(1);
-                Server server = new Server(tlsProtocol, clientAuth,
-                        serverReady);
-                server.start();
+                Server server = null;
+                try {
+                    System.out.printf("Protocol %s: Client side auth enabled: %s%n",
+                            tlsProtocol, clientAuth);
+                    CountDownLatch serverReady = new CountDownLatch(1);
+                    server = new Server(tlsProtocol, clientAuth,
+                            serverReady);
+                    server.start();
 
-                // Wait till server is ready to accept connection.
-                serverReady.await();
-                new Client(tlsProtocol, clientAuth, server.port).doClientSide();
-                if (server.serverExc != null) {
-                    throw new RuntimeException(server.serverExc);
+                    // Wait till server is ready to accept connection.
+                    serverReady.await();
+                    new Client(tlsProtocol, clientAuth, server.port).doClientSide();
+                    if (server.serverExc != null) {
+                        throw new RuntimeException(server.serverExc);
+                    }
+                } catch (java.lang.RuntimeException re) {
+                    if (SecurityUtils.isFIPS()) {
+                        if (!SecurityUtils.TLS_PROTOCOLS.contains(tlsProtocol)) {
+                            if (server.serverExc != null) {
+                                if (server.serverExc instanceof javax.net.ssl.SSLHandshakeException) {
+                                    if ("No appropriate protocol (protocol is disabled or cipher suites are inappropriate)".equals(server.serverExc.getMessage())) {
+                                        System.out.println("Expected exception msg: <No appropriate protocol (protocol is disabled or cipher suites are inappropriate)> is caught");
+                                        return;
+                                    } else {
+                                        System.out.println("Unexpected exception msg: <" + server.serverExc.getMessage() + "> is caught");
+                                        return;
+                                    }
+                                } else {
+                                    System.out.println("Unexpected exception is caught");
+                                    server.serverExc.printStackTrace();
+                                    return;
+                                }
+                            }
+                        }
+                    }
                 }
             }
-        }
+        } 
     }
 
     public static class Server implements Runnable {

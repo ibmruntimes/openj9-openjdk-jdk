@@ -30,12 +30,16 @@
  * @test
  * @bug 8144566
  * @summary Custom HostnameVerifier disables SNI extension
+ * @library /test/lib
  * @run main/othervm BestEffortOnLazyConnected
  */
 
 import java.io.*;
 import java.net.*;
 import javax.net.ssl.*;
+
+import jdk.test.lib.Utils;
+import jdk.test.lib.security.SecurityUtils;
 
 public class BestEffortOnLazyConnected {
 
@@ -170,6 +174,11 @@ public class BestEffortOnLazyConnected {
         String trustFilename =
             System.getProperty("test.src", ".") + "/" + pathToStores +
                 "/" + trustStoreFile;
+
+        if (SecurityUtils.isFIPS()) {
+            keyFilename = SecurityUtils.revertJKSToPKCS12(keyFilename, passwd);
+            trustFilename = SecurityUtils.revertJKSToPKCS12(trustFilename, passwd);
+        }
 
         System.setProperty("javax.net.ssl.keyStore", keyFilename);
         System.setProperty("javax.net.ssl.keyStorePassword", passwd);

@@ -112,7 +112,7 @@ public abstract class SSLContextTemplate {
         CertificateFactory cf = CertificateFactory.getInstance("X.509");
         ByteArrayInputStream is;
 
-        KeyStore ts = KeyStore.getInstance("JKS");
+	KeyStore ts = KeyStore.getInstance("JKS");
         ts.load(null, null);
 
         if (trustedCerts != null && trustedCerts.length != 0) {

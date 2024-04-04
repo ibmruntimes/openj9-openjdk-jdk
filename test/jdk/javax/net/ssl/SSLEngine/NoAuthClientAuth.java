@@ -30,6 +30,7 @@
  * @test
  * @bug 4495742 8190492
  * @summary Demonstrate SSLEngine switch from no client auth to client auth.
+ * @library /test/lib
  * @run main/othervm NoAuthClientAuth SSLv3
  * @run main/othervm NoAuthClientAuth TLSv1
  * @run main/othervm NoAuthClientAuth TLSv1.1
@@ -81,6 +82,9 @@ import javax.net.ssl.SSLEngineResult.*;
 import java.io.*;
 import java.security.*;
 import java.nio.*;
+
+import jdk.test.lib.Utils;
+import jdk.test.lib.security.SecurityUtils;
 
 // Note that this test case depends on JSSE provider implementation details.
 public class NoAuthClientAuth {
@@ -140,16 +144,49 @@ public class NoAuthClientAuth {
      * Main entry point for this test.
      */
     public static void main(String args[]) throws Exception {
-        Security.setProperty("jdk.tls.disabledAlgorithms", "");
+        if (!(SecurityUtils.isFIPS())) {
+            Security.setProperty("jdk.tls.disabledAlgorithms", "");
+            tlsProtocol = args[0];
+        } else {
+            if (SecurityUtils.TLS_PROTOCOLS.contains(args[0])) {
+                tlsProtocol = args[0];
+            }
+        }
+        // if (tlsProtocol == null) {
+        //     return;
+        // }
 
         if (debug) {
             System.setProperty("javax.net.debug", "all");
         }
 
-        tlsProtocol = args[0];
-
         NoAuthClientAuth test = new NoAuthClientAuth();
-        test.runTest();
+        try {
+            test.runTest();
+        } catch (java.lang.IllegalArgumentException iae) {
+            if (SecurityUtils.isFIPS()) {
+                if (tlsProtocol == null) {
+                    if ("Unsupported protocolnull".equals(iae.getMessage())) {
+                        System.out.println("Expected exception msg: <Unsupported protocolnull> is caught");
+                        return;
+                    } else {
+                        System.out.println("Unexpected exception msg: <" + iae.getMessage() + "> is caught");
+                        return;
+                    }
+                } else {
+                    System.out.println("Unexpected exception is caught");
+                    iae.printStackTrace();
+                    return;
+                }
+            } else {
+                System.out.println("Unexpected exception is caught in Non-FIPS mode");
+                iae.printStackTrace();
+                return;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return;
+        }
 
         System.out.println("Test Passed.");
     }

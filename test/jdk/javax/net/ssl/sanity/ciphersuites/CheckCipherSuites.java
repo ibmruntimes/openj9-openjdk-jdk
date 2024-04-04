@@ -25,6 +25,7 @@
  * @test
  * @bug 4750141 4895631 8217579 8163326 8279164 8245545
  * @summary Check enabled and supported ciphersuites are correct
+ * @library /test/lib
  * @run main/othervm CheckCipherSuites default
  * @run main/othervm CheckCipherSuites limited
  */
@@ -32,6 +33,9 @@
 import java.util.*;
 import java.security.Security;
 import javax.net.ssl.*;
+
+import jdk.test.lib.Utils;
+import jdk.test.lib.security.SecurityUtils;
 
 public class CheckCipherSuites {
 
@@ -121,6 +125,21 @@ public class CheckCipherSuites {
         "TLS_EMPTY_RENEGOTIATION_INFO_SCSV"
     };
 
+    // List of enabled cipher suites when the "-Dsemeru.fips=true -Dsemeru.customprofile" security
+    // property is set.
+    private final static String[] ENABLED_FIPS = {
+        "TLS_AES_256_GCM_SHA384",
+        "TLS_AES_128_GCM_SHA256",
+        "TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384",
+        "TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256",
+        "TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384",
+        "TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256",
+        "TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA384",
+        "TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384",
+        "TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256",
+        "TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256",
+    };
+
     // List of supported cipher suites when the "crypto.policy" security
     // property is set to "unlimited" (the default value).
     private final static String[] SUPPORTED_DEFAULT = {
@@ -207,6 +226,21 @@ public class CheckCipherSuites {
         "TLS_EMPTY_RENEGOTIATION_INFO_SCSV"
     };
 
+    // List of enabled cipher suites when the "-Dsemeru.fips=true -Dsemeru.customprofile" security
+    // property is set.
+    private final static String[] SUPPORTED_FIPS = {
+        "TLS_AES_256_GCM_SHA384",
+        "TLS_AES_128_GCM_SHA256",
+        "TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384",
+        "TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256",
+        "TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384",
+        "TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256",
+        "TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA384",
+        "TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384",
+        "TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256",
+        "TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256",
+    };
+
     private static void showSuites(String[] suites) {
         if ((suites == null) || (suites.length == 0)) {
             System.out.println("<none>");
@@ -225,7 +259,12 @@ public class CheckCipherSuites {
 
         String[] ENABLED;
         String[] SUPPORTED;
-        if (args[0].equals("default")) {
+        String[] FIPS;
+                
+        if (SecurityUtils.isFIPS()) {
+            ENABLED = ENABLED_FIPS;
+            SUPPORTED = SUPPORTED_FIPS;
+        } else if (args[0].equals("default")) {
             ENABLED = ENABLED_DEFAULT;
             SUPPORTED = SUPPORTED_DEFAULT;
         } else if (args[0].equals("limited")) {

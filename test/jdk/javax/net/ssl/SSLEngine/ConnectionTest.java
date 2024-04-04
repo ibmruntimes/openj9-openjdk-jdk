@@ -27,7 +27,7 @@
  * @summary Add non-blocking SSL/TLS functionality, usable with any
  *      I/O abstraction
  * @author Brad Wetmore
- *
+ * @library /test/lib
  * @run main/othervm ConnectionTest TLSv1.2 TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384
  * @run main/othervm ConnectionTest TLSv1.3 TLS_AES_256_GCM_SHA384
  */
@@ -43,6 +43,9 @@ import javax.net.ssl.SSLEngineResult.*;
 import java.io.*;
 import java.security.*;
 import java.nio.*;
+
+import jdk.test.lib.Utils;
+import jdk.test.lib.security.SecurityUtils;
 
 public class ConnectionTest {
 
@@ -93,6 +96,7 @@ public class ConnectionTest {
     private SSLContext getSSLContext() throws Exception {
         KeyStore ks = KeyStore.getInstance("JKS");
         KeyStore ts = KeyStore.getInstance("JKS");
+
         char[] passphrase = "passphrase".toCharArray();
 
         ks.load(new FileInputStream(KEYSTORE_PATH), passphrase);
@@ -597,7 +601,9 @@ public class ConnectionTest {
     public static void main(String args[]) throws Exception {
         // reset the security property to make sure that the algorithms
         // and keys used in this test are not disabled.
-        Security.setProperty("jdk.tls.disabledAlgorithms", "");
+        if (!(SecurityUtils.isFIPS())) {
+            Security.setProperty("jdk.tls.disabledAlgorithms", "");
+        }
 
         log(String.format("Running with %s and %s%n", args[0], args[1]));
         ConnectionTest ct = new ConnectionTest(args[0], args[1]);

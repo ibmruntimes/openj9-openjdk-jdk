@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001, 2011, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2001, 2019, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -21,235 +21,81 @@
  * questions.
  */
 
-/*
+/**
  * @test
- * @bug 4482187
- * @summary HttpsClient tests are failing for build 71
- * @run main/othervm GetResponseCode
- *
- *     SunJSSE does not support dynamic system properties, no way to re-use
- *     system properties in samevm/agentvm mode.
- *
- * @author Yingxian Wang
+ * @bug 4191815
+ * @library /test/lib
+ * @summary Check that getResponseCode doesn't throw exception if http
+ *          respone code is >= 400.
  */
-import java.io.*;
 import java.net.*;
-import javax.net.ssl.*;
-import java.security.cert.Certificate;
+import java.io.*;
 
-public class GetResponseCode implements HostnameVerifier {
-    /*
-     * =============================================================
-     * Set the various variables needed for the tests, then
-     * specify what tests to run on each side.
-     */
+import jdk.test.lib.net.URIBuilder;
+
+public class GetResponseCode implements Runnable {
+
+    ServerSocket ss;
 
     /*
-     * Should we run the client or server in a separate thread?
-     * Both sides can throw exceptions, but do you have a preference
-     * as to which side should be the main thread.
+     * Our "http" server to return a 404
      */
-    static boolean separateServerThread = true;
+    public void run() {
+        try {
+            Socket s = ss.accept();
 
-    /*
-     * Where do we find the keystores?
-     */
-    static String pathToStores = "../etc";
-    static String keyStoreFile = "keystore";
-    static String trustStoreFile = "truststore";
-    static String passwd = "passphrase";
+            PrintStream out = new PrintStream(
+                                 new BufferedOutputStream(
+                                    s.getOutputStream() ));
 
-    /*
-     * Is the server ready to serve?
-     */
-    volatile static boolean serverReady = false;
+            /* send the header */
+            out.print("HTTP/1.1 404 Not Found\r\n");
+            out.print("Content-Type: text/html; charset=iso-8859-1\r\n");
+            out.print("Connection: close\r\n");
+            out.print("\r\n");
+            out.print("<HTML>");
+            out.print("<HEAD><TITLE>404 Not Found</TITLE></HEAD>");
+            out.print("<BODY>The requested URL was not found.</BODY>");
+            out.print("</HTML>");
+            out.flush();
 
-    /*
-     * Turn on SSL debugging?
-     */
-    static boolean debug = false;
-
-    /*
-     * If the client or server is doing some kind of object creation
-     * that the other side depends on, and that thread prematurely
-     * exits, you may experience a hang.  The test harness will
-     * terminate all hung threads after its timeout has expired,
-     * currently 3 minutes by default, but you might try to be
-     * smart about it....
-     */
-
-    /*
-     * Define the server side of the test.
-     *
-     * If the server prematurely exits, serverReady will be set to true
-     * to avoid infinite hangs.
-     */
-    void doServerSide() throws Exception {
-        SSLServerSocketFactory sslssf =
-            (SSLServerSocketFactory) SSLServerSocketFactory.getDefault();
-        SSLServerSocket sslServerSocket =
-            (SSLServerSocket) sslssf.createServerSocket(serverPort);
-        serverPort = sslServerSocket.getLocalPort();
-
-        /*
-         * Signal Client, we're ready for his connect.
-         */
-        serverReady = true;
-
-        SSLSocket sslSocket = (SSLSocket) sslServerSocket.accept();
-        OutputStream sslOS = sslSocket.getOutputStream();
-        BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(sslOS));
-        bw.write("HTTP/1.1 200 OK\r\n\r\n\r\n");
-        bw.flush();
-        Thread.sleep(5000);
-        sslSocket.close();
-    }
-
-    /*
-     * Define the client side of the test.
-     *
-     * If the server prematurely exits, serverReady will be set to true
-     * to avoid infinite hangs.
-     */
-    void doClientSide() throws Exception {
-
-        /*
-         * Wait for server to get started.
-         */
-        while (!serverReady) {
-            Thread.sleep(50);
-        }
-
-        URL url = new URL("https://localhost:"+serverPort+"/index.html");
-        HttpsURLConnection urlc = (HttpsURLConnection)url.openConnection();
-        urlc.setHostnameVerifier(this);
-        urlc.getInputStream();
-
-        if (urlc.getResponseCode() == -1) {
-            throw new RuntimeException("getResponseCode() returns -1");
+            /*
+             * Sleep added to avoid connection reset
+             * on the client side
+             */
+            Thread.sleep(1000);
+            s.close();
+            ss.close();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
-    /*
-     * =============================================================
-     * The remainder is just support stuff
-     */
-
-    // use any free port by default
-    volatile int serverPort = 0;
-
-    volatile Exception serverException = null;
-    volatile Exception clientException = null;
-
-    public static void main(String[] args) throws Exception {
-        String keyFilename =
-            System.getProperty("test.src", "./") + "/" + pathToStores +
-                "/" + keyStoreFile;
-        String trustFilename =
-            System.getProperty("test.src", "./") + "/" + pathToStores +
-                "/" + trustStoreFile;
-
-        System.setProperty("javax.net.ssl.keyStore", keyFilename);
-        System.setProperty("javax.net.ssl.keyStorePassword", passwd);
-        System.setProperty("javax.net.ssl.trustStore", trustFilename);
-        System.setProperty("javax.net.ssl.trustStorePassword", passwd);
-
-        if (debug)
-            System.setProperty("javax.net.debug", "all");
-
-        /*
-         * Start the tests.
-         */
-        new GetResponseCode();
-    }
-
-    Thread clientThread = null;
-    Thread serverThread = null;
-
-    /*
-     * Primary constructor, used to drive remainder of the test.
-     *
-     * Fork off the other side, then do your work.
-     */
     GetResponseCode() throws Exception {
-        if (separateServerThread) {
-            startServer(true);
-            startClient(false);
-        } else {
-            startClient(true);
-            startServer(false);
-        }
 
-        /*
-         * Wait for other side to close down.
-         */
-        if (separateServerThread) {
-            serverThread.join();
-        } else {
-            clientThread.join();
-        }
+        /* start the server */
+        ss = new ServerSocket();
+        ss.bind(new InetSocketAddress(InetAddress.getLoopbackAddress(), 0));
+        (new Thread(this)).start();
 
-        /*
-         * When we get here, the test is pretty much over.
-         *
-         * If the main thread excepted, that propagates back
-         * immediately.  If the other thread threw an exception, we
-         * should report back.
-         */
-        if (serverException != null)
-            throw serverException;
-        if (clientException != null)
-            throw clientException;
+        /* establish http connection to server */
+        URL url = URIBuilder.newBuilder()
+                .scheme("http")
+                .loopback()
+                .port(ss.getLocalPort())
+                .path("/missing.nohtml")
+                .toURL();
+
+        HttpURLConnection http = (HttpURLConnection) url.openConnection(Proxy.NO_PROXY);
+
+        int respCode = http.getResponseCode();
+
+        http.disconnect();
+
     }
 
-    void startServer(boolean newThread) throws Exception {
-        if (newThread) {
-            serverThread = new Thread() {
-                public void run() {
-                    try {
-                        doServerSide();
-                    } catch (Exception e) {
-                        /*
-                         * Our server thread just died.
-                         *
-                         * Release the client, if not active already...
-                         */
-                        System.err.println("Server died...");
-                        serverReady = true;
-                        serverException = e;
-                    }
-                }
-            };
-            serverThread.start();
-        } else {
-            doServerSide();
-        }
-    }
-
-    void startClient(boolean newThread) throws Exception {
-        if (newThread) {
-            clientThread = new Thread() {
-                public void run() {
-                    try {
-                        doClientSide();
-                    } catch (Exception e) {
-                        /*
-                         * Our client thread just died.
-                         */
-                        System.err.println("Client died...");
-                        clientException = e;
-                    }
-                }
-            };
-            clientThread.start();
-        } else {
-            doClientSide();
-        }
-    }
-
-    // Simple test method to blindly agree that hostname and certname match
-    public boolean verify(String hostname, SSLSession session) {
-        return true;
+    public static void main(String args[]) throws Exception {
+        new GetResponseCode();
     }
 
 }

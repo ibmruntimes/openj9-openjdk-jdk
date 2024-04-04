@@ -20,11 +20,13 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-import java.util.Arrays;
+import java.util.*;
 import java.util.stream.Stream;
+
 import javax.net.ssl.SSLServerSocket;
 import javax.net.ssl.SSLSocket;
 
+import jdk.test.lib.Utils;
 import jdk.test.lib.security.SecurityUtils;
 
 /*
@@ -78,14 +80,47 @@ import jdk.test.lib.security.SecurityUtils;
 public class SystemPropCipherSuitesOrder extends SSLSocketTemplate {
 
     private final String protocol;
-    private static String[] servercipherSuites;
-    private static String[] clientcipherSuites;
+    private static String[] servercipherSuites = null;
+    private static String[] clientcipherSuites = null;
 
     public static void main(String[] args) {
-        servercipherSuites
+
+        if (SecurityUtils.isFIPS()) {
+            // if (!SecurityUtils.TLS_PROTOCOLS.contains(args[0])) {
+            //     System.out.println(args[0] + " is not supported in FIPS 140-3.");
+            //     return;
+            // }
+            List<String> tmpClient = new ArrayList<>();
+            if (System.getProperty("jdk.tls.client.cipherSuites") != null) {
+                for (String clientcipherSuite : toArray(System.getProperty("jdk.tls.client.cipherSuites"))) {
+                    if (SecurityUtils.TLS_CIPHERSUITES.containsKey(clientcipherSuite)) {
+                        tmpClient.add(clientcipherSuite);
+                        System.out.println("jdk.tls.client.cipherSuites: " + clientcipherSuite);
+                    }
+                }
+            }
+            List<String> tmpServer = new ArrayList<>();
+            if (System.getProperty("jdk.tls.server.cipherSuites") != null) {
+                for (String servercipherSuite : toArray(System.getProperty("jdk.tls.server.cipherSuites"))) {
+                    if (SecurityUtils.TLS_CIPHERSUITES.containsKey(servercipherSuite)) {
+                        tmpServer.add(servercipherSuite);
+                        System.out.println("jdk.tls.server.cipherSuites: " + servercipherSuite);
+                    }
+                }
+            }
+            if (tmpClient.size() != 0) {
+                clientcipherSuites = tmpClient.toArray(new String[0]);
+            }
+            if (tmpServer.size() != 0) {
+                servercipherSuites = tmpServer.toArray(new String[0]);
+            }
+            
+        } else {
+            servercipherSuites
                 = toArray(System.getProperty("jdk.tls.server.cipherSuites"));
-        clientcipherSuites
+            clientcipherSuites
                 = toArray(System.getProperty("jdk.tls.client.cipherSuites"));
+        }
         System.out.printf("SYSTEM PROPERTIES: ServerProp:%s - ClientProp:%s%n",
                           Arrays.deepToString(servercipherSuites),
                           Arrays.deepToString(clientcipherSuites));
@@ -104,6 +139,16 @@ public class SystemPropCipherSuitesOrder extends SSLSocketTemplate {
 
         try {
             new SystemPropCipherSuitesOrder(args[0]).run();
+        } catch (javax.net.ssl.SSLHandshakeException sslhe) {
+            if (SecurityUtils.isFIPS()) {
+                if (!SecurityUtils.TLS_PROTOCOLS.contains(args[0]) 
+                || (servercipherSuites == null && clientcipherSuites == null)) {
+                    if ("No appropriate protocol (protocol is disabled or cipher suites are inappropriate)".equals(sslhe.getMessage())) {
+                        System.out.println("Expected exception msg: <No appropriate protocol (protocol is disabled or cipher suites are inappropriate)> is caught.");
+                        return;
+                    }
+                }
+            }
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -113,7 +158,9 @@ public class SystemPropCipherSuitesOrder extends SSLSocketTemplate {
         this.protocol = protocol;
         // Re-enable protocol if disabled.
         if (protocol.equals("TLSv1") || protocol.equals("TLSv1.1")) {
-            SecurityUtils.removeFromDisabledTlsAlgs(protocol);
+            if (!(SecurityUtils.isFIPS())) {
+                SecurityUtils.removeFromDisabledTlsAlgs(protocol);
+            }
         }
     }
 
