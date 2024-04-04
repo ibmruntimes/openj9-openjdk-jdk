@@ -30,6 +30,7 @@
  * @test
  * @bug 7188657
  * @summary There should be a way to reorder the JSSE ciphers
+ * @library /test/lib
  * @run main/othervm UseCipherSuitesOrder
  *     TLS_RSA_WITH_AES_128_CBC_SHA,TLS_DHE_RSA_WITH_AES_128_CBC_SHA
  */
@@ -38,6 +39,8 @@ import java.io.*;
 import java.security.Security;
 import javax.net.ssl.*;
 import java.util.Arrays;
+
+import jdk.test.lib.Utils;
 
 public class UseCipherSuitesOrder {
 
@@ -174,6 +177,10 @@ public class UseCipherSuitesOrder {
             throw new Exception("Need to enable at least two cipher suites");
         }
 
+        if (Utils.isFIPS()) {
+            cliEnabledCipherSuites = new String[] { "TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256", "TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384"};
+        }
+
         // Only need to use 2 cipher suites in server side.
         srvEnabledCipherSuites = Arrays.<String>copyOf(
                                             cliEnabledCipherSuites, 2);
@@ -197,7 +204,9 @@ public class UseCipherSuitesOrder {
     public static void main(String[] args) throws Exception {
         // reset the security property to make sure that the algorithms
         // and keys used in this test are not disabled.
-        Security.setProperty("jdk.tls.disabledAlgorithms", "");
+        if (!(Utils.isFIPS())) {
+            Security.setProperty("jdk.tls.disabledAlgorithms", "");
+        }
 
         // parse the arguments
         parseArguments(args);
@@ -208,6 +217,11 @@ public class UseCipherSuitesOrder {
         String trustFilename =
             System.getProperty("test.src", ".") + "/" + pathToStores +
                 "/" + trustStoreFile;
+
+        if (Utils.isFIPS()) {
+            keyFilename = Utils.revertJKSToPKCS12(keyFilename, passwd);
+            trustFilename = Utils.revertJKSToPKCS12(trustFilename, passwd);
+        }
 
         System.setProperty("javax.net.ssl.keyStore", keyFilename);
         System.setProperty("javax.net.ssl.keyStorePassword", passwd);

@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import jdk.test.lib.security.DiffieHellmanGroup;
+import java.util.*;
 
 /**
  * Common library for various security test helper functions.
@@ -216,4 +217,23 @@ public final class SecurityUtils {
     }
 
     private SecurityUtils() {}
+
+    public static final List<String> TLS_PROTOCOLS = new ArrayList<>();
+    public static final Map<String, String> TLS_CIPHERSUITES = new HashMap<>();
+
+    static {
+        TLS_PROTOCOLS.add("TLSv1.2");
+        TLS_PROTOCOLS.add("TLSv1.3");
+
+        TLS_CIPHERSUITES.put("TLS_AES_128_GCM_SHA256", "TLSv1.3");
+        TLS_CIPHERSUITES.put("TLS_AES_256_GCM_SHA384", "TLSv1.3");
+        TLS_CIPHERSUITES.put("TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384", "TLSv1.2");
+        TLS_CIPHERSUITES.put("TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256", "TLSv1.2");
+        TLS_CIPHERSUITES.put("TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384", "TLSv1.2");
+        TLS_CIPHERSUITES.put("TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256", "TLSv1.2");
+        TLS_CIPHERSUITES.put("TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA384", "TLSv1.2");
+        TLS_CIPHERSUITES.put("TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384", "TLSv1.2");
+        TLS_CIPHERSUITES.put("TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256", "TLSv1.2");
+        TLS_CIPHERSUITES.put("TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256", "TLSv1.2");
+    }
 }

@@ -29,6 +29,7 @@
 /*
  * @test
  * @bug 4366807
+ * @library /test/lib
  * @summary Need new APIs to get/set session timeout and session cache size.
  * @run main/othervm SessionCacheSizeTests
  */
@@ -38,6 +39,8 @@ import java.net.*;
 import javax.net.ssl.*;
 import java.util.*;
 import java.security.*;
+
+import jdk.test.lib.Utils;
 
 /**
  * Session cache size tests cover the following cases:
@@ -304,6 +307,11 @@ public class SessionCacheSizeTests {
         String trustFilename =
             System.getProperty("test.src", "./") + "/" + pathToStores +
                 "/" + trustStoreFile;
+
+        if (Utils.isFIPS()) {
+            keyFilename = Utils.revertJKSToPKCS12(keyFilename, passwd);
+            trustFilename = Utils.revertJKSToPKCS12(trustFilename, passwd);
+        }
 
         System.setProperty("javax.net.ssl.keyStore", keyFilename);
         System.setProperty("javax.net.ssl.keyStorePassword", passwd);

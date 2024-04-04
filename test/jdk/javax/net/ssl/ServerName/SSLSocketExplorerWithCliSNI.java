@@ -31,6 +31,7 @@
  * @bug 7068321
  * @summary Support TLS Server Name Indication (SNI) Extension in JSSE Server
  * @library ../templates
+ * @library /test/lib
  * @build SSLCapabilities SSLExplorer
  * @run main/othervm SSLSocketExplorerWithCliSNI
  */
@@ -41,6 +42,8 @@ import java.nio.channels.*;
 import java.util.*;
 import java.net.*;
 import javax.net.ssl.*;
+
+import jdk.test.lib.Utils;
 
 public class SSLSocketExplorerWithCliSNI {
 
@@ -267,6 +270,11 @@ public class SSLSocketExplorerWithCliSNI {
         String trustFilename =
             System.getProperty("test.src", ".") + "/" + pathToStores +
                 "/" + trustStoreFile;
+
+        if (Utils.isFIPS()) {
+            keyFilename = Utils.revertJKSToPKCS12(keyFilename, passwd);
+            trustFilename = Utils.revertJKSToPKCS12(trustFilename, passwd);
+        }
 
         System.setProperty("javax.net.ssl.keyStore", keyFilename);
         System.setProperty("javax.net.ssl.keyStorePassword", passwd);

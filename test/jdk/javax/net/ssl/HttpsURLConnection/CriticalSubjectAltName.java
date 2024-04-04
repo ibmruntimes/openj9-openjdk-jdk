@@ -31,6 +31,7 @@
  * @bug 6668231
  * @summary Presence of a critical subjectAltName causes JSSE's SunX509 to
  *          fail trusted checks
+ * @library /test/lib
  * @run main/othervm CriticalSubjectAltName
  * @author Xuelei Fan
  */
@@ -52,6 +53,8 @@ import java.net.*;
 import javax.net.ssl.*;
 import java.security.Security;
 import java.security.cert.Certificate;
+
+import jdk.test.lib.Utils;
 
 public class CriticalSubjectAltName implements HostnameVerifier {
     /*
@@ -159,10 +162,12 @@ public class CriticalSubjectAltName implements HostnameVerifier {
 
     public static void main(String[] args) throws Exception {
         // MD5 is used in this test case, don't disable MD5 algorithm.
-        Security.setProperty("jdk.certpath.disabledAlgorithms",
-                "MD2, RSA keySize < 1024");
-        Security.setProperty("jdk.tls.disabledAlgorithms",
-                "SSLv3, RC4, DH keySize < 768");
+        if (!(Utils.isFIPS())) {
+            Security.setProperty("jdk.certpath.disabledAlgorithms",
+                    "MD2, RSA keySize < 1024");
+            Security.setProperty("jdk.tls.disabledAlgorithms",
+                    "SSLv3, RC4, DH keySize < 768");
+        }
 
         String keyFilename =
             System.getProperty("test.src", "./") + "/" + pathToStores +
@@ -170,6 +175,11 @@ public class CriticalSubjectAltName implements HostnameVerifier {
         String trustFilename =
             System.getProperty("test.src", "./") + "/" + pathToStores +
                 "/" + trustStoreFile;
+
+        if (Utils.isFIPS()) {
+            keyFilename = Utils.revertJKSToPKCS12(keyFilename, passwd);
+            trustFilename = Utils.revertJKSToPKCS12(trustFilename, passwd);
+        }
 
         System.setProperty("javax.net.ssl.keyStore", keyFilename);
         System.setProperty("javax.net.ssl.keyStorePassword", passwd);
@@ -182,7 +192,29 @@ public class CriticalSubjectAltName implements HostnameVerifier {
         /*
          * Start the tests.
          */
-        new CriticalSubjectAltName();
+        try {
+            new CriticalSubjectAltName();
+        } catch (Exception e) {
+            if (Utils.isFIPS()) {
+                if (e instanceof java.security.cert.CertPathValidatorException) {
+                    if ("Algorithm constraints check failed on signature algorithm: MD5withRSA".equals(e.getMessage())) {
+                        System.out.println("MD5withRSA is not a supported signature algorithm.");
+                        return;
+                    } else {
+                        System.out.println("Unexpected exception msg: <" + e.getMessage() + "> is caught");
+                        return;
+                    }
+                } else {
+                    System.out.println("Unexpected exception is caught");
+                    e.printStackTrace();
+                    return;
+                }
+            } else {
+                System.out.println("Unexpected exception is caught in Non-FIPS mode");
+                e.printStackTrace();
+                return;
+            }
+        }
     }
 
     Thread clientThread = null;

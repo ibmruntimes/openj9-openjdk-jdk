@@ -26,6 +26,7 @@
  * @bug 4387882
  * @summary Need to revisit the javadocs for JSSE, especially the
  *      promoted classes.
+ * @library /test/lib
  * @run main/othervm ImplicitHandshake
  *
  *     SunJSSE does not support dynamic system properties, no way to re-use
@@ -36,6 +37,8 @@
 import java.io.*;
 import java.net.*;
 import javax.net.ssl.*;
+
+import jdk.test.lib.Utils;
 
 public class ImplicitHandshake {
 
@@ -191,6 +194,10 @@ public class ImplicitHandshake {
             System.getProperty("test.src", "./") + "/" + pathToStores +
                 "/" + trustStoreFile;
 
+        if (Utils.isFIPS()) {
+            keyFilename = Utils.revertJKSToPKCS12(keyFilename, passwd);
+            trustFilename = Utils.revertJKSToPKCS12(trustFilename, passwd);
+        }
         System.setProperty("javax.net.ssl.keyStore", keyFilename);
         System.setProperty("javax.net.ssl.keyStorePassword", passwd);
         System.setProperty("javax.net.ssl.trustStore", trustFilename);

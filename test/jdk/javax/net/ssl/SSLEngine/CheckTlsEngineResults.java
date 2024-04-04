@@ -25,9 +25,8 @@
  * @test
  * @bug 4948079
  * @summary Verify return values from SSLEngine wrap/unwrap (TLSv1.2) operations
- *
+ * @library /test/lib
  * @run main CheckTlsEngineResults
- *
  * @author Brad Wetmore
  */
 
@@ -40,6 +39,8 @@ import javax.net.ssl.SSLEngineResult.*;
 import java.io.*;
 import java.security.*;
 import java.nio.*;
+
+import jdk.test.lib.Utils;
 
 public class CheckTlsEngineResults {
 
@@ -126,8 +127,15 @@ public class CheckTlsEngineResults {
 
         SSLEngineResult result1;        // clientEngine's results from last operation
         SSLEngineResult result2;        // serverEngine's results from last operation
-        String [] suite1 = new String [] {
-            "TLS_DHE_RSA_WITH_AES_128_CBC_SHA" };
+        String[] suite1;
+        if (!(Utils.isFIPS())) {
+            suite1 = new String [] {
+                "TLS_DHE_RSA_WITH_AES_128_CBC_SHA" };
+        } else {
+            suite1 = new String [] {
+                "TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256" };
+        }
+
         String [] suite2 = new String [] {
             "TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256" };
 
@@ -153,7 +161,7 @@ public class CheckTlsEngineResults {
         result2 = serverEngine.unwrap(clientToServer, serverIn);
 
         checkResult(clientToServer, serverIn, result2,
-             Status.OK, HandshakeStatus.NEED_TASK, result1.bytesProduced(), 0);
+             Status.OK, HandshakeStatus.NEED_TASK, result1.bytesProduced(), 0);        
         runDelegatedTasks(serverEngine);
 
         clientToServer.compact();
