@@ -24,7 +24,7 @@
  */
 /*
  * ===========================================================================
- * (c) Copyright IBM Corp. 2018, 2023 All Rights Reserved
+ * (c) Copyright IBM Corp. 2018, 2024 All Rights Reserved
  * ===========================================================================
  */
 
@@ -44,6 +44,7 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 
 import jdk.crypto.jniprovider.NativeCrypto;
+import jdk.internal.util.OperatingSystem;
 import jdk.internal.util.StaticProperty;
 import sun.security.action.GetBooleanAction;
 import sun.security.action.GetPropertyAction;
@@ -278,6 +279,7 @@ public final class SunEntries {
         /*
          * Digest engines
          */
+        String providerMD5;
         String providerSHA;
         String providerSHA224;
         String providerSHA256;
@@ -287,6 +289,17 @@ public final class SunEntries {
          * Set the digest provider based on whether native crypto is
          * enabled or not.
          */
+        /* Don't use native MD5 on AIX due to an observed performance regression. */
+        if (useNativeDigest
+            && NativeCrypto.isAllowedAndLoaded()
+            && NativeCrypto.isMD5Available()
+            && !OperatingSystem.isAix()
+        ) {
+            providerMD5 = "sun.security.provider.NativeMD5";
+        } else {
+            providerMD5 = "sun.security.provider.MD5";
+        }
+
         if (useNativeDigest && NativeCrypto.isAllowedAndLoaded()) {
             providerSHA = "sun.security.provider.NativeSHA";
             providerSHA224 = "sun.security.provider.NativeSHA2$SHA224";
@@ -302,7 +315,7 @@ public final class SunEntries {
         }
         addWithAlias(p, "MessageDigest", "MD2", "sun.security.provider.MD2",
                 attrs);
-        addWithAlias(p, "MessageDigest", "MD5", "sun.security.provider.MD5",
+        addWithAlias(p, "MessageDigest", "MD5", providerMD5,
                 attrs);
         addWithAlias(p, "MessageDigest", "SHA-1", providerSHA,
                 attrs);
