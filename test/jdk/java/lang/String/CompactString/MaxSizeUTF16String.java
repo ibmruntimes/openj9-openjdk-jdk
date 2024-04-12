@@ -20,6 +20,11 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
+/*
+ * ===========================================================================
+ * (c) Copyright IBM Corp. 2024, 2024 All Rights Reserved
+ * ===========================================================================
+ */
 
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
@@ -137,6 +142,8 @@ public class MaxSizeUTF16String {
         byte[] bytes = s1.getBytes(StandardCharsets.UTF_8);
         int remaining = Integer.MAX_VALUE - bytes.length;
         assertTrue(remaining >= bytes1.length, "remainder too large: " + remaining);
+        min += 1; // adjust for OpenJ9
+        max += 1;
 
         // Strings of size min+1...min+2, throw OOME
         // The resulting byte array would exceed implementation limits
