@@ -205,6 +205,7 @@ ifeq ($(call isTargetOs, windows macosx)+$(ENABLE_HEADLESS_ONLY), false+false)
       OPTIMIZATION := LOW, \
       CFLAGS := -DXAWT -DXAWT_HACK $(LIBAWT_XAWT_CFLAGS) \
           $(FONTCONFIG_CFLAGS) $(CUPS_CFLAGS) $(X_CFLAGS), \
+      WARNINGS_AS_ERRORS_xlc := false, \
       DISABLED_WARNINGS_gcc := int-to-pointer-cast, \
       DISABLED_WARNINGS_gcc_awt_Taskbar.c := parentheses, \
       DISABLED_WARNINGS_gcc_GLXSurfaceData.c := unused-function, \
@@ -411,6 +412,14 @@ else
      HARFBUZZ_CFLAGS += -DHAVE_INTEL_ATOMIC_PRIMITIVES -DHB_NO_VISIBILITY
    endif
 
+   # Early re-canonizing has to be disabled to workaround an internal XlC compiler error
+   # when building libharfbuzz
+   ifeq ($(call isTargetOs, aix), true)
+    ifneq ($(TOOLCHAIN_TYPE), clang)
+     HARFBUZZ_CFLAGS += -qdebug=necan
+    endif
+   endif
+
    # hb-ft.cc is not presently needed, and requires freetype 2.4.2 or later.
    # hb-subset and hb-style APIs are not needed, excluded to cut on compilation
    # time.
@@ -496,6 +505,7 @@ $(eval $(call SetupJdkLibrary, BUILD_LIBFONTMANAGER, \
     CFLAGS_windows = -DCC_NOEX, \
     EXTRA_HEADER_DIRS := $(LIBFONTMANAGER_EXTRA_HEADER_DIRS), \
     EXTRA_SRC := $(LIBFONTMANAGER_EXTRA_SRC), \
+    WARNINGS_AS_ERRORS_xlc := false, \
     DISABLED_WARNINGS_gcc := $(HARFBUZZ_DISABLED_WARNINGS_gcc), \
     DISABLED_WARNINGS_CXX_gcc := $(HARFBUZZ_DISABLED_WARNINGS_CXX_gcc), \
     DISABLED_WARNINGS_clang := $(HARFBUZZ_DISABLED_WARNINGS_clang), \
