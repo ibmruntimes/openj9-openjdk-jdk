@@ -22,6 +22,9 @@
 # or visit www.oracle.com if you need additional information or have any
 # questions.
 #
+# ===========================================================================
+# (c) Copyright IBM Corp. 2024, 2024 All Rights Reserved
+# ===========================================================================
 
 ################################################################################
 # This file builds the native component of the JTReg tests for JDK.
@@ -93,6 +96,10 @@ else
     BUILD_JDK_JTREG_EXECUTABLES_LIBS_exelauncher := -ldl
   endif
   BUILD_JDK_JTREG_EXECUTABLES_LIBS_exeNullCallerTest := $(LIBCXX)
+endif
+
+ifeq ($(call isTargetOs, aix), true)
+  BUILD_JDK_JTREG_EXECUTABLES_LIBS_exeJliLaunchTest := -lz
 endif
 
 ifeq ($(call isTargetOs, macosx), true)
