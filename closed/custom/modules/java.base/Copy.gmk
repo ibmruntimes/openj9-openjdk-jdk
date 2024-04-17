@@ -61,14 +61,14 @@ endif
 # redirector
 
 $(call openj9_copy_files_and_debuginfos, \
-	$(addsuffix $(call SHARED_LIBRARY,jvm), \
+	$(addsuffix $(LIBRARY_PREFIX)jvm$(SHARED_LIBRARY_SUFFIX), \
 		$(OPENJ9_VM_BUILD_DIR)/redirector/ \
 		$(addprefix $(LIB_DST_DIR), /j9vm/ /server/)))
 
 # jsig
 
 $(call openj9_copy_files_and_debuginfos, \
-	$(addsuffix $(call SHARED_LIBRARY,jsig), \
+	$(addsuffix $(LIBRARY_PREFIX)jsig$(SHARED_LIBRARY_SUFFIX), \
 		$(OPENJ9_VM_BUILD_DIR)/ \
 		$(addprefix $(LIB_DST_DIR), / /j9vm/ /server/)))
 
@@ -102,7 +102,7 @@ $(call openj9_copy_shlibs, \
 ifeq (zos,$(OPENJDK_TARGET_OS))
 
 $(call openj9_copy_files_and_debuginfos, \
-	$(addsuffix /$(call SHARED_LIBRARY,j9a2e), \
+	$(addsuffix /$(LIBRARY_PREFIX)j9a2e$(SHARED_LIBRARY_SUFFIX), \
 		$(OPENJ9_VM_BUILD_DIR) \
 		$(LIB_DST_DIR)))
 
@@ -118,7 +118,7 @@ $(call openj9_copy_files,, \
 
 # 31/64-bit interoperability shim library and side deck files.
 $(call openj9_copy_files_and_debuginfos, \
-	$(addsuffix $(call SHARED_LIBRARY,jvm31), \
+	$(addsuffix $(LIBRARY_PREFIX)jvm31$(SHARED_LIBRARY_SUFFIX), \
 		$(OPENJ9_VM_BUILD_DIR)/ \
 		$(addprefix $(LIB_DST_DIR), /j9vm/ /server/)))
 
@@ -133,13 +133,13 @@ endif # zos
 ifeq ($(call isTargetOs, windows), true)
 
 $(call openj9_copy_files,, \
-	$(addsuffix /$(call STATIC_LIBRARY,jsig), \
+	$(addsuffix /$(LIBRARY_PREFIX)jsig$(STATIC_LIBRARY_SUFFIX), \
 		$(OPENJ9_VM_BUILD_DIR)/lib \
 		$(LIB_DST_DIR)))
 
 $(call openj9_copy_files,, \
-	$(OPENJ9_VM_BUILD_DIR)/redirector/$(call STATIC_LIBRARY,redirector_jvm) \
-	$(LIB_DST_DIR)/$(call STATIC_LIBRARY,jvm))
+	$(OPENJ9_VM_BUILD_DIR)/redirector/$(LIBRARY_PREFIX)redirector_jvm$(STATIC_LIBRARY_SUFFIX) \
+	$(LIB_DST_DIR)/$(LIBRARY_PREFIX)jvm$(STATIC_LIBRARY_SUFFIX))
 
 endif # windows
 

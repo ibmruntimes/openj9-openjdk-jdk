@@ -1,5 +1,5 @@
 # ===========================================================================
-# (c) Copyright IBM Corp. 2020, 2021 All Rights Reserved
+# (c) Copyright IBM Corp. 2020, 2024 All Rights Reserved
 # ===========================================================================
 # This code is free software; you can redistribute it and/or modify it
 # under the terms of the GNU General Public License version 2 only, as
@@ -124,6 +124,6 @@ openj9_copy_exes = \
 openj9_copy_shlibs = \
 	$(foreach name, $1, \
 		$(call openj9_copy_files_and_debuginfos, \
-			$(addsuffix /$(call SHARED_LIBRARY,$(name)), \
+			$(addsuffix /$(LIBRARY_PREFIX)$(name)$(SHARED_LIBRARY_SUFFIX), \
 				$(OPENJ9_VM_BUILD_DIR) \
 				$(LIB_DST_DIR)/$(OPENJ9_LIBS_SUBDIR))))

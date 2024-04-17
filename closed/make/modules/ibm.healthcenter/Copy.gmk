@@ -1,5 +1,5 @@
 # ===========================================================================
-# (c) Copyright IBM Corp. 2021, 2021 All Rights Reserved
+# (c) Copyright IBM Corp. 2021, 2024 All Rights Reserved
 # ===========================================================================
 # This code is free software; you can redistribute it and/or modify it
 # under the terms of the GNU General Public License version 2 only, as
@@ -65,9 +65,9 @@ HEALTHCENTER_EXCLUSIONS := \
 # Not all components are available on all platforms, hence the use of $(wildcard).
 # Also note that evaluation must be delayed, so we use '=' instead of ':='.
 HEALTHCENTER_LIBRARIES = \
-	$(HEALTHCENTER_HOME)/$(call SHARED_LIBRARY,healthcenter) \
-	$(HEALTHCENTER_HOME)/plugins/$(call SHARED_LIBRARY,hcapiplugin) \
-	$(wildcard $(HEALTHCENTER_HOME)/plugins/$(call SHARED_LIBRARY,hcmqtt))
+	$(HEALTHCENTER_HOME)/$(LIBRARY_PREFIX)healthcenter$(SHARED_LIBRARY_SUFFIX) \
+	$(HEALTHCENTER_HOME)/plugins/$(LIBRARY_PREFIX)hcapiplugin$(SHARED_LIBRARY_SUFFIX) \
+	$(wildcard $(HEALTHCENTER_HOME)/plugins/$(LIBRARY_PREFIX)hcmqtt$(SHARED_LIBRARY_SUFFIX))
 
 # User-configurable .properties files should be encoded in EBCDIC on z/OS.
 ifeq (zos,$(OPENJDK_TARGET_OS))

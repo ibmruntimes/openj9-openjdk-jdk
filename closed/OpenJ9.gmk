@@ -195,7 +195,7 @@ $(foreach file, \
 		vmLifecyleTests \
 		vmtest \
 		) \
-	$(patsubst %, $(OPENJ9_VM_BUILD_DIR)/$(call SHARED_LIBRARY,%), \
+	$(patsubst %, $(OPENJ9_VM_BUILD_DIR)/$(LIBRARY_PREFIX)%$(SHARED_LIBRARY_SUFFIX), \
 		access \
 		anntests \
 		balloon29 \
@@ -228,7 +228,7 @@ $(foreach file, \
 		vmruntimestateagent29 \
 		) \
 	$(OPENJ9_VM_BUILD_DIR)/libloadLibraryTest.jnilib \
-	$(SUPPORT_OUTPUTDIR)/test/agct/lib/$(call SHARED_LIBRARY,AsyncGetCallTraceTest), \
+	$(SUPPORT_OUTPUTDIR)/test/agct/lib/$(LIBRARY_PREFIX)AsyncGetCallTraceTest$(SHARED_LIBRARY_SUFFIX), \
 	$(if $(wildcard $(file)), \
 		$(eval $(call openj9_test_image_rules, $(file)))))
 
