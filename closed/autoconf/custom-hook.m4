@@ -679,9 +679,6 @@ AC_DEFUN_ONCE([CUSTOM_LATE_HOOK],
   # Create the custom-spec.gmk
   AC_CONFIG_FILES([$OUTPUTDIR/custom-spec.gmk:$CLOSED_AUTOCONF_DIR/custom-spec.gmk.in])
 
-  # explicitly disable CDS archive generation (OpenJ9 does not support '-Xshare:dump')
-  BUILD_CDS_ARCHIVE=false
-
   # Override the default for '--with-output-sync' to 'none' for better feedback during VM build.
   if test "x[$with_output_sync]" = x ; then
     OUTPUT_SYNC_SUPPORTED=false
