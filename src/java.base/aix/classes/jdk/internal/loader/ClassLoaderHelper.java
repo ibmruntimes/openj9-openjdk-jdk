@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012, 2020, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2024, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -25,7 +25,7 @@
 
 /*
  * ===========================================================================
- * (c) Copyright IBM Corp. 2020, 2021 All Rights Reserved
+ * (c) Copyright IBM Corp. 2020, 2024 All Rights Reserved
  * ===========================================================================
  */
 
@@ -39,11 +39,12 @@ class ClassLoaderHelper {
     private ClassLoaderHelper() {}
 
     /**
-     * Returns true if loading a native library only if
-     * it's present on the file system.
+     * Shared objects may be loaded from .a archive object on AIX and .so may not exist.
+     * This method returns false so that loading of shared library continues if
+     * libname.so is not present.
      */
     static boolean loadLibraryOnlyIfPresent() {
-        return true;
+        return false;
     }
 
     /**
@@ -82,3 +83,4 @@ class ClassLoaderHelper {
         return paths.toArray(new String[paths.size()]);
     }
 }
+
