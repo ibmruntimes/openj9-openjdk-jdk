@@ -1,6 +1,6 @@
 #!/bin/sh
 # ===========================================================================
-# (c) Copyright IBM Corp. 2019, 2023 All Rights Reserved
+# (c) Copyright IBM Corp. 2019, 2024 All Rights Reserved
 # ===========================================================================
 #
 # This code is free software; you can redistribute it and/or modify it
@@ -321,9 +321,12 @@ check () {
       IN_JDK=0;;
     make/jdk/src/classes/build/tools/*)
       trace  "$1 deemed not to be in the built JDK because it matches case parameter expansion make/jdk/src/classes/build/tools/*"
-      IN_JDK=0;;  
+      IN_JDK=0;;
     */share/classes/sun/security/util/math/intpoly/FieldGen.jsh)
       trace  "$1 is not part of the built JDK"
+      IN_JDK=0;;
+    src/java.base/linux/native/libsimdsort/*)
+      trace  "$1 deemed not to be in the built JDK because it matches case parameter expansion src/java.base/linux/native/libsimdsort/* and the feature is not enabled"
       IN_JDK=0;;
     *) IN_JDK=1;;
   esac
@@ -369,7 +372,7 @@ check () {
           ERROR=1
         fi
       else
-        # The file is in the 'closed' directory and doesn't contain 
+        # The file is in the 'closed' directory and doesn't contain
         # Oracle copyright with GPLv2 and Classpath Exception so should
         # have IBM copyright with GPLv2 and CE at the top of the file
         if [ "$FOUND_IBM_COPYRIGHT" -gt 5 ]; then
@@ -616,7 +619,7 @@ echo "jdk/test/java/awt/Frame/DecoratedExceptions/DecoratedExceptions.java" >>$T
 # themselves are not actually present in the openjdk source repository
 echo "src/java.smartcardio/unix/native/libj2pcsc/MUSCLE/COPYING" >>$TEMPFILE
 echo "jdk/src/solaris/native/sun/security/smartcardio/MUSCLE/COPYING" >>$TEMPFILE
-# The following file was written by IBM, and then later some oracle code has been added to this file, 
+# The following file was written by IBM, and then later some oracle code has been added to this file,
 # After legal consideration, decesion was top add oracle copyrights where ever the oracle code is written which result IBM copyrights on top and later oracle.
 echo "closed/adds/jdk/src/windows/native/jdk/crypto/jniprovider/NativeCrypto_md.c" >>$TEMPFILE
 
