@@ -684,9 +684,6 @@ AC_DEFUN_ONCE([CUSTOM_LATE_HOOK],
     OUTPUT_SYNC_SUPPORTED=false
   fi
 
-  # explicitly disable classlist generation
-  ENABLE_GENERATE_CLASSLIST=false
-
   if test "x$OPENJDK_BUILD_OS" = xwindows ; then
     OPENJ9_TOOL_DIR="$OUTPUTDIR/tools"
     AC_SUBST(OPENJ9_TOOL_DIR)
