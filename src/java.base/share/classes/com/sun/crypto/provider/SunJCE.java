@@ -43,7 +43,7 @@ import jdk.crypto.jniprovider.NativeCrypto;
 import jdk.internal.util.StaticProperty;
 import sun.security.action.GetPropertyAction;
 
-/**
+/*
  * The "SunJCE" Cryptographic Service Provider.
  *
  * @author Jan Luehe
