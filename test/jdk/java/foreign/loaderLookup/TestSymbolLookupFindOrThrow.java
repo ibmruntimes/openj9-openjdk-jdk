@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008, 2015, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2024, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -19,28 +19,38 @@
  * Please contact Oracle, 500 Oracle Parkway, Redwood Shores, CA 94065 USA
  * or visit www.oracle.com if you need additional information or have any
  * questions.
- *
  */
-package com.sun.hotspot.igv.controlflow;
 
-import java.awt.event.ActionEvent;
-import javax.swing.AbstractAction;
-import org.openide.util.NbBundle;
-import org.openide.windows.TopComponent;
-
-/**
- *
- * @author Thomas Wuerthinger
+/*
+ * @test
+ * @run junit/othervm --enable-native-access=ALL-UNNAMED TestSymbolLookupFindOrThrow
  */
-public class ControlFlowAction extends AbstractAction {
 
-    public ControlFlowAction() {
-        super(NbBundle.getMessage(ControlFlowAction.class, "CTL_ControlFlowAction"));
+import java.lang.foreign.MemorySegment;
+import java.lang.foreign.SymbolLookup;
+import java.util.NoSuchElementException;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.Assert.*;
+
+final class TestSymbolLookupFindOrThrow {
+
+    static {
+        System.loadLibrary("Foo");
     }
 
-    public void actionPerformed(ActionEvent evt) {
-        TopComponent win = ControlFlowTopComponent.findInstance();
-        win.open();
-        win.requestActive();
+    @Test
+    void findOrThrow() {
+        MemorySegment symbol = SymbolLookup.loaderLookup().findOrThrow("foo");
+        Assertions.assertNotEquals(0, symbol.address());
     }
+
+    @Test
+    void findOrThrowNotFound() {
+        assertThrows(NoSuchElementException.class, () ->
+                SymbolLookup.loaderLookup().findOrThrow("bar"));
+    }
+
 }
