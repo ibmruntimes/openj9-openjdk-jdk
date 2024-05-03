@@ -21,33 +21,21 @@
  * questions.
  */
 
-/*
+import java.security.*;
+
+/**
  * @test
- * @bug 8321278
- * @summary C2: Partial peeling fails with assert "last_peel <- first_not_peeled"
- * @run main/othervm -XX:CompileCommand=quiet -XX:CompileCommand=compileonly,TestPartialPeelingAtSingleInputRegion::test
- *                   -XX:-TieredCompilation -Xbatch -XX:PerMethodTrapLimit=0 TestPartialPeelingAtSingleInputRegion
- *
+ * @bug 8328864
+ * @summary Test that ProviderList.getService checks configs when
+ * ProviderList.getProvider fails for preferred providers.
+ * @run main/othervm
+ *  -Djava.security.properties=${test.src}/app-security.properties NullPreferredList
  */
 
-public class TestPartialPeelingAtSingleInputRegion {
+public class NullPreferredList {
 
-    static void test() {
-        for (int i = 100; i > 10; --i) {
-            for (int j = i; j < 10; ++j) {
-                switch (j) {
-                case 1:
-                    if (j != 0) {
-                        return;
-                    }
-                }
-             }
-        }
-    }
-
-    public static void main(String[] args) {
-        for (int i = 0; i < 10_000; ++i) {
-            test();
-        }
+    public static void main(final String[] args) throws Exception {
+        final KeyStore ks = KeyStore.getInstance("PKCS12");
+        System.out.println("Got keystore " + ks);
     }
 }
