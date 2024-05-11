@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2003, 2022, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2003, 2024, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -129,6 +129,9 @@ final class Config {
 
     // whether to print debug info during startup
     private boolean showInfo = false;
+
+    // whether to allow legacy mechanisms
+    private boolean allowLegacy = false;
 
     // template manager, initialized from parsed attributes
     private TemplateManager templateManager;
@@ -262,6 +265,10 @@ final class Config {
 
     boolean getShowInfo() {
         return (SunPKCS11.debug != null) || showInfo;
+    }
+
+    boolean getAllowLegacy() {
+        return allowLegacy;
     }
 
     TemplateManager getTemplateManager() {
@@ -466,6 +473,8 @@ final class Config {
                 destroyTokenAfterLogout = parseBooleanEntry(st.sval);
             case "showInfo"->
                 showInfo = parseBooleanEntry(st.sval);
+            case "allowLegacy"->
+                allowLegacy = parseBooleanEntry(st.sval);
             case "keyStoreCompatibilityMode"->
                 keyStoreCompatibilityMode = parseBooleanEntry(st.sval);
             case "explicitCancel"->
