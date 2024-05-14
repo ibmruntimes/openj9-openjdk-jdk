@@ -24,7 +24,7 @@
 #
 
 # ===========================================================================
-# (c) Copyright IBM Corp. 2022, 2023 All Rights Reserved
+# (c) Copyright IBM Corp. 2022, 2024 All Rights Reserved
 # ===========================================================================
 
 ###############################################################################
@@ -194,15 +194,8 @@ AC_DEFUN_ONCE([JDKOPT_SETUP_JDK_OPTIONS],
   fi
   AC_SUBST(INCLUDE_SA)
 
-  # Setup default CDS alignment. On platforms where one build may run on machines with different
-  # page sizes, the JVM choses a compatible alignment to fit all possible page sizes. This slightly
-  # increases archive size.
-  # The only platform having this problem at the moment is Linux on aarch64, which may encounter
-  # three different page sizes: 4K, 64K, and if run on Mac m1 hardware, 16K.
+  # Setup default CDS alignment. For OpenJ9 it needs to be false.
   COMPATIBLE_CDS_ALIGNMENT_DEFAULT=false
-  if test "x$OPENJDK_TARGET_OS" = "xlinux" && test "x$OPENJDK_TARGET_CPU" = "xaarch64"; then
-    COMPATIBLE_CDS_ALIGNMENT_DEFAULT=true
-  fi
   AC_SUBST(COMPATIBLE_CDS_ALIGNMENT_DEFAULT)
 
   # Compress jars
