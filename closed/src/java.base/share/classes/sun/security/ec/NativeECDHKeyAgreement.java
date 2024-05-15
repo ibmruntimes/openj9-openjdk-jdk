@@ -25,12 +25,13 @@
 
 /*
  * ===========================================================================
- * (c) Copyright IBM Corp. 2022, 2023 All Rights Reserved
+ * (c) Copyright IBM Corp. 2022, 2024 All Rights Reserved
  * ===========================================================================
  */
 
 package sun.security.ec;
 
+import java.math.BigInteger;
 import java.security.AlgorithmParameters;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
@@ -41,11 +42,14 @@ import java.security.ProviderException;
 import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.security.interfaces.ECKey;
+import java.security.interfaces.ECPublicKey;
 import java.security.spec.AlgorithmParameterSpec;
 import java.security.spec.ECGenParameterSpec;
 import java.security.spec.ECParameterSpec;
+import java.security.spec.EllipticCurve;
 import java.security.spec.InvalidParameterSpecException;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.crypto.KeyAgreementSpi;
@@ -55,6 +59,9 @@ import javax.crypto.spec.SecretKeySpec;
 
 import jdk.crypto.jniprovider.NativeCrypto;
 
+import sun.security.ec.point.Point;
+import sun.security.util.ArrayUtil;
+import sun.security.util.CurveDB;
 import sun.security.util.ECUtil;
 import sun.security.util.NamedCurve;
 
@@ -71,6 +78,9 @@ public final class NativeECDHKeyAgreement extends KeyAgreementSpi {
 
     /* private key, if initialized */
     private ECPrivateKeyImpl privateKey;
+
+    /* operations associated with private key, if initialized */
+    private ECOperations privateKeyOps;
 
     /* public key, non-null between doPhase() & generateSecret() only */
     private ECPublicKeyImpl publicKey;
@@ -90,9 +100,12 @@ public final class NativeECDHKeyAgreement extends KeyAgreementSpi {
     public NativeECDHKeyAgreement() {
     }
 
-    @Override
-    protected void engineInit(Key key, SecureRandom random)
-            throws InvalidKeyException {
+    private void init(Key key)
+            throws InvalidKeyException, InvalidAlgorithmParameterException {
+        this.privateKey = null;
+        this.privateKeyOps = null;
+        this.publicKey = null;
+
         if (!(key instanceof PrivateKey)) {
             throw new InvalidKeyException
                 ("Key must be an instance of PrivateKey");
@@ -100,17 +113,25 @@ public final class NativeECDHKeyAgreement extends KeyAgreementSpi {
         /* attempt to translate the key if it is not an ECKey */
         ECKey ecKey = ECKeyFactory.toECKey(key);
         if (ecKey instanceof ECPrivateKeyImpl keyImpl) {
-            this.privateKey = keyImpl;
-            this.publicKey = null;
+            Optional<ECOperations> opsOpt =
+                ECOperations.forParameters(keyImpl.getParams());
+            if (opsOpt.isEmpty()) {
+                NamedCurve nc = CurveDB.lookup(keyImpl.getParams());
+                throw new InvalidAlgorithmParameterException(
+                        "Curve not supported: " +
+                        ((nc != null) ? nc.toString() : "unknown"));
+            }
+            ECUtil.checkPrivateKey(keyImpl);
 
-            ECUtil.checkPrivateKey(this.privateKey);
+            this.privateKey = keyImpl;
+            this.privateKeyOps = opsOpt.get();
 
             ECParameterSpec params = this.privateKey.getParams();
             this.curve = NativeECUtil.getCurveName(params);
             if ((this.curve != null) && NativeECUtil.isCurveSupported(this.curve, params)) {
                 this.javaImplementation = null;
             } else {
-                this.initializeJavaImplementation(key, random);
+                this.initializeJavaImplementation(key);
             }
         } else {
             boolean absent = NativeECUtil.putCurveIfAbsent("ECKeyImpl", Boolean.FALSE);
@@ -120,7 +141,17 @@ public final class NativeECDHKeyAgreement extends KeyAgreementSpi {
                         " are supported by the native implementation, " +
                         "using Java crypto implementation for key agreement.");
             }
-            this.initializeJavaImplementation(key, random);
+            this.initializeJavaImplementation(key);
+        }
+    }
+
+    @Override
+    protected void engineInit(Key key, SecureRandom random)
+            throws InvalidKeyException {
+        try {
+            init(key);
+        } catch (InvalidAlgorithmParameterException e) {
+            throw new InvalidKeyException(e);
         }
     }
 
@@ -131,7 +162,7 @@ public final class NativeECDHKeyAgreement extends KeyAgreementSpi {
             throw new InvalidAlgorithmParameterException
                         ("Parameters not supported");
         }
-        engineInit(key, random);
+        init(key);
     }
 
     @Override
@@ -150,12 +181,14 @@ public final class NativeECDHKeyAgreement extends KeyAgreementSpi {
             throw new IllegalStateException
                 ("Only two party agreement supported, lastPhase must be true");
         }
-        if (!(key instanceof PublicKey)) {
+        if (!(key instanceof ECPublicKey ecKey)) {
             throw new InvalidKeyException
                 ("Key must be an instance of PublicKey");
         }
-        /* attempt to translate the key if it is not an ECKey */
-        ECKey ecKey = ECKeyFactory.toECKey(key);
+
+        // Validate public key.
+        validate(privateKeyOps, ecKey);
+
         if (ecKey instanceof ECPublicKeyImpl keyImpl) {
             this.publicKey = keyImpl;
 
@@ -171,8 +204,67 @@ public final class NativeECDHKeyAgreement extends KeyAgreementSpi {
                         " are supported by the native implementation, " +
                         "using Java crypto implementation for key agreement.");
             }
-            this.initializeJavaImplementation(this.privateKey, null);
+            this.initializeJavaImplementation(this.privateKey);
             return this.javaImplementation.engineDoPhase(key, lastPhase);
+        }
+    }
+
+    // Verify that x and y are integers in the interval [0, p - 1].
+    private static void validateCoordinate(BigInteger c, BigInteger mod)
+            throws InvalidKeyException {
+        if ((c.signum() < 0) || (c.compareTo(mod) >= 0)) {
+            throw new InvalidKeyException("Invalid coordinate");
+        }
+    }
+
+    // Check whether a public key is valid, following the ECC
+    // Full Public-key Validation Routine (See section 5.6.2.3.3,
+    // NIST SP 800-56A Revision 3).
+    private static void validate(ECOperations ops, ECPublicKey key)
+            throws InvalidKeyException {
+        // Note: Per the NIST 800-56A specification, it is required
+        // to verify that the public key is not the identity element
+        // (point of infinity).  However, the point of infinity has no
+        // affine coordinates, although the point of infinity could
+        // be encoded.  Per IEEE 1363.3-2013 (see section A.6.4.1),
+        // the point of infinity is represented by a pair of
+        // coordinates (x, y) not on the curve.  For EC prime finite
+        // field (q = p^m), the point of infinity is (0, 0) unless
+        // b = 0; in which case it is (0, 1).
+        //
+        // It means that this verification could be covered by the
+        // validation that the public key is on the curve.  As will be
+        // verified in the following steps.
+
+        // Ensure that integers are in proper range.
+        BigInteger x = key.getW().getAffineX();
+        BigInteger y = key.getW().getAffineY();
+        BigInteger p = ops.getField().getSize();
+        validateCoordinate(x, p);
+        validateCoordinate(y, p);
+
+        ECParameterSpec spec = key.getParams();
+
+        // Ensure the point is on the curve.
+        EllipticCurve curve = spec.getCurve();
+        BigInteger rhs = x.modPow(BigInteger.valueOf(3), p)
+                          .add(curve.getA().multiply(x))
+                          .add(curve.getB())
+                          .mod(p);
+        BigInteger lhs = y.modPow(BigInteger.TWO, p);
+        if (!rhs.equals(lhs)) {
+            throw new InvalidKeyException("Point is not on curve");
+        }
+
+        // Check the order of the point.
+        //
+        // Compute nQ (using elliptic curve arithmetic), and verify that
+        // nQ is the identity element.
+        byte[] order = spec.getOrder().toByteArray();
+        ArrayUtil.reverse(order);
+        Point product = ops.multiply(key.getW(), order);
+        if (!ops.isNeutral(product)) {
+            throw new InvalidKeyException("Point has incorrect order");
         }
     }
 
@@ -220,7 +312,7 @@ public final class NativeECDHKeyAgreement extends KeyAgreementSpi {
                         " is not supported by OpenSSL, using Java crypto implementation for preparing agreement.");
             }
             try {
-                this.initializeJavaImplementation(this.privateKey, null);
+                this.initializeJavaImplementation(this.privateKey);
                 this.javaImplementation.engineDoPhase(this.publicKey, true);
             } catch (InvalidKeyException e) {
                 /* should not happen */
@@ -266,10 +358,9 @@ public final class NativeECDHKeyAgreement extends KeyAgreementSpi {
      * Initializes the java implementation.
      *
      * @param key the private key
-     * @param random source of randomness
      */
-    private void initializeJavaImplementation(Key key, SecureRandom random) throws InvalidKeyException {
+    private void initializeJavaImplementation(Key key) throws InvalidKeyException {
         this.javaImplementation = new ECDHKeyAgreement();
-        this.javaImplementation.engineInit(key, random);
+        this.javaImplementation.engineInit(key, null);
     }
 }
