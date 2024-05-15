@@ -32,22 +32,18 @@
 package sun.security.ec;
 
 import java.math.BigInteger;
-import java.security.AlgorithmParameters;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.ProviderException;
-import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.security.interfaces.ECKey;
 import java.security.interfaces.ECPublicKey;
 import java.security.spec.AlgorithmParameterSpec;
-import java.security.spec.ECGenParameterSpec;
 import java.security.spec.ECParameterSpec;
 import java.security.spec.EllipticCurve;
-import java.security.spec.InvalidParameterSpecException;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
