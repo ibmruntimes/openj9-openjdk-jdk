@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2024, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -23,34 +23,18 @@
  * questions.
  */
 
-package com.sun.source.tree;
+package sun.security.util.math;
 
-import java.util.List;
+import java.math.BigInteger;
 
 /**
- * A tree node for a {@code switch} expression.
- *
- * For example:
- * <pre>
- *   switch ( <em>expression</em> ) {
- *     <em>cases</em>
- *   }
- * </pre>
- *
- * @jls 15.29 Switch Expressions
- *
- * @since 14
+ * An interface for the field of integers modulo a prime number. An
+ * implementation of this interface can be used to get properties of the
+ * field and to produce field elements of type ImmutableIntegerModuloP from
+ * other objects and representations of field elements.
  */
-public interface SwitchExpressionTree extends ExpressionTree {
-    /**
-     * Returns the expression for the {@code switch} expression.
-     * @return the expression
-     */
-    ExpressionTree getExpression();
 
-    /**
-     * Returns the cases for the {@code switch} expression.
-     * @return the cases
-     */
-    List<? extends CaseTree> getCases();
+public interface IntegerMontgomeryFieldModuloP extends IntegerFieldModuloP {
+    ImmutableIntegerModuloP fromMontgomery(ImmutableIntegerModuloP m);
+    IntegerFieldModuloP residueField();
 }
