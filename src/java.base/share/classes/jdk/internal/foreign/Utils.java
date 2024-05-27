@@ -24,12 +24,6 @@
  *
  */
 
-/*
- * ===========================================================================
- * (c) Copyright IBM Corp. 2022, 2023 All Rights Reserved
- * ===========================================================================
- */
-
 package jdk.internal.foreign;
 
 import java.lang.foreign.AddressLayout;
@@ -61,7 +55,6 @@ import static sun.security.action.GetPropertyAction.privilegedGetProperty;
 public final class Utils {
 
     public static final boolean IS_WINDOWS = privilegedGetProperty("os.name").startsWith("Windows");
-    public static final boolean IS_AIX = privilegedGetProperty("os.name").startsWith("AIX");
 
     // Suppresses default constructor, ensuring non-instantiability.
     private Utils() {}
