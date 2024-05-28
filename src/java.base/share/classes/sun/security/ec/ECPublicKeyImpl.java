@@ -25,7 +25,7 @@
 
 /*
  * ===========================================================================
- * (c) Copyright IBM Corp. 2022, 2023 All Rights Reserved
+ * (c) Copyright IBM Corp. 2022, 2024 All Rights Reserved
  * ===========================================================================
  */
 
@@ -65,7 +65,6 @@ public final class ECPublicKeyImpl extends X509Key implements ECPublicKey {
     private ECPoint w;
     @SuppressWarnings("serial") // Type of field is not Serializable
     private ECParameterSpec params;
-    private long nativeECKey;
 
     /**
      * Construct a key from its components. Used by the
@@ -152,42 +151,5 @@ public final class ECPublicKeyImpl extends X509Key implements ECPublicKey {
             throws IOException, ClassNotFoundException {
         throw new InvalidObjectException(
                 "ECPublicKeyImpl keys are not directly deserializable");
-    }
-
-    /**
-     * Returns the native EC public key context pointer.
-     * @return the native EC public key context pointer or -1 on error
-     */
-    long getNativePtr() {
-        if (this.nativeECKey == 0x0) {
-            synchronized (this) {
-                if (this.nativeECKey == 0x0) {
-                    if (nativeCrypto == null) {
-                        nativeCrypto = NativeCrypto.getNativeCrypto();
-                    }
-                    long nativePointer = NativeECUtil.encodeGroup(this.params);
-                    try {
-                        if (nativePointer != -1) {
-                            byte[] x = this.w.getAffineX().toByteArray();
-                            byte[] y = this.w.getAffineY().toByteArray();
-                            int fieldType = NativeCrypto.ECField_Fp;
-                            if (this.params.getCurve().getField() instanceof ECFieldF2m) {
-                                fieldType = NativeCrypto.ECField_F2m;
-                            }
-                            if (nativeCrypto.ECCreatePublicKey(nativePointer, x, x.length, y, y.length, fieldType) == -1) {
-                                nativeCrypto.ECDestroyKey(nativePointer);
-                                nativePointer = -1;
-                            }
-                        }
-                    } finally {
-                        if (nativePointer != -1) {
-                            nativeCrypto.createECKeyCleaner(this, nativePointer);
-                        }
-                    }
-                    this.nativeECKey = nativePointer;
-                }
-            }
-        }
-        return this.nativeECKey;
     }
 }
