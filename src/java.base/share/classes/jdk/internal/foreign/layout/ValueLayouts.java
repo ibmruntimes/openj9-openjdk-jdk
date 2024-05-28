@@ -26,7 +26,7 @@
 
 /*
  * ===========================================================================
- * (c) Copyright IBM Corp. 2023, 2023 All Rights Reserved
+ * (c) Copyright IBM Corp. 2023, 2024 All Rights Reserved
  * ===========================================================================
  */
 
@@ -36,6 +36,7 @@ import jdk.internal.foreign.Utils;
 import jdk.internal.misc.Unsafe;
 import jdk.internal.reflect.CallerSensitive;
 import jdk.internal.reflect.Reflection;
+import jdk.internal.util.OperatingSystem;
 import jdk.internal.vm.annotation.ForceInline;
 import jdk.internal.vm.annotation.Stable;
 
@@ -301,12 +302,12 @@ public final class ValueLayouts {
         }
 
         public static OfDouble of(ByteOrder order) {
-            return new OfDoubleImpl(order, Utils.IS_AIX ? 4 : Double.BYTES, Optional.empty());
+            return new OfDoubleImpl(order, OperatingSystem.isAix() ? 4 : ADDRESS_SIZE_BYTES, Optional.empty());
         }
 
         @Override
         public boolean hasNaturalAlignment() {
-            return Utils.IS_AIX ? (byteAlignment() == 4) : super.hasNaturalAlignment();
+            return OperatingSystem.isAix() ? (byteAlignment() == 4) : super.hasNaturalAlignment();
         }
     }
 

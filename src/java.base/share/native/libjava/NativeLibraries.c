@@ -25,13 +25,16 @@
 
 /*
  * ===========================================================================
- * (c) Copyright IBM Corp. 2022, 2022 All Rights Reserved
+ * (c) Copyright IBM Corp. 2022, 2024 All Rights Reserved
  * ===========================================================================
  */
 
 #include <stdlib.h>
 #include <assert.h>
 #include <string.h>
+#if defined(_AIX) || defined(__MVS__)
+#include <dlfcn.h>
+#endif /* defined(_AIX) || defined(__MVS__) */
 
 #include "jni.h"
 #include "jni_util.h"
@@ -306,7 +309,7 @@ Java_jdk_internal_loader_NativeLibraries_findBuiltinLib
     return NULL;
 }
 
-#if defined(_AIX)
+#if defined(_AIX) || defined(__MVS__)
 /*
  * Class:     jdk_internal_loader_NativeLibraries
  * Method:    findEntryInProcess
@@ -328,8 +331,8 @@ Java_jdk_internal_loader_NativeLibraries_findEntryInProcess
         return jlong_zero;
     }
 
-    res = ptr_to_jlong(findEntryInProcess(cname));
+    res = ptr_to_jlong(JVM_FindLibraryEntry(RTLD_DEFAULT, cname));
     (*env)->ReleaseStringUTFChars(env, name, cname);
     return res;
 }
-#endif /* defined(_AIX) */
+#endif /* defined(_AIX) || defined(__MVS__) */

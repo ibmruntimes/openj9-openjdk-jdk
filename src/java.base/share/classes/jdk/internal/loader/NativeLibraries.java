@@ -25,7 +25,7 @@
 
 /*
  * ===========================================================================
- * (c) Copyright IBM Corp. 2022, 2022 All Rights Reserved
+ * (c) Copyright IBM Corp. 2022, 2024 All Rights Reserved
  * ===========================================================================
  */
 
@@ -33,6 +33,7 @@ package jdk.internal.loader;
 
 import jdk.internal.misc.VM;
 import jdk.internal.ref.CleanerFactory;
+import jdk.internal.util.OperatingSystem;
 import jdk.internal.util.StaticProperty;
 
 import java.io.File;
@@ -383,11 +384,10 @@ public final class NativeLibraries {
 
         @Override
         public long find(String name) {
-            boolean isAixOS = System.getProperty("os.name").toLowerCase().contains("aix");
-            if (isAixOS) {
+            if (OperatingSystem.isAix() || OperatingSystem.isZOS()) {
                 return NativeLibraries.findEntryInProcess(name);
             } else {
-                throw new UnsupportedOperationException("Cannot find on non-AIX platforms");
+                throw new UnsupportedOperationException("Cannot find on non-AIX/zOS platforms");
             }
         }
 

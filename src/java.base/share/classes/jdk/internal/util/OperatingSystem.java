@@ -22,6 +22,11 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
+/*
+ * ===========================================================================
+ * (c) Copyright IBM Corp. 2024, 2024 All Rights Reserved
+ * ===========================================================================
+ */
 package jdk.internal.util;
 
 import java.util.Locale;
@@ -81,6 +86,10 @@ public enum OperatingSystem {
      * The AIX Operating system.
      */
     AIX,
+    /**
+     * The z/OS Operating system.
+     */
+    ZOS,
     ;
 
     // The current OperatingSystem
@@ -116,6 +125,14 @@ public enum OperatingSystem {
     @ForceInline
     public static boolean isAix() {
         return PlatformProps.TARGET_OS_IS_AIX;
+    }
+
+    /**
+     * {@return {@code true} if built for the z/OS operating system}
+     */
+    @ForceInline
+    public static boolean isZOS() {
+        return PlatformProps.TARGET_OS_IS_ZOS;
     }
 
     /**
