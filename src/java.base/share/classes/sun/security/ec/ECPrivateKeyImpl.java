@@ -23,12 +23,6 @@
  * questions.
  */
 
-/*
- * ===========================================================================
- * (c) Copyright IBM Corp. 2022, 2024 All Rights Reserved
- * ===========================================================================
- */
-
 package sun.security.ec;
 
 import java.io.IOException;
@@ -40,8 +34,6 @@ import java.security.*;
 import java.security.interfaces.*;
 import java.security.spec.*;
 import java.util.Arrays;
-
-import jdk.crypto.jniprovider.NativeCrypto;
 
 import sun.security.ec.point.AffinePoint;
 import sun.security.ec.point.MutablePoint;
@@ -76,7 +68,6 @@ public final class ECPrivateKeyImpl extends PKCS8Key implements ECPrivateKey {
 
     @java.io.Serial
     private static final long serialVersionUID = 88695385615075129L;
-    private static NativeCrypto nativeCrypto;
 
     private BigInteger s;       // private value
     private byte[] arrayS;      // private value as a little-endian array
