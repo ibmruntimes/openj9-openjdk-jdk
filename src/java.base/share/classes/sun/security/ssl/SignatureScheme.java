@@ -23,6 +23,12 @@
  * questions.
  */
 
+/*
+ * ===========================================================================
+ * (c) Copyright IBM Corp. 2024, 2024 All Rights Reserved
+ * ===========================================================================
+ */
+
 package sun.security.ssl;
 
 import java.security.*;
@@ -62,6 +68,12 @@ enum SignatureScheme {
                                     "EC",
                                     NamedGroup.SECP521_R1,
                                     ProtocolVersion.PROTOCOLS_TO_13),
+    // Brainpool signature defintion for curve ecdsa_brainpoolP512r1tls13_sha512 as per RFC 8734.
+    ECDSA_BRAINPOOLP512R1TLS13_SHA512(0x081C, "ecdsa_brainpoolP512r1tls13_sha512",
+                                    "SHA512withECDSA",
+                                    "EC",
+                                    NamedGroup.BRAINPOOLP512_R1TLS13,
+                                    ProtocolVersion.PROTOCOLS_OF_13),
 
     // EdDSA algorithms
     ED25519                 (0x0807, "ed25519", "Ed25519",
@@ -375,10 +387,34 @@ enum SignatureScheme {
             List<ProtocolVersion> activeProtocols) {
         List<SignatureScheme> supported = new LinkedList<>();
 
-        List<SignatureScheme> schemesToCheck =
-                config.signatureSchemes == null ?
-                    Arrays.asList(SignatureScheme.values()) :
-                    namesOfAvailable(config.signatureSchemes);
+        // If config.signatureSchemes is non-null then it means that
+        // it was defined by a system property.  Per
+        // SSLConfiguration.getCustomizedSignatureScheme() the list will
+        // only contain schemes that are in the enum.
+        // Otherwise, use the enum constants (converted to a list).
+        //
+        // Additional logic is added here to remove the ecdsa_brainpoolP512r1tls13_sha512
+        // signature scheme by default. We only want to make use of ecdsa_brainpoolP512r1tls13_sha512
+        // when explicitly set via system properties jdk.tls.client.SignatureSchemes or
+        // jdk.tls.server.SignatureSchemes.
+        List<SignatureScheme> schemesToCheck;
+        if (config.signatureSchemes != null) {
+            schemesToCheck = namesOfAvailable(config.signatureSchemes);
+        } else {
+            SignatureScheme[] schemes = SignatureScheme.values();
+            schemesToCheck = new ArrayList<>(schemes.length);
+            for (SignatureScheme scheme : schemes) {
+                if (scheme != ECDSA_BRAINPOOLP512R1TLS13_SHA512) {
+                    schemesToCheck.add(scheme);
+                } else {
+                    if (SSLLogger.isOn &&
+                        SSLLogger.isOn("ssl,handshake,verbose")) {
+                        SSLLogger.finest("Ignore " + ECDSA_BRAINPOOLP512R1TLS13_SHA512.name
+                                + " from supported signature schemes");
+                    }
+                }
+            }
+        }
 
         for (SignatureScheme ss: schemesToCheck) {
             if (!ss.isAvailable) {

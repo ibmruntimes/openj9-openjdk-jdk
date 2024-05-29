@@ -116,10 +116,10 @@ public final class NativeECDHKeyAgreement extends KeyAgreementSpi {
         /* attempt to translate the key if it is not an ECKey */
         ECKey ecKey = ECKeyFactory.toECKey(key);
         if (ecKey instanceof ECPrivateKey ecPrivateKey) {
-            Optional<ECOperations> opsOpt =
-                ECOperations.forParameters(ecPrivateKey.getParams());
-            if (opsOpt.isEmpty()) {
-                NamedCurve nc = CurveDB.lookup(ecPrivateKey.getParams());
+            ECParameterSpec params = ecPrivateKey.getParams();
+            ECOperations ops = ECOperations.forParameters(params).orElse(null);
+            if ((ops == null) && !NativeECUtil.isBrainpoolP512r1(params)) {
+                NamedCurve nc = CurveDB.lookup(params);
                 throw new InvalidAlgorithmParameterException(
                         "Curve not supported: " +
                         ((nc != null) ? nc.toString() : "unknown"));
@@ -136,9 +136,9 @@ public final class NativeECDHKeyAgreement extends KeyAgreementSpi {
                 this.initializeJavaImplementation(key);
                 return;
             }
-            this.privateKeyOps = opsOpt.get();
 
-            ECParameterSpec params = this.privateKey.getParams();
+            this.privateKeyOps = ops;
+
             this.curve = NativeECUtil.getCurveName(params);
             if ((this.curve != null) && NativeECUtil.isCurveSupported(this.curve, params)) {
                 this.javaImplementation = null;
@@ -198,8 +198,10 @@ public final class NativeECDHKeyAgreement extends KeyAgreementSpi {
                 ("Key must be an instance of PublicKey");
         }
 
-        // Validate public key.
-        validate(privateKeyOps, ecKey);
+        // Validate public key when we are not making use of a brainpoolP512r1 based key.
+        if (!NativeECUtil.isBrainpoolP512r1(this.privateKey.getParams())) {
+            validate(privateKeyOps, ecKey);
+        }
 
         this.publicKey = ecKey;
         this.nativePublicKey = NativeECUtil.getPublicKeyNativePtr(ecKey);
