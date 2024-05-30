@@ -72,7 +72,7 @@ public final class SystemLookup implements SymbolLookup {
 
     private static SymbolLookup makeSystemLookup() {
         try {
-            if (Utils.IS_WINDOWS) {
+            if (OperatingSystem.isWindows()) {
                 return makeWindowsLookup();
             } else if (OperatingSystem.isAix() || OperatingSystem.isZOS()) {
                 return makeDefaultLookup();
@@ -209,7 +209,7 @@ public final class SystemLookup implements SymbolLookup {
      */
     private static Path jdkLibraryPath(String name) {
         Path javahome = Path.of(GetPropertyAction.privilegedGetProperty("java.home"));
-        String lib = Utils.IS_WINDOWS ? "bin" : "lib";
+        String lib = OperatingSystem.isWindows() ? "bin" : "lib";
         String libname = System.mapLibraryName(name);
         return javahome.resolve(lib).resolve(libname);
     }
