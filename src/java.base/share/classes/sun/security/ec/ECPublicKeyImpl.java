@@ -23,24 +23,15 @@
  * questions.
  */
 
-/*
- * ===========================================================================
- * (c) Copyright IBM Corp. 2022, 2024 All Rights Reserved
- * ===========================================================================
- */
-
 package sun.security.ec;
 
 import java.io.IOException;
-import java.math.BigInteger;
 
 import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
 import java.security.*;
 import java.security.interfaces.*;
 import java.security.spec.*;
-
-import jdk.crypto.jniprovider.NativeCrypto;
 
 import sun.security.util.BitArray;
 import sun.security.util.ECParameters;
@@ -58,7 +49,6 @@ public final class ECPublicKeyImpl extends X509Key implements ECPublicKey {
 
     @java.io.Serial
     private static final long serialVersionUID = -2462037275160462289L;
-    private static NativeCrypto nativeCrypto;
 
     @SuppressWarnings("serial") // Type of field is not
                                 // Serializable;see writeReplace
