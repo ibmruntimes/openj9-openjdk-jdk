@@ -18,6 +18,12 @@
 # 2 along with this work; if not, see <http://www.gnu.org/licenses/>.
 # ===========================================================================
 
+.PHONY : all
+
+all :
+
+include $(SPEC)
+include $(TOPDIR)/make/common/MakeBase.gmk
 include $(TOPDIR)/make/common/CopyFiles.gmk
 include $(TOPDIR)/closed/JPP.gmk
 
@@ -56,8 +62,6 @@ $(eval $(call SetupCopyFiles,COPY_OVERLAY_FILES, \
 
 IncludeIfUnsure := -includeIfUnsure -noWarnIncludeIf
 
-J9JCL_SOURCES_DONEFILE := $(MAKESUPPORT_OUTPUTDIR)/j9jcl.done
-
 $(J9JCL_SOURCES_DONEFILE) : \
 		$(foreach dir, $(JppSourceDirs), $(call RecursiveWildcard,$(dir),*)) \
 		$(COPY_OVERLAY_FILES)
@@ -79,5 +83,4 @@ $(J9JCL_SOURCES_DONEFILE) : \
 	@$(MKDIR) -p $(@D)
 	@$(TOUCH) $@
 
-# Force (re-)generation of module dependencies after preprocessing OpenJ9 source files.
-$(MODULE_DEPS_MAKEFILE) : $(J9JCL_SOURCES_DONEFILE)
+all : $(J9JCL_SOURCES_DONEFILE)
