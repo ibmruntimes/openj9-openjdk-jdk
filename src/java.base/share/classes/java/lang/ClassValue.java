@@ -191,9 +191,9 @@ public abstract class ClassValue<T> {
         map.changeEntry(this, value);
     }
 
-    /// --------
-    /// Implementation...
-    /// --------
+    //| --------
+    //| Implementation...
+    //| --------
 
     /** Return the cache, if it exists, else a dummy empty cache. */
     private static Entry<?>[] getCacheCarefully(Class<?> type) {
@@ -548,9 +548,9 @@ public abstract class ClassValue<T> {
             addToCache(classValue, e);
         }
 
-        /// --------
-        /// Cache management.
-        /// --------
+        //| --------
+        //| Cache management.
+        //| --------
 
         // Statics do not need synchronization.
 

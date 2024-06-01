@@ -1268,7 +1268,7 @@ public final class String
         return Arrays.copyOf(dst, dp);
     }
 
-    //////////////////////////////// utf8 ////////////////////////////////////
+    //------------------------------ utf8 ------------------------------------
 
     /**
      * Decodes ASCII from the source byte array into the destination
@@ -5588,7 +5588,7 @@ public final class String
         System.arraycopy(buffer, offset, buffer, offset + copied, limit - copied);
     }
 
-    ////////////////////////////////////////////////////////////////
+    //--------------------------------------------------------------
 
     /**
      * Copy character bytes from this string into dst starting at dstBegin.
