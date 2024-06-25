@@ -23,9 +23,17 @@
  * questions.
  */
 
+/*
+ * ===========================================================================
+ * (c) Copyright IBM Corp. 2024, 2024 All Rights Reserved
+ * ===========================================================================
+ */
+
 package sun.security.jca;
 
 import java.security.Provider;
+
+import openj9.internal.security.RestrictedSecurity;
 import sun.security.x509.AlgorithmId;
 
 /**
@@ -53,6 +61,7 @@ public class Providers {
         // triggers a getInstance() call (although that should not happen)
         providerList = ProviderList.EMPTY;
         providerList = ProviderList.fromSecurityProperties();
+        RestrictedSecurity.checkHashValues();
     }
 
     private Providers() {
