@@ -23,27 +23,30 @@
 
 /**
  * @test
- * @bug 8320362
- * @summary Verifies successful connection to external server with
- *          KEYCHAINSTORE-ROOT trust store
+ * @bug 8306580
+ * @summary Test the writing error when archive file cannot be created
+ * @requires vm.cds
  * @library /test/lib
- * @requires os.family == "mac"
- * @run main/othervm/manual HttpsURLConnectionTest https://github.com KeychainStore-Root
+ * @run driver StaticWritingError
  */
-import java.io.*;
-import java.net.*;
-import javax.net.ssl.*;
 
-public class HttpsURLConnectionTest {
-    public static void main(String[] args) {
-        System.setProperty( "javax.net.ssl.trustStoreType", args[1]);
-        try {
-            HttpsURLConnection httpsCon = (HttpsURLConnection) new URL(args[0]).openConnection();
-            if(httpsCon.getResponseCode() != 200) {
-                throw new RuntimeException("Test failed : bad http response code : "+ httpsCon.getResponseCode());
-            }
-        } catch(IOException ioe) {
-            throw new RuntimeException("Test failed: " + ioe.getMessage());
-        }
+import java.io.File;
+import jdk.test.lib.cds.CDSOptions;
+import jdk.test.lib.cds.CDSTestUtils;
+import jdk.test.lib.process.OutputAnalyzer;
+
+public class StaticWritingError {
+    public static void main(String[] args) throws Exception {
+        String directoryName = "nosuchdir";
+        String archiveName = "staticWritingError.jsa";
+
+        // Perform static dump and attempt to write archive in unwritable directory
+        CDSOptions opts = (new CDSOptions())
+            .addPrefix("-Xlog:cds")
+            .setArchiveName(directoryName + File.separator + archiveName);
+        OutputAnalyzer out = CDSTestUtils.createArchive(opts);
+        out.shouldHaveExitValue(1);
+        out.shouldContain("Unable to create shared archive file");
+        out.shouldContain("Encountered error while dumping");
     }
 }
