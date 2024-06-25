@@ -6,7 +6,7 @@
 # under the terms of the GNU General Public License version 2 only, as
 # published by the Free Software Foundation.
 #
-# IBM designates this particular file as subject to the "Classpath" exception 
+# IBM designates this particular file as subject to the "Classpath" exception
 # as provided by IBM in the LICENSE file that accompanied this code.
 #
 # This code is distributed in the hope that it will be useful, but WITHOUT
@@ -22,8 +22,8 @@
 #
 # THE FOLLOWING ARE EXAMPLES OF SYNTAXES copyrightCheck SUPPORTS:
 # 1. **/jobs/** # path contains "jobs" folder, but not root directory
-# 2. /doc #root root level directory and file named "doc"
-# 3. /debugtools/**/*.ignore # all .ignore file in the root directory debugtools
+# 2. /doc # root level directory and file named "doc"
+# 3. /debugtools/**/*.ignore # all .ignore files in the root directory debugtools
 # 4. /*.ignore # all root directory .ignore files
 # 5. **/jobs/pipelines/ # pipeline folder follows closely with jobs not in root directory
 # 6. *.ignore # all ignore files only
@@ -31,11 +31,11 @@
 # 8. *job* # all things at contains characters in between stars
 # ===========================================================================
 
-src/bsd/doc
-src/jdk.crypto.ec/share/native/libsunec/impl
-src/linux/doc
-src/solaris/doc
-/test
+/src/bsd/doc/
+/src/jdk.crypto.ec/share/native/libsunec/impl/
+/src/linux/doc/
+/src/solaris/doc/
+/test/
 
 .copyrightignore
 /LICENSE
