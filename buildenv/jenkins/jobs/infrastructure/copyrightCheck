@@ -96,31 +96,31 @@ timeout(time: 6, unit: 'HOURS') {
                                         regexsElm = regexsElm.replaceAll(/[*]/, /\.\*/)
                                     }
 
-                                    if (item.startsWith("/") && item.lastIndexOf("/") == 0 ) {
-                                        regexsElm = regexsElm.replaceAll("[/]","");
+                                    if (item.startsWith("/") && item.lastIndexOf("/") == 0) {
+                                        regexsElm = regexsElm.replaceAll("[/]", "");
                                         if (item.contains("*.")) {
-                                            regexsElm = regexsElm.replaceAll("[*]","");
-                                            regexsElm =  "[A-Za-z0-9[^/]+]+" + regexsElm
+                                            regexsElm = regexsElm.replaceAll("[*]", "");
+                                            regexsElm = "[A-Za-z0-9[^/]+]+" + regexsElm
                                         }
 
-                                        if (!item.contains(".")){
+                                        if (!item.contains(".")) {
                                             regexsElm = regexsElm + /\// + ".*" + /|$/
                                         }
 
                                     } else if (!item.startsWith("/") && item.lastIndexOf("/") != 0 && item.contains("/")) {
-                                        regexsElm = regexsElm.replaceAll(/\//,/\/+/)
-                                        if (!item.contains(".")){
+                                        regexsElm = regexsElm.replaceAll(/\//, /\/+/)
+                                        if (!item.contains(".")) {
                                             regexsElm = regexsElm + ".*"
                                         }
                                     } else {
-                                        regexsElm = regexsElm.replaceAll("[/]","");
+                                        regexsElm = regexsElm.replaceAll("[/]", "");
                                     }
                                 }
-                                if (regexsElm.contains ("/+.*.*")) {
-                                    regexsElm = regexsElm.replace("/+.*.*","/*.*.*");
+                                if (regexsElm.contains("/+.*.*")) {
+                                    regexsElm = regexsElm.replace("/+.*.*", "/*.*.*");
                                 }
 
-                                if (regexsElm ==~ /.*.[A-Za-z0-9]/){
+                                if (regexsElm ==~ /.*.[A-Za-z0-9]/) {
                                     print regexsElm;
                                     regexsElm = regexsElm.substring(0, regexsElm.lastIndexOf(".")) + /\./ + regexsElm.substring(regexsElm.lastIndexOf(".") + 1);
                                 }
@@ -129,7 +129,7 @@ timeout(time: 6, unit: 'HOURS') {
                             }
                             print REGEXLIST
                             FILES_LIST.each { fileName ->
-                               for (regex in REGEXLIST) {
+                                for (regex in REGEXLIST) {
                                     if (fileName ==~ /${regex}/) {
                                         FILES_LIST = FILES_LIST.collect { it.toString() } - "${fileName}"
                                         echo "Ignoring File: '${fileName}', as it appears to match .copyrightignore regex " + /${regex}/
@@ -207,8 +207,8 @@ timeout(time: 6, unit: 'HOURS') {
                                             println "We have found the Oracle copyright on line '${foundOracleCopyright}' in file: '${file}'"
                                         } else {
                                             if (foundIBMCopyright < 0 && foundIBMPortionsCopyright < 0 && foundOracleCopyright < 0 && foundBSDorMITCopyright < 0) {
-                                               foundCopyright = lineCount;
-                                               println "We have found a different copyright on line '${foundCopyright}' in file: '${file}'"
+                                                foundCopyright = lineCount;
+                                                println "We have found a different copyright on line '${foundCopyright}' in file: '${file}'"
                                             }
                                         }
                                     }
@@ -397,7 +397,7 @@ timeout(time: 6, unit: 'HOURS') {
                                 } // !foundNonIBMCopyright
                             } // if closed
 
-                             // We need to check that the copyright update year is the current year
+                            // We need to check that the copyright update year is the current year
                             if (checkCopyrightDate) {
                                 if (!theFile.find(REGEX)) {
                                     errorStr = "IBM Copyright date appears to be incorrect"
