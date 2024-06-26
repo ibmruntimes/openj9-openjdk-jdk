@@ -1,5 +1,5 @@
 # ===========================================================================
-# (c) Copyright IBM Corp. 2018, 2019 All Rights Reserved
+# (c) Copyright IBM Corp. 2018, 2024 All Rights Reserved
 # ===========================================================================
 #
 # This code is free software; you can redistribute it and/or modify it
@@ -20,15 +20,15 @@
 #
 # ===========================================================================
 #
-#  THE FOLLOWING ARE EXAMPLES OF SYNTAXES copyrightCheck SUPPORTS:
-#  1.**/jobs/** # path contains "jobs" folder, but not root directory
-#  2./doc#root root level directory and file named "doc"
-#  3./debugtools/**/*.ignore # all .ignore file in the root directory debugtools
-#  4./*.ignore #all root directory .ignore files
-#  5.**/jobs/pipelines/ #pipeline folder follows closely with jobs not in root directory
-#  6.*.ignore #all ignore files only
-#  7.**/jobs/**/pipelines/ #directory path contains both jobs and pipelines not root directory
-#  8.*job*  #all things at contains characters in between stars
+# THE FOLLOWING ARE EXAMPLES OF SYNTAXES copyrightCheck SUPPORTS:
+# 1. **/jobs/** # path contains "jobs" folder, but not root directory
+# 2. /doc #root root level directory and file named "doc"
+# 3. /debugtools/**/*.ignore # all .ignore file in the root directory debugtools
+# 4. /*.ignore # all root directory .ignore files
+# 5. **/jobs/pipelines/ # pipeline folder follows closely with jobs not in root directory
+# 6. *.ignore # all ignore files only
+# 7. **/jobs/**/pipelines/ # directory path contains both jobs and pipelines not root directory
+# 8. *job* # all things at contains characters in between stars
 # ===========================================================================
 
 src/bsd/doc
@@ -37,13 +37,15 @@ src/linux/doc
 src/solaris/doc
 /test
 
-*.gif
-*.ini
 .copyrightignore
-*.jpg
-*.ico
+/LICENSE
+
 *.bmp
-*.wav
-*.md
+*.gif
+*.ico
 *.icu
+*.ini
+*.jpg
+*.md
 *.project
+*.wav
