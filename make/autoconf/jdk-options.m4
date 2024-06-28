@@ -196,7 +196,6 @@ AC_DEFUN_ONCE([JDKOPT_SETUP_JDK_OPTIONS],
 
   # Setup default CDS alignment. For OpenJ9 it needs to be false.
   COMPATIBLE_CDS_ALIGNMENT_DEFAULT=false
-  AC_SUBST(COMPATIBLE_CDS_ALIGNMENT_DEFAULT)
 
   # Compress jars
   COMPRESS_JARS=false
