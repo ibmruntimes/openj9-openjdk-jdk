@@ -1,6 +1,6 @@
 /*
  * ===========================================================================
- * (c) Copyright IBM Corp. 2018, 2022 All Rights Reserved
+ * (c) Copyright IBM Corp. 2018, 2024 All Rights Reserved
  * ===========================================================================
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -20,7 +20,7 @@
  * 2 along with this work; if not, see <http://www.gnu.org/licenses/>.
  *
  * ===========================================================================
-*/
+ */
 
 def FAIL = false
 Boolean KEEP_WORKSPACE = params.KEEP_WORKSPACE ?: true
@@ -85,54 +85,55 @@ timeout(time: 6, unit: 'HOURS') {
                             def readinFiles = get_file_content("${env.WORKSPACE}/.copyrightignore")
                             def READLIST = readinFiles.split("\\r?\\n")
                             for (item in READLIST) {
-                                regexsElm = item
-
-                                if (item.contains("#")) {
-                                    regexsElm = regexsElm.substring(0, regexsElm.indexOf("#"))
+                                if (item.contains("#")) { // remove comments
+                                    item = item.substring(0, item.indexOf("#")).trim()
                                 }
-
-                                if (regexsElm != "") {
-                                    if (item.contains("*")) {
-                                        regexsElm = regexsElm.replaceAll(/[*]/, /\.\*/)
-                                    }
-
-                                    if (item.startsWith("/") && item.lastIndexOf("/") == 0 ) {
-                                        regexsElm = regexsElm.replaceAll("[/]","");
-                                        if (item.contains("*.")) {
-                                            regexsElm = regexsElm.replaceAll("[*]","");
-                                            regexsElm =  "[A-Za-z0-9[^/]+]+" + regexsElm
-                                        }
-
-                                        if (!item.contains(".")){
-                                            regexsElm = regexsElm + /\// + ".*" + /|$/
-                                        }
-
-                                    } else if (!item.startsWith("/") && item.lastIndexOf("/") != 0 && item.contains("/")) {
-                                        regexsElm = regexsElm.replaceAll(/\//,/\/+/)
-                                        if (!item.contains(".")){
-                                            regexsElm = regexsElm + ".*"
-                                        }
+                                if (item != "") { // only consider non-blank lines
+                                    def regexElem = ""
+                                    def itemTail = item
+                                    if (itemTail.startsWith("/")) {
+                                        itemTail = itemTail.substring(1);
                                     } else {
-                                        regexsElm = regexsElm.replaceAll("[/]","");
+                                        regexElem = "(.+/)?"
                                     }
-                                }
-                                if (regexsElm.contains ("/+.*.*")) {
-                                    regexsElm = regexsElm.replace("/+.*.*","/*.*.*");
-                                }
 
-                                if (regexsElm ==~ /.*.[A-Za-z0-9]/){
-                                    print regexsElm;
-                                    regexsElm = regexsElm.substring(0, regexsElm.lastIndexOf(".")) + /\./ + regexsElm.substring(regexsElm.lastIndexOf(".") + 1);
-                                }
+                                    while (itemTail != "") {
+                                        if (itemTail.startsWith("**")) {
+                                            // "**" matches zero or more characters possibly including "/"
+                                            regexElem = regexElem + ".*"
+                                            itemTail = itemTail.substring(2);
+                                        } else {
+                                            if (itemTail.startsWith("*")) {
+                                                // "*" matches zero or more characters other than "/"
+                                                regexElem = regexElem + "[^/]*"
+                                            } else if (itemTail.startsWith(".")) {
+                                                // "." must be escaped
+                                                regexElem = regexElem + "\\."
+                                            } else {
+                                                // other characters must match literally
+                                                regexElem = regexElem + itemTail.substring(0, 1)
+                                            }
+                                            itemTail = itemTail.substring(1);
+                                        }
+                                    }
+                                    if (regexElem.endsWith("/")) {
+                                        // match all files within a directory pattern
+                                        regexElem = regexElem + ".+"
+                                    } else {
+                                        // match files or directories
+                                        regexElem = regexElem + "(/.+)?"
+                                    }
 
-                                REGEXLIST << regexsElm
+                                    print "'${item}' -> '${regexElem}'";
+                                    REGEXLIST << regexElem
+                                }
                             }
                             print REGEXLIST
                             FILES_LIST.each { fileName ->
-                               for (regex in REGEXLIST) {
+                                for (regex in REGEXLIST) {
                                     if (fileName ==~ /${regex}/) {
                                         FILES_LIST = FILES_LIST.collect { it.toString() } - "${fileName}"
-                                        echo "Ignoring File: '${fileName}', as it appears to match .copyrightignore regex " + /${regex}/
+                                        echo "Ignoring file: '${fileName}', as it appears to match .copyrightignore regex '${regex}'"
                                         break
                                     }
                                 }
@@ -162,7 +163,7 @@ timeout(time: 6, unit: 'HOURS') {
 
                             theFile = get_file_content("${file}")
 
-                            if( theFile.length() <= 0 ) {
+                            if (theFile.length() <= 0) {
                                 println "File is empty"
                             } else {
                                 String[] fileLines = theFile.split("\n")
@@ -207,8 +208,8 @@ timeout(time: 6, unit: 'HOURS') {
                                             println "We have found the Oracle copyright on line '${foundOracleCopyright}' in file: '${file}'"
                                         } else {
                                             if (foundIBMCopyright < 0 && foundIBMPortionsCopyright < 0 && foundOracleCopyright < 0 && foundBSDorMITCopyright < 0) {
-                                               foundCopyright = lineCount;
-                                               println "We have found a different copyright on line '${foundCopyright}' in file: '${file}'"
+                                                foundCopyright = lineCount;
+                                                println "We have found a different copyright on line '${foundCopyright}' in file: '${file}'"
                                             }
                                         }
                                     }
@@ -231,10 +232,10 @@ timeout(time: 6, unit: 'HOURS') {
                                     }
                                 }
                             }
-                            // Check to see if we have a non IBM Copyright and set boolean
+                            // Check to see if we have a non-IBM Copyright and set boolean
                             if (foundOracleCopyright >= 0 || foundApacheCopyright >= 0 ||
                                 foundBSDorMITCopyright >= 0 || foundCopyright >= 0) {
-                                println "We have found a non IBM copyright"
+                                println "We have found a non-IBM copyright"
                                 foundNonIBMCopyright = true
                             }
 
@@ -251,13 +252,14 @@ timeout(time: 6, unit: 'HOURS') {
                                     if (foundIBMCopyright >= 0) {
                                         // We have an IBM copyright, so check its location
                                         // it should be after any existing copyright
-                                        if (foundIBMCopyright < foundOracleCopyright ||
-                                            foundIBMCopyright < foundBSDorMITCopyright ||
-                                            foundIBMCopyright < foundApacheCopyright ||
-                                            foundIBMCopyright < foundCopyright) {
-                                                //The IBM Copyright is not after the existing copyright in the file
-                                                errorStr = "IBM Copyright is not after the existing copyright"
-                                                FAIL = addError(BAD_FILES, "${file}", errorStr)
+                                        if (foundIBMCopyright < foundOracleCopyright
+                                        ||  foundIBMCopyright < foundBSDorMITCopyright
+                                        ||  foundIBMCopyright < foundApacheCopyright
+                                        ||  foundIBMCopyright < foundCopyright
+                                        ) {
+                                            // The IBM Copyright is not after the existing copyright in the file
+                                            errorStr = "IBM Copyright is not after the existing copyright"
+                                            FAIL = addError(BAD_FILES, "${file}", errorStr)
                                         }
                                     } else {
                                         errorStr = "IBM Copyright (basic) is missing from the file"
@@ -265,7 +267,7 @@ timeout(time: 6, unit: 'HOURS') {
                                         checkCopyrightDate = false
                                     }
                                 } else {
-                                    // The file is in the 'closed' directory and doesnt contain
+                                    // The file is in the 'closed' directory and doesn't contain
                                     // Oracle copyright with GPLv2 and Classpath Exception so should
                                     // have IBM copyright with GPLv2 and CE at the top of the file
                                     if (foundIBMCopyright >= 5) {
@@ -290,21 +292,21 @@ timeout(time: 6, unit: 'HOURS') {
                                 // We have updated the file so it should have an
                                 // IBM copyright or an IBM Portions copyright
 
-                                // If we dont have some other copyright, ie Oracle, ASF, BSD, MIT etc
+                                // If we don't have some other copyright, i.e. Oracle, ASF, BSD, MIT etc.
                                 if (!foundNonIBMCopyright) {
-                                    // and dont have a GPLv2 or CPE
+                                    // and don't have a GPLv2 or CPE
                                     if (foundGPLv2 < 0) {
                                         if (foundCPE < 0) {
                                             println "We have no GPLv2 with CE"
                                             // and the file is a user config
                                             if (checkMatches("${file}", CONFIG_EXTENSIONS, CONFIG_PATHS)) {
-                                                // The file is a user configuration file so shouldnt have a copyright
+                                                // The file is a user configuration file so shouldn't have a copyright.
                                                 println "The file is a user configuration file"
                                                 checkCopyrightDate = false
                                                 if (foundIBMCopyright >= 0) {
                                                     // if we have an IBM copyright then this is an error
                                                     println "We have a IBM Copyright - so this is an error"
-                                                    errorStr = "IBM Copyright should NOT be used in this file as it is a user config file"
+                                                    errorStr = "IBM Copyright should NOT be used in this file as it is a user configuration file"
                                                     FAIL = addError(BAD_FILES, "${file}", errorStr)
                                                 }
                                             } else {
@@ -317,8 +319,8 @@ timeout(time: 6, unit: 'HOURS') {
                                                 }
                                                 // Check to see if the IBM Portions copyright is at top of file
                                                 if (foundIBMPortionsCopyright >= 0) {
-                                                    // We have an IBM copyright, so check is location
-                                                    if (foundIBMPortionsCopyright > 3 ) {
+                                                    // We have an IBM copyright, so check its location
+                                                    if (foundIBMPortionsCopyright > 3) {
                                                         // The Portions Copyright should be at top of the file
                                                         errorStr = "Portions Copyright is not at top of the file"
                                                         FAIL = addError(BAD_FILES, "${file}", errorStr)
@@ -328,8 +330,8 @@ timeout(time: 6, unit: 'HOURS') {
                                         } // foundCPE
                                     } // foundGPLv2
                                 } else {
-                                    // We have found some nonIBM copyright
-                                    println "We have found some nonIBM copyright"
+                                    // We have found some non-IBM copyright
+                                    println "We have found some non-IBM copyright"
                                     if (foundGPLv2 >= 0) {
                                         // We have found GPLv2
                                         println "We have found GPLv2"
@@ -380,13 +382,14 @@ timeout(time: 6, unit: 'HOURS') {
                                         if (foundIBMCopyright >= 0) {
                                             // We have an IBM copyright, so check its location
                                             // it should be after any existing copyright
-                                            if (foundIBMCopyright < foundOracleCopyright ||
-                                                foundIBMCopyright < foundBSDorMITCopyright ||
-                                                foundIBMCopyright < foundApacheCopyright ||
-                                                foundIBMCopyright < foundCopyright) {
-                                                    //The IBM Copyright is not after the existing copyright in the file
-                                                    errorStr = "IBM Copyright is not after the existing copyright"
-                                                    FAIL = addError(BAD_FILES, "${file}", errorStr)
+                                            if (foundIBMCopyright < foundOracleCopyright
+                                            ||  foundIBMCopyright < foundBSDorMITCopyright
+                                            ||  foundIBMCopyright < foundApacheCopyright
+                                            ||  foundIBMCopyright < foundCopyright
+                                            ) {
+                                                // The IBM Copyright is not after the existing copyright in the file
+                                                errorStr = "IBM Copyright is not after the existing copyright"
+                                                FAIL = addError(BAD_FILES, "${file}", errorStr)
                                             }
                                         } else {
                                             errorStr = "IBM Copyright (basic) is missing from the file"
@@ -397,7 +400,7 @@ timeout(time: 6, unit: 'HOURS') {
                                 } // !foundNonIBMCopyright
                             } // if closed
 
-                             // We need to check that the copyright update year is the current year
+                            // We need to check that the copyright update year is the current year
                             if (checkCopyrightDate) {
                                 if (!theFile.find(REGEX)) {
                                     errorStr = "IBM Copyright date appears to be incorrect"
@@ -412,7 +415,7 @@ timeout(time: 6, unit: 'HOURS') {
                             echo "${HASHES}"
                             echo "The following files were modified and have incorrect copyrights"
                             BAD_FILES.keySet().each {badfile ->
-                                echo "${badfile}"+BAD_FILES.get("${badfile}")
+                                echo "${badfile}" + BAD_FILES.get("${badfile}")
                             }
                             echo "${HASHES}"
                             error "Found ${BAD_FILES.size()} files with incorrect copyrights"
@@ -433,9 +436,9 @@ timeout(time: 6, unit: 'HOURS') {
 def addError(errorMap, errorfile, errorStr) {
     echo errorStr
     if (errorMap.containsKey(errorfile)) {
-        errorMap.put(errorfile, errorMap.get(errorfile) + ("\n\t"+errorStr))
+        errorMap.put(errorfile, errorMap.get(errorfile) + "\n\t" + errorStr)
     } else {
-        errorMap.put(errorfile, "\n\t"+errorStr)
+        errorMap.put(errorfile, "\n\t" + errorStr)
     }
     return true
 }
