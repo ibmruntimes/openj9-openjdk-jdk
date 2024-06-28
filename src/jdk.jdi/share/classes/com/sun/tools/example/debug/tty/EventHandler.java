@@ -31,6 +31,12 @@
  * this sample code.
  */
 
+/*
+ * ===========================================================================
+ * (c) Copyright IBM Corp. 2024, 2024 All Rights Reserved
+ * ===========================================================================
+ */
+
 
 package com.sun.tools.example.debug.tty;
 
@@ -151,6 +157,10 @@ public class EventHandler implements Runnable {
             return threadDeathEvent(event);
         } else if (event instanceof VMStartEvent) {
             return vmStartEvent(event);
+/*[IF CRIU_SUPPORT]*/
+        } else if (event instanceof VMRestoreEvent) {
+            return vmRestoreEvent(event);
+/*[ENDIF] CRIU_SUPPORT */
         } else {
             return handleExitEvent(event);
         }
@@ -212,6 +222,10 @@ public class EventHandler implements Runnable {
             return ((ThreadDeathEvent)event).thread();
         } else if (event instanceof VMStartEvent) {
             return ((VMStartEvent)event).thread();
+/*[IF CRIU_SUPPORT]*/
+        } else if (event instanceof VMRestoreEvent) {
+            return ((VMRestoreEvent)event).thread();
+/*[ENDIF] CRIU_SUPPORT */
         } else {
             return null;
         }
@@ -242,6 +256,14 @@ public class EventHandler implements Runnable {
         notifier.vmStartEvent(se);
         return stopOnVMStart;
     }
+
+/*[IF CRIU_SUPPORT]*/
+    private boolean vmRestoreEvent(Event event)  {
+        VMRestoreEvent re = (VMRestoreEvent)event;
+        notifier.vmRestoreEvent(re);
+        return stopOnVMStart;
+    }
+/*[ENDIF] CRIU_SUPPORT */
 
     private boolean breakpointEvent(Event event)  {
         BreakpointEvent be = (BreakpointEvent)event;
