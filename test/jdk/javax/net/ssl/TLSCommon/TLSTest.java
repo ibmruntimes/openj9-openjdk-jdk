@@ -20,6 +20,12 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
+
+/*
+ * ===========================================================================
+ * (c) Copyright IBM Corp. 2024, 2024 All Rights Reserved
+ * ===========================================================================
+ */
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -51,6 +57,11 @@ import javax.net.ssl.TrustManagerFactory;
  * @bug 8205111
  * @summary Test TLS with different types of supported keys.
  * @run main/othervm TLSTest TLSv1.3 rsa_pkcs1_sha1 TLS_AES_128_GCM_SHA256
+ * @run main/othervm
+ *      -Djdk.tls.client.SignatureSchemes=ecdsa_brainpoolP512r1tls13_sha512
+ *      -Djdk.tls.namedGroups=brainpoolP512r1tls13
+ *      -Djdk.tls.server.SignatureSchemes=ecdsa_brainpoolP512r1tls13_sha512
+ *      TLSTest TLSv1.3 ecdsa_brainpoolP512r1_sha512 TLS_AES_128_GCM_SHA256
  * @run main/othervm TLSTest TLSv1.3 rsa_pkcs1_sha256 TLS_AES_128_GCM_SHA256
  * @run main/othervm TLSTest TLSv1.3 rsa_pkcs1_sha384 TLS_AES_128_GCM_SHA256
  * @run main/othervm TLSTest TLSv1.3 rsa_pkcs1_sha512 TLS_AES_128_GCM_SHA256
@@ -452,6 +463,31 @@ public class TLSTest {
                 "MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQgyJJNI8eqYVKcCshG\n"
                 + "t89mrRZ1jMeD8fAbgijAG7WfgtGhRANCAAR6LMO6lBGdmpo87XTjtA2vsXvq1kd8\n"
                 + "ktaIGEdCrA8BKk0A30LW8SY5Be29ScYu8d+IjQ3X/fpblrVh/64pOgQz"
+        ),
+        ecdsa_brainpoolP512r1_sha512(
+            "EC",
+
+            "-----BEGIN CERTIFICATE-----\n"
+            + "MIICRzCCAaygAwIBAgIIRwv8F2wpI+gwCgYIKoZIzj0EAwQwVjELMAkGA1UEBhMC\n"
+            + "VVMxCzAJBgNVBAgTAk5ZMQ0wCwYDVQQHEwRUZXN0MQ0wCwYDVQQKEwRUZXN0MQ0w\n"
+            + "CwYDVQQLEwRUZXN0MQ0wCwYDVQQDEwRUZXN0MB4XDTI0MDUwOTE3MzEwOVoXDTI1\n"
+            + "MDUwOTE3MzEwOVowVjELMAkGA1UEBhMCVVMxCzAJBgNVBAgTAk5ZMQ0wCwYDVQQH\n"
+            + "EwRUZXN0MQ0wCwYDVQQKEwRUZXN0MQ0wCwYDVQQLEwRUZXN0MQ0wCwYDVQQDEwRU\n"
+            + "ZXN0MIGbMBQGByqGSM49AgEGCSskAwMCCAEBDQOBggAEKW44Kx0jbGqLa0YqK2zc\n"
+            + "6/95LIgJseQjKAE5bxyr92hnGwXQV4Xpu9ncZKFEPx1XJpfeb68+ds6CF4oRI8cf\n"
+            + "YR3KEXazpDOZ6EoM8qYawch61QZlJmfBw9+SzDI26Kr7yOphqi8WTO1X6LWRjCTT\n"
+            + "KpBiIfWcIBw25G1NNDM26/ujITAfMB0GA1UdDgQWBBSQ5LauX//LL5I3Re1m5Z92\n"
+            + "9iVd3jAKBggqhkjOPQQDBAOBiAAwgYQCQHIcs0OAiPOjknW4scGqxBkOTgdjOaEE\n"
+            + "ts0Q6O0kzOYYBYEjsyNTWAO6cIZjXovvdwbs0j+YXaPV6bh0aerKXMACQFVMMJJF\n"
+            + "tDZNP+FsegcRWA14Jx+aeNIRWeEa7cVZ9lRzf5/IsFS9mQnXpyI8oQStnNncqyLR\n"
+            + "RIW0f9OAnOvzApQ=\n"
+            + "-----END CERTIFICATE-----\n",
+            //
+            // Private key.
+            //
+            "MGICAQAwFAYHKoZIzj0CAQYJKyQDAwIIAQENBEcwRQIBAQRAgPx92Cu2UnmeC/NG\n"
+            + "KdwrYso1y3MHfY8UbcvuC/POxDqvrYsaSqBBWq8uSFlgRAwFXhdMJDzF9jGbaw79\n"
+            + "gNzowQ==\n"
         ),
         rsa_pss_pss_sha256(
                 "RSASSA-PSS",

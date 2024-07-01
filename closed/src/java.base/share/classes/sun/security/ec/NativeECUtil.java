@@ -47,6 +47,7 @@ import java.security.spec.ECFieldF2m;
 import java.security.spec.ECParameterSpec;
 import java.security.spec.ECGenParameterSpec;
 import java.security.AlgorithmParameters;
+import sun.security.util.CurveDB;
 import sun.security.util.NamedCurve;
 
 import jdk.crypto.jniprovider.NativeCrypto;
@@ -216,5 +217,18 @@ public final class NativeECUtil {
             }
             return nativePointer;
         }
+    }
+
+    static boolean isBrainpoolP512r1(ECParameterSpec name) {
+        NamedCurve curve = CurveDB.lookup(name);
+        if (curve != null) {
+            String[] nameAndAliases = curve.getNameAndAliases();
+            for (String nameOrAlias : nameAndAliases) {
+                if ("brainpoolP512r1".equalsIgnoreCase(nameOrAlias)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }

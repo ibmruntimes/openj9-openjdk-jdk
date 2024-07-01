@@ -42,7 +42,8 @@ import java.util.List;
 
 import jdk.crypto.jniprovider.NativeCrypto;
 
-import sun.security.action.GetPropertyAction;
+import jdk.internal.util.OperatingSystem;
+
 import sun.security.ec.ed.EdDSAKeyFactory;
 import sun.security.ec.ed.EdDSAKeyPairGenerator;
 import sun.security.ec.ed.EdDSASignature;
@@ -60,9 +61,6 @@ public final class SunEC extends Provider {
     private static final long serialVersionUID = -2279741672933606418L;
 
     private static final boolean nativeCryptTrace = NativeCrypto.isTraceEnabled();
-
-    // Flag indicating whether the operating system is AIX.
-    private static final boolean isAIX = "AIX".equals(GetPropertyAction.privilegedGetProperty("os.name"));
 
     /* The property 'jdk.nativeEC' is used to control enablement of the native
      * ECDH implementation.
@@ -252,11 +250,6 @@ public final class SunEC extends Provider {
                                 if (nativeCryptTrace) {
                                     System.err.println("EC KeyPair Generation - Not using OpenSSL integration due to older version of OpenSSL (<1.1.0).");
                                 }
-                            } else if (isAIX) {
-                                /* Disabling OpenSSL usage on AIX due to perfomance regression observed. */
-                                if (nativeCryptTrace) {
-                                    System.err.println("EC KeyPair Generation - Not using OpenSSL integration on AIX.");
-                                }
                             } else {
                                 if (nativeCryptTrace) {
                                     System.err.println("EC KeyPair Generation - Using OpenSSL integration.");
@@ -271,7 +264,7 @@ public final class SunEC extends Provider {
                                 if (nativeCryptTrace) {
                                     System.err.println("XDH KeyPair Generation - Not using OpenSSL integration due to older version of OpenSSL (<1.1.1).");
                                 }
-                            } else if (isAIX) {
+                            } else if (OperatingSystem.isAix()) {
                                 /* Disabling OpenSSL usage on AIX due to perfomance regression observed. */
                                 if (nativeCryptTrace) {
                                     System.err.println("XDH KeyPair Generation - Not using OpenSSL integration on AIX.");
@@ -290,7 +283,7 @@ public final class SunEC extends Provider {
                                 if (nativeCryptTrace) {
                                     System.err.println("X25519 KeyPair Generation - Not using OpenSSL integration due to older version of OpenSSL (<1.1.1).");
                                 }
-                            } else if (isAIX) {
+                            } else if (OperatingSystem.isAix()) {
                                 /* Disabling OpenSSL usage on AIX due to perfomance regression observed. */
                                 if (nativeCryptTrace) {
                                     System.err.println("X25519 KeyPair Generation - Not using OpenSSL integration on AIX.");
@@ -309,7 +302,7 @@ public final class SunEC extends Provider {
                                 if (nativeCryptTrace) {
                                     System.err.println("X448 KeyPair Generation - Not using OpenSSL integration due to older version of OpenSSL (<1.1.1).");
                                 }
-                            } else if (isAIX) {
+                            } else if (OperatingSystem.isAix()) {
                                 /* Disabling OpenSSL usage on AIX due to perfomance regression observed. */
                                 if (nativeCryptTrace) {
                                     System.err.println("X448 KeyPair Generation - Not using OpenSSL integration on AIX.");
@@ -342,7 +335,7 @@ public final class SunEC extends Provider {
                                 if (nativeCryptTrace) {
                                     System.err.println("XDH Key Agreement - Not using OpenSSL integration due to older version of OpenSSL (<1.1.1).");
                                 }
-                            } else if (isAIX) {
+                            } else if (OperatingSystem.isAix()) {
                                 /* Disabling OpenSSL usage on AIX due to perfomance regression observed. */
                                 if (nativeCryptTrace) {
                                     System.err.println("XDH Key Agreement - Not using OpenSSL integration on AIX.");
@@ -361,7 +354,7 @@ public final class SunEC extends Provider {
                                 if (nativeCryptTrace) {
                                     System.err.println("X25519 Key Agreement - Not using OpenSSL integration due to older version of OpenSSL (<1.1.1).");
                                 }
-                            } else if (isAIX) {
+                            } else if (OperatingSystem.isAix()) {
                                 /* Disabling OpenSSL usage on AIX due to perfomance regression observed. */
                                 if (nativeCryptTrace) {
                                     System.err.println("X25519 Key Agreement - Not using OpenSSL integration on AIX.");
@@ -380,7 +373,7 @@ public final class SunEC extends Provider {
                                 if (nativeCryptTrace) {
                                     System.err.println("X448 Key Agreement - Not using OpenSSL integration due to older version of OpenSSL (<3.x).");
                                 }
-                            } else if (isAIX) {
+                            } else if (OperatingSystem.isAix()) {
                                 /* Disabling OpenSSL usage on AIX due to perfomance regression observed. */
                                 if (nativeCryptTrace) {
                                     System.err.println("X448 Key Agreement - Not using OpenSSL integration on AIX.");
@@ -603,7 +596,7 @@ public final class SunEC extends Provider {
         /* Disabling OpenSSL usage in AIX due to perfomance regression observed */
         if (useNativeECKeyGen
             && (NativeCrypto.getVersionIfAvailable() >= NativeCrypto.OPENSSL_VERSION_1_1_0)
-            && !isAIX
+            && !OperatingSystem.isAix()
         ) {
             putService(new ProviderServiceA(this, "KeyPairGenerator",
                 "EC", "sun.security.ec.NativeECKeyPairGenerator", ATTRS));
@@ -640,7 +633,7 @@ public final class SunEC extends Provider {
 
         if (useNativeXDHKeyGen
             && (NativeCrypto.getVersionIfAvailable() >= NativeCrypto.OPENSSL_VERSION_1_1_1)
-            && !isAIX
+            && !OperatingSystem.isAix()
         ) {
             putService(new ProviderService(this, "KeyPairGenerator",
                 "XDH", "sun.security.ec.NativeXDHKeyPairGenerator", null, ATTRS));
@@ -663,7 +656,7 @@ public final class SunEC extends Provider {
 
         if (useNativeXDHKeyAgreement
             && (NativeCrypto.getVersionIfAvailable() >= NativeCrypto.OPENSSL_VERSION_1_1_1)
-            && !isAIX
+            && !OperatingSystem.isAix()
         ) {
             putService(new ProviderService(this, "KeyAgreement",
                 "XDH", "sun.security.ec.NativeXDHKeyAgreement", null, ATTRS));
