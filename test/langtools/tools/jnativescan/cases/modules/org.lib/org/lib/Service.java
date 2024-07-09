@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, 2024, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2024, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -20,31 +20,7 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
+package org.lib;
 
-package gc.arguments;
-
-/**
- * @test TestMinInitialErgonomics
- * @bug 8006088
- * @requires vm.gc.Parallel
- * @requires vm.compMode != "Xcomp"
- * @summary Test Parallel GC ergonomics decisions related to minimum and initial heap size.
- * @library /test/lib
- * @library /
- * @modules java.base/jdk.internal.misc
- *          java.management
- * @build jdk.test.whitebox.WhiteBox
- * @run driver jdk.test.lib.helpers.ClassFileInstaller jdk.test.whitebox.WhiteBox
- * @run driver gc.arguments.TestMinInitialErgonomics
- * @author thomas.schatzl@oracle.com
- */
-
-public class TestMinInitialErgonomics {
-
-  public static void main(String args[]) throws Exception {
-    final String gcName = "-XX:+UseParallelGC";
-    // check ergonomic decisions about minimum and initial heap size in
-    // a single gc only as ergonomics are the same everywhere.
-    TestMaxHeapSizeTools.checkMinInitialErgonomics(gcName);
-  }
+public interface Service {
 }
