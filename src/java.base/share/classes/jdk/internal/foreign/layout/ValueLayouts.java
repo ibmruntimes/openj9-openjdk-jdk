@@ -307,7 +307,7 @@ public final class ValueLayouts {
         }
 
         public static OfDouble of(ByteOrder order) {
-            return new OfDoubleImpl(order, OperatingSystem.isAix() ? 4 : ADDRESS_SIZE_BYTES, Optional.empty());
+            return new OfDoubleImpl(order, OperatingSystem.isAix() ? 4 : Double.BYTES, Optional.empty());
         }
 
         @Override
