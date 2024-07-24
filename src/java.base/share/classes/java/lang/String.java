@@ -3769,7 +3769,7 @@ public final class String
         if (str.isEmpty()) {
             return this;
         }
-        return StringConcatHelper.simpleConcat(this, str);
+        return StringConcatHelper.doConcat(this, str);
     }
 
     /**
