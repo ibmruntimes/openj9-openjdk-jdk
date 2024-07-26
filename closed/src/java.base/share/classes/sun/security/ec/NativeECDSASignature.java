@@ -541,8 +541,11 @@ abstract class NativeECDSASignature extends SignatureSpi {
         int sigLen = ((params.getOrder().bitLength() + 7) / 8) * 2;
         byte[] sig = new byte[sigLen];
 
-        ECDSAOperations.forParameters(params)
-                .orElseThrow(() -> new SignatureException("Curve not supported: " + params));
+        if (ECDSAOperations.forParameters(params).isEmpty()
+                && !NativeECUtil.isBrainpoolP512r1(params)
+        ) {
+             throw new SignatureException("Curve not supported: " + params);
+        }
 
         if (nativeCrypto == null) {
             nativeCrypto = NativeCrypto.getNativeCrypto();
@@ -584,11 +587,13 @@ abstract class NativeECDSASignature extends SignatureSpi {
             return false;
         }
 
-        ECDSAOperations ops = ECDSAOperations.forParameters(params)
-                .orElseThrow(() -> new SignatureException("Curve not supported: " + params));
+        ECDSAOperations ops = ECDSAOperations.forParameters(params).orElse(null);
+        if ((ops == null) && !NativeECUtil.isBrainpoolP512r1(params)) {
+            throw new SignatureException("Curve not supported: " + params);
+        }
 
         // Full public key validation, only necessary when h != 1.
-        if (params.getCofactor() != 1) {
+        if ((ops != null) && params.getCofactor() != 1) {
             if (!ops.getEcOperations().checkOrder(w)) {
                 return false;
             }
