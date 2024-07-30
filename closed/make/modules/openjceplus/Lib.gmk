@@ -23,7 +23,7 @@ include LibCommon.gmk
 ifeq (true,$(BUILD_OPENJCEPLUS))
 
 # Identify the desired JGSKIT target platform.
-OPENJCEPLUS_BOOT_JDK := $(BOOT_JDK)
+OPENJCEPLUS_BOOT_JDK := $(JDK_OUTPUTDIR)
 OPENJCEPLUS_GSKIT_HOME := $(OPENJCEPLUS_TOPDIR)/ock/jgsk_sdk
 OPENJCEPLUS_JCE_CLASSPATH := $(JDK_OUTPUTDIR)/modules/openjceplus:$(JDK_OUTPUTDIR)/modules/java.base
 OPENJCEPLUS_JGSKIT_MAKE := jgskit.mak
