@@ -24,6 +24,12 @@
  */
 
 /*
+ * ===========================================================================
+ * (c) Copyright IBM Corp. 2023, 2024 All Rights Reserved
+ * ===========================================================================
+ */
+
+/*
  * This source code is provided to illustrate the usage of a given feature
  * or technique and has been deliberately simplified. Additional steps
  * required for a production-quality application, such as security checks,
@@ -494,6 +500,9 @@ public class TTYResources extends java.util.ListResourceBundle {
              "<arguments> are the arguments passed to the main() method of <class>\n" +
              "\n" +
              "For command help type ''help'' at {0} prompt"},
+/*[IF CRIU_SUPPORT]*/
+        {"VM Restored:", "VM restored from checkpoint:"},
+/*[ENDIF] CRIU_SUPPORT */
         // END OF MATERIAL TO LOCALIZE
         };
 
