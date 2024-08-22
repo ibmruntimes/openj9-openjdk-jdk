@@ -30,7 +30,7 @@ $(call openj9_copy_files,, \
 	$(OPENJ9_VM_BUILD_DIR)/include/jvmti.h \
 	$(INCLUDE_TARGET_DIR)/jvmti.h)
 
-ifeq (zos,$(OPENJDK_TARGET_OS))
+ifeq ($(call isTargetOs, zos), true)
 $(call openj9_copy_files,, \
 	$(OPENJ9_TOPDIR)/runtime/include/jni_convert.h \
 	$(INCLUDE_TARGET_DIR)/jni_convert.h)
@@ -99,8 +99,7 @@ $(call openj9_copy_shlibs, \
 	omrsig \
 	)
 
-ifeq (zos,$(OPENJDK_TARGET_OS))
-
+ifeq ($(call isTargetOs, zos), true)
 $(call openj9_copy_files_and_debuginfos, \
 	$(addsuffix /$(LIBRARY_PREFIX)j9a2e$(SHARED_LIBRARY_SUFFIX), \
 		$(OPENJ9_VM_BUILD_DIR) \
