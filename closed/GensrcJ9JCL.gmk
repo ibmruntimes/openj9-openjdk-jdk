@@ -58,6 +58,15 @@ $(eval $(call SetupCopyFiles,COPY_OVERLAY_FILES, \
 		src/java.base/share/classes/sun/security/provider/SecureRandom.java \
 		src/java.base/unix/classes/java/lang/ProcessEnvironment.java \
 		src/java.base/unix/classes/sun/security/provider/NativePRNG.java \
+		src/java.se/share/data/jdwp/jdwp.spec \
+		src/jdk.jdi/share/classes/com/sun/tools/example/debug/tty/EventHandler.java \
+		src/jdk.jdi/share/classes/com/sun/tools/example/debug/tty/EventNotifier.java \
+		src/jdk.jdi/share/classes/com/sun/tools/example/debug/tty/TTY.java \
+		src/jdk.jdi/share/classes/com/sun/tools/example/debug/tty/TTYResources.java \
+		src/jdk.jdi/share/classes/com/sun/tools/example/debug/tty/TTYResources_de.java \
+		src/jdk.jdi/share/classes/com/sun/tools/example/debug/tty/TTYResources_ja.java \
+		src/jdk.jdi/share/classes/com/sun/tools/example/debug/tty/TTYResources_zh_CN.java \
+		src/jdk.jdi/share/classes/com/sun/tools/jdi/EventSetImpl.java \
 	))
 
 IncludeIfUnsure := -includeIfUnsure -noWarnIncludeIf

@@ -22,6 +22,11 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
+/*
+ * ===========================================================================
+ * (c) Copyright IBM Corp. 2024, 2024 All Rights Reserved
+ * ===========================================================================
+ */
 package jdk.tools.jlink.internal.plugins;
 
 import java.io.InputStream;
@@ -104,9 +109,7 @@ public final class StripNativeDebugSymbolsPlugin extends AbstractPlugin {
                                                         stripBin);
         in.transformAndCopy((resource) -> {
             ResourcePoolEntry res = resource;
-            if ((resource.type() == ResourcePoolEntry.Type.NATIVE_LIB &&
-                 resource.path().endsWith(SHARED_LIBS_EXT)) ||
-                resource.type() == ResourcePoolEntry.Type.NATIVE_CMD) {
+            if (shouldStrip(resource)) {
                 Optional<StrippedDebugInfoBinary> strippedBin = builder.build(resource);
                 if (strippedBin.isPresent()) {
                     StrippedDebugInfoBinary sb = strippedBin.get();
@@ -129,6 +132,35 @@ public final class StripNativeDebugSymbolsPlugin extends AbstractPlugin {
         }, out);
 
         return out.build();
+    }
+
+    /**
+     * Method to determine if a particular resource should be stripped.
+     *
+     * Particular paths are added here to handle libraries within the openjceplus module.
+     * The FIPS certified library located in the C/icc directory is sensitive to
+     * any modifications to the native library. Performing any modifications to the library
+     * in any way, causes the FIPS library to fail to load due to a self verification check made.
+     *
+     * @param resource the resource to examine for stripping eligibility
+     * @return return true if stripping should be done on a particular resource, false otherwise
+     */
+    private static boolean shouldStrip(ResourcePoolEntry resource) {
+        switch (resource.type()) {
+        case NATIVE_CMD:
+            return true;
+        case NATIVE_LIB:
+            String path = resource.path();
+            if (path.endsWith(SHARED_LIBS_EXT)) {
+                if (!(resource.moduleName().equals("openjceplus") && path.contains("/C/icc/"))) {
+                    return true;
+                }
+            }
+            break;
+        default:
+            break;
+        }
+        return false;
     }
 
     private void logError(ResourcePoolEntry resource, String msgKey) {

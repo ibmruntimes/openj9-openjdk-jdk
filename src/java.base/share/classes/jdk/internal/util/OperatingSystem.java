@@ -90,6 +90,10 @@ public enum OperatingSystem {
      * The z/OS Operating system.
      */
     ZOS,
+    /**
+     * The z/TPF Operating system.
+     */
+    ZTPF,
     ;
 
     // The current OperatingSystem
@@ -133,6 +137,14 @@ public enum OperatingSystem {
     @ForceInline
     public static boolean isZOS() {
         return PlatformProps.TARGET_OS_IS_ZOS;
+    }
+
+    /**
+     * {@return {@code true} if built for the z/TPF operating system}
+     */
+    @ForceInline
+    public static boolean isZTPF() {
+        return PlatformProps.TARGET_OS_IS_ZTPF;
     }
 
     /**
