@@ -108,6 +108,13 @@ check () {
     *.ser)
       trace "Ignoring $1 because it appears to match case parameter expansion *.ser"
       CHECK=0;;
+    # Ignore JFR metadata files.
+    /src/hotspot/share/jfr/metadata/metadata.xml)
+      trace "Ignoring $1 because it appears to match case parameter expansion /src/hotspot/share/jfr/metadata/metadata.xml"
+      CHECK=0;;
+    /src/hotspot/share/jfr/metadata/metadata.xsd)
+      trace "Ignoring $1 because it appears to match case parameter expansion /src/hotspot/share/jfr/metadata/metadata.xsd"
+      CHECK=0;;
     *) CHECK=1;;
   esac
 
