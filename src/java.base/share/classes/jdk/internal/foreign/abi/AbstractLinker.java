@@ -89,7 +89,7 @@ public abstract sealed class AbstractLinker implements Linker permits LinuxAArch
     @Override
     @CallerSensitive
     public final MethodHandle downcallHandle(MemorySegment symbol, FunctionDescriptor function, Option... options) {
-        Reflection.ensureNativeAccess(Reflection.getCallerClass(), Linker.class, "downcallHandle");
+        Reflection.ensureNativeAccess(Reflection.getCallerClass(), Linker.class, "downcallHandle", false);
         SharedUtils.checkSymbol(symbol);
         return downcallHandle0(function, options).bindTo(symbol);
     }
@@ -97,7 +97,7 @@ public abstract sealed class AbstractLinker implements Linker permits LinuxAArch
     @Override
     @CallerSensitive
     public final MethodHandle downcallHandle(FunctionDescriptor function, Option... options) {
-        Reflection.ensureNativeAccess(Reflection.getCallerClass(), Linker.class, "downcallHandle");
+        Reflection.ensureNativeAccess(Reflection.getCallerClass(), Linker.class, "downcallHandle", false);
         return downcallHandle0(function, options);
     }
 
@@ -124,7 +124,7 @@ public abstract sealed class AbstractLinker implements Linker permits LinuxAArch
     @Override
     @CallerSensitive
     public final MemorySegment upcallStub(MethodHandle target, FunctionDescriptor function, Arena arena, Linker.Option... options) {
-        Reflection.ensureNativeAccess(Reflection.getCallerClass(), Linker.class, "upcallStub");
+        Reflection.ensureNativeAccess(Reflection.getCallerClass(), Linker.class, "upcallStub", false);
         Objects.requireNonNull(arena);
         Objects.requireNonNull(target);
         Objects.requireNonNull(function);
