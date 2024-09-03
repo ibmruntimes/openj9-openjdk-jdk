@@ -29,6 +29,7 @@ OPENJCEPLUS_JCE_CLASSPATH := $(JDK_OUTPUTDIR)/modules/openjceplus:$(JDK_OUTPUTDI
 OPENJCEPLUS_JGSKIT_MAKE := jgskit.mak
 OPENJCEPLUS_JGSKIT_MAKE_PATH := $(OPENJCEPLUS_TOPDIR)/src/main/native
 OPENJCEPLUS_JGSKIT_PLATFORM :=
+OPENJCEPLUS_VS_LIB :=
 
 ifeq ($(call isTargetOs, aix), true)
   OPENJCEPLUS_JGSKIT_PLATFORM := ppc-aix64
@@ -47,6 +48,7 @@ else ifeq ($(call isTargetOs, windows), true)
     OPENJCEPLUS_JCE_CLASSPATH := "$(call MixedPath,$(JDK_OUTPUTDIR)/modules/openjceplus)\;$(call MixedPath,$(JDK_OUTPUTDIR)/modules/java.base)"
     OPENJCEPLUS_JGSKIT_MAKE := jgskit.win64.mak
     OPENJCEPLUS_JGSKIT_PLATFORM := win64
+    OPENJCEPLUS_VS_LIB := LIB='$(OPENJ9_VS_LIB)'
   endif
 endif
 
@@ -59,6 +61,7 @@ endif # OPENJCEPLUS_JGSKIT_PLATFORM
 compile-libs :
 	@$(ECHO) Compiling OpenJCEPlus native code
 	export \
+			$(OPENJCEPLUS_VS_LIB) \
 			GSKIT_HOME=$(OPENJCEPLUS_GSKIT_HOME) \
 			JAVA_HOME=$(OPENJCEPLUS_BOOT_JDK) \
 			JCE_CLASSPATH=$(OPENJCEPLUS_JCE_CLASSPATH) \
