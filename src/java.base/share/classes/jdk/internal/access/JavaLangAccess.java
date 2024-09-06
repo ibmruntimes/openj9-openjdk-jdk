@@ -29,6 +29,7 @@ import java.io.InputStream;
 import java.io.PrintStream;
 import java.lang.annotation.Annotation;
 import java.lang.foreign.MemorySegment;
+import java.lang.foreign.SymbolLookup;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodType;
 import java.lang.module.ModuleDescriptor;
@@ -46,6 +47,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.stream.Stream;
 
+import jdk.internal.loader.NativeLibraries;
 import jdk.internal.misc.CarrierThreadLocal;
 import jdk.internal.module.ServicesCatalog;
 import jdk.internal.reflect.ConstantPool;
@@ -319,6 +321,11 @@ public interface JavaLangAccess {
     int countPositives(byte[] ba, int off, int len);
 
     /**
+     * Count the number of leading non-zero ascii chars in the String.
+     */
+    int countNonZeroAscii(String s);
+
+    /**
      * Constructs a new {@code String} by decoding the specified subarray of
      * bytes using the specified {@linkplain java.nio.charset.Charset charset}.
      *
@@ -473,7 +480,11 @@ public interface JavaLangAccess {
 
     int getCharsUTF16(long i, int index, byte[] buf);
 
-    long findNative(ClassLoader loader, String entry);
+    /**
+     * Returns the {@link NativeLibraries} object associated with the provided class loader.
+     * This is used by {@link SymbolLookup#loaderLookup()}.
+     */
+    NativeLibraries nativeLibrariesFor(ClassLoader loader);
 
     /**
      * Direct access to Shutdown.exit to avoid security manager checks
