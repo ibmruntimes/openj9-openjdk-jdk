@@ -1,5 +1,5 @@
 # ===========================================================================
-# (c) Copyright IBM Corp. 2017, 2023 All Rights Reserved
+# (c) Copyright IBM Corp. 2017, 2024 All Rights Reserved
 # ===========================================================================
 # This code is free software; you can redistribute it and/or modify it
 # under the terms of the GNU General Public License version 2 only, as
@@ -41,15 +41,20 @@ else
 	#
 endif
 
+ifeq (false,$(OPENJ9_ENABLE_JFR))
+  MODULES_FILTER += \
+	jdk.jfr \
+	jdk.management.jfr \
+	#
+endif
+
 MODULES_FILTER += \
 	jdk.aot \
 	jdk.hotspot.agent \
 	jdk.internal.vm.ci \
 	jdk.internal.vm.compiler \
 	jdk.internal.vm.compiler.management \
-	jdk.jfr \
 	jdk.jstatd \
-	jdk.management.jfr \
 	#
 
 TOP_SRC_DIRS += \
