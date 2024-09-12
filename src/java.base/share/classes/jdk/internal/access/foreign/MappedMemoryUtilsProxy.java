@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, 2022, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2024, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -23,12 +23,17 @@
  * questions.
  */
 
-package jdk.internal.event;
+package jdk.internal.access.foreign;
+
+import java.io.FileDescriptor;
 
 /**
- * Event recording thread sleeping.
+ * This proxy interface is required to allow access to @{code MappedMemoryUtils} methods from {@code ScopedMemoryAccess}.
+ * This allows to avoid pesky initialization issues in the middle of memory mapped scoped methods.
  */
-
-public final class ThreadSleepEvent extends Event {
-    public long time;
+public interface MappedMemoryUtilsProxy {
+    boolean isLoaded(long address, boolean isSync, long size);
+    void load(long address, boolean isSync, long size);
+    void unload(long address, boolean isSync, long size);
+    void force(FileDescriptor fd, long address, boolean isSync, long index, long length);
 }
