@@ -87,6 +87,7 @@ requires.properties= \
     vm.musl \
     vm.flagless \
     docker.support \
+    systemd.support \
     jdk.containerized
 
 # Unset Hotspot VMProps ProdDefns requires class and replace with optional OpenJ9 class
