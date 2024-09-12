@@ -22,10 +22,14 @@
  */
 package requires;
 
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.Callable;
+import java.util.concurrent.TimeUnit;
+
+import jdk.test.lib.Platform;
 
 public class OpenJ9PropsExt implements Callable<Map<String, String>> {
 
@@ -34,6 +38,8 @@ public class OpenJ9PropsExt implements Callable<Map<String, String>> {
         Map<String, String> map = new HashMap<>();
         try {
             map.put("container.support", "true");
+            map.put("jlink.packagedModules", Boolean.toString(packagedModules()));
+            map.put("systemd.support", Boolean.toString(systemdSupport()));
             map.put("vm.bits", vmBits());
             map.put("vm.cds", "false");
             map.put("vm.cds.write.archived.java.heap", "false");
@@ -63,9 +69,38 @@ public class OpenJ9PropsExt implements Callable<Map<String, String>> {
     }
 
     /**
+     * @return whether the current SDK includes packaged modules
+     */
+    private static boolean packagedModules() {
+        try {
+            return Path.of(System.getProperty("java.home"), "jmods").toFile().exists();
+        } catch (Throwable t) {
+            return false;
+        }
+    }
+
+    /**
+     * @return whether systemd is available on the current platform
+     */
+    private static boolean systemdSupport() {
+        if (Platform.isLinux()) {
+            try {
+                Process probe = new ProcessBuilder("which", "systemd-run").start();
+                probe.waitFor(10, TimeUnit.SECONDS);
+                if (probe.exitValue() == 0) {
+                    return true;
+                }
+            } catch (Exception e) {
+                // assume not supported
+            }
+        }
+        return false;
+    }
+
+    /**
      * @return VM bitness, the value of the "sun.arch.data.model" property.
      */
-    protected String vmBits() throws Exception {
+    private static String vmBits() throws Exception {
         String dataModel = System.getProperty("sun.arch.data.model");
         if (dataModel != null) {
             return dataModel;
