@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2004, 2024, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2024, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -21,22 +21,29 @@
  * questions.
  */
 
-/* @test
- * @bug 5046110
- * @summary Ensure that direct memory can be unreserved
- *          as the reserving thread sleeps
+/*
+ * @test
+ * @bug 8334165
+ * @summary Test that jmx.serial.form is not recognised.
  *
- * @run main/othervm -Xmx16M Chew
+ * @run main/othervm -Djmx.serial.form=1.0 SerialCompatRemovedTest
+ * @run main/othervm SerialCompatRemovedTest
  */
 
-import java.nio.*;
+import java.io.*;
+import java.util.*;
+import javax.management.ObjectName;
 
+public class SerialCompatRemovedTest {
 
-public class Chew {
-
-    public static void main(String[] args) {
-        for (int i = 0; i < 64; i++)
-            ByteBuffer.allocateDirect(1 << 20);
+    public static void main(String[] args) throws Exception {
+        ObjectStreamClass osc = ObjectStreamClass.lookup(ObjectName.class);
+        // Serial form has no fields, uses writeObject, so we should never see
+        // non-zero field count here:
+        if (osc.getFields().length != 0) {
+            throw new Exception("ObjectName using old serial form?: fields: " +
+                    Arrays.asList(osc.getFields()));
+        }
     }
-
 }
+
