@@ -23,6 +23,12 @@
  * questions.
  */
 
+/*
+ * ===========================================================================
+ * (c) Copyright IBM Corp. 2024, 2024 All Rights Reserved
+ * ===========================================================================
+ */
+
 package java.util.zip;
 
 import java.io.Closeable;
@@ -74,6 +80,10 @@ import sun.security.util.SignatureFileVerifier;
 
 import static java.util.zip.ZipConstants64.*;
 import static java.util.zip.ZipUtils.*;
+
+/*[IF CRIU_SUPPORT]*/
+import openj9.internal.criu.NotCheckpointSafe;
+/*[ENDIF] CRIU_SUPPORT */
 
 /**
  * This class is used to read entries from a ZIP file.
@@ -342,6 +352,9 @@ public class ZipFile implements ZipConstants, Closeable {
      * @return the ZIP file entry, or null if not found
      * @throws IllegalStateException if the ZIP file has been closed
      */
+    /*[IF CRIU_SUPPORT]*/
+    @NotCheckpointSafe
+    /*[ENDIF] CRIU_SUPPORT */
     public ZipEntry getEntry(String name) {
         Objects.requireNonNull(name, "name");
         ZipEntry entry = null;
