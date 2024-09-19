@@ -816,8 +816,7 @@ abstract class MethodHandleImpl {
         final int CALL_TARGET  = nameCursor++;
         assert(CALL_TARGET == SELECT_ALT+1);  // must be true to trigger IBG.emitSelectAlternative
 
-        MethodType lambdaType = basicType.invokerType();
-        Name[] names = arguments(nameCursor - ARG_LIMIT, lambdaType);
+        Name[] names = invokeArguments(nameCursor - ARG_LIMIT, basicType);
 
         BoundMethodHandle.SpeciesData data =
                 (GET_COUNTERS != -1) ? BoundMethodHandle.speciesData_LLLL()
@@ -849,7 +848,7 @@ abstract class MethodHandleImpl {
         invokeArgs[0] = names[SELECT_ALT];
         names[CALL_TARGET] = new Name(basicType, invokeArgs);
 
-        lform = LambdaForm.create(lambdaType.parameterCount(), names, /*forceInline=*/true, Kind.GUARD);
+        lform = LambdaForm.create(basicType.parameterCount() + 1, names, /*forceInline=*/true, Kind.GUARD);
 
         return basicType.form().setCachedLambdaForm(MethodTypeForm.LF_GWT, lform);
     }
@@ -876,8 +875,6 @@ abstract class MethodHandleImpl {
      * among catchException combinators with the same basic type.
      */
     private static LambdaForm makeGuardWithCatchForm(MethodType basicType) {
-        MethodType lambdaType = basicType.invokerType();
-
         LambdaForm lform = basicType.form().cachedLambdaForm(MethodTypeForm.LF_GWC);
         if (lform != null) {
             return lform;
@@ -896,7 +893,7 @@ abstract class MethodHandleImpl {
         final int TRY_CATCH        = nameCursor++;
         final int UNBOX_RESULT     = nameCursor++;
 
-        Name[] names = arguments(nameCursor - ARG_LIMIT, lambdaType);
+        Name[] names = invokeArguments(nameCursor - ARG_LIMIT, basicType);
 
         BoundMethodHandle.SpeciesData data = BoundMethodHandle.speciesData_LLLLL();
         names[THIS_MH]          = names[THIS_MH].withConstraint(data);
@@ -925,7 +922,7 @@ abstract class MethodHandleImpl {
         Object[] unboxArgs  = new Object[] {names[GET_UNBOX_RESULT], names[TRY_CATCH]};
         names[UNBOX_RESULT] = new Name(invokeBasicUnbox, unboxArgs);
 
-        lform = LambdaForm.create(lambdaType.parameterCount(), names, Kind.GUARD_WITH_CATCH);
+        lform = LambdaForm.create(basicType.parameterCount() + 1, names, Kind.GUARD_WITH_CATCH);
 
         return basicType.form().setCachedLambdaForm(MethodTypeForm.LF_GWC, lform);
     }
@@ -1739,8 +1736,6 @@ abstract class MethodHandleImpl {
      * bytecode generation}.
      */
     private static LambdaForm makeLoopForm(MethodType basicType, BasicType[] localVarTypes) {
-        MethodType lambdaType = basicType.invokerType();
-
         final int THIS_MH = 0;  // the BMH_LLL
         final int ARG_BASE = 1; // start of incoming arguments
         final int ARG_LIMIT = ARG_BASE + basicType.parameterCount();
@@ -1755,7 +1750,7 @@ abstract class MethodHandleImpl {
 
         LambdaForm lform = basicType.form().cachedLambdaForm(MethodTypeForm.LF_LOOP);
         if (lform == null) {
-            Name[] names = arguments(nameCursor - ARG_LIMIT, lambdaType);
+            Name[] names = invokeArguments(nameCursor - ARG_LIMIT, basicType);
 
             BoundMethodHandle.SpeciesData data = BoundMethodHandle.speciesData_LLL();
             names[THIS_MH] = names[THIS_MH].withConstraint(data);
@@ -1783,7 +1778,7 @@ abstract class MethodHandleImpl {
             names[UNBOX_RESULT] = new Name(invokeBasicUnbox, unboxArgs);
 
             lform = basicType.form().setCachedLambdaForm(MethodTypeForm.LF_LOOP,
-                    LambdaForm.create(lambdaType.parameterCount(), names, Kind.LOOP));
+                    LambdaForm.create(basicType.parameterCount() + 1, names, Kind.LOOP));
         }
 
         // BOXED_ARGS is the index into the names array where the loop idiom starts
@@ -1972,8 +1967,6 @@ abstract class MethodHandleImpl {
      * forms among tryFinally combinators with the same basic type.
      */
     private static LambdaForm makeTryFinallyForm(MethodType basicType) {
-        MethodType lambdaType = basicType.invokerType();
-
         LambdaForm lform = basicType.form().cachedLambdaForm(MethodTypeForm.LF_TF);
         if (lform != null) {
             return lform;
@@ -1991,7 +1984,7 @@ abstract class MethodHandleImpl {
         final int TRY_FINALLY      = nameCursor++;
         final int UNBOX_RESULT     = nameCursor++;
 
-        Name[] names = arguments(nameCursor - ARG_LIMIT, lambdaType);
+        Name[] names = invokeArguments(nameCursor - ARG_LIMIT, basicType);
 
         BoundMethodHandle.SpeciesData data = BoundMethodHandle.speciesData_LLLL();
         names[THIS_MH]          = names[THIS_MH].withConstraint(data);
@@ -2017,7 +2010,7 @@ abstract class MethodHandleImpl {
         Object[] unboxArgs  = new Object[] {names[GET_UNBOX_RESULT], names[TRY_FINALLY]};
         names[UNBOX_RESULT] = new Name(invokeBasicUnbox, unboxArgs);
 
-        lform = LambdaForm.create(lambdaType.parameterCount(), names, Kind.TRY_FINALLY);
+        lform = LambdaForm.create(basicType.parameterCount() + 1, names, Kind.TRY_FINALLY);
 
         return basicType.form().setCachedLambdaForm(MethodTypeForm.LF_TF, lform);
     }
@@ -2061,7 +2054,6 @@ abstract class MethodHandleImpl {
     }
 
     private static LambdaForm makeCollectorForm(MethodType basicType, Class<?> arrayType) {
-        MethodType lambdaType = basicType.invokerType();
         int parameterCount = basicType.parameterCount();
 
         // Only share the lambda form for empty arrays and reference types.
@@ -2094,7 +2086,7 @@ abstract class MethodHandleImpl {
         final int STORE_ELEMENT_LIMIT = STORE_ELEMENT_BASE + parameterCount;
         nameCursor = STORE_ELEMENT_LIMIT;
 
-        Name[] names = arguments(nameCursor - ARG_LIMIT, lambdaType);
+        Name[] names = invokeArguments(nameCursor - ARG_LIMIT, basicType);
 
         BoundMethodHandle.SpeciesData data = BoundMethodHandle.speciesData_L();
         names[THIS_MH]          = names[THIS_MH].withConstraint(data);
@@ -2112,7 +2104,7 @@ abstract class MethodHandleImpl {
                     names[CALL_NEW_ARRAY], storeIndex, names[argCursor]);
         }
 
-        LambdaForm lform = LambdaForm.create(lambdaType.parameterCount(), names, CALL_NEW_ARRAY, Kind.COLLECTOR);
+        LambdaForm lform = LambdaForm.create(basicType.parameterCount() + 1, names, CALL_NEW_ARRAY, Kind.COLLECTOR);
         if (isSharedLambdaForm) {
             lform = basicType.form().setCachedLambdaForm(MethodTypeForm.LF_COLLECTOR, lform);
         }
@@ -2175,8 +2167,6 @@ abstract class MethodHandleImpl {
 
     private static LambdaForm makeTableSwitchForm(MethodType basicType, BoundMethodHandle.SpeciesData data,
                                                   int numCases) {
-        MethodType lambdaType = basicType.invokerType();
-
         // We need to cache based on the basic type X number of cases,
         // since the number of cases is used when generating bytecode.
         // This also means that we can't use the cache in MethodTypeForm,
@@ -2208,7 +2198,7 @@ abstract class MethodHandleImpl {
         final int FIELD_UNBOX_RESULT  = fieldCursor++;
         final int FIELD_CASES         = fieldCursor++;
 
-        Name[] names = arguments(nameCursor - ARG_LIMIT, lambdaType);
+        Name[] names = invokeArguments(nameCursor - ARG_LIMIT, basicType);
 
         names[THIS_MH] = names[THIS_MH].withConstraint(data);
         names[GET_DEFAULT_CASE] = new Name(data.getterFunction(FIELD_DEFAULT_CASE), names[THIS_MH]);
@@ -2237,7 +2227,7 @@ abstract class MethodHandleImpl {
             names[UNBOXED_RESULT] = new Name(invokeBasic, unboxArgs);
         }
 
-        lform = LambdaForm.create(lambdaType.parameterCount(), names, Kind.TABLE_SWITCH);
+        lform = LambdaForm.create(basicType.parameterCount() + 1, names, Kind.TABLE_SWITCH);
         LambdaForm prev = TableSwitchCacheKey.CACHE.putIfAbsent(key, lform);
         return prev != null ? prev : lform;
     }
