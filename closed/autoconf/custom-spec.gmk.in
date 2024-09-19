@@ -87,7 +87,6 @@ J9JDK_EXT_VERSION       := $(VERSION_NUMBER_FOUR_POSITIONS)-ea
 J9JDK_EXT_NAME          := Extensions for OpenJDK for Eclipse OpenJ9
 
 # required by CMake
-CMAKE                   := @CMAKE@
 OPENJ9_ENABLE_CMAKE     := @OPENJ9_ENABLE_CMAKE@
 
 # required by UMA
