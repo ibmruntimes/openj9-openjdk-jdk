@@ -23,6 +23,12 @@
  * questions.
  */
 
+/*
+ * ===========================================================================
+ * (c) Copyright IBM Corp. 2025, 2025 All Rights Reserved
+ * ===========================================================================
+ */
+
 #include <unistd.h>
 #include <assert.h>
 #include <sys/types.h>
@@ -50,6 +56,8 @@
 #include "io_util_md.h"
 #include "java_io_FileSystem.h"
 #include "java_io_UnixFileSystem.h"
+
+#include "ut_jcl_java.h"
 
 #if defined(_AIX)
   #if !defined(NAME_MAX)
@@ -268,6 +276,7 @@ Java_java_io_UnixFileSystem_createFileExclusively0(JNIEnv *env, jclass cls,
                 if (errno != EEXIST)
                     JNU_ThrowIOExceptionWithLastError(env, "Could not open file");
             } else {
+                Trc_io_UnixFileSystem_createFileExclusively_close(fd);
                 if (close(fd) == -1)
                     JNU_ThrowIOExceptionWithLastError(env, "Could not close file");
                 rv = JNI_TRUE;
