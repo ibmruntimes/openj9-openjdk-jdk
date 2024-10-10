@@ -1,10 +1,13 @@
+#!/bin/bash
 #
-# Copyright (c) 2018, 2024, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2024, Oracle and/or its affiliates. All rights reserved.
 # DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
 #
 # This code is free software; you can redistribute it and/or modify it
 # under the terms of the GNU General Public License version 2 only, as
-# published by the Free Software Foundation.
+# published by the Free Software Foundation.  Oracle designates this
+# particular file as subject to the "Classpath" exception as provided
+# by Oracle in the LICENSE file that accompanied this code.
 #
 # This code is distributed in the hope that it will be useful, but WITHOUT
 # ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
@@ -21,12 +24,18 @@
 # questions.
 #
 
-#############################################################################
-#
-# List of quarantined tests for testing in Xcomp mode.
-#
-#############################################################################
-
-java/lang/invoke/MethodHandles/CatchExceptionTest.java          8146623 generic-all
-java/foreign/TestUpcallStress.java                              8341584 generic-all
-com/sun/jdi/InterruptHangTest.java                              8043571 generic-all
+function truncate_summary() {
+  # With large hs_errs, the summary can easily exceed 1024 kB, the limit set by Github
+  # Trim it down if so.
+  summary_size=$(wc -c < $GITHUB_STEP_SUMMARY)
+  if [[ $summary_size -gt 1000000 ]]; then
+    # Trim to below 1024 kB, and cut off after the last detail group
+    head -c 1000000 $GITHUB_STEP_SUMMARY | tac | sed -n -e '/<\/details>/,$ p' | tac > $GITHUB_STEP_SUMMARY.tmp
+    mv $GITHUB_STEP_SUMMARY.tmp $GITHUB_STEP_SUMMARY
+    (
+      echo ''
+      echo ':x: **WARNING: Summary is too large and has been truncated.**'
+      echo ''
+    )  >> $GITHUB_STEP_SUMMARY
+  fi
+}
