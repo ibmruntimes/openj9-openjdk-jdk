@@ -62,6 +62,12 @@ public class StdLibTest extends NativeTestHelper {
 
     final static Charset nativeCharset = Charset.forName(System.getProperty("native.encoding"));
 
+    static MemorySegment allocateSegmentForString(Arena arena, String str) {
+        // Allocate a memory segment using the native-encoded bytes.
+        byte[] nativeBytes = str.getBytes(nativeCharset);
+        return arena.allocateFrom(ValueLayout.JAVA_BYTE, Arrays.copyOf(nativeBytes, nativeBytes.length + 1));
+    }
+
     private StdLibHelper stdLibHelper = new StdLibHelper();
 
     @Test(dataProvider = "stringPairs")
@@ -315,7 +321,7 @@ public class StdLibTest extends NativeTestHelper {
 
         int printf(String format, List<PrintfArg> args) throws Throwable {
             try (var arena = Arena.ofConfined()) {
-                MemorySegment formatStr = arena.allocateFrom(format, nativeCharset);
+                MemorySegment formatStr = allocateSegmentForString(arena, format);
                 return (int)specializedPrintf(args).invokeExact(formatStr,
                         args.stream().map(a -> a.nativeValue(arena)).toArray());
             }
@@ -396,7 +402,7 @@ public class StdLibTest extends NativeTestHelper {
         INT(int.class, C_INT, "%d", "%d", arena -> 42, 42),
         LONG(long.class, C_LONG_LONG, "%lld", "%d", arena -> 84L, 84L),
         DOUBLE(double.class, C_DOUBLE, "%.4f", "%.4f", arena -> 1.2345d, 1.2345d),
-        STRING(MemorySegment.class, C_POINTER, "%s", "%s", arena -> arena.allocateFrom("str", nativeCharset), "str");
+        STRING(MemorySegment.class, C_POINTER, "%s", "%s", arena -> allocateSegmentForString(arena, "str"), "str");
 
         final Class<?> carrier;
         final ValueLayout layout;
