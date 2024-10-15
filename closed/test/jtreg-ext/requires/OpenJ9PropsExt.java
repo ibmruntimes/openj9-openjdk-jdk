@@ -1,13 +1,13 @@
 /*
  * ===========================================================================
- * (c) Copyright IBM Corp. 2019, 2023 All Rights Reserved
+ * (c) Copyright IBM Corp. 2019, 2024 All Rights Reserved
  * ===========================================================================
- * 
+ *
  * This code is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License version 2 only, as
- * published by the Free Software Foundation.  
+ * published by the Free Software Foundation.
  *
- * IBM designates this particular file as subject to the "Classpath" exception 
+ * IBM designates this particular file as subject to the "Classpath" exception
  * as provided by IBM in the LICENSE file that accompanied this code.
  *
  * This code is distributed in the hope that it will be useful, but WITHOUT
@@ -18,10 +18,8 @@
  *
  * You should have received a copy of the GNU General Public License version
  * 2 along with this work; if not, see <http://www.gnu.org/licenses/>.
- * 
  * ===========================================================================
  */
-
 package requires;
 
 import java.util.HashMap;
@@ -33,10 +31,9 @@ public class OpenJ9PropsExt implements Callable<Map<String, String>> {
 
     @Override
     public Map<String, String> call() {
-
         Map<String, String> map = new HashMap<>();
         try {
-            map.put("docker.support", "true");
+            map.put("container.support", "true");
             map.put("vm.bits", vmBits());
             map.put("vm.cds", "false");
             map.put("vm.cds.write.archived.java.heap", "false");
@@ -58,11 +55,10 @@ public class OpenJ9PropsExt implements Callable<Map<String, String>> {
             map.put("vm.openj9", "true");
             map.put("vm.opt.final.ClassUnloading", "true");
             map.put("vm.opt.final.ZGenerational", "false");
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
             System.exit(1);
-        } 
+        }
         return map;
     }
 
