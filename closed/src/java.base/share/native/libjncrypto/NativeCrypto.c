@@ -82,6 +82,9 @@ int OSSL102_RSA_set0_crt_params(RSA *, BIGNUM *, BIGNUM *, BIGNUM *);
 #define EVP_CTRL_AEAD_SET_TAG EVP_CTRL_GCM_SET_TAG
 #endif
 
+/* Check whether loaded library is in FIPS mode. */
+jboolean OSSL_IS_FIPS;
+
 /* Header for EC algorithm */
 jboolean OSSL_ECGF2M;
 int setECPublicCoordinates(EC_KEY *, BIGNUM *, BIGNUM *, int);
@@ -365,6 +368,18 @@ static jlong extractVersionToJlong(const char *astring)
 }
 
 static void *crypto_library = NULL;
+
+/*
+ * Class:     jdk_crypto_jniprovider_NativeCrypto
+ * Method:    isOpenSSLFIPS
+ * Signature: ()Z
+ */
+JNIEXPORT jboolean JNICALL Java_jdk_crypto_jniprovider_NativeCrypto_isOpenSSLFIPS
+  (JNIEnv *env, jclass thisObj)
+{
+    return OSSL_IS_FIPS;
+}
+
 /*
  * Class:     jdk_crypto_jniprovider_NativeCrypto
  * Method:    loadCrypto
@@ -437,6 +452,27 @@ JNIEXPORT jlong JNICALL Java_jdk_crypto_jniprovider_NativeCrypto_loadCrypto
             unload_crypto_library(crypto_library);
             crypto_library = NULL;
             return -1;
+        }
+    }
+
+    /* Check whether the loaded OpenSSL library is in FIPS mode. */
+    if (ossl_ver >= OPENSSL_VERSION_3_0_0) {
+        typedef int OSSL_fipsmode_t(OSSL_LIB_CTX *);
+        OSSL_fipsmode_t* OSSL_fipsmode;
+        OSSL_fipsmode = (OSSL_fipsmode_t*)find_crypto_symbol(crypto_library, "EVP_default_properties_is_fips_enabled");
+        if ((NULL != OSSL_fipsmode) && ((*OSSL_fipsmode)(NULL) == 1)) {
+            OSSL_IS_FIPS = JNI_TRUE;
+        } else {
+            OSSL_IS_FIPS = JNI_FALSE;
+        }
+    } else {
+        typedef int OSSL_fipsmode_t(void);
+        OSSL_fipsmode_t* OSSL_fipsmode;
+        OSSL_fipsmode = (OSSL_fipsmode_t*)find_crypto_symbol(crypto_library, "FIPS_mode");
+        if ((NULL != OSSL_fipsmode) && ((*OSSL_fipsmode)() == 1)) {
+            OSSL_IS_FIPS = JNI_TRUE;
+        } else {
+            OSSL_IS_FIPS = JNI_FALSE;
         }
     }
 
