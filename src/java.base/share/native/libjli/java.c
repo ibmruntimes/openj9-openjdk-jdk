@@ -292,7 +292,7 @@ JLI_Launch(int argc, char ** argv,              /* main argc, argv */
     InvocationFunctions ifn;
     jlong start = 0, end = 0;
     char jvmpath[MAXPATHLEN];
-    char jrepath[MAXPATHLEN];
+    char jdkroot[MAXPATHLEN];
     char jvmcfg[MAXPATHLEN];
 
     _fVersion = fullversion;
@@ -321,9 +321,9 @@ JLI_Launch(int argc, char ** argv,              /* main argc, argv */
     }
 
     CreateExecutionEnvironment(&argc, &argv,
-                               jrepath, sizeof(jrepath),
+                               jdkroot, sizeof(jdkroot),
                                jvmpath, sizeof(jvmpath),
-                               jvmcfg,  sizeof(jvmcfg));
+                               jvmcfg, sizeof(jvmcfg));
 
     ifn.CreateJavaVM = 0;
     ifn.GetDefaultJavaVMInitArgs = 0;
@@ -364,8 +364,8 @@ JLI_Launch(int argc, char ** argv,              /* main argc, argv */
      */
     {
 #define OPTIONS_DEFAULT_PATH "/lib/options.default"
-        char optionsfile[sizeof(jrepath) + sizeof(OPTIONS_DEFAULT_PATH) - 1];
-        JLI_Snprintf(optionsfile, sizeof(optionsfile), "%s" OPTIONS_DEFAULT_PATH, jrepath);
+        char optionsfile[sizeof(jdkroot) + sizeof(OPTIONS_DEFAULT_PATH) - 1];
+        JLI_Snprintf(optionsfile, sizeof(optionsfile), "%s" OPTIONS_DEFAULT_PATH, jdkroot);
         parseXmsoInFile(optionsfile);
         parseXmsoInEnv("JAVA_TOOL_OPTIONS");
         parseXmsoInEnv("OPENJ9_JAVA_OPTIONS");
@@ -2108,7 +2108,7 @@ PrintUsage(JNIEnv* env, jboolean doXUsage)
  * JVM on the command line.
  *
  * The intent of the jvm.cfg file is to allow several JVM libraries to
- * be installed in different subdirectories of a single JRE installation,
+ * be installed in different subdirectories of a single JDK installation,
  * for space-savings and convenience in testing.
  * The intent is explicitly not to provide a full aliasing or predicate
  * mechanism.
