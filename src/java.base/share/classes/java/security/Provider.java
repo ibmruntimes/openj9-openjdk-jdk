@@ -363,16 +363,6 @@ public abstract class Provider extends Properties {
      * Clears this {@code Provider} so that it no longer contains the properties
      * used to look up facilities implemented by the {@code Provider}.
      *
-     * <p>If a security manager is enabled, its {@code checkSecurityAccess}
-     * method is called with the string {@code "clearProviderProperties."+name}
-     * (where {@code name} is the provider name) to see if it's ok to clear
-     * this provider.
-     *
-     * @throws  SecurityException
-     *          if a security manager exists and its {@link
-     *          java.lang.SecurityManager#checkSecurityAccess} method
-     *          denies access to clear this provider
-     *
      * @since 1.2
      */
     @Override
@@ -475,16 +465,6 @@ public abstract class Provider extends Properties {
      * Sets the {@code key} property to have the specified
      * {@code value}.
      *
-     * <p>If a security manager is enabled, its {@code checkSecurityAccess}
-     * method is called with the string {@code "putProviderProperty."+name},
-     * where {@code name} is the provider name, to see if it's ok to set this
-     * provider's property values.
-     *
-     * @throws  SecurityException
-     *          if a security manager exists and its {@link
-     *          java.lang.SecurityManager#checkSecurityAccess} method
-     *          denies access to set property values.
-     *
      * @since 1.2
      */
     @Override
@@ -502,16 +482,6 @@ public abstract class Provider extends Properties {
      * to {@code null}) associates it with the given value and returns
      * {@code null}, else returns the current value.
      *
-     * <p>If a security manager is enabled, its {@code checkSecurityAccess}
-     * method is called with the string {@code "putProviderProperty."+name},
-     * where {@code name} is the provider name, to see if it's ok to set this
-     * provider's property values.
-     *
-     * @throws  SecurityException
-     *          if a security manager exists and its {@link
-     *          java.lang.SecurityManager#checkSecurityAccess} method
-     *          denies access to set property values.
-     *
      * @since 1.8
      */
     @Override
@@ -528,16 +498,6 @@ public abstract class Provider extends Properties {
      * Removes the {@code key} property (and its corresponding
      * {@code value}).
      *
-     * <p>If a security manager is enabled, its {@code checkSecurityAccess}
-     * method is called with the string {@code "removeProviderProperty."+name},
-     * where {@code name} is the provider name, to see if it's ok to remove this
-     * provider's properties.
-     *
-     * @throws  SecurityException
-     *          if a security manager exists and its {@link
-     *          java.lang.SecurityManager#checkSecurityAccess} method
-     *          denies access to remove this provider's properties.
-     *
      * @since 1.2
      */
     @Override
@@ -552,16 +512,6 @@ public abstract class Provider extends Properties {
     /**
      * Removes the entry for the specified key only if it is currently
      * mapped to the specified value.
-     *
-     * <p>If a security manager is enabled, its {@code checkSecurityAccess}
-     * method is called with the string {@code "removeProviderProperty."+name},
-     * where {@code name} is the provider name, to see if it's ok to remove this
-     * provider's properties.
-     *
-     * @throws  SecurityException
-     *          if a security manager exists and its {@link
-     *          java.lang.SecurityManager#checkSecurityAccess} method
-     *          denies access to remove this provider's properties.
      *
      * @since 1.8
      */
@@ -578,16 +528,6 @@ public abstract class Provider extends Properties {
      * Replaces the entry for the specified key only if currently
      * mapped to the specified value.
      *
-     * <p>If a security manager is enabled, its {@code checkSecurityAccess}
-     * method is called with the string {@code "putProviderProperty."+name},
-     * where {@code name} is the provider name, to see if it's ok to set this
-     * provider's property values.
-     *
-     * @throws  SecurityException
-     *          if a security manager exists and its {@link
-     *          java.lang.SecurityManager#checkSecurityAccess} method
-     *          denies access to set property values.
-     *
      * @since 1.8
      */
     @Override
@@ -603,16 +543,6 @@ public abstract class Provider extends Properties {
     /**
      * Replaces the entry for the specified key only if it is
      * currently mapped to some value.
-     *
-     * <p>If a security manager is enabled, its {@code checkSecurityAccess}
-     * method is called with the string {@code "putProviderProperty."+name},
-     * where {@code name} is the provider name, to see if it's ok to set this
-     * provider's property values.
-     *
-     * @throws  SecurityException
-     *          if a security manager exists and its {@link
-     *          java.lang.SecurityManager#checkSecurityAccess} method
-     *          denies access to set property values.
      *
      * @since 1.8
      */
@@ -631,16 +561,6 @@ public abstract class Provider extends Properties {
      * set iterator, until all entries have been processed or the function
      * throws an exception.
      *
-     * <p>If a security manager is enabled, its {@code checkSecurityAccess}
-     * method is called with the string {@code "putProviderProperty."+name},
-     * where {@code name} is the provider name, to see if it's ok to set this
-     * provider's property values.
-     *
-     * @throws  SecurityException
-     *          if a security manager exists and its {@link
-     *          java.lang.SecurityManager#checkSecurityAccess} method
-     *          denies access to set property values.
-     *
      * @since 1.8
      */
     @Override
@@ -657,17 +577,6 @@ public abstract class Provider extends Properties {
      * Attempts to compute a mapping for the specified key and its
      * current mapped value (or {@code null} if there is no current
      * mapping).
-     *
-     * <p>If a security manager is enabled, its {@code checkSecurityAccess}
-     * method is called with the strings {@code "putProviderProperty."+name}
-     * and {@code "removeProviderProperty."+name}, where {@code name} is the
-     * provider name, to see if it's ok to set this provider's property values
-     * and remove this provider's properties.
-     *
-     * @throws  SecurityException
-     *          if a security manager exists and its {@link
-     *          java.lang.SecurityManager#checkSecurityAccess} method
-     *          denies access to set property values or remove properties.
      *
      * @since 1.8
      */
@@ -688,17 +597,6 @@ public abstract class Provider extends Properties {
      * the given mapping function and enters it into this map unless
      * {@code null}.
      *
-     * <p>If a security manager is enabled, its {@code checkSecurityAccess}
-     * method is called with the strings {@code "putProviderProperty."+name}
-     * and {@code "removeProviderProperty."+name}, where {@code name} is the
-     * provider name, to see if it's ok to set this provider's property values
-     * and remove this provider's properties.
-     *
-     * @throws  SecurityException
-     *          if a security manager exists and its {@link
-     *          java.lang.SecurityManager#checkSecurityAccess} method
-     *          denies access to set property values and remove properties.
-     *
      * @since 1.8
      */
     @Override
@@ -716,17 +614,6 @@ public abstract class Provider extends Properties {
     /**
      * If the value for the specified key is present and non-null, attempts to
      * compute a new mapping given the key and its current mapped value.
-     *
-     * <p>If a security manager is enabled, its {@code checkSecurityAccess}
-     * method is called with the strings {@code "putProviderProperty."+name}
-     * and {@code "removeProviderProperty."+name}, where {@code name} is the
-     * provider name, to see if it's ok to set this provider's property values
-     * and remove this provider's properties.
-     *
-     * @throws  SecurityException
-     *          if a security manager exists and its {@link
-     *          java.lang.SecurityManager#checkSecurityAccess} method
-     *          denies access to set property values or remove properties.
      *
      * @since 1.8
      */
@@ -749,17 +636,6 @@ public abstract class Provider extends Properties {
      * Otherwise, replaces the value with the results of the given remapping
      * function, or removes if the result is {@code null}. This method may be
      * of use when combining multiple mapped values for a key.
-     *
-     * <p>If a security manager is enabled, its {@code checkSecurityAccess}
-     * method is called with the strings {@code "putProviderProperty."+name}
-     * and {@code "removeProviderProperty."+name}, where {@code name} is the
-     * provider name, to see if it's ok to set this provider's property values
-     * and remove this provider's properties.
-     *
-     * @throws  SecurityException
-     *          if a security manager exists and its {@link
-     *          java.lang.SecurityManager#checkSecurityAccess} method
-     *          denies access to set property values or remove properties.
      *
      * @since 1.8
      */
@@ -1366,22 +1242,8 @@ public abstract class Provider extends Properties {
      * {@extLink security_guide_jca
      * Java Cryptography Architecture (JCA) Reference Guide}.
      *
-     * <p>Also, if there is a security manager, its
-     * {@code checkSecurityAccess} method is called with the string
-     * {@code "putProviderProperty."+name}, where {@code name} is
-     * the provider name, to see if it's ok to set this provider's property
-     * values. If the default implementation of {@code checkSecurityAccess}
-     * is used (that is, that method is not overridden), then this results in
-     * a call to the security manager's {@code checkPermission} method with
-     * a {@code SecurityPermission("putProviderProperty."+name)}
-     * permission.
-     *
      * @param s the Service to add
      *
-     * @throws SecurityException
-     *      if a security manager exists and its {@link
-     *      java.lang.SecurityManager#checkSecurityAccess} method denies
-     *      access to set property values.
      * @throws NullPointerException if s is {@code null}
      *
      * @since 1.5
@@ -1492,23 +1354,8 @@ public abstract class Provider extends Properties {
      * {@link #getService getService()} and its information will be removed
      * from this provider's Hashtable.
      *
-     * <p>Also, if there is a security manager, its
-     * {@code checkSecurityAccess} method is called with the string
-     * {@code "removeProviderProperty."+name}, where {@code name} is
-     * the provider name, to see if it's ok to remove this provider's
-     * properties. If the default implementation of
-     * {@code checkSecurityAccess} is used (that is, that method is not
-     * overridden), then this results in a call to the security manager's
-     * {@code checkPermission} method with a
-     * {@code SecurityPermission("removeProviderProperty."+name)}
-     * permission.
-     *
      * @param s the Service to be removed
      *
-     * @throws  SecurityException
-     *          if a security manager exists and its {@link
-     *          java.lang.SecurityManager#checkSecurityAccess} method denies
-     *          access to remove this provider's properties.
      * @throws NullPointerException if s is {@code null}
      *
      * @since 1.5
