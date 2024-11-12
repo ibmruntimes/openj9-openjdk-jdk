@@ -123,7 +123,9 @@ requires.properties= \
     systemd.support \
     release.implementor \
     jdk.containerized \
-    jdk.foreign.linker
+    jdk.foreign.linker \
+    jlink.runtime.linkable \
+    jlink.packagedModules
 
 # Unset Hotspot VMProps ProdDefns requires class and replace with optional OpenJ9 class
 requires.extraPropDefns = [../../closed/test/jtreg-ext/requires/OpenJ9PropsExt.java]
