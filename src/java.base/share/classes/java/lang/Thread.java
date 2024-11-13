@@ -3149,10 +3149,8 @@ public class Thread implements Runnable {
     }
 
     private boolean isDead() {
-        // Has already started, is not alive anymore, and has been removed from the ThreadGroup
-        synchronized (interruptLock) {
-            return (started && (eetop == NO_REF));
-        }
+        /* Has already started and is not alive anymore. */
+        return started && (eetop == NO_REF);
     }
 
     Thread(Runnable runnable, String threadName, boolean isSystemThreadGroup, boolean inheritThreadLocals, boolean isDaemon, ClassLoader contextClassLoader) {
