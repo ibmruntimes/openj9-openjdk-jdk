@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2020, 2023, Oracle and/or its affiliates. All rights reserved.
+ *  Copyright (c) 2020, 2024, Oracle and/or its affiliates. All rights reserved.
  *  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  *  This code is free software; you can redistribute it and/or modify it
@@ -38,7 +38,6 @@ import jdk.internal.util.OperatingSystem;
 import jdk.internal.util.StaticProperty;
 
 import static java.lang.foreign.ValueLayout.ADDRESS;
-import static sun.security.action.GetPropertyAction.privilegedGetProperty;
 
 public enum CABI {
     SYS_V,
@@ -58,7 +57,7 @@ public enum CABI {
     private static final CABI CURRENT = computeCurrent();
 
     private static CABI computeCurrent() {
-        String abi = privilegedGetProperty("jdk.internal.foreign.CABI");
+        String abi = System.getProperty("jdk.internal.foreign.CABI");
         if (abi != null) {
             return CABI.valueOf(abi);
         }
