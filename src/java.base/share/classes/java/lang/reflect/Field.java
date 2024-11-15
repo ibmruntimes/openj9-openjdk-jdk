@@ -172,7 +172,6 @@ class Field extends AccessibleObject implements Member {
 
     /**
      * @throws InaccessibleObjectException {@inheritDoc}
-     * @throws SecurityException {@inheritDoc}
      */
     @Override
     @CallerSensitive
