@@ -51,6 +51,7 @@ import jdk.internal.foreign.abi.aarch64.linux.LinuxAArch64CallArranger;
 import jdk.internal.foreign.abi.aarch64.macos.MacOsAArch64CallArranger;
 import jdk.internal.foreign.abi.aarch64.windows.WindowsAArch64CallArranger;
 import jdk.internal.foreign.Utils;
+import jdk.internal.util.OperatingSystem;
 
 import java.lang.foreign.ValueLayout;
 import java.lang.invoke.MethodHandle;
@@ -186,7 +187,7 @@ public abstract class CallArranger {
 
     /* Replace DowncallLinker in OpenJDK with the implementation of DowncallLinker specific to OpenJ9. */
     public MethodHandle arrangeDowncall(MethodType mt, FunctionDescriptor cDesc, LinkerOptions options) {
-        if (Utils.IS_WINDOWS) {
+        if (OperatingSystem.isWindows()) {
             throw new InternalError("arrangeDowncall is not implemented on Windows/Aarch64");
         }
         return DowncallLinker.getBoundMethodHandle(mt, cDesc, options);
@@ -195,7 +196,7 @@ public abstract class CallArranger {
     /* Replace UpcallLinker in OpenJDK with the implementation of UpcallLinker specific to OpenJ9. */
     public UpcallStubFactory arrangeUpcall(MethodType mt, FunctionDescriptor cDesc,
                                                           LinkerOptions options) {
-        if (Utils.IS_WINDOWS) {
+        if (OperatingSystem.isWindows()) {
             throw new InternalError("arrangeUpcall is not implemented on Windows/Aarch64");
         }
         return UpcallLinker.makeFactory(mt, cDesc, options);

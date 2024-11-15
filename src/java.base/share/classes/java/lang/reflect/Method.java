@@ -179,7 +179,6 @@ public final class Method extends Executable {
     @Override
     @CallerSensitive
     public void setAccessible(boolean flag) {
-        AccessibleObject.checkPermission();
         if (flag) checkCanSetAccessible(Reflection.getCallerClass());
         setAccessible0(flag);
     }

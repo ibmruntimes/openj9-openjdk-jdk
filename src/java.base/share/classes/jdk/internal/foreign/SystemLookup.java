@@ -36,8 +36,6 @@ import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
@@ -45,7 +43,6 @@ import jdk.internal.loader.NativeLibraries;
 import jdk.internal.loader.NativeLibrary;
 import jdk.internal.loader.RawNativeLibraries;
 import jdk.internal.util.OperatingSystem;
-import sun.security.action.GetPropertyAction;
 
 import static java.lang.foreign.ValueLayout.ADDRESS;
 
@@ -143,24 +140,12 @@ public final class SystemLookup implements SymbolLookup {
     }
 
     private static SymbolLookup makeWindowsLookup() {
-        @SuppressWarnings("removal")
-        String systemRoot = AccessController.doPrivileged(new PrivilegedAction<>() {
-            @Override
-            public String run() {
-                return System.getenv("SystemRoot");
-            }
-        });
+        String systemRoot = System.getenv("SystemRoot");
         Path system32 = Path.of(systemRoot, "System32");
         Path ucrtbase = system32.resolve("ucrtbase.dll");
         Path msvcrt = system32.resolve("msvcrt.dll");
 
-        @SuppressWarnings("removal")
-        boolean useUCRT = AccessController.doPrivileged(new PrivilegedAction<>() {
-            @Override
-            public Boolean run() {
-                return Files.exists(ucrtbase);
-            }
-        });
+        boolean useUCRT = Files.exists(ucrtbase);
         Path stdLib = useUCRT ? ucrtbase : msvcrt;
         SymbolLookup lookup = libLookup(libs -> libs.load(stdLib));
 
@@ -208,7 +193,7 @@ public final class SystemLookup implements SymbolLookup {
      * Returns the path of the given library name from JDK
      */
     private static Path jdkLibraryPath(String name) {
-        Path javahome = Path.of(GetPropertyAction.privilegedGetProperty("java.home"));
+        Path javahome = Path.of(System.getProperty("java.home"));
         String lib = OperatingSystem.isWindows() ? "bin" : "lib";
         String libname = System.mapLibraryName(name);
         return javahome.resolve(lib).resolve(libname);
