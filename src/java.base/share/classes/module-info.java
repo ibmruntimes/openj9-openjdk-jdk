@@ -154,6 +154,8 @@ module java.base {
         java.security.sasl;
     exports jdk.crypto.jniprovider to
         jdk.crypto.ec;
+    exports jdk.internal to
+        jdk.incubator.vector;
     // Note: all modules in the exported list participate in preview  features
     // and therefore if they use preview features they do not need to be
     // compiled with "--enable-preview".
@@ -330,7 +332,6 @@ module java.base {
         java.desktop;
     exports sun.reflect.misc to
         java.desktop,
-        java.datatransfer,
         java.management,
         java.management.rmi,
         java.rmi,
