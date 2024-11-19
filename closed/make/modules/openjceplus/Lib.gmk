@@ -35,7 +35,9 @@ OPENJCEPLUS_JGSKIT_PLATFORM :=
 ifeq ($(call isTargetOs, aix), true)
   OPENJCEPLUS_JGSKIT_PLATFORM := ppc-aix64
 else ifeq ($(call isTargetOs, linux), true)
-  ifeq ($(call isTargetCpu, ppc64le), true)
+  ifeq ($(call isTargetCpu, aarch64), true)
+    OPENJCEPLUS_JGSKIT_PLATFORM := arm-linux64
+  else ifeq ($(call isTargetCpu, ppc64le), true)
     OPENJCEPLUS_JGSKIT_PLATFORM := ppcle-linux64
   else ifeq ($(call isTargetCpu, s390x), true)
     OPENJCEPLUS_JGSKIT_PLATFORM := s390-linux64
