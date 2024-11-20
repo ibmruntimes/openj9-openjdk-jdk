@@ -33,7 +33,6 @@ package java.lang;
 
 import java.lang.ref.Reference;
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.time.Duration;
 import java.util.Map;
 import java.util.HashMap;
@@ -2733,7 +2732,6 @@ public class Thread implements Runnable {
             // default CCL to the system class loader when not inheriting
             this.contextClassLoader = ClassLoader.getSystemClassLoader();
         }
-        threadGroup.checkAccess();
     }
 
     /**
