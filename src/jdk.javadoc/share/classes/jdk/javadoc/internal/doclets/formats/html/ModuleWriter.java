@@ -23,6 +23,12 @@
  * questions.
  */
 
+/*
+ * ===========================================================================
+ * (c) Copyright IBM Corp. 2024, 2024 All Rights Reserved
+ * ===========================================================================
+ */
+
 package jdk.javadoc.internal.doclets.formats.html;
 
 import java.util.ArrayList;
@@ -623,14 +629,14 @@ public class ModuleWriter extends HtmlDocletWriter {
                 } else {
                     String aepText = resources.getText("doclet.Indirect_Exports_Summary");
                     var aepTable = getTable2(Text.of(aepText), indirectPackagesHeader);
-                    addIndirectPackages(aepTable, indirectPackages, _ -> true);
+                    addIndirectPackages(aepTable, indirectPackages, m -> true);
                     section.add(aepTable);
                 }
             }
             if (display(indirectOpenPackages)) {
                 String aopText = resources.getText("doclet.Indirect_Opens_Summary");
                 var aopTable = getTable2(Text.of(aopText), indirectPackagesHeader);
-                addIndirectPackages(aopTable, indirectOpenPackages, _ -> true);
+                addIndirectPackages(aopTable, indirectOpenPackages, m -> true);
                 section.add(aopTable);
             }
             summariesList.add(HtmlTree.LI(section));
