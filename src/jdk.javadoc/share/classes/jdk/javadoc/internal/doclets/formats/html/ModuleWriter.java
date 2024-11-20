@@ -23,6 +23,12 @@
  * questions.
  */
 
+/*
+ * ===========================================================================
+ * (c) Copyright IBM Corp. 2024, 2024 All Rights Reserved
+ * ===========================================================================
+ */
+
 package jdk.javadoc.internal.doclets.formats.html;
 
 import java.util.ArrayList;
@@ -41,6 +47,7 @@ import javax.lang.model.util.ElementFilter;
 
 import com.sun.source.doctree.DeprecatedTree;
 import com.sun.source.doctree.DocTree;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import jdk.javadoc.doclet.DocletEnvironment.ModuleMode;
@@ -591,14 +598,10 @@ public class ModuleWriter extends HtmlDocletWriter {
                                      .anyMatch(rd -> rd.isTransitive() &&
                                                      javaBase.equals(rd.getDependency()));
                 if (hasRequiresTransitiveJavaBase) {
-                    Map<ModuleElement, SortedSet<PackageElement>> filteredIndirectPackages =
-                            indirectPackages.entrySet()
-                                            .stream()
-                                            .filter(e -> !e.getKey().equals(javaBase))
-                                            .collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue()));
                     String aepText = resources.getText("doclet.Indirect_Exports_Summary");
                     var aepTable = getTable2(Text.of(aepText), indirectPackagesHeader);
-                    addIndirectPackages(aepTable, filteredIndirectPackages);
+                    addIndirectPackages(aepTable, indirectPackages,
+                                        m -> !m.equals(javaBase));
                     section.add(aepTable);
                     //add the preview box:
                     section.add(HtmlTree.BR());
@@ -614,30 +617,26 @@ public class ModuleWriter extends HtmlDocletWriter {
                     section.add(previewDiv);
 
                     //add the Indirect Exports
-                    filteredIndirectPackages =
-                            indirectPackages.entrySet()
-                                            .stream()
-                                            .filter(e -> e.getKey().equals(javaBase))
-                                            .collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue()));
                     String aepPreviewText = resources.getText("doclet.Indirect_Exports_Summary");
                     ContentBuilder tableCaption = new ContentBuilder(
                             Text.of(aepPreviewText),
                             HtmlTree.SUP(links.createLink(previewRequiresTransitiveId,
                                          contents.previewMark)));
                     var aepPreviewTable = getTable2(tableCaption, indirectPackagesHeader);
-                    addIndirectPackages(aepPreviewTable, filteredIndirectPackages);
+                    addIndirectPackages(aepPreviewTable, indirectPackages,
+                                        m -> m.equals(javaBase));
                     section.add(aepPreviewTable);
                 } else {
                     String aepText = resources.getText("doclet.Indirect_Exports_Summary");
                     var aepTable = getTable2(Text.of(aepText), indirectPackagesHeader);
-                    addIndirectPackages(aepTable, indirectPackages);
+                    addIndirectPackages(aepTable, indirectPackages, m -> true);
                     section.add(aepTable);
                 }
             }
             if (display(indirectOpenPackages)) {
                 String aopText = resources.getText("doclet.Indirect_Opens_Summary");
                 var aopTable = getTable2(Text.of(aopText), indirectPackagesHeader);
-                addIndirectPackages(aopTable, indirectOpenPackages);
+                addIndirectPackages(aopTable, indirectOpenPackages, m -> true);
                 section.add(aopTable);
             }
             summariesList.add(HtmlTree.LI(section));
@@ -768,9 +767,14 @@ public class ModuleWriter extends HtmlDocletWriter {
      * @param table the table to which the content rows will be added
      * @param ip indirect packages to be added
      */
-    public void addIndirectPackages(Table<?> table, Map<ModuleElement, SortedSet<PackageElement>> ip) {
+    public void addIndirectPackages(Table<?> table,
+                                    Map<ModuleElement, SortedSet<PackageElement>> ip,
+                                    Predicate<ModuleElement> acceptModule) {
         for (Map.Entry<ModuleElement, SortedSet<PackageElement>> entry : ip.entrySet()) {
             ModuleElement m = entry.getKey();
+            if (!acceptModule.test(m)) {
+                continue;
+            }
             SortedSet<PackageElement> pkgList = entry.getValue();
             Content moduleLinkContent = getModuleLink(m, Text.of(m.getQualifiedName()));
             Content list = new ContentBuilder();
