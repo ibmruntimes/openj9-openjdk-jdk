@@ -36,14 +36,10 @@ import java.io.File;
 import java.io.FilePermission;
 import java.io.IOException;
 import java.io.InputStream;
-import java.security.AccessControlContext;
-import java.security.AccessController;
 import java.security.CodeSigner;
 import java.security.CodeSource;
 import java.security.Permission;
 import java.security.PermissionCollection;
-import java.security.PrivilegedAction;
-import java.security.PrivilegedExceptionAction;
 import java.security.SecureClassLoader;
 import java.util.Enumeration;
 import java.util.List;
@@ -86,9 +82,6 @@ public class URLClassLoader extends SecureClassLoader implements Closeable {
     /* The search path for classes and resources */
     private final URLClassPath ucp;
 
-    /* The context to be used when loading classes and resources */
-    @SuppressWarnings("removal")
-    private final AccessControlContext acc;
     /* Private member fields used for shared classes. */                         //OpenJ9-shared_classes_misc
     private SharedClassProvider sharedClassServiceProvider;                      //OpenJ9-shared_classes_misc
     private SharedClassMetaDataCache sharedClassMetaDataCache;                   //OpenJ9-shared_classes_misc
@@ -209,20 +202,10 @@ public class URLClassLoader extends SecureClassLoader implements Closeable {
      * @throws     NullPointerException if {@code urls} or any of its
      *             elements is {@code null}.
      */
-    @SuppressWarnings("removal")
     public URLClassLoader(URL[] urls, ClassLoader parent) {
         super(parent);
-        initializeSharedClassesSupport(urls);                                    //OpenJ9-shared_classes_misc
-        this.acc = AccessController.getContext();
-        this.ucp = new URLClassPath(urls, null, this.acc, sharedClassServiceProvider); //OpenJ9-shared_classes_misc
-    }
-
-    URLClassLoader(String name, URL[] urls, ClassLoader parent,
-                   @SuppressWarnings("removal") AccessControlContext acc) {
-        super(name, parent);
-        initializeSharedClassesSupport(urls);                                    //OpenJ9-shared_classes_misc
-        this.acc = acc;
-        this.ucp = new URLClassPath(urls, null, this.acc, sharedClassServiceProvider); //OpenJ9-shared_classes_misc
+        initializeSharedClassesSupport(urls);                                //OpenJ9-shared_classes_misc
+        this.ucp = new URLClassPath(urls, null, sharedClassServiceProvider); //OpenJ9-shared_classes_misc
     }
 
     /**
@@ -239,16 +222,10 @@ public class URLClassLoader extends SecureClassLoader implements Closeable {
      * @throws     NullPointerException if {@code urls} or any of its
      *             elements is {@code null}.
      */
-    @SuppressWarnings("removal")
     public URLClassLoader(URL[] urls) {
-        this(urls, AccessController.getContext());                               //OpenJ9-shared_classes_misc
-    }
-
-    URLClassLoader(URL[] urls, @SuppressWarnings("removal") AccessControlContext acc) {
         super();
-        initializeSharedClassesSupport(urls);                                    //OpenJ9-shared_classes_misc
-        this.acc = acc;
-        this.ucp = new URLClassPath(urls, null, this.acc, sharedClassServiceProvider); //OpenJ9-shared_classes_misc
+        initializeSharedClassesSupport(urls);                                //OpenJ9-shared_classes_misc
+        this.ucp = new URLClassPath(urls, null, sharedClassServiceProvider); //OpenJ9-shared_classes_misc
     }
 
     /**
@@ -265,13 +242,11 @@ public class URLClassLoader extends SecureClassLoader implements Closeable {
      * @throws NullPointerException if {@code urls} or any of its
      *         elements is {@code null}.
      */
-    @SuppressWarnings("removal")
     public URLClassLoader(URL[] urls, ClassLoader parent,
                           URLStreamHandlerFactory factory) {
         super(parent);
-        initializeSharedClassesSupport(urls);                                    //OpenJ9-shared_classes_misc
-        this.acc = AccessController.getContext();
-        this.ucp = new URLClassPath(urls, factory, this.acc, sharedClassServiceProvider); //OpenJ9-shared_classes_misc
+        initializeSharedClassesSupport(urls);                                   //OpenJ9-shared_classes_misc
+        this.ucp = new URLClassPath(urls, factory, sharedClassServiceProvider); //OpenJ9-shared_classes_misc
     }
 
 
@@ -293,14 +268,12 @@ public class URLClassLoader extends SecureClassLoader implements Closeable {
      *
      * @since 9
      */
-    @SuppressWarnings("removal")
     public URLClassLoader(String name,
                           URL[] urls,
                           ClassLoader parent) {
         super(name, parent);
-        initializeSharedClassesSupport(urls);                                    //OpenJ9-shared_classes_misc
-        this.acc = AccessController.getContext();
-        this.ucp = new URLClassPath(urls, null, this.acc, sharedClassServiceProvider); //OpenJ9-shared_classes_misc
+        initializeSharedClassesSupport(urls);                                //OpenJ9-shared_classes_misc
+        this.ucp = new URLClassPath(urls, null, sharedClassServiceProvider); //OpenJ9-shared_classes_misc
     }
 
     /**
@@ -321,13 +294,11 @@ public class URLClassLoader extends SecureClassLoader implements Closeable {
      *
      * @since 9
      */
-    @SuppressWarnings("removal")
     public URLClassLoader(String name, URL[] urls, ClassLoader parent,
                           URLStreamHandlerFactory factory) {
         super(name, parent);
-        initializeSharedClassesSupport(urls);                                    //OpenJ9-shared_classes_misc
-        this.acc = AccessController.getContext();
-        this.ucp = new URLClassPath(urls, factory, this.acc, sharedClassServiceProvider); //OpenJ9-shared_classes_misc
+        initializeSharedClassesSupport(urls);                                   //OpenJ9-shared_classes_misc
+        this.ucp = new URLClassPath(urls, factory, sharedClassServiceProvider); //OpenJ9-shared_classes_misc
     }
 
     /* A map (used as a set) to keep track of closeable local resources
@@ -418,11 +389,6 @@ public class URLClassLoader extends SecureClassLoader implements Closeable {
     * @since 1.7
     */
     public void close() throws IOException {
-        @SuppressWarnings("removal")
-        SecurityManager security = System.getSecurityManager();
-        if (security != null) {
-            security.checkPermission(new RuntimePermission("closeClassLoader"));
-        }
         List<IOException> errors = ucp.closeLoaders();
 
         // now close any remaining streams.
@@ -488,48 +454,51 @@ public class URLClassLoader extends SecureClassLoader implements Closeable {
      *            or if the loader is closed.
      * @throws    NullPointerException if {@code name} is {@code null}.
      */
-    @SuppressWarnings("removal")
     protected Class<?> findClass(final String name)
         throws ClassNotFoundException
     {
-        final Class<?> result;
-        try {
-            /* Try to find the class from the shared cache using the class name. //OpenJ9-shared_classes_misc
-             * If we found the class and if we have its corresponding metadata  //OpenJ9-shared_classes_misc
-             * (code source and manifest entry) already cached, then we define  //OpenJ9-shared_classes_misc
-             * the class passing in these parameters.  If however, we do not    //OpenJ9-shared_classes_misc
-             * have the metadata cached, then we define the class as normal.    //OpenJ9-shared_classes_misc
-             * Also, if we do not find the class from the shared class cache,   //OpenJ9-shared_classes_misc
-             * we define the class as normal.                                   //OpenJ9-shared_classes_misc
-             */                                                                 //OpenJ9-shared_classes_misc
-            if (usingSharedClasses()) {                                         //OpenJ9-shared_classes_misc
-                SharedClassIndexHolder sharedClassIndexHolder = new SharedClassIndexHolder(); /*ibm@94142*/ //OpenJ9-shared_classes_misc
-                IntConsumer consumer = (i)->sharedClassIndexHolder.setIndex(i); //OpenJ9-shared_classes_misc
-                byte[] sharedClazz = sharedClassServiceProvider.findSharedClassURLClasspath(name, consumer); //OpenJ9-shared_classes_misc
-                if (sharedClazz != null) {                                      //OpenJ9-shared_classes_misc
-                    int indexFoundData = sharedClassIndexHolder.index;          //OpenJ9-shared_classes_misc
-                    SharedClassMetaData metadata = sharedClassMetaDataCache.getSharedClassMetaData(indexFoundData); //OpenJ9-shared_classes_misc
-                    if (metadata != null) {                                     //OpenJ9-shared_classes_misc
-                        try {                                                   //OpenJ9-shared_classes_misc
-                            Class<?> clazz = defineClass(name, sharedClazz,     //OpenJ9-shared_classes_misc
-                                               metadata.getCodeSource(),        //OpenJ9-shared_classes_misc
-                                               metadata.getManifest());         //OpenJ9-shared_classes_misc
-                            return clazz;                                       //OpenJ9-shared_classes_misc
-                        } catch (IOException e) {                               //OpenJ9-shared_classes_misc
-                            e.printStackTrace();                                //OpenJ9-shared_classes_misc
-                        }                                                       //OpenJ9-shared_classes_misc
-                    }                                                           //OpenJ9-shared_classes_misc
-                }                                                               //OpenJ9-shared_classes_misc
-            }                                                                   //OpenJ9-shared_classes_misc
-            ClassFinder loader = new ClassFinder(name, this);   /*ibm@80916.1*/ //OpenJ9-shared_classes_misc
-            result = AccessController.doPrivileged(loader, acc);                //OpenJ9-shared_classes_misc
-        } catch (java.security.PrivilegedActionException pae) {
-            throw (ClassNotFoundException) pae.getException();
+        /* Try to find the class from the shared cache using the class name. //OpenJ9-shared_classes_misc
+         * If we found the class and if we have its corresponding metadata  //OpenJ9-shared_classes_misc
+         * (code source and manifest entry) already cached, then we define  //OpenJ9-shared_classes_misc
+         * the class passing in these parameters.  If however, we do not    //OpenJ9-shared_classes_misc
+         * have the metadata cached, then we define the class as normal.    //OpenJ9-shared_classes_misc
+         * Also, if we do not find the class from the shared class cache,   //OpenJ9-shared_classes_misc
+         * we define the class as normal.                                   //OpenJ9-shared_classes_misc
+         */                                                                 //OpenJ9-shared_classes_misc
+        if (usingSharedClasses()) {                                         //OpenJ9-shared_classes_misc
+            SharedClassIndexHolder sharedClassIndexHolder = new SharedClassIndexHolder(); /*ibm@94142*/ //OpenJ9-shared_classes_misc
+            IntConsumer consumer = (i)->sharedClassIndexHolder.setIndex(i); //OpenJ9-shared_classes_misc
+            byte[] sharedClazz = sharedClassServiceProvider.findSharedClassURLClasspath(name, consumer); //OpenJ9-shared_classes_misc
+            if (sharedClazz != null) {                                      //OpenJ9-shared_classes_misc
+                int indexFoundData = sharedClassIndexHolder.index;          //OpenJ9-shared_classes_misc
+                SharedClassMetaData metadata = sharedClassMetaDataCache.getSharedClassMetaData(indexFoundData); //OpenJ9-shared_classes_misc
+                if (metadata != null) {                                     //OpenJ9-shared_classes_misc
+                    try {                                                   //OpenJ9-shared_classes_misc
+                        Class<?> clazz = defineClass(name, sharedClazz,     //OpenJ9-shared_classes_misc
+                                metadata.getCodeSource(),                   //OpenJ9-shared_classes_misc
+                                metadata.getManifest());                    //OpenJ9-shared_classes_misc
+                        return clazz;                                       //OpenJ9-shared_classes_misc
+                    } catch (IOException e) {                               //OpenJ9-shared_classes_misc
+                        e.printStackTrace();                                //OpenJ9-shared_classes_misc
+                    }                                                       //OpenJ9-shared_classes_misc
+                }                                                           //OpenJ9-shared_classes_misc
+            }                                                               //OpenJ9-shared_classes_misc
+        }                                                                   //OpenJ9-shared_classes_misc
+        String path = name.replace('.', '/').concat(".class");
+        Resource res = ucp.getResource(path);
+        if (res != null) {
+            try {
+                return defineClass(name, res);
+            } catch (IOException e) {
+                throw new ClassNotFoundException(name, e);
+            } catch (ClassFormatError e2) {
+                if (res.getDataError() != null) {
+                    e2.addSuppressed(res.getDataError());
+                }
+                throw e2;
+            }
         }
-        if (result == null) {
-            throw new ClassNotFoundException(name);
-        }
-        return result;
+        throw new ClassNotFoundException(name);
     }
 
     /*
@@ -769,18 +738,7 @@ public class URLClassLoader extends SecureClassLoader implements Closeable {
      * if the resource could not be found, or if the loader is closed.
      */
     public URL findResource(final String name) {
-        /*
-         * The same restriction to finding classes applies to resources
-         */
-        @SuppressWarnings("removal")
-        URL url = AccessController.doPrivileged(
-            new PrivilegedAction<>() {
-                public URL run() {
-                    return ucp.findResource(name, true);
-                }
-            }, acc);
-
-        return url != null ? URLClassPath.checkURL(url) : null;
+        return ucp.findResource(name);
     }
 
     /**
@@ -792,10 +750,11 @@ public class URLClassLoader extends SecureClassLoader implements Closeable {
      * @return An {@code Enumeration} of {@code URL}s.
      *         If the loader is closed, the Enumeration contains no elements.
      */
+    @Override
     public Enumeration<URL> findResources(final String name)
         throws IOException
     {
-        final Enumeration<URL> e = ucp.findResources(name, true);
+        final Enumeration<URL> e = ucp.findResources(name);
 
         return new Enumeration<>() {
             private URL url = null;
@@ -804,23 +763,14 @@ public class URLClassLoader extends SecureClassLoader implements Closeable {
                 if (url != null) {
                     return true;
                 }
-                do {
-                    @SuppressWarnings("removal")
-                    URL u = AccessController.doPrivileged(
-                        new PrivilegedAction<>() {
-                            public URL run() {
-                                if (!e.hasMoreElements())
-                                    return null;
-                                return e.nextElement();
-                            }
-                        }, acc);
-                    if (u == null)
-                        break;
-                    url = URLClassPath.checkURL(u);
-                } while (url == null);
+                if (!e.hasMoreElements()) {
+                    return false;
+                }
+                url = e.nextElement();
                 return url != null;
             }
 
+            @Override
             public URL nextElement() {
                 if (!next()) {
                     throw new NoSuchElementException();
@@ -830,6 +780,7 @@ public class URLClassLoader extends SecureClassLoader implements Closeable {
                 return u;
             }
 
+            @Override
             public boolean hasMoreElements() {
                 return next();
             }
@@ -860,7 +811,6 @@ public class URLClassLoader extends SecureClassLoader implements Closeable {
      * @throws    NullPointerException if {@code codesource} is {@code null}.
      * @return the permissions for the codesource
      */
-    @SuppressWarnings("removal")
     protected PermissionCollection getPermissions(CodeSource codesource)
     {
         PermissionCollection perms = super.getPermissions(codesource);
@@ -906,23 +856,13 @@ public class URLClassLoader extends SecureClassLoader implements Closeable {
             String host = locUrl.getHost();
             if (host != null && !host.isEmpty())
                 p = new SocketPermission(host,
-                                         SecurityConstants.SOCKET_CONNECT_ACCEPT_ACTION);
+                        SecurityConstants.SOCKET_CONNECT_ACCEPT_ACTION);
         }
 
         // make sure the person that created this class loader
         // would have this permission
 
         if (p != null) {
-            final SecurityManager sm = System.getSecurityManager();
-            if (sm != null) {
-                final Permission fp = p;
-                AccessController.doPrivileged(new PrivilegedAction<>() {
-                    public Void run() throws SecurityException {
-                        sm.checkPermission(fp);
-                        return null;
-                    }
-                }, acc);
-            }
             perms.add(p);
         }
         return perms;
@@ -940,18 +880,7 @@ public class URLClassLoader extends SecureClassLoader implements Closeable {
      */
     public static URLClassLoader newInstance(final URL[] urls,
                                              final ClassLoader parent) {
-        // Save the caller's context
-        @SuppressWarnings("removal")
-        final AccessControlContext acc = AccessController.getContext();
-        // Need a privileged block to create the class loader
-        @SuppressWarnings("removal")
-        URLClassLoader ucl = AccessController.doPrivileged(
-            new PrivilegedAction<>() {
-                public URLClassLoader run() {
-                    return new FactoryURLClassLoader(null, urls, parent, acc);
-                }
-            });
-        return ucl;
+        return new URLClassLoader(null, urls, parent);
     }
 
     /**
@@ -964,85 +893,10 @@ public class URLClassLoader extends SecureClassLoader implements Closeable {
      * @return the resulting class loader
      */
     public static URLClassLoader newInstance(final URL[] urls) {
-        // Save the caller's context
-        @SuppressWarnings("removal")
-        final AccessControlContext acc = AccessController.getContext();
-        // Need a privileged block to create the class loader
-        @SuppressWarnings("removal")
-        URLClassLoader ucl = AccessController.doPrivileged(
-            new PrivilegedAction<>() {
-                public URLClassLoader run() {
-                    return new FactoryURLClassLoader(urls, acc);
-                }
-            });
-        return ucl;
+        return new URLClassLoader(urls);
     }
 
     static {
         ClassLoader.registerAsParallelCapable();
     }
-
-    final class ClassFinder implements PrivilegedExceptionAction<Class<?>>        //OpenJ9-shared_classes_misc
-    {                                                                             //OpenJ9-shared_classes_misc
-       private final String name;                                                 //OpenJ9-shared_classes_misc
-       private final ClassLoader classloader;                                     //OpenJ9-shared_classes_misc
-                                                                                  //OpenJ9-shared_classes_misc
-       public ClassFinder(String name, ClassLoader loader) {                      //OpenJ9-shared_classes_misc
-          this.name = name;                                                       //OpenJ9-shared_classes_misc
-          this.classloader = loader;                                              //OpenJ9-shared_classes_misc
-       }                                                                          //OpenJ9-shared_classes_misc
-                                                                                  //OpenJ9-shared_classes_misc
-       @Override                                                                  //OpenJ9-shared_classes_misc
-       public Class<?> run() throws ClassNotFoundException {                      //OpenJ9-shared_classes_misc
-          String path = name.replace('.', '/').concat(".class");                  //OpenJ9-shared_classes_misc
-          Resource res = ucp.getResource(path, false);                            //OpenJ9-shared_classes_misc
-          if (res != null) {                                                      //OpenJ9-shared_classes_misc
-              try {                                                               //OpenJ9-shared_classes_misc
-                  return defineClass(name, res);                                  //OpenJ9-shared_classes_misc
-              } catch (IOException e) {                                           //OpenJ9-shared_classes_misc
-                  throw new ClassNotFoundException(name, e);                      //OpenJ9-shared_classes_misc
-              } catch (ClassFormatError e2) {                                     //OpenJ9-shared_classes_misc
-                  if (res.getDataError() != null) {                               //OpenJ9-shared_classes_misc
-                      e2.addSuppressed(res.getDataError());                       //OpenJ9-shared_classes_misc
-                  }                                                               //OpenJ9-shared_classes_misc
-                  throw e2;                                                       //OpenJ9-shared_classes_misc
-              }                                                                   //OpenJ9-shared_classes_misc
-          }                                                                       //OpenJ9-shared_classes_misc
-          return null;                                                            //OpenJ9-shared_classes_misc
-       }                                                                          //OpenJ9-shared_classes_misc
-    }                                                                             //OpenJ9-shared_classes_misc
-
 }
-
-final class FactoryURLClassLoader extends URLClassLoader {
-
-    static {
-        ClassLoader.registerAsParallelCapable();
-    }
-
-    FactoryURLClassLoader(String name, URL[] urls, ClassLoader parent,
-                          @SuppressWarnings("removal") AccessControlContext acc) {
-        super(name, urls, parent, acc);
-    }
-
-    FactoryURLClassLoader(URL[] urls, @SuppressWarnings("removal") AccessControlContext acc) {
-        super(urls, acc);
-    }
-
-    public final Class<?> loadClass(String name, boolean resolve)
-        throws ClassNotFoundException
-    {
-        // First check if we have permission to access the package. This
-        // should go away once we've added support for exported packages.
-        @SuppressWarnings("removal")
-        SecurityManager sm = System.getSecurityManager();
-        if (sm != null) {
-            int i = name.lastIndexOf('.');
-            if (i != -1) {
-                sm.checkPackageAccess(name.substring(0, i));
-            }
-        }
-        return super.loadClass(name, resolve);
-    }
-}
-//OpenJ9-shared_classes_misc
