@@ -337,8 +337,7 @@ module java.base {
         java.rmi,
         java.sql.rowset;
     exports sun.security.action to
-        java.desktop,
-        java.security.jgss;
+        java.desktop;
     exports sun.security.internal.interfaces to
 /*[IF OPENJCEPLUS_SUPPORT]*/
         openjceplus,

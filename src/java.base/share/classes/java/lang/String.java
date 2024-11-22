@@ -872,12 +872,6 @@ public final class String
             cd.onMalformedInput(CodingErrorAction.REPLACE)
                     .onUnmappableCharacter(CodingErrorAction.REPLACE);
             char[] ca = new char[en];
-            if (charset.getClass().getClassLoader0() != null &&
-                    System.getSecurityManager() != null) {
-                bytes = Arrays.copyOfRange(bytes, offset, offset + length);
-                offset = 0;
-            }
-
             int caLen;
             try {
                 caLen = decodeWithDecoder(cd, ca, bytes, offset, length);
@@ -1021,10 +1015,6 @@ public final class String
         }
         int en = scale(len, cd.maxCharsPerByte());
         char[] ca = new char[en];
-        if (cs.getClass().getClassLoader0() != null &&
-                System.getSecurityManager() != null) {
-            src = Arrays.copyOf(src, len);
-        }
         int caLen;
         try {
             caLen = decodeWithDecoder(cd, ca, src, 0, src.length);
@@ -1046,9 +1036,8 @@ public final class String
     private static final char REPL = '\ufffd';
 
     // Trim the given byte array to the given length
-    @SuppressWarnings("removal")
-    private static byte[] safeTrim(byte[] ba, int len, boolean isTrusted) {
-        if (len == ba.length && (isTrusted || System.getSecurityManager() == null)) {
+    private static byte[] trimArray(byte[] ba, int len) {
+        if (len == ba.length) {
             return ba;
         } else {
             return Arrays.copyOf(ba, len);
@@ -1107,7 +1096,7 @@ public final class String
             int blen = (coder == LATIN1) ? ae.encodeFromLatin1(val, 0, len, ba)
                     : ae.encodeFromUTF16(val, 0, len, ba);
             if (blen != -1) {
-                return safeTrim(ba, blen, true);
+                return trimArray(ba, blen);
             }
         }
 
@@ -1137,7 +1126,7 @@ public final class String
                 throw new Error(x);
             }
         }
-        return safeTrim(ba, bb.position(), cs.getClass().getClassLoader0() == null);
+        return trimArray(ba, bb.position());
     }
 
     /*
