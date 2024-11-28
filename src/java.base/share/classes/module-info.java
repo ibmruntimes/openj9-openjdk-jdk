@@ -305,7 +305,6 @@ module java.base {
         java.security.jgss,
         jdk.naming.dns;
     exports sun.net.util to
-        java.desktop,
         java.net.http,
         jdk.jconsole,
         jdk.sctp;
@@ -336,8 +335,6 @@ module java.base {
         java.management.rmi,
         java.rmi,
         java.sql.rowset;
-    exports sun.security.action to
-        java.desktop;
     exports sun.security.internal.interfaces to
 /*[IF OPENJCEPLUS_SUPPORT]*/
         openjceplus,
@@ -375,7 +372,6 @@ module java.base {
 /*[IF OPENJCEPLUS_SUPPORT]*/
         openjceplus,
 /*[ENDIF] OPENJCEPLUS_SUPPORT */
-        java.desktop,
         java.naming,
         java.rmi,
         java.security.jgss,
