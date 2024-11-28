@@ -42,6 +42,13 @@ else ifeq ($(call isTargetOs, linux), true)
   else ifeq ($(call isTargetCpu, x86_64), true)
     OPENJCEPLUS_JGSKIT_PLATFORM := x86-linux64
   endif
+else ifeq ($(call isTargetOs, macosx), true)
+  ifeq ($(call isTargetCpu, aarch64), true)
+    OPENJCEPLUS_JGSKIT_PLATFORM := aarch64-mac
+  else ifeq ($(call isTargetCpu, x86_64), true)
+    OPENJCEPLUS_JGSKIT_PLATFORM := x86_64-mac
+  endif
+  OPENJCEPLUS_JGSKIT_MAKE := jgskit.mac.mak
 else ifeq ($(call isTargetOs, windows), true)
   ifeq ($(call isTargetCpu, x86_64), true)
     EXPORT_COMPILER_ENV_VARS := LIB='$(OPENJ9_VS_LIB)'
