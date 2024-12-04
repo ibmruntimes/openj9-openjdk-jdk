@@ -24,7 +24,7 @@
 #
 
 # ===========================================================================
-# (c) Copyright IBM Corp. 2020, 2023 All Rights Reserved
+# (c) Copyright IBM Corp. 2020, 2024 All Rights Reserved
 # ===========================================================================
 
 ################################################################################
@@ -1318,7 +1318,8 @@ endif
 ################################################################################
 
 # all-images builds all our deliverables as images.
-all-images: product-images static-jdk-image test-image all-docs-images
+# OpenJ9 does not currently support static-jdk-image
+all-images: product-images test-image all-docs-images
 
 # all-bundles packages all our deliverables as tar.gz bundles.
 all-bundles: product-bundles test-bundles docs-bundles static-libs-bundles
