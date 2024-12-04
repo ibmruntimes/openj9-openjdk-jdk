@@ -34,11 +34,9 @@ package java.lang.invoke;
 import jdk.internal.misc.VM;
 import jdk.internal.ref.CleanerFactory;
 import sun.invoke.util.Wrapper;
-import sun.security.action.GetPropertyAction;
 
 import java.lang.invoke.MethodHandles.Lookup;
 import java.lang.reflect.Field;
-import java.util.Properties;
 
 import static java.lang.invoke.MethodHandleNatives.Constants.*;
 import static java.lang.invoke.MethodHandleStatics.TRACE_METHOD_LINKAGE;

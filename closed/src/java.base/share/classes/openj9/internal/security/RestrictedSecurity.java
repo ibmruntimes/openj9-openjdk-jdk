@@ -345,9 +345,10 @@ public final class RestrictedSecurity {
             }
             String defaultMatch = null;
             boolean profileExists = false;
+            String profilePrefix = potentialProfileID + '.';
             for (Object keyObject : props.keySet()) {
                 if (keyObject instanceof String key) {
-                    if (key.startsWith(potentialProfileID)) {
+                    if (key.startsWith(profilePrefix)) {
                         profileExists = true;
                         if (key.endsWith(".desc.default")) {
                             // Check if property is set to true.

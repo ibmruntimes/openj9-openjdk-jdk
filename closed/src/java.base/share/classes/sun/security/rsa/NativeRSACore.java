@@ -37,7 +37,6 @@ import java.security.SecureRandom;
 import java.security.interfaces.*;
 
 import javax.crypto.BadPaddingException;
-import sun.security.action.GetPropertyAction;
 import jdk.crypto.jniprovider.NativeCrypto;
 
 import sun.security.jca.JCAUtil;

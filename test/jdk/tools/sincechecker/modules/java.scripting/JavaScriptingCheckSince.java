@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2004, 2024, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2024, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -23,26 +23,8 @@
 
 /*
  * @test
- * @bug 5057136
- * @summary Generify sun.security.action.GetPropertyAction and friends
- * @modules java.base/sun.security.action
+ * @bug 8343780
+ * @summary Test for `@since` in java.scripting module
+ * @library /test/lib /test/jdk/tools/sincechecker
+ * @run main SinceChecker java.scripting
  */
-
-import java.security.*;
-import sun.security.action.*;
-
-public class Generify {
-
-    public static void main(String[] args) throws Exception {
-
-        System.setProperty("property", "propertyvalue");
-
-        String prop = AccessController.doPrivileged
-                        (new GetPropertyAction("property"));
-        if (prop.equals("propertyvalue")) {
-            System.out.println("property test passed");
-        } else {
-            throw new SecurityException("property test failed");
-        }
-    }
-}
