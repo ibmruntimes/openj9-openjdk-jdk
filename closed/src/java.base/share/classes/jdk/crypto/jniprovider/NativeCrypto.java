@@ -33,8 +33,6 @@ import jdk.internal.ref.CleanerFactory;
 import jdk.internal.reflect.Reflection;
 import jdk.internal.reflect.CallerSensitive;
 
-import sun.security.action.GetPropertyAction;
-
 /*[IF CRIU_SUPPORT]*/
 import openj9.internal.criu.InternalCRIUSupport;
 /*[ENDIF] CRIU_SUPPORT */
@@ -65,10 +63,10 @@ public class NativeCrypto {
     private static final Cleaner ECKeyCleaner = CleanerFactory.cleaner();
 
     private static final boolean useNativeCrypto = Boolean.parseBoolean(
-            GetPropertyAction.privilegedGetProperty("jdk.nativeCrypto", "true"));
+            System.getProperty("jdk.nativeCrypto", "true"));
 
     private static final boolean traceEnabled = Boolean.parseBoolean(
-            GetPropertyAction.privilegedGetProperty("jdk.nativeCryptoTrace", "false"));
+            System.getProperty("jdk.nativeCryptoTrace", "false"));
 
     private static final class InstanceHolder {
         private static final NativeCrypto instance = new NativeCrypto();
@@ -160,7 +158,7 @@ public class NativeCrypto {
         boolean useNativeAlgorithm = false;
         if (useNativeCrypto) {
             useNativeAlgorithm = Boolean.parseBoolean(
-                    GetPropertyAction.privilegedGetProperty(property, "true"));
+                    System.getProperty(property, "true"));
         }
         /*
          * User wants to use the native crypto implementation. Ensure that the native crypto library is enabled.
