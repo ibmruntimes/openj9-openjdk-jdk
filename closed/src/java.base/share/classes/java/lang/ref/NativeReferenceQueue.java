@@ -24,7 +24,7 @@
  */
 /*
  * ===========================================================================
- * (c) Copyright IBM Corp. 2022, 2022 All Rights Reserved
+ * (c) Copyright IBM Corp. 2022, 2024 All Rights Reserved
  * ===========================================================================
  */
 package java.lang.ref;
@@ -37,6 +37,6 @@ package java.lang.ref;
  */
 final class NativeReferenceQueue<T> extends ReferenceQueue<T> {
 	public NativeReferenceQueue() {
-		super(0);
+		super();
 	}
 }

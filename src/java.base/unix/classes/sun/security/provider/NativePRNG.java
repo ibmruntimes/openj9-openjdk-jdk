@@ -139,93 +139,86 @@ public final class NativePRNG extends SecureRandomSpi {
     /**
      * Create a RandomIO object for all I/O of this Variant type.
      */
-    @SuppressWarnings("removal")
     private static RandomIO initIO(final Variant v) {
-        return AccessController.doPrivileged(
-            new PrivilegedAction<>() {
-                @Override
-                public RandomIO run() {
 
-                    File seedFile;
-                    File nextFile;
+        File seedFile;
+        File nextFile;
 
-                    switch(v) {
-                    /*[IF CRIU_SUPPORT]*/
-                    case CRIU:
-                        seedFile = new File(NAME_RANDOM);
-                        nextFile = new File(NAME_URANDOM);
-                        break;
-                    /*[ENDIF] CRIU_SUPPORT */
+        switch(v) {
+        /*[IF CRIU_SUPPORT]*/
+        case CRIU:
+            seedFile = new File(NAME_RANDOM);
+            nextFile = new File(NAME_URANDOM);
+            break;
+        /*[ENDIF] CRIU_SUPPORT */
 
-                    case MIXED:
-                        URL egdUrl;
-                        File egdFile = null;
+        case MIXED:
+            URL egdUrl;
+            File egdFile = null;
 
-                        if ((egdUrl = getEgdUrl()) != null) {
-                            try {
-                                egdFile = SunEntries.getDeviceFile(egdUrl);
-                            } catch (IOException e) {
-                                // Swallow, seedFile is still null
-                            }
-                        }
-
-                        // Try egd first.
-                        if ((egdFile != null) && egdFile.canRead()) {
-                            seedFile = egdFile;
-                        } else {
-                            // fall back to /dev/random.
-                            seedFile = new File(NAME_RANDOM);
-                        }
-                        nextFile = new File(NAME_URANDOM);
-                        break;
-
-                    case BLOCKING:
-                        seedFile = new File(NAME_RANDOM);
-                        nextFile = new File(NAME_RANDOM);
-                        break;
-
-                    case NONBLOCKING:
-                        seedFile = new File(NAME_URANDOM);
-                        nextFile = new File(NAME_URANDOM);
-                        break;
-
-                    default:
-                        // Shouldn't happen!
-                        return null;
-                    }
-
-                    if (debug != null) {
-                        debug.println("NativePRNG." + v +
-                            " seedFile: " + seedFile +
-                            " nextFile: " + nextFile);
-                    }
-
-                    if (!seedFile.canRead() || !nextFile.canRead()) {
-                        if (debug != null) {
-                            debug.println("NativePRNG." + v +
-                                " Couldn't read Files.");
-                        }
-                        return null;
-                    }
-
-                    try {
-                        RandomIO instance = new RandomIO(seedFile, nextFile, v);
-
-                        /*[IF CRIU_SUPPORT]*/
-                        /* CRIU is only used if isCheckpointAllowed(),
-                         * so there's no need to check that again here.
-                         */
-                        if (v == Variant.CRIU) {
-                            CRIUSECProvider.doOnRestart(instance, random -> random.clearRNGState());
-                        }
-                        /*[ENDIF] CRIU_SUPPORT */
-
-                        return instance;
-                    } catch (Exception e) {
-                        return null;
-                    }
+            if ((egdUrl = getEgdUrl()) != null) {
+                try {
+                    egdFile = SunEntries.getDeviceFile(egdUrl);
+                } catch (IOException e) {
+                    // Swallow, seedFile is still null
                 }
-        });
+            }
+
+            // Try egd first.
+            if ((egdFile != null) && egdFile.canRead()) {
+                seedFile = egdFile;
+            } else {
+                // fall back to /dev/random.
+                seedFile = new File(NAME_RANDOM);
+            }
+            nextFile = new File(NAME_URANDOM);
+            break;
+
+        case BLOCKING:
+            seedFile = new File(NAME_RANDOM);
+            nextFile = new File(NAME_RANDOM);
+            break;
+
+        case NONBLOCKING:
+            seedFile = new File(NAME_URANDOM);
+            nextFile = new File(NAME_URANDOM);
+            break;
+
+        default:
+            // Shouldn't happen!
+            return null;
+        }
+
+        if (debug != null) {
+            debug.println("NativePRNG." + v +
+                " seedFile: " + seedFile +
+                " nextFile: " + nextFile);
+        }
+
+        if (!seedFile.canRead() || !nextFile.canRead()) {
+            if (debug != null) {
+                debug.println("NativePRNG." + v +
+                    " Couldn't read Files.");
+            }
+            return null;
+        }
+
+        try {
+            RandomIO instance = new RandomIO(seedFile, nextFile, v);
+
+            /*[IF CRIU_SUPPORT]*/
+            /* CRIU is only used if isCheckpointAllowed(),
+             * so there's no need to check that again here.
+             */
+            if (v == Variant.CRIU) {
+                CRIUSECProvider.doOnRestart(instance, random -> random.clearRNGState());
+            }
+            /*[ENDIF] CRIU_SUPPORT */
+
+            return instance;
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     // return whether the NativePRNG is available
@@ -547,22 +540,15 @@ public final class NativePRNG extends SecureRandomSpi {
         // supply random bytes to the OS
         // write to "seed" if possible
         // always add the seed to our mixing random
-        @SuppressWarnings("removal")
         private void implSetSeed(byte[] seed) {
             synchronized (LOCK_SET_SEED) {
                 if (seedOutInitialized == false) {
                     seedOutInitialized = true;
-                    seedOut = AccessController.doPrivileged(
-                            new PrivilegedAction<>() {
-                        @Override
-                        public OutputStream run() {
-                            try {
-                                return new FileOutputStream(seedFile, true);
-                            } catch (Exception e) {
-                                return null;
-                            }
-                        }
-                    });
+                    try {
+                        seedOut = new FileOutputStream(seedFile, true);
+                    } catch (Exception e) {
+                        seedOut = null;
+                    }
                 }
                 if (seedOut != null) {
                     try {

@@ -328,14 +328,7 @@ public final class Security {
     }
 
     static {
-        // doPrivileged here because there are multiple
-        // things in initialize that might require privs.
-        // (the FileInputStream call and the File.exists call, etc)
-        @SuppressWarnings("removal")
-        var dummy = AccessController.doPrivileged((PrivilegedAction<Object>) () -> {
-            initialize();
-            return null;
-        });
+        initialize();
         // Set up JavaSecurityPropertiesAccess in SharedSecrets
         SharedSecrets.setJavaSecurityPropertiesAccess(new JavaSecurityPropertiesAccess() {
             @Override
@@ -511,15 +504,13 @@ public final class Security {
         CRIUConfigurator.invalidateAlgorithmCache();
         /*[ENDIF] CRIU_SUPPORT */
 
-        String providerName = provider.getName();
-        checkInsertProvider(providerName);
         ProviderList list = Providers.getFullProviderList();
         ProviderList newList = ProviderList.insertAt(list, provider, position - 1);
         if (list == newList) {
             return -1;
         }
         Providers.setProviderList(newList);
-        return newList.getIndex(providerName) + 1;
+        return newList.getIndex(provider.getName()) + 1;
     }
 
     /**
@@ -567,7 +558,6 @@ public final class Security {
         CRIUConfigurator.invalidateAlgorithmCache();
         /*[ENDIF] CRIU_SUPPORT */
 
-        check("removeProvider." + name);
         ProviderList list = Providers.getFullProviderList();
         ProviderList newList = ProviderList.remove(list, name);
         Providers.setProviderList(newList);
@@ -862,7 +852,6 @@ public final class Security {
      */
     public static String getProperty(String key) {
         SecPropLoader.checkReservedKey(key);
-        check("getProperty." + key);
         String name = props.getProperty(key);
         if (name != null)
             name = name.trim(); // could be a class name with trailing ws
@@ -885,7 +874,6 @@ public final class Security {
      */
     public static void setProperty(String key, String datum) {
         SecPropLoader.checkReservedKey(key);
-        check("setProperty." + key);
 
         // Check whether the change to the property is allowed.
         RestrictedSecurity.checkSetSecurityProperty(key);
@@ -900,32 +888,6 @@ public final class Security {
 
         if (EventHelper.isLoggingSecurity()) {
             EventHelper.logSecurityPropertyEvent(key, datum);
-        }
-    }
-
-    private static void check(String directive) {
-        @SuppressWarnings("removal")
-        SecurityManager security = System.getSecurityManager();
-        if (security != null) {
-            security.checkSecurityAccess(directive);
-        }
-    }
-
-    private static void checkInsertProvider(String name) {
-        @SuppressWarnings("removal")
-        SecurityManager security = System.getSecurityManager();
-        if (security != null) {
-            try {
-                security.checkSecurityAccess("insertProvider");
-            } catch (SecurityException se1) {
-                try {
-                    security.checkSecurityAccess("insertProvider." + name);
-                } catch (SecurityException se2) {
-                    // throw first exception, but add second to suppressed
-                    se1.addSuppressed(se2);
-                    throw se1;
-                }
-            }
         }
     }
 
