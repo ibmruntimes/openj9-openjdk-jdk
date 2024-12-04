@@ -33,8 +33,6 @@ package sun.security.jca;
 
 import java.util.*;
 
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.security.Provider;
 import java.security.Provider.Service;
 import java.security.Security;
@@ -95,19 +93,12 @@ public final class ProviderList {
 
     // construct a ProviderList from the security properties
     // (static provider configuration in the java.security file)
-    @SuppressWarnings("removal")
     static ProviderList fromSecurityProperties() {
-        // doPrivileged() because of Security.getProperty()
-        return AccessController.doPrivileged(
-                        new PrivilegedAction<ProviderList>() {
-            public ProviderList run() {
 /*[IF CRIU_SUPPORT]*/
-                // ensure the providers are reloaded from scratch
-                ProviderConfig.reloadServices();
+        // ensure the providers are reloaded from scratch
+        ProviderConfig.reloadServices();
 /*[ENDIF] CRIU_SUPPORT */
-                return new ProviderList();
-            }
-        });
+        return new ProviderList();
     }
 
     public static ProviderList add(ProviderList providerList, Provider p) {

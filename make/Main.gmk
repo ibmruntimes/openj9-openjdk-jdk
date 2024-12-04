@@ -24,7 +24,7 @@
 #
 
 # ===========================================================================
-# (c) Copyright IBM Corp. 2020, 2023 All Rights Reserved
+# (c) Copyright IBM Corp. 2020, 2024 All Rights Reserved
 # ===========================================================================
 
 ################################################################################
@@ -460,6 +460,18 @@ $(eval $(call SetupTarget, legacy-jre-image, \
 $(eval $(call SetupTarget, symbols-image, \
     MAKEFILE := Images, \
     TARGET := symbols, \
+))
+
+$(eval $(call SetupTarget, static-launcher, \
+    MAKEFILE := StaticLibs, \
+    TARGET := static-launcher, \
+    DEPS := hotspot-static-libs static-libs, \
+))
+
+$(eval $(call SetupTarget, static-jdk-image, \
+    MAKEFILE := StaticLibs, \
+    TARGET := static-jdk-image, \
+    DEPS := static-exploded-image jdk-image, \
 ))
 
 $(eval $(call SetupTarget, static-libs-image, \
@@ -1094,9 +1106,9 @@ else
 
   symbols-image: $(LIBS_TARGETS) $(LAUNCHER_TARGETS)
 
-  static-libs-image: hotspot-static-libs $(STATIC_LIBS_TARGETS)
+  static-libs-image: hotspot-static-libs static-libs
 
-  static-libs-graal-image: $(STATIC_LIBS_TARGETS)
+  static-libs-graal-image: static-libs
 
   bootcycle-images: jdk-image
 
@@ -1262,6 +1274,8 @@ ifeq ($(call isTargetOs, macosx), true)
   legacy-images: mac-legacy-jre-bundle
 endif
 
+static-exploded-image: static-launcher exploded-image
+
 # These targets build the various documentation images
 docs-jdk-image: docs-jdk
 docs-javase-image: docs-javase
@@ -1304,6 +1318,7 @@ endif
 ################################################################################
 
 # all-images builds all our deliverables as images.
+# OpenJ9 does not currently support static-jdk-image
 all-images: product-images test-image all-docs-images
 
 # all-bundles packages all our deliverables as tar.gz bundles.
@@ -1317,7 +1332,7 @@ ALL_TARGETS += buildtools hotspot hotspot-libs hotspot-static-libs \
     create-buildjdk docs-jdk-api docs-javase-api docs-reference-api docs-jdk \
     docs-javase docs-reference docs-javadoc mac-bundles product-images legacy-images \
     docs-image docs-javase-image docs-reference-image all-docs-images \
-    docs-bundles all-docs-bundles test-image all-images \
+    docs-bundles all-docs-bundles test-image all-images static-exploded-image \
     all-bundles
 
 ################################################################################
