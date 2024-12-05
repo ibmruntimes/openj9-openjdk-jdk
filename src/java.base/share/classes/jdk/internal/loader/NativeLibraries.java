@@ -38,8 +38,6 @@ import jdk.internal.util.StaticProperty;
 
 import java.io.File;
 import java.io.IOException;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.function.BiFunction;
@@ -342,7 +340,6 @@ public final class NativeLibraries {
             return load(this, name, isBuiltin, throwExceptionIfFail());
         }
 
-        @SuppressWarnings("removal")
         private boolean throwExceptionIfFail() {
             if (!loadLibraryOnlyIfPresentInitialized) {
                 initLoadLibraryOnlyIfPresent();
@@ -351,12 +348,8 @@ public final class NativeLibraries {
 
             // If the file exists but fails to load, UnsatisfiedLinkException thrown by the VM
             // will include the error message from dlopen to provide diagnostic information
-            return AccessController.doPrivileged(new PrivilegedAction<>() {
-                public Boolean run() {
-                    File file = new File(name);
-                    return file.exists();
-                }
-            });
+            File file = new File(name);
+            return file.exists();
         }
 
         /*
