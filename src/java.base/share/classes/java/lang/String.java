@@ -733,7 +733,6 @@ public final class String
      * Important: parameter order of this method is deliberately changed in order to
      * disambiguate it against other similar methods of this class.
      */
-    @SuppressWarnings("removal")
     private String(Charset charset, byte[] bytes, int offset, int length) {
         if (length == 0) {
             this.value = "".value;
@@ -980,7 +979,6 @@ public final class String
         }
     }
 
-    @SuppressWarnings("removal")
     private static String newStringNoRepl1(byte[] src, Charset cs) {
         int len = src.length;
         if (len == 0) {
