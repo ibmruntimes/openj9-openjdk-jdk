@@ -20,6 +20,11 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
+/*
+ * ===========================================================================
+ * (c) Copyright IBM Corp. 2024, 2024 All Rights Reserved
+ * ===========================================================================
+ */
 
 /*
  * @test
@@ -87,7 +92,7 @@ public class SecurityManagerWarnings {
         run(prop, cp)
                 .shouldNotHaveExitValue(0)
                 .shouldNotContain("SecurityManagerWarnings.main")
-                .shouldContain("at java.lang.System.initPhase3")
+                .shouldContain("at java/lang/System.initSecurityManager")
                 .shouldContain("Error: A command line option has attempted to allow or enable the Security Manager.");
     }
 
