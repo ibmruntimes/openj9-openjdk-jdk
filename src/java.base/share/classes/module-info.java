@@ -332,8 +332,7 @@ module java.base {
         java.desktop;
     exports sun.reflect.misc to
         java.desktop,
-        java.management,
-        java.sql.rowset;
+        java.management;
     exports sun.security.internal.interfaces to
 /*[IF OPENJCEPLUS_SUPPORT]*/
         openjceplus,
