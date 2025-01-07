@@ -22,6 +22,12 @@
  */
 
 /*
+ * ===========================================================================
+ * (c) Copyright IBM Corp. 2025, 2025 All Rights Reserved
+ * ===========================================================================
+ */
+
+/*
  * @test
  * @library ../
  * @modules java.base/jdk.internal.foreign
@@ -47,8 +53,8 @@ import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 public class TestLargeStub extends NativeTestHelper {
 
-    private static final int DOWNCALL_AVAILABLE_SLOTS = 248;
-    private static final int UPCALL_AVAILABLE_SLOTS = 250;
+    private static final int DOWNCALL_AVAILABLE_SLOTS = 125;
+    private static final int UPCALL_AVAILABLE_SLOTS = 125;
 
     MemoryLayout STRUCT_LL = MemoryLayout.structLayout(
         C_LONG_LONG,
