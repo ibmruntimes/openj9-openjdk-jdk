@@ -117,6 +117,7 @@ com/sun/crypto/provider/Cipher/RSA/TestOAEPParameterSpec.java https://github.com
 com/sun/crypto/provider/Cipher/RSA/TestOAEPWithParams.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 com/sun/crypto/provider/Cipher/RSA/TestOAEP_KAT.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 com/sun/crypto/provider/Cipher/RSA/TestRSA.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
+com/sun/crypto/provider/Cipher/Test4958071.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 com/sun/crypto/provider/Cipher/TextLength/SameBufferOverwrite.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 com/sun/crypto/provider/Cipher/TextLength/TestCipherTextLength.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 com/sun/crypto/provider/Cipher/UTIL/StrongOrUnlimited.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
@@ -141,6 +142,7 @@ com/sun/crypto/provider/KeyFactory/TestProviderLeak.java https://github.com/ecli
 com/sun/crypto/provider/KeyGenerator/Test4628062.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 com/sun/crypto/provider/KeyGenerator/Test6227536.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 com/sun/crypto/provider/KeyGenerator/TestExplicitKeyLength.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
+com/sun/crypto/provider/KeyProtector/IterationCount.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 com/sun/crypto/provider/Mac/DigestCloneabilityTest.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 com/sun/crypto/provider/Mac/EmptyByteBufferTest.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 com/sun/crypto/provider/Mac/HmacMD5.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
@@ -152,6 +154,7 @@ com/sun/crypto/provider/Mac/MacClone.java https://github.com/eclipse-openj9/open
 com/sun/crypto/provider/Mac/MacKAT.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 com/sun/crypto/provider/Mac/MacSameTest.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 com/sun/crypto/provider/Mac/NullByteBufferTest.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
+com/sun/crypto/provider/Mac/Test6205692.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 com/sun/crypto/provider/NSASuiteB/TestAESOids.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 com/sun/crypto/provider/NSASuiteB/TestAESWrapOids.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 com/sun/crypto/provider/NSASuiteB/TestHmacSHAOids.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
@@ -208,7 +211,7 @@ java/security/MessageDigest/TestDigestIOStream.java https://github.com/eclipse-o
 java/security/MessageDigest/TestSameLength.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 java/security/MessageDigest/TestSameValue.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 java/security/Policy/ExtensiblePolicy/ExtensiblePolicyTest.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
-java/security/Policy/ExtensiblePolicy/ExtensiblePolicyWithJarTest.java https://github.ibm.com/runtimes/jit-crypto/issues/622 generic-all
+java/security/Policy/ExtensiblePolicy/ExtensiblePolicyWithJarTest.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 java/security/Policy/GetInstance/GetInstance.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 java/security/Policy/GetInstance/GetInstanceSecurity.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 java/security/Policy/SignedJar/SignedJarTest.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
@@ -281,6 +284,7 @@ java/security/cert/CertPathValidator/trustAnchor/ValWithAnchorByName.java https:
 java/security/cert/CertPathValidatorException/Serial.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 java/security/cert/CertificateRevokedException/Basic.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 java/security/cert/GetInstance.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
+java/security/cert/PKIXRevocationChecker/OcspUnauthorized.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 java/security/cert/PKIXRevocationChecker/UnitTest.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 java/security/cert/PolicyNode/GetPolicyQualifiers.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 java/security/cert/X509CRL/VerifyDefault.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
@@ -299,7 +303,7 @@ javax/crypto/Cipher/TestCipherMode.java https://github.com/eclipse-openj9/openj9
 javax/crypto/Cipher/TestGetInstance.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 javax/crypto/Cipher/Turkish.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 javax/crypto/CipherSpi/DirectBBRemaining.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
-javax/crypto/CipherSpi/ResetByteBuffer.java https://github.com/eclipse-openj9/openj9/issues/20343 linux-s390x,windows-all
+javax/crypto/CipherSpi/ResetByteBuffer.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 javax/crypto/CryptoPermission/AllPermCheck.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 javax/crypto/CryptoPermission/LowercasePermCheck.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 javax/crypto/CryptoPermission/RC2PermCheck.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
@@ -329,6 +333,7 @@ javax/crypto/spec/DESKeySpec/CheckParity.java https://github.com/eclipse-openj9/
 javax/crypto/spec/RC2ParameterSpec/RC2AlgorithmParameters.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 javax/security/auth/kerberos/KerberosTixDateTest.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 javax/security/auth/kerberos/StandardNames.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
+javax/security/auth/Subject/UnsupportedSV.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 javax/xml/crypto/dsig/BadXPointer.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 javax/xml/crypto/dsig/Basic.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 javax/xml/crypto/dsig/ErrorHandlerPermissions.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
@@ -432,8 +437,8 @@ sun/security/krb5/auto/UnboundService.java https://github.com/eclipse-openj9/ope
 sun/security/krb5/auto/UseCacheAndStoreKey.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 sun/security/krb5/auto/W83.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 sun/security/krb5/auto/principalProperty/PrincipalSystemPropTest.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
-sun/security/krb5/auto/tools/KinitConfPlusProps.java https://github.com/eclipse-openj9/openj9/issues/20343 windows-all
-sun/security/krb5/auto/tools/KtabSalt.java https://github.com/eclipse-openj9/openj9/issues/20343 windows-all
+sun/security/krb5/auto/tools/KinitConfPlusProps.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
+sun/security/krb5/auto/tools/KtabSalt.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 sun/security/krb5/etype/KerberosAesSha2.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 sun/security/krb5/etype/WeakCrypto.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 sun/security/krb5/ktab/BufferBoundary.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
@@ -473,7 +478,7 @@ java/rmi/MarshalledObject/MOFilterTest.java https://github.com/eclipse-openj9/op
 java/rmi/MarshalledObject/compare/Compare.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 java/rmi/MarshalledObject/compare/HashCode.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 java/rmi/Naming/DefaultRegistryPort.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
-java/rmi/Naming/LookupIPv6.java https://github.com/eclipse-openj9/openj9/issues/20343 aix-all,linux-ppc64le,linux-s390x,windows-all
+java/rmi/Naming/LookupIPv6.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 java/rmi/Naming/LookupNameWithColon.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 java/rmi/Naming/RmiIsNoScheme.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 java/rmi/Naming/UnderscoreHost.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
@@ -540,6 +545,7 @@ java/sql/testng/test/sql/SQLTransientExceptionTests.java https://github.com/ecli
 java/sql/testng/test/sql/SQLWarningTests.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 javax/naming/module/RunBasic.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 javax/naming/spi/FactoryCacheTest.java https://github.ibm.com/runtimes/backlog/issues/1089 generic-all
+javax/naming/spi/providers/InitialContextTest.java https://github.ibm.com/runtimes/backlog/issues/1089 generic-all
 javax/net/ssl/ALPN/SSLEngineAlpnTest.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 javax/net/ssl/ALPN/SSLServerSocketAlpnTest.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 javax/net/ssl/ALPN/SSLSocketAlpnTest.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
@@ -628,8 +634,8 @@ javax/net/ssl/ServerName/EndingDotHostname.java https://github.com/eclipse-openj
 javax/net/ssl/ServerName/SSLEngineExplorer.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 javax/net/ssl/ServerName/SSLEngineExplorerMatchedSNI.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 javax/net/ssl/ServerName/SSLEngineExplorerUnmatchedSNI.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
-javax/net/ssl/ServerName/SSLEngineExplorerWithCli.java https://github.com/eclipse-openj9/openj9/issues/20343 windows-all
-javax/net/ssl/ServerName/SSLEngineExplorerWithSrv.java https://github.com/eclipse-openj9/openj9/issues/20343 windows-all
+javax/net/ssl/ServerName/SSLEngineExplorerWithCli.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
+javax/net/ssl/ServerName/SSLEngineExplorerWithSrv.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 javax/net/ssl/ServerName/SSLSocketConsistentSNI.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 javax/net/ssl/ServerName/SSLSocketExplorer.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 javax/net/ssl/ServerName/SSLSocketExplorerFailure.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
@@ -739,6 +745,9 @@ javax/xml/jaxp/datatype/8033980/SerializationTest.java https://github.com/eclips
 jdk/dynalink/BeanLinkerTest.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 jdk/dynalink/TrustedDynamicLinkerFactoryTest.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 jdk/dynalink/UntrustedDynamicLinkerFactoryTest.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
+jdk/internal/jline/JLineConsoleProviderTest.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
+jdk/internal/jline/LazyJdkConsoleProvider.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
+jdk/internal/jline/RedirectedStdOut.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 jdk/security/jarsigner/Function.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 jdk/security/jarsigner/JarWithOneNonDisabledDigestAlg.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 jdk/security/jarsigner/Properties.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
@@ -780,20 +789,21 @@ sun/security/ec/xec/TestXDH.java https://github.com/eclipse-openj9/openj9/issues
 sun/security/ec/xec/XECKeyFormat.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 sun/security/jca/PreferredProviderNegativeTest.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 sun/security/jca/PreferredProviderTest.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
-sun/security/mscapi/AccessKeyStore.java https://github.com/eclipse-openj9/openj9/issues/20343 windows-all
-sun/security/mscapi/AllTypes.java https://github.com/eclipse-openj9/openj9/issues/20343 windows-all
-sun/security/mscapi/DupAlias.java https://github.com/eclipse-openj9/openj9/issues/20343 windows-all
-sun/security/mscapi/EncodingMutability.java https://github.com/eclipse-openj9/openj9/issues/20343 windows-all
-sun/security/mscapi/IsSunMSCAPIAvailable.java https://github.com/eclipse-openj9/openj9/issues/20343 windows-all
-sun/security/mscapi/IterateWindowsRootStore.java https://github.com/eclipse-openj9/openj9/issues/20343 windows-all
-sun/security/mscapi/KeyStoreCompatibilityMode.java https://github.com/eclipse-openj9/openj9/issues/20343 windows-all
-sun/security/mscapi/KeytoolChangeAlias.java https://github.com/eclipse-openj9/openj9/issues/20343 windows-all
-sun/security/mscapi/NullKey.java https://github.com/eclipse-openj9/openj9/issues/20343 windows-all
-sun/security/mscapi/PrngSerialize.java https://github.com/eclipse-openj9/openj9/issues/20343 windows-all
-sun/security/mscapi/PrngSlow.java https://github.com/eclipse-openj9/openj9/issues/20343 windows-all
+sun/security/mscapi/AccessKeyStore.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
+sun/security/mscapi/AllTypes.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
+sun/security/mscapi/DupAlias.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
+sun/security/mscapi/EncodingMutability.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
+sun/security/mscapi/IsSunMSCAPIAvailable.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
+sun/security/mscapi/IterateWindowsRootStore.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
+sun/security/mscapi/KeyStoreCompatibilityMode.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
+sun/security/mscapi/KeytoolChangeAlias.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
+sun/security/mscapi/NullKey.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
+sun/security/mscapi/PrngSerialize.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
+sun/security/mscapi/PrngSlow.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 sun/security/pkcs/pkcs10/PKCS10AttrEncoding.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 sun/security/pkcs/pkcs7/PKCS7VerifyTest.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 sun/security/pkcs/pkcs7/SignerOrder.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
+sun/security/pkcs/pkcs8/LongPKCS8orX509KeySpec.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 sun/security/pkcs/pkcs8/PKCS8Test.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 sun/security/pkcs/pkcs8/TestLeadingZeros.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 sun/security/pkcs/pkcs9/PKCS9AttrTypeTests.java https://github.ibm.com/runtimes/backlog/issues/1089 generic-all
@@ -823,6 +833,7 @@ sun/security/pkcs12/StorePasswordTest.java https://github.com/eclipse-openj9/ope
 sun/security/pkcs12/StoreSecretKeyTest.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 sun/security/pkcs12/StoreTrustedCertTest.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 sun/security/pkcs12/WrongPBES2.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
+sun/security/provider/all/Deterministic.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 sun/security/provider/DSA/SecureRandomReset.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 sun/security/provider/DSA/SupportedDSAParamGen.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 sun/security/provider/DSA/SupportedDSAParamGenLongKey.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
@@ -1029,7 +1040,7 @@ sun/security/ssl/rsa/CheckProviderEntries.java https://github.com/eclipse-openj9
 sun/security/ssl/rsa/SignatureOffsets.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 sun/security/ssl/rsa/SignedObjectChain.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 sun/security/ssl/spi/ProviderInit.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
-sun/security/tools/jarsigner/CertChainUnclosed.java https://github.com/eclipse-openj9/openj9/issues/20343 windows-all
+sun/security/tools/jarsigner/CertChainUnclosed.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 sun/security/tools/jarsigner/DefaultSigalg.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 sun/security/tools/jarsigner/EntriesOrder.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 sun/security/tools/jarsigner/JarSigningNonAscii.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
@@ -1085,6 +1096,9 @@ sun/security/x509/AlgorithmId/NonStandardNames.java https://github.com/eclipse-o
 sun/security/x509/AlgorithmId/OmitAlgIdParam.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 sun/security/x509/AlgorithmId/PBES2.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 sun/security/x509/AlgorithmId/Uppercase.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
+sun/security/x509/CertificateValidity/NullName.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
+sun/security/x509/EDIPartyName/NullName.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
+sun/security/x509/Extensions/IllegalExtensions.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 sun/security/x509/OtherName/Parse.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 sun/security/x509/URICertStore/AIACertTimeout.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 sun/security/x509/URICertStore/CRLReadTimeout.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all

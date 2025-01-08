@@ -1,5 +1,5 @@
 # ===========================================================================
-# (c) Copyright IBM Corp. 2023, 2024 All Rights Reserved
+# (c) Copyright IBM Corp. 2023, 2025 All Rights Reserved
 # ===========================================================================
 # This code is free software; you can redistribute it and/or modify it
 # under the terms of the GNU General Public License version 2 only, as
@@ -162,7 +162,7 @@ java/lang/Class/GetPackageBootLoaderChildLayer.java https://github.com/ibmruntim
 java/lang/ClassLoader/forNameLeak/ClassForNameLeak.java https://github.com/ibmruntimes/openj9-openjdk-jdk/issues/820 generic-all
 java/lang/ProcessBuilder/JspawnhelperWarnings.java https://github.com/ibmruntimes/openj9-openjdk-jdk/issues/820 generic-all
 java/lang/SecurityManager/CheckSecurityProvider.java https://github.com/ibmruntimes/openj9-openjdk-jdk/issues/820 generic-all
-java/lang/String/CompactString/NegativeSize.java https://github.com/ibmruntimes/openj9-openjdk-jdk/issues/820 aix-all,linux-ppc64le,linux-s390x,windows-all
+java/lang/String/CompactString/NegativeSize.java https://github.com/ibmruntimes/openj9-openjdk-jdk/issues/820 generic-all
 java/lang/reflect/records/IsRecordTest.java https://github.com/ibmruntimes/openj9-openjdk-jdk/issues/820 generic-all
 java/lang/reflect/records/RecordPermissionsTest.java https://github.com/ibmruntimes/openj9-openjdk-jdk/issues/820 generic-all
 java/lang/reflect/records/RecordReflectionTest.java https://github.com/ibmruntimes/openj9-openjdk-jdk/issues/820 generic-all
@@ -292,7 +292,7 @@ javax/crypto/Cipher/TestCipherMode.java https://github.com/ibmruntimes/openj9-op
 javax/crypto/Cipher/TestGetInstance.java https://github.com/ibmruntimes/openj9-openjdk-jdk/issues/820 generic-all
 javax/crypto/Cipher/Turkish.java https://github.com/ibmruntimes/openj9-openjdk-jdk/issues/820 generic-all
 javax/crypto/CipherSpi/DirectBBRemaining.java https://github.com/ibmruntimes/openj9-openjdk-jdk/issues/820 generic-all
-javax/crypto/CipherSpi/ResetByteBuffer.java https://github.com/ibmruntimes/openj9-openjdk-jdk/issues/820 linux-s390x,windows-all
+javax/crypto/CipherSpi/ResetByteBuffer.java https://github.com/ibmruntimes/openj9-openjdk-jdk/issues/820 generic-all
 javax/crypto/CryptoPermission/AllPermCheck.java https://github.com/ibmruntimes/openj9-openjdk-jdk/issues/820 generic-all
 javax/crypto/CryptoPermission/LowercasePermCheck.java https://github.com/ibmruntimes/openj9-openjdk-jdk/issues/820 generic-all
 javax/crypto/CryptoPermission/RC2PermCheck.java https://github.com/ibmruntimes/openj9-openjdk-jdk/issues/820 generic-all
@@ -354,7 +354,7 @@ sun/security/krb5/auto/BasicKrb5Test.java https://github.com/ibmruntimes/openj9-
 sun/security/krb5/auto/BasicProc.java https://github.com/ibmruntimes/openj9-openjdk-jdk/issues/820 generic-all
 sun/security/krb5/auto/BogusKDC.java https://github.com/ibmruntimes/openj9-openjdk-jdk/issues/820 generic-all
 sun/security/krb5/auto/CleanState.java https://github.com/ibmruntimes/openj9-openjdk-jdk/issues/820 generic-all
-sun/security/krb5/auto/Cleaners.java https://github.com/ibmruntimes/openj9-openjdk-jdk/issues/820 linux-ppc64le,linux-s390x,linux-x64,windows-all
+sun/security/krb5/auto/Cleaners.java https://github.com/ibmruntimes/openj9-openjdk-jdk/issues/820 generic-all
 sun/security/krb5/auto/CrossRealm.java https://github.com/ibmruntimes/openj9-openjdk-jdk/issues/820 generic-all
 sun/security/krb5/auto/DiffNameSameKey.java https://github.com/ibmruntimes/openj9-openjdk-jdk/issues/820 generic-all
 sun/security/krb5/auto/DiffSaltParams.java https://github.com/ibmruntimes/openj9-openjdk-jdk/issues/820 generic-all
@@ -431,6 +431,7 @@ sun/security/krb5/ktab/BufferBoundary.java https://github.com/ibmruntimes/openj9
 sun/security/krb5/ktab/FileKeyTab.java https://github.com/ibmruntimes/openj9-openjdk-jdk/issues/820 generic-all
 sun/security/krb5/ktab/KeyTabIndex.java https://github.com/ibmruntimes/openj9-openjdk-jdk/issues/820 generic-all
 sun/security/krb5/runNameEquals.sh https://github.com/ibmruntimes/openj9-openjdk-jdk/issues/820 generic-all
+sun/security/provider/all/Deterministic.java https://github.com/ibmruntimes/openj9-openjdk-jdk/issues/820 generic-all
 #
 # Exclude tests list from extended.openjdk
 #
@@ -470,10 +471,10 @@ java/io/Serializable/records/WriteReplaceTest.java https://github.com/ibmruntime
 java/io/Serializable/serialFilter/FilterWithSecurityManagerTest.java https://github.com/ibmruntimes/openj9-openjdk-jdk/issues/820 generic-all
 java/io/Serializable/serialFilter/GlobalFilterTest.java https://github.com/ibmruntimes/openj9-openjdk-jdk/issues/820 generic-all
 java/io/Serializable/serialFilter/SerialFilterFactoryTest.java https://github.com/ibmruntimes/openj9-openjdk-jdk/issues/820 generic-all
-java/nio/channels/DatagramChannel/AdaptorMulticasting.java https://github.com/ibmruntimes/openj9-openjdk-jdk/issues/820 linux-x64,windows-all
+java/nio/channels/DatagramChannel/AdaptorMulticasting.java https://github.com/ibmruntimes/openj9-openjdk-jdk/issues/820 generic-all
 java/nio/channels/Selector/SelectWithConsumer.java https://github.com/ibmruntimes/openj9-openjdk-jdk/issues/820 generic-all
-java/nio/channels/etc/OpenAndConnect.java https://github.com/ibmruntimes/openj9-openjdk-jdk/issues/820 linux-x64,windows-all
-java/nio/channels/etc/ProtocolFamilies.java https://github.com/ibmruntimes/openj9-openjdk-jdk/issues/820 linux-x64,windows-all
+java/nio/channels/etc/OpenAndConnect.java https://github.com/ibmruntimes/openj9-openjdk-jdk/issues/820 generic-all
+java/nio/channels/etc/ProtocolFamilies.java https://github.com/ibmruntimes/openj9-openjdk-jdk/issues/820 generic-all
 java/nio/channels/unixdomain/IOExchanges.java https://github.com/ibmruntimes/openj9-openjdk-jdk/issues/820 generic-all
 java/nio/channels/unixdomain/Security.java https://github.com/ibmruntimes/openj9-openjdk-jdk/issues/820 generic-all
 java/nio/file/Files/CopyToNonDefaultFS.java https://github.com/ibmruntimes/openj9-openjdk-jdk/issues/820 generic-all
@@ -623,7 +624,7 @@ javax/net/ssl/TLSv11/ExportableStreamCipher.java https://github.com/ibmruntimes/
 javax/net/ssl/TLSv11/GenericBlockCipher.java https://github.com/ibmruntimes/openj9-openjdk-jdk/issues/820 generic-all
 javax/net/ssl/TLSv11/GenericStreamCipher.java https://github.com/ibmruntimes/openj9-openjdk-jdk/issues/820 generic-all
 javax/net/ssl/TLSv11/TLSDataExchangeTest.java https://github.com/ibmruntimes/openj9-openjdk-jdk/issues/820 generic-all
-javax/net/ssl/TLSv11/TLSEnginesClosureTest.java https://github.com/ibmruntimes/openj9-openjdk-jdk/issues/820 linux-ppc64le,linux-s390x,linux-x64,windows-all
+javax/net/ssl/TLSv11/TLSEnginesClosureTest.java https://github.com/ibmruntimes/openj9-openjdk-jdk/issues/820 generic-all
 javax/net/ssl/TLSv11/TLSHandshakeTest.java https://github.com/ibmruntimes/openj9-openjdk-jdk/issues/820 generic-all
 javax/net/ssl/TLSv11/TLSMFLNTest.java https://github.com/ibmruntimes/openj9-openjdk-jdk/issues/820 generic-all
 javax/net/ssl/TLSv11/TLSNotEnabledRC4Test.java https://github.com/ibmruntimes/openj9-openjdk-jdk/issues/820 generic-all
@@ -672,7 +673,7 @@ jdk/nio/zipfs/PropertyPermissionTests.java https://github.com/ibmruntimes/openj9
 jdk/nio/zipfs/TestPosix.java https://github.com/ibmruntimes/openj9-openjdk-jdk/issues/820 generic-all
 jdk/nio/zipfs/ZFSTests.java https://github.com/ibmruntimes/openj9-openjdk-jdk/issues/820 generic-all
 jdk/nio/zipfs/ZipFSPermissionsTest.java https://github.com/ibmruntimes/openj9-openjdk-jdk/issues/820 generic-all
-jdk/nio/zipfs/ZipFSTester.java https://github.com/ibmruntimes/openj9-openjdk-jdk/issues/820 aix-all,linux-ppc64le,linux-s390x,windows-all
+jdk/nio/zipfs/ZipFSTester.java https://github.com/ibmruntimes/openj9-openjdk-jdk/issues/820 generic-all
 jdk/security/jarsigner/Function.java https://github.com/ibmruntimes/openj9-openjdk-jdk/issues/820 generic-all
 jdk/security/jarsigner/JarWithOneNonDisabledDigestAlg.java https://github.com/ibmruntimes/openj9-openjdk-jdk/issues/820 generic-all
 jdk/security/jarsigner/Properties.java https://github.com/ibmruntimes/openj9-openjdk-jdk/issues/820 generic-all
@@ -691,7 +692,7 @@ sun/security/ec/SignatureDigestTruncate.java https://github.com/ibmruntimes/open
 sun/security/ec/SignatureKAT.java https://github.com/ibmruntimes/openj9-openjdk-jdk/issues/820 generic-all
 sun/security/ec/SignatureParameters.java https://github.com/ibmruntimes/openj9-openjdk-jdk/issues/820 generic-all
 sun/security/ec/SignedObjectChain.java https://github.com/ibmruntimes/openj9-openjdk-jdk/issues/820 generic-all
-sun/security/ec/TestEC.java https://github.com/ibmruntimes/openj9-openjdk-jdk/issues/820 linux-ppc64le,linux-s390x,linux-x64,windows-all
+sun/security/ec/TestEC.java https://github.com/ibmruntimes/openj9-openjdk-jdk/issues/820 generic-all
 sun/security/ec/ed/EdCRLSign.java https://github.com/ibmruntimes/openj9-openjdk-jdk/issues/820 generic-all
 sun/security/ec/ed/EdDSAKeyCompatibility.java https://github.com/ibmruntimes/openj9-openjdk-jdk/issues/820 generic-all
 sun/security/ec/ed/EdDSAKeySize.java https://github.com/ibmruntimes/openj9-openjdk-jdk/issues/820 generic-all
@@ -707,17 +708,17 @@ sun/security/ec/xec/TestXDH.java https://github.com/ibmruntimes/openj9-openjdk-j
 sun/security/ec/xec/XECKeyFormat.java https://github.com/ibmruntimes/openj9-openjdk-jdk/issues/820 generic-all
 sun/security/jca/PreferredProviderNegativeTest.java https://github.com/ibmruntimes/openj9-openjdk-jdk/issues/820 generic-all
 sun/security/jca/PreferredProviderTest.java https://github.com/ibmruntimes/openj9-openjdk-jdk/issues/820 generic-all
-sun/security/mscapi/AccessKeyStore.java https://github.com/ibmruntimes/openj9-openjdk-jdk/issues/820 windows-all
-sun/security/mscapi/AllTypes.java https://github.com/ibmruntimes/openj9-openjdk-jdk/issues/820 windows-all
-sun/security/mscapi/DupAlias.java https://github.com/ibmruntimes/openj9-openjdk-jdk/issues/820 windows-all
-sun/security/mscapi/EncodingMutability.java https://github.com/ibmruntimes/openj9-openjdk-jdk/issues/820 windows-all
-sun/security/mscapi/IsSunMSCAPIAvailable.java https://github.com/ibmruntimes/openj9-openjdk-jdk/issues/820 windows-all
-sun/security/mscapi/IterateWindowsRootStore.java https://github.com/ibmruntimes/openj9-openjdk-jdk/issues/820 windows-all
-sun/security/mscapi/KeyStoreCompatibilityMode.java https://github.com/ibmruntimes/openj9-openjdk-jdk/issues/820 windows-all
-sun/security/mscapi/KeytoolChangeAlias.java https://github.com/ibmruntimes/openj9-openjdk-jdk/issues/820 windows-all
-sun/security/mscapi/NullKey.java https://github.com/ibmruntimes/openj9-openjdk-jdk/issues/820 windows-all
-sun/security/mscapi/PrngSerialize.java https://github.com/ibmruntimes/openj9-openjdk-jdk/issues/820 windows-all
-sun/security/mscapi/PrngSlow.java https://github.com/ibmruntimes/openj9-openjdk-jdk/issues/820 windows-all
+sun/security/mscapi/AccessKeyStore.java https://github.com/ibmruntimes/openj9-openjdk-jdk/issues/820 generic-all
+sun/security/mscapi/AllTypes.java https://github.com/ibmruntimes/openj9-openjdk-jdk/issues/820 generic-all
+sun/security/mscapi/DupAlias.java https://github.com/ibmruntimes/openj9-openjdk-jdk/issues/820 generic-all
+sun/security/mscapi/EncodingMutability.java https://github.com/ibmruntimes/openj9-openjdk-jdk/issues/820 generic-all
+sun/security/mscapi/IsSunMSCAPIAvailable.java https://github.com/ibmruntimes/openj9-openjdk-jdk/issues/820 generic-all
+sun/security/mscapi/IterateWindowsRootStore.java https://github.com/ibmruntimes/openj9-openjdk-jdk/issues/820 generic-all
+sun/security/mscapi/KeyStoreCompatibilityMode.java https://github.com/ibmruntimes/openj9-openjdk-jdk/issues/820 generic-all
+sun/security/mscapi/KeytoolChangeAlias.java https://github.com/ibmruntimes/openj9-openjdk-jdk/issues/820 generic-all
+sun/security/mscapi/NullKey.java https://github.com/ibmruntimes/openj9-openjdk-jdk/issues/820 generic-all
+sun/security/mscapi/PrngSerialize.java https://github.com/ibmruntimes/openj9-openjdk-jdk/issues/820 generic-all
+sun/security/mscapi/PrngSlow.java https://github.com/ibmruntimes/openj9-openjdk-jdk/issues/820 generic-all
 sun/security/pkcs/pkcs10/PKCS10AttrEncoding.java https://github.com/ibmruntimes/openj9-openjdk-jdk/issues/820 generic-all
 sun/security/pkcs/pkcs7/PKCS7VerifyTest.java https://github.com/ibmruntimes/openj9-openjdk-jdk/issues/820 generic-all
 sun/security/pkcs/pkcs7/SignerOrder.java https://github.com/ibmruntimes/openj9-openjdk-jdk/issues/820 generic-all
@@ -726,7 +727,7 @@ sun/security/pkcs/pkcs8/TestLeadingZeros.java https://github.com/ibmruntimes/ope
 sun/security/pkcs11/KeyStore/ClientAuth.java https://github.com/ibmruntimes/openj9-openjdk-jdk/issues/820 generic-all
 sun/security/pkcs11/Provider/Absolute.java https://github.com/ibmruntimes/openj9-openjdk-jdk/issues/820 generic-all
 sun/security/pkcs11/SecretKeyFactory/TestPBKD.java https://github.com/ibmruntimes/openj9-openjdk-jdk/issues/820 generic-all
-sun/security/pkcs11/sslecc/ClientJSSEServerJSSE.java https://github.com/ibmruntimes/openj9-openjdk-jdk/issues/820 aix-all,linux-s390x,linux-x64,windows-all
+sun/security/pkcs11/sslecc/ClientJSSEServerJSSE.java https://github.com/ibmruntimes/openj9-openjdk-jdk/issues/820 generic-all
 sun/security/pkcs12/Bug6415637.java https://github.com/ibmruntimes/openj9-openjdk-jdk/issues/820 generic-all
 sun/security/pkcs12/EmptyPassword.java https://github.com/ibmruntimes/openj9-openjdk-jdk/issues/820 generic-all
 sun/security/pkcs12/GetAttributes.java https://github.com/ibmruntimes/openj9-openjdk-jdk/issues/820 generic-all
@@ -816,12 +817,12 @@ sun/security/ssl/AppInputStream/ReadZeroBytes.java https://github.com/ibmruntime
 sun/security/ssl/AppInputStream/RemoveMarkReset.java https://github.com/ibmruntimes/openj9-openjdk-jdk/issues/820 generic-all
 sun/security/ssl/AppOutputStream/NoExceptionOnClose.java https://github.com/ibmruntimes/openj9-openjdk-jdk/issues/820 generic-all
 sun/security/ssl/CertPathRestrictions/TLSRestrictions.java https://github.com/ibmruntimes/openj9-openjdk-jdk/issues/820 generic-all
-sun/security/ssl/CipherSuite/DisabledCurve.java https://github.com/ibmruntimes/openj9-openjdk-jdk/issues/820 linux-ppc64le,linux-s390x,linux-x64,windows-all
+sun/security/ssl/CipherSuite/DisabledCurve.java https://github.com/ibmruntimes/openj9-openjdk-jdk/issues/820 generic-all
 sun/security/ssl/CipherSuite/LegacyConstraints.java https://github.com/ibmruntimes/openj9-openjdk-jdk/issues/820 generic-all
-sun/security/ssl/CipherSuite/NamedGroupsWithCipherSuite.java https://github.com/ibmruntimes/openj9-openjdk-jdk/issues/820 linux-ppc64le,linux-s390x,linux-x64,windows-all
+sun/security/ssl/CipherSuite/NamedGroupsWithCipherSuite.java https://github.com/ibmruntimes/openj9-openjdk-jdk/issues/820 generic-all
 sun/security/ssl/CipherSuite/RestrictNamedGroup.java https://github.com/ibmruntimes/openj9-openjdk-jdk/issues/820 generic-all
 sun/security/ssl/CipherSuite/RestrictSignatureScheme.java https://github.com/ibmruntimes/openj9-openjdk-jdk/issues/820 generic-all
-sun/security/ssl/CipherSuite/SupportedGroups.java https://github.com/ibmruntimes/openj9-openjdk-jdk/issues/820 linux-ppc64le,linux-s390x,linux-x64,windows-all
+sun/security/ssl/CipherSuite/SupportedGroups.java https://github.com/ibmruntimes/openj9-openjdk-jdk/issues/820 generic-all
 sun/security/ssl/ClientHandshaker/CipherSuiteOrder.java https://github.com/ibmruntimes/openj9-openjdk-jdk/issues/820 generic-all
 sun/security/ssl/ClientHandshaker/LengthCheckTest.java https://github.com/ibmruntimes/openj9-openjdk-jdk/issues/820 generic-all
 sun/security/ssl/ClientHandshaker/RSAExport.java https://github.com/ibmruntimes/openj9-openjdk-jdk/issues/820 generic-all
@@ -935,7 +936,7 @@ sun/security/tools/jarsigner/EntriesOrder.java https://github.com/ibmruntimes/op
 sun/security/tools/jarsigner/JarSigningNonAscii.java https://github.com/ibmruntimes/openj9-openjdk-jdk/issues/820 generic-all
 sun/security/tools/jarsigner/LargeJarEntry.java https://github.com/ibmruntimes/openj9-openjdk-jdk/issues/820 generic-all
 sun/security/tools/jarsigner/LineBrokenMultiByteCharacter.java https://github.com/ibmruntimes/openj9-openjdk-jdk/issues/820 generic-all
-sun/security/tools/jarsigner/PreserveRawManifestEntryAndDigest.java https://github.com/ibmruntimes/openj9-openjdk-jdk/issues/820 linux-ppc64le,linux-s390x,linux-x64,windows-all
+sun/security/tools/jarsigner/PreserveRawManifestEntryAndDigest.java https://github.com/ibmruntimes/openj9-openjdk-jdk/issues/820 generic-all
 sun/security/tools/jarsigner/Test4431684.java https://github.com/ibmruntimes/openj9-openjdk-jdk/issues/820 generic-all
 sun/security/tools/jarsigner/TimestampCheck.java https://github.com/ibmruntimes/openj9-openjdk-jdk/issues/820 generic-all
 sun/security/tools/jarsigner/TsacertOptionTest.java https://github.com/ibmruntimes/openj9-openjdk-jdk/issues/820 generic-all
