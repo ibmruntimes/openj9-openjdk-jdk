@@ -208,6 +208,7 @@ java/security/MessageDigest/TestDigestIOStream.java https://github.com/eclipse-o
 java/security/MessageDigest/TestSameLength.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 java/security/MessageDigest/TestSameValue.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 java/security/Policy/ExtensiblePolicy/ExtensiblePolicyTest.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
+java/security/Policy/ExtensiblePolicy/ExtensiblePolicyWithJarTest.java https://github.ibm.com/runtimes/jit-crypto/issues/622 generic-all
 java/security/Policy/GetInstance/GetInstance.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 java/security/Policy/GetInstance/GetInstanceSecurity.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 java/security/Policy/SignedJar/SignedJarTest.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
