@@ -25,7 +25,7 @@
 
 /*
  * ===========================================================================
- * (c) Copyright IBM Corp. 1997, 2023 All Rights Reserved
+ * (c) Copyright IBM Corp. 1997, 2025 All Rights Reserved
  * ===========================================================================
  */
 
@@ -431,6 +431,9 @@ public class URLClassPath {
         for (int i = 0; (loader = getLoader(i)) != null; i++) {
             Resource res = loader.getResource(name);
             if (res != null) {
+                res.setClasspathLoadIndex(i); /* Store the classpath index that this resource came from. */ //OpenJ9-shared_classes_misc
+                /* Update the search path with shared Classes Helper, this is only if we are using shared classes. */ //OpenJ9-shared_classes_misc
+                updateClasspathWithSharedClassesHelper(i);                      //OpenJ9-shared_classes_misc
                 return res;
             }
         }
