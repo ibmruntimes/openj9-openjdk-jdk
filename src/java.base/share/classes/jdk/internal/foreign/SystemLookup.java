@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, 2024, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2021, 2025, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -31,7 +31,18 @@
 
 package jdk.internal.foreign;
 
-import java.lang.foreign.*;
+import jdk.internal.loader.NativeLibraries;
+import jdk.internal.loader.NativeLibrary;
+import jdk.internal.loader.RawNativeLibraries;
+import jdk.internal.util.OperatingSystem;
+import jdk.internal.util.StaticProperty;
+
+import java.lang.foreign.FunctionDescriptor;
+import java.lang.foreign.Linker;
+import java.lang.foreign.MemoryLayout;
+import java.lang.foreign.MemorySegment;
+import java.lang.foreign.SequenceLayout;
+import java.lang.foreign.SymbolLookup;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.nio.file.Files;
@@ -39,11 +50,6 @@ import java.nio.file.Path;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
-import jdk.internal.loader.NativeLibraries;
-import jdk.internal.loader.NativeLibrary;
-import jdk.internal.loader.RawNativeLibraries;
-import jdk.internal.util.OperatingSystem;
-import jdk.internal.util.StaticProperty;
 
 import static java.lang.foreign.ValueLayout.ADDRESS;
 
