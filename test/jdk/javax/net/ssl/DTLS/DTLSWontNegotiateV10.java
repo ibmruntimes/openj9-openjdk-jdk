@@ -56,7 +56,7 @@ public class DTLSWontNegotiateV10 {
     public static void main(String[] args) throws Exception {
 
         if (args[0].equals(DTLSV_1_0) 
-        && !(Utils.isFIPS())) {
+        && !(SecurityUtils.isFIPS())) {
             SecurityUtils.removeFromDisabledTlsAlgs(DTLSV_1_0);
         }
 
@@ -80,7 +80,7 @@ public class DTLSWontNegotiateV10 {
                 } catch (SocketTimeoutException exc) {
                     System.out.println("The server timed-out waiting for packets from the client.");
                 } catch (javax.net.ssl.SSLHandshakeException sslhe) {
-                    if (Utils.isFIPS()) {
+                    if (SecurityUtils.isFIPS()) {
                         if(!SecurityUtils.TLS_PROTOCOLS.contains(args[0])) {
                             if ("No appropriate protocol (protocol is disabled or cipher suites are inappropriate)".equals(sslhe.getMessage())) {
                                 System.out.println("Expected exception msg: <No appropriate protocol (protocol is disabled or cipher suites are inappropriate)> is caught");

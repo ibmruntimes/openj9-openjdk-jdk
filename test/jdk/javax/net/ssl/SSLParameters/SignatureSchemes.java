@@ -94,7 +94,7 @@ public class SignatureSchemes extends SSLSocketTemplate {
     }
 
     public static void main(String[] args) throws Exception {
-        if (!(Utils.isFIPS())) {
+        if (!(SecurityUtils.isFIPS())) {
             Security.setProperty("jdk.tls.disabledAlgorithms", "");
         }
 

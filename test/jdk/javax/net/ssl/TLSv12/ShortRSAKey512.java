@@ -171,7 +171,7 @@ public class ShortRSAKey512 extends SSLContextTemplate {
     public static void main(String[] args) throws Exception {
         // reset the security property to make sure that the algorithms
         // and keys used in this test are not disabled.
-        if (!(Utils.isFIPS())) {
+        if (!(SecurityUtils.isFIPS())) {
             Security.setProperty("jdk.certpath.disabledAlgorithms", "MD2");
             Security.setProperty("jdk.tls.disabledAlgorithms",
                     "SSLv3, RC4, DH keySize < 768");
@@ -191,7 +191,7 @@ public class ShortRSAKey512 extends SSLContextTemplate {
         try {
             new ShortRSAKey512();
         } catch (java.security.spec.InvalidKeySpecException ikse) {
-            if (Utils.isFIPS()) {
+            if (SecurityUtils.isFIPS()) {
                 System.out.println("Inappropriate key specification: RSA keys must be at least 1024 bits long");
                 return;
             }

@@ -169,7 +169,7 @@ public class TestEnabledProtocols extends SSLSocketTemplate {
     }
 
     public static void main(String[] args) throws Exception {
-        if (!(Utils.isFIPS())) {
+        if (!(SecurityUtils.isFIPS())) {
                 Security.setProperty("jdk.tls.disabledAlgorithms", "");
                 runCase(new String[] { "TLSv1" },
                         new String[] { "TLSv1" },

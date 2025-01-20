@@ -76,7 +76,7 @@ public class DTLSNamedGroups extends DTLSOverDatagram {
     }
 
     public static void main(String[] args) throws Exception {
-        if (!(Utils.isFIPS())) {
+        if (!(SecurityUtils.isFIPS())) {
                 Security.setProperty("jdk.tls.disabledAlgorithms", "");
         }
 

@@ -241,7 +241,7 @@ public class SSLSocketExplorer {
     public static void main(String[] args) throws Exception {
         // reset the security property to make sure that the algorithms
         // and keys used in this test are not disabled.
-        if (!(Utils.isFIPS())) {
+        if (!(SecurityUtils.isFIPS())) {
             Security.setProperty("jdk.tls.disabledAlgorithms", "");
         }
 
@@ -252,9 +252,9 @@ public class SSLSocketExplorer {
             System.getProperty("test.src", ".") + "/" + pathToStores +
                 "/" + trustStoreFile;
 
-        if (Utils.isFIPS()) {
-            keyFilename = Utils.revertJKSToPKCS12(keyFilename, passwd);
-            trustFilename = Utils.revertJKSToPKCS12(trustFilename, passwd);
+        if (SecurityUtils.isFIPS()) {
+            keyFilename = SecurityUtils.revertJKSToPKCS12(keyFilename, passwd);
+            trustFilename = SecurityUtils.revertJKSToPKCS12(trustFilename, passwd);
         }
 
         System.setProperty("javax.net.ssl.keyStore", keyFilename);
@@ -276,7 +276,7 @@ public class SSLSocketExplorer {
         try {
             new SSLSocketExplorer();
         } catch (javax.net.ssl.SSLHandshakeException sslhe) {
-            if (Utils.isFIPS()) {
+            if (SecurityUtils.isFIPS()) {
                 if (supportedProtocols == null || supportedProtocols.length == 0) {
                     if ("No appropriate protocol (protocol is disabled or cipher suites are inappropriate)".equals(sslhe.getMessage())) {
                         System.out.println("Expected exception msg: <No appropriate protocol (protocol is disabled or cipher suites are inappropriate)> is caught");

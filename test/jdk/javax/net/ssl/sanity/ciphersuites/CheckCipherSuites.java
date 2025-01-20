@@ -261,7 +261,7 @@ public class CheckCipherSuites {
         String[] SUPPORTED;
         String[] FIPS;
                 
-        if (Utils.isFIPS()) {
+        if (SecurityUtils.isFIPS()) {
             ENABLED = ENABLED_FIPS;
             SUPPORTED = SUPPORTED_FIPS;
         } else if (args[0].equals("default")) {

@@ -558,7 +558,7 @@ public class TLSWithEdDSA extends SSLSocketTemplate {
     }
 
     public static void main(String[] args) throws Exception {
-        if (!(Utils.isFIPS())) {
+        if (!(SecurityUtils.isFIPS())) {
             SecurityUtils.removeFromDisabledTlsAlgs("TLSv1.1", "TLSv1");
         }
         certFac = CertificateFactory.getInstance("X.509");
@@ -569,7 +569,7 @@ public class TLSWithEdDSA extends SSLSocketTemplate {
             testKeyManager(DEF_ALL_EE, "EdDSA",
                     new String[] {"ee_ed25519", "ee_ed448"});
         } catch (NoSuchAlgorithmException nsae) {
-            if (Utils.isFIPS()) {
+            if (SecurityUtils.isFIPS()) {
                 if ("EdDSA KeyFactory not available".equals(nsae.getMessage())){
                     System.out.println("Expected exception msg: <EdDSA KeyFactory not available> is caught.");
                     return;
@@ -639,7 +639,7 @@ public class TLSWithEdDSA extends SSLSocketTemplate {
     private static void runtest(String testNameFmt, SessionChecker cliChk,
             Class<? extends Throwable> cliExpExc, SessionChecker servChk,
             Class<? extends Throwable> servExpExc) {
-        // if (!(Utils.isFIPS())) {
+        // if (!(SecurityUtils.isFIPS())) {
         //     TEST_PROTOS = List.of(
         //         "TLSv1.3", "TLSv1.2");
         // }

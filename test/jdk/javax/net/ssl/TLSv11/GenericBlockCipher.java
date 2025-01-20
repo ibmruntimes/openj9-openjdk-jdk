@@ -174,7 +174,7 @@ public class GenericBlockCipher {
 
     public static void main(String[] args) throws Exception {
         // Re-enable TLSv1.1 since test depends on it.
-        if (!(Utils.isFIPS())) {
+        if (!(SecurityUtils.isFIPS())) {
             // Re-enable TLSv1.1 and TLS_RSA_* since test depends on it.
             SecurityUtils.removeFromDisabledTlsAlgs("TLSv1.1", "TLS_RSA_*");
         }
@@ -200,7 +200,7 @@ public class GenericBlockCipher {
         try {
             new GenericBlockCipher();
         } catch (javax.net.ssl.SSLHandshakeException sslhe) {
-            if (Utils.isFIPS()) {
+            if (SecurityUtils.isFIPS()) {
                 if ("No appropriate protocol (protocol is disabled or cipher suites are inappropriate)".equals(sslhe.getMessage())) {
                     System.out.println("Expected exception msg: <No appropriate protocol (protocol is disabled or cipher suites are inappropriate)> is caught");
                     return;

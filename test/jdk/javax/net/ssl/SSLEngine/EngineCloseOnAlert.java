@@ -66,7 +66,7 @@ public class EngineCloseOnAlert {
     }
 
     public static void main(String[] args) throws Exception {
-        if (!(Utils.isFIPS())) {
+        if (!(SecurityUtils.isFIPS())) {
             // Re-enable TLS_RSA_* since test depends on it.
             SecurityUtils.removeFromDisabledTlsAlgs("TLS_RSA_*");
         }

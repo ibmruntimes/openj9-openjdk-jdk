@@ -59,7 +59,7 @@ public class TLSCipherSuitesOrder extends SSLSocketTemplate {
     private final String[] clientcipherSuites;
 
     public static void main(String[] args) {
-        if (!(Utils.isFIPS())) {
+        if (!(SecurityUtils.isFIPS())) {
             // Re-enable TLS_RSA_* since test depends on it.
             SecurityUtils.removeFromDisabledTlsAlgs("TLS_RSA_*");
         }
@@ -75,7 +75,7 @@ public class TLSCipherSuitesOrder extends SSLSocketTemplate {
                     protocol.getCipherSuite(args[1]),
                     protocol.getCipherSuite(args[2])).run();
         } catch (javax.net.ssl.SSLHandshakeException sslex) {
-            if (Utils.isFIPS()) {
+            if (SecurityUtils.isFIPS()) {
                 if (!SecurityUtils.TLS_PROTOCOLS.contains(args[0])) {
                     System.out.println(args[0] + " is not supported in FIPS 140-3.");
                 }
@@ -99,7 +99,7 @@ public class TLSCipherSuitesOrder extends SSLSocketTemplate {
     private TLSCipherSuitesOrder(String protocol, String[] clientcipherSuites,
             String[] servercipherSuites) {
         // Re-enable protocol if it is disabled.
-        if (!Utils.isFIPS()) {
+        if (!SecurityUtils.isFIPS()) {
             if (protocol.equals("TLSv1") || protocol.equals("TLSv1.1")) {
                 SecurityUtils.removeFromDisabledTlsAlgs(protocol);
             }

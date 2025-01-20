@@ -24,16 +24,20 @@
 package jdk.test.lib.security;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.security.Key;
 import java.security.KeyStore;
 import java.security.Security;
-import java.util.Arrays;
-import java.util.List;
+import java.security.cert.Certificate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import jdk.test.lib.security.DiffieHellmanGroup;
 import java.util.*;
+
+import java.util.Enumeration;
 
 /**
  * Common library for various security test helper functions.
@@ -236,4 +240,52 @@ public final class SecurityUtils {
         TLS_CIPHERSUITES.put("TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256", "TLSv1.2");
         TLS_CIPHERSUITES.put("TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256", "TLSv1.2");
     }
+
+    public static final String isFIPS = System.getProperty("semeru.fips");
+    public static boolean isFIPS() {
+        System.out.println("semeru.fips is: " + System.getProperty("semeru.fips"));
+        return Boolean.parseBoolean(isFIPS);
+    }
+
+    public static final String FIPS_PROFILE = System.getProperty("semeru.customprofile");
+    public static String getFipsProfile() {
+        System.out.println("semeru.customprofile is: " + System.getProperty("semeru.customprofile"));
+        return FIPS_PROFILE;
+    }
+
+    public static String revertJKSToPKCS12(String keyFilename, String passwd) {
+        String p12keyFilename = keyFilename + ".p12";
+        try {
+            KeyStore jksKeystore = KeyStore.getInstance("JKS");
+            try (FileInputStream fis = new FileInputStream(keyFilename)) {
+                jksKeystore.load(fis, passwd.toCharArray());
+            }
+
+            KeyStore pkcs12Keystore = KeyStore.getInstance("PKCS12");
+            pkcs12Keystore.load(null, null);
+
+            Enumeration<String> aliasesKey = jksKeystore.aliases();
+            while (aliasesKey.hasMoreElements()) {
+                String alias = aliasesKey.nextElement();
+                if (jksKeystore.isKeyEntry(alias)) {
+                    char[] keyPassword = passwd.toCharArray();
+                    Key key = jksKeystore.getKey(alias, keyPassword);
+                    Certificate[] chain = jksKeystore.getCertificateChain(alias);
+                    pkcs12Keystore.setKeyEntry(alias, key, passwd.toCharArray(), chain);
+                } else if (jksKeystore.isCertificateEntry(alias)) {
+                    Certificate cert = jksKeystore.getCertificate(alias);
+                    pkcs12Keystore.setCertificateEntry(alias, cert);
+                }
+            }
+
+            try (FileOutputStream fos = new FileOutputStream(p12keyFilename)) {
+                pkcs12Keystore.store(fos, passwd.toCharArray());
+            }
+            System.out.println("JKS keystore converted to PKCS12 successfully.");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return p12keyFilename;
+    }
+
 }

@@ -137,7 +137,7 @@ public class SignatureAlgorithms extends SSLContextTemplate {
         }
         Cert[] trustedCerts;
 
-        if (Utils.isFIPS()) {
+        if (SecurityUtils.isFIPS()) {
             trustedCerts = new Cert[]{Cert.CA_RSA_2048};
         } else {
             trustedCerts = new Cert[]{Cert.CA_DSA_SHA1_1024};
@@ -271,7 +271,7 @@ public class SignatureAlgorithms extends SSLContextTemplate {
             return;
         }
 
-        if (!(Utils.isFIPS())) {
+        if (!(SecurityUtils.isFIPS())) {
             /*
             * Expose the target algorithms by diabling unexpected algorithms.
             */

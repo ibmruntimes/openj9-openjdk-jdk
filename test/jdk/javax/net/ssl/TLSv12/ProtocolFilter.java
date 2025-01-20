@@ -95,7 +95,7 @@ public class ProtocolFilter {
             (SSLServerSocket) sslssf.createServerSocket(serverPort);
 
         // Only enable cipher suites for TLS v1.2.
-        if (Utils.isFIPS()) {
+        if (SecurityUtils.isFIPS()) {
             sslServerSocket.setEnabledCipherSuites(
                 new String[]{"TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256"});
         } else {
@@ -166,7 +166,7 @@ public class ProtocolFilter {
     volatile Exception clientException = null;
 
     public static void main(String[] args) throws Exception {
-        if (!(Utils.isFIPS())) {
+        if (!(SecurityUtils.isFIPS())) {
             // Re-enable TLS_RSA_* since test depends on it.
             SecurityUtils.removeFromDisabledTlsAlgs("TLS_RSA_*");
         }
@@ -178,9 +178,9 @@ public class ProtocolFilter {
             System.getProperty("test.src", ".") + "/" + pathToStores +
                 "/" + trustStoreFile;
 
-        if (Utils.isFIPS()) {
-            keyFilename = Utils.revertJKSToPKCS12(keyFilename, passwd);
-            trustFilename = Utils.revertJKSToPKCS12(trustFilename, passwd);
+        if (SecurityUtils.isFIPS()) {
+            keyFilename = SecurityUtils.revertJKSToPKCS12(keyFilename, passwd);
+            trustFilename = SecurityUtils.revertJKSToPKCS12(trustFilename, passwd);
         }
 
         System.setProperty("javax.net.ssl.keyStore", keyFilename);

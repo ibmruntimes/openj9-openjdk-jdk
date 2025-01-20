@@ -76,7 +76,7 @@ public class ClientHelloKeyShares {
         List<Integer> expectedKeyShares = new ArrayList<>();
         Arrays.stream(args).forEach(arg ->
                 expectedKeyShares.add(Integer.valueOf(arg)));
-        if (Utils.isFIPS()) {
+        if (SecurityUtils.isFIPS()) {
             expectedKeyShares.clear();
             Map<String, Integer> supportKeyShares = new HashMap<>();
             supportKeyShares.put("secp256r1", 23);
@@ -110,7 +110,7 @@ public class ClientHelloKeyShares {
         } catch (java.lang.ExceptionInInitializerError eiie) {
             Throwable cause = eiie.getCause();
             if (cause instanceof java.lang.IllegalArgumentException) {
-                if (Utils.isFIPS() 
+                if (SecurityUtils.isFIPS() 
                 && ("System property jdk.tls.namedGroups(" + System.getProperty("jdk.tls.namedGroups") + ") contains no supported named groups").equals(cause.getMessage())) {
                     System.out.println("Expected msg is caught.");
                     return;

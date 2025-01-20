@@ -58,7 +58,7 @@ public class TestSessionLocalPrincipal {
 
     public static void main(String[] args) throws Exception {
         String[] protocols = new String[]{"TLSv1.3", "TLSv1.2", "TLSv1.1", "TLSv1"};
-        if (!(Utils.isFIPS())) {
+        if (!(SecurityUtils.isFIPS())) {
             Security.setProperty("jdk.tls.disabledAlgorithms", "");
         } 
         for (String tlsProtocol : protocols) {
@@ -79,7 +79,7 @@ public class TestSessionLocalPrincipal {
                         throw new RuntimeException(server.serverExc);
                     }
                 } catch (java.lang.RuntimeException re) {
-                    if (Utils.isFIPS()) {
+                    if (SecurityUtils.isFIPS()) {
                         if (!SecurityUtils.TLS_PROTOCOLS.contains(tlsProtocol)) {
                             if (server.serverExc != null) {
                                 if (server.serverExc instanceof javax.net.ssl.SSLHandshakeException) {

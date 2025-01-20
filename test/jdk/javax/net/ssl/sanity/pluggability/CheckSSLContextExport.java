@@ -49,7 +49,7 @@ public class CheckSSLContextExport extends Provider {
 
         String providerName = mySSLContext.getProvider().getName();
         if (!providerName.equals("TestJSSEPluggability")) {
-            if (!(Utils.isFIPS())) {
+            if (!(SecurityUtils.isFIPS())) {
                 System.out.println(providerName + "'s SSLContext is used");
                 throw new Exception("...used the wrong provider: " + providerName);
             } else {
@@ -123,7 +123,7 @@ public class CheckSSLContextExport extends Provider {
                 try {
                     test(protocols[i]);
                 } catch (java.lang.IllegalStateException ise) {
-                    if (Utils.isFIPS()) {
+                    if (SecurityUtils.isFIPS()) {
                         if (protocols[i].equals("SSL") && "SSLContext is not initialized".equals(ise.getMessage())) {
                             System.out.println("SSL is not supported in FIPS140-3.");
                             continue;

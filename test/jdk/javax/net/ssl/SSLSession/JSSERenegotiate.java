@@ -42,6 +42,7 @@ import java.security.Security;
 import javax.net.ssl.*;
 
 import jdk.test.lib.Utils;
+import jdk.test.lib.security.SecurityUtils;
 
 public class JSSERenegotiate {
 
@@ -196,7 +197,7 @@ public class JSSERenegotiate {
     public static void main(String[] args) throws Exception {
         // reset the security property to make sure that the cipher suites
         // used in this test are not disabled
-        if (!(Utils.isFIPS())) {
+        if (!(SecurityUtils.isFIPS())) {
             Security.setProperty("jdk.tls.disabledAlgorithms", "");
         }
 
@@ -207,9 +208,9 @@ public class JSSERenegotiate {
             System.getProperty("test.src", "./") + "/" + pathToStores +
                 "/" + trustStoreFile;
 
-        if (Utils.isFIPS()) {
-            keyFilename = Utils.revertJKSToPKCS12(keyFilename, passwd);
-            trustFilename = Utils.revertJKSToPKCS12(trustFilename, passwd);
+        if (SecurityUtils.isFIPS()) {
+            keyFilename = SecurityUtils.revertJKSToPKCS12(keyFilename, passwd);
+            trustFilename = SecurityUtils.revertJKSToPKCS12(trustFilename, passwd);
             suite1 = "TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256";
             suite2 = "TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384";
         } else {

@@ -41,6 +41,7 @@ import javax.net.ssl.*;
 import java.util.Arrays;
 
 import jdk.test.lib.Utils;
+import jdk.test.lib.security.SecurityUtils;
 
 public class UseCipherSuitesOrder {
 
@@ -177,7 +178,7 @@ public class UseCipherSuitesOrder {
             throw new Exception("Need to enable at least two cipher suites");
         }
 
-        if (Utils.isFIPS()) {
+        if (SecurityUtils.isFIPS()) {
             cliEnabledCipherSuites = new String[] { "TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256", "TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384"};
         }
 
@@ -204,7 +205,7 @@ public class UseCipherSuitesOrder {
     public static void main(String[] args) throws Exception {
         // reset the security property to make sure that the algorithms
         // and keys used in this test are not disabled.
-        if (!(Utils.isFIPS())) {
+        if (!(SecurityUtils.isFIPS())) {
             Security.setProperty("jdk.tls.disabledAlgorithms", "");
         }
 
@@ -218,9 +219,9 @@ public class UseCipherSuitesOrder {
             System.getProperty("test.src", ".") + "/" + pathToStores +
                 "/" + trustStoreFile;
 
-        if (Utils.isFIPS()) {
-            keyFilename = Utils.revertJKSToPKCS12(keyFilename, passwd);
-            trustFilename = Utils.revertJKSToPKCS12(trustFilename, passwd);
+        if (SecurityUtils.isFIPS()) {
+            keyFilename = SecurityUtils.revertJKSToPKCS12(keyFilename, passwd);
+            trustFilename = SecurityUtils.revertJKSToPKCS12(trustFilename, passwd);
         }
 
         System.setProperty("javax.net.ssl.keyStore", keyFilename);
