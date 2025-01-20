@@ -92,7 +92,7 @@ public class TestAllSuites {
     private void test() throws Exception {
         List<String> tmpCipherSuites = new ArrayList<>();
         String [] suites;
-        if (Utils.isFIPS()) {
+        if (SecurityUtils.isFIPS()) {
             for (String ciphersuite : clientEngine.getEnabledCipherSuites()) {
                 if (!SecurityUtils.TLS_CIPHERSUITES.containsKey(ciphersuite)) {
                     continue;
@@ -243,7 +243,7 @@ public class TestAllSuites {
         if (args.length < 1) {
             throw new RuntimeException("Missing TLS protocol parameter.");
         }
-        if (!(Utils.isFIPS())) {
+        if (!(SecurityUtils.isFIPS())) {
             switch(args[0]) {
                 case "TLSv1.1" -> SecurityUtils.removeFromDisabledTlsAlgs("TLSv1.1");
                 case "TLSv1.3" -> SecurityUtils.addToDisabledTlsAlgs("TLSv1.2");

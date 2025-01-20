@@ -39,7 +39,7 @@ public class ClientJSSEServerJSSE {
     public static void main(String[] args) throws Exception {
         // reset security properties to make sure that the algorithms
         // and keys used in this test are not disabled.
-        if (!(Utils.isFIPS())) {
+        if (!(SecurityUtils.isFIPS())) {
             Security.setProperty("jdk.tls.disabledAlgorithms", "");
             Security.setProperty("jdk.certpath.disabledAlgorithms", "");
         }

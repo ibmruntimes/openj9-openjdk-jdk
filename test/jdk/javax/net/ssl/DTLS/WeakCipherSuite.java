@@ -55,7 +55,7 @@ public class WeakCipherSuite extends DTLSOverDatagram {
     public static void main(String[] args) throws Exception {
         // reset security properties to make sure that the algorithms
         // and keys used in this test are not disabled.
-        if (!(Utils.isFIPS())) {
+        if (!(SecurityUtils.isFIPS())) {
             Security.setProperty("jdk.tls.disabledAlgorithms", "");
             Security.setProperty("jdk.certpath.disabledAlgorithms", "");
         }
@@ -66,7 +66,7 @@ public class WeakCipherSuite extends DTLSOverDatagram {
         try {
             testCase.runTest(testCase);
         } catch (javax.net.ssl.SSLHandshakeException sslhe) {
-            if (Utils.isFIPS()) {
+            if (SecurityUtils.isFIPS()) {
                 if(!SecurityUtils.TLS_CIPHERSUITES.containsKey(cipherSuite)) {
                     if ("No appropriate protocol (protocol is disabled or cipher suites are inappropriate)".equals(sslhe.getMessage())) {
                         System.out.println("Expected exception msg: <No appropriate protocol (protocol is disabled or cipher suites are inappropriate)> is caught");

@@ -65,7 +65,7 @@ public class DisabledShortRSAKeys extends SSLSocketTemplate {
 
     @Override
     public SSLContext createClientSSLContext() throws Exception {
-        if (Utils.isFIPS()) {
+        if (SecurityUtils.isFIPS()) {
             return createSSLContext(new Cert[]{Cert.CA_RSA_2048}, null,
                 new ContextParameters(enabledProtocol, tmAlgorithm, "NewSunX509"));
         } else {
@@ -76,7 +76,7 @@ public class DisabledShortRSAKeys extends SSLSocketTemplate {
 
     @Override
     public SSLContext createServerSSLContext() throws Exception {
-        if (Utils.isFIPS()) {
+        if (SecurityUtils.isFIPS()) {
             return createSSLContext(new Cert[]{Cert.EE_RSA_2048}, null,
                 new ContextParameters(enabledProtocol, tmAlgorithm, "NewSunX509"));
         } else {
@@ -121,7 +121,7 @@ public class DisabledShortRSAKeys extends SSLSocketTemplate {
     }
 
     public static void main(String[] args) throws Exception {
-        if (!(Utils.isFIPS())) {
+        if (!(SecurityUtils.isFIPS())) {
             Security.setProperty("jdk.certpath.disabledAlgorithms",
                     "RSA keySize < 1024");
             Security.setProperty("jdk.tls.disabledAlgorithms",

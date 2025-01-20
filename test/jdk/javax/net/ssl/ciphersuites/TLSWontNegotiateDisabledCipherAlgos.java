@@ -60,7 +60,7 @@ public class TLSWontNegotiateDisabledCipherAlgos {
 
     public static void main(String [] args) throws Exception {
         boolean useDisabledAlgo = Boolean.parseBoolean(args[1]);
-        if (useDisabledAlgo && !(Utils.isFIPS())) {
+        if (useDisabledAlgo && !(SecurityUtils.isFIPS())) {
             Security.setProperty("jdk.tls.disabledAlgorithms", "");
         }
 

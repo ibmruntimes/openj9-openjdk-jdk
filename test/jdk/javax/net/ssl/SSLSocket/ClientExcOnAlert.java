@@ -213,7 +213,7 @@ public class ClientExcOnAlert {
         SSLContext sslc = SSLContext.getInstance("TLS");
         log("doServerSide start");
         KeyManagerFactory kmf;
-        if (!(Utils.isFIPS())) {
+        if (!(SecurityUtils.isFIPS())) {
             kmf = createKeyManagerFactory(KEYSTORE_PEM,
                 KEYSTORE_PASS);
         } else {

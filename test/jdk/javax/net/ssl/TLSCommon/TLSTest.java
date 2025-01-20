@@ -161,7 +161,7 @@ public class TLSTest {
         final String tlsProtocol = args[0];
         final KeyType keyType = KeyType.valueOf(args[1]);
         final String cipher = args[2];
-        if (!(Utils.isFIPS())) {
+        if (!(SecurityUtils.isFIPS())) {
             Security.setProperty("jdk.tls.disabledAlgorithms", "");
         }
 
@@ -174,7 +174,7 @@ public class TLSTest {
         try {
             new Client(tlsProtocol, keyType, cipher, server.port).doClientSide();
         } catch (javax.net.ssl.SSLHandshakeException sslhe) {
-            if (Utils.isFIPS()) {
+            if (SecurityUtils.isFIPS()) {
                 if (!SecurityUtils.TLS_PROTOCOLS.contains(tlsProtocol)) {
                     System.out.println(tlsProtocol + " is not available from Client side.");
                 } 
@@ -200,7 +200,7 @@ public class TLSTest {
         } catch (java.lang.ExceptionInInitializerError eiie) {
             Throwable cause = eiie.getCause();
             if (cause instanceof java.lang.IllegalArgumentException) {
-                if (Utils.isFIPS() 
+                if (SecurityUtils.isFIPS() 
                 && ("System property jdk.tls.namedGroups(" + System.getProperty("jdk.tls.namedGroups") + ") contains no supported named groups").equals(cause.getMessage())) {
                     System.out.println("Expected msg is caught from Client side.");
                     return;
@@ -208,7 +208,7 @@ public class TLSTest {
             }
         }
         if (server.serverExc != null) {
-            if (Utils.isFIPS()) {
+            if (SecurityUtils.isFIPS()) {
                 if (!SecurityUtils.TLS_PROTOCOLS.contains(tlsProtocol)) {
                     System.out.println(tlsProtocol + " is not available from Server side.");
                 } 

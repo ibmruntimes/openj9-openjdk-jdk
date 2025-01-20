@@ -61,7 +61,7 @@ public class ConcurrentClientAccessTest {
 
     public static void main(String[] args) throws Exception {
         String[] protocols = new String[]{"TLSv1.3", "TLSv1.2", "TLSv1.1", "TLSv1"};
-        if (!(Utils.isFIPS())) {
+        if (!(SecurityUtils.isFIPS())) {
             Security.setProperty("jdk.tls.disabledAlgorithms", "");
         } 
         // else {
@@ -126,7 +126,7 @@ public class ConcurrentClientAccessTest {
                 }
                 System.out.println();
             } catch (java.lang.RuntimeException re) {
-                if (Utils.isFIPS()) {
+                if (SecurityUtils.isFIPS()) {
                     if (!SecurityUtils.TLS_PROTOCOLS.contains(tlsProtocol)) {
                         if (server.exception != null) {
                             if (server.exception instanceof javax.net.ssl.SSLHandshakeException) {

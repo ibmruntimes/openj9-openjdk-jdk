@@ -56,6 +56,7 @@ import java.util.Base64;
 import java.io.ByteArrayInputStream;
 
 import jdk.test.lib.Utils;
+import jdk.test.lib.security.SecurityUtils;
 
 // Note: this test case works only on TLS 1.2 and prior versions because of
 // the use of MD5withRSA signed certificate.
@@ -439,7 +440,7 @@ public class SSLSocketSNISensitive {
 
     public static void main(String[] args) throws Exception {
         // MD5 is used in this test case, don't disable MD5 algorithm.
-        if (!(Utils.isFIPS())) {
+        if (!(SecurityUtils.isFIPS())) {
             Security.setProperty("jdk.certpath.disabledAlgorithms",
                     "MD2, RSA keySize < 1024");
             Security.setProperty("jdk.tls.disabledAlgorithms",
@@ -460,7 +461,7 @@ public class SSLSocketSNISensitive {
         try {
             new SSLSocketSNISensitive();
         } catch (Exception e) {
-            if (Utils.isFIPS()) {
+            if (SecurityUtils.isFIPS()) {
                 // for (int i=0; i<signatureAlgos.length; i++) {
                 //     if (signatureAlgos[i].contains("MD5") 
                 //      && e instanceof javax.net.ssl.SSLHandshakeException

@@ -55,6 +55,7 @@ import java.security.Security;
 import java.security.cert.Certificate;
 
 import jdk.test.lib.Utils;
+import jdk.test.lib.security.SecurityUtils;
 
 public class CriticalSubjectAltName implements HostnameVerifier {
     /*
@@ -162,7 +163,7 @@ public class CriticalSubjectAltName implements HostnameVerifier {
 
     public static void main(String[] args) throws Exception {
         // MD5 is used in this test case, don't disable MD5 algorithm.
-        if (!(Utils.isFIPS())) {
+        if (!(SecurityUtils.isFIPS())) {
             Security.setProperty("jdk.certpath.disabledAlgorithms",
                     "MD2, RSA keySize < 1024");
             Security.setProperty("jdk.tls.disabledAlgorithms",
@@ -176,9 +177,9 @@ public class CriticalSubjectAltName implements HostnameVerifier {
             System.getProperty("test.src", "./") + "/" + pathToStores +
                 "/" + trustStoreFile;
 
-        if (Utils.isFIPS()) {
-            keyFilename = Utils.revertJKSToPKCS12(keyFilename, passwd);
-            trustFilename = Utils.revertJKSToPKCS12(trustFilename, passwd);
+        if (SecurityUtils.isFIPS()) {
+            keyFilename = SecurityUtils.revertJKSToPKCS12(keyFilename, passwd);
+            trustFilename = SecurityUtils.revertJKSToPKCS12(trustFilename, passwd);
         }
 
         System.setProperty("javax.net.ssl.keyStore", keyFilename);
@@ -195,7 +196,7 @@ public class CriticalSubjectAltName implements HostnameVerifier {
         try {
             new CriticalSubjectAltName();
         } catch (Exception e) {
-            if (Utils.isFIPS()) {
+            if (SecurityUtils.isFIPS()) {
                 if (e instanceof java.security.cert.CertPathValidatorException) {
                     if ("Algorithm constraints check failed on signature algorithm: MD5withRSA".equals(e.getMessage())) {
                         System.out.println("MD5withRSA is not a supported signature algorithm.");

@@ -189,7 +189,7 @@ public class Arrays {
         contextVersion = args[0];
         // Re-enable context version if it is disabled.
         // If context version is SSLv3, TLSv1 needs to be re-enabled.
-        if (!(Utils.isFIPS())) {
+        if (!(SecurityUtils.isFIPS())) {
             if (contextVersion.equals("SSLv3")) {
                 SecurityUtils.removeFromDisabledTlsAlgs("TLSv1");
             } else if (contextVersion.equals("TLSv1") ||
@@ -207,7 +207,7 @@ public class Arrays {
         try {
             test.runTest();
         } catch (javax.net.ssl.SSLHandshakeException sslhe) {
-            if (Utils.isFIPS()) {
+            if (SecurityUtils.isFIPS()) {
                 if(!SecurityUtils.TLS_PROTOCOLS.contains(contextVersion)) {
                     if ("No appropriate protocol (protocol is disabled or cipher suites are inappropriate)".equals(sslhe.getMessage())) {
                         System.out.println("Expected exception msg: <No appropriate protocol (protocol is disabled or cipher suites are inappropriate)> is caught");

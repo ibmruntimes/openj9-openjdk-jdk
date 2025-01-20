@@ -176,7 +176,7 @@ public class DisabledShortDSAKeys extends SSLContextTemplate {
     volatile Exception clientException = null;
 
     public static void main(String[] args) throws Exception {
-        if (!(Utils.isFIPS())) {
+        if (!(SecurityUtils.isFIPS())) {
             Security.setProperty("jdk.certpath.disabledAlgorithms",
                         "DSA keySize < 1024");
             Security.setProperty("jdk.tls.disabledAlgorithms",

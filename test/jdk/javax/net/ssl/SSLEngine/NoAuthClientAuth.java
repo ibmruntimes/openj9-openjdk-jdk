@@ -144,7 +144,7 @@ public class NoAuthClientAuth {
      * Main entry point for this test.
      */
     public static void main(String args[]) throws Exception {
-        if (!(Utils.isFIPS())) {
+        if (!(SecurityUtils.isFIPS())) {
             Security.setProperty("jdk.tls.disabledAlgorithms", "");
             tlsProtocol = args[0];
         } else {
@@ -164,7 +164,7 @@ public class NoAuthClientAuth {
         try {
             test.runTest();
         } catch (java.lang.IllegalArgumentException iae) {
-            if (Utils.isFIPS()) {
+            if (SecurityUtils.isFIPS()) {
                 if (tlsProtocol == null) {
                     if ("Unsupported protocolnull".equals(iae.getMessage())) {
                         System.out.println("Expected exception msg: <Unsupported protocolnull> is caught");

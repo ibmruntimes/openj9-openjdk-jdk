@@ -53,6 +53,7 @@ import java.net.*;
 import javax.net.ssl.*;
 
 import jdk.test.lib.Utils;
+import jdk.test.lib.security.SecurityUtils;
 
 public class SSLSocketExplorerMatchedSNI {
 
@@ -294,9 +295,9 @@ public class SSLSocketExplorerMatchedSNI {
             System.getProperty("test.src", ".") + "/" + pathToStores +
                 "/" + trustStoreFile;
 
-        if (Utils.isFIPS()) {
-            keyFilename = Utils.revertJKSToPKCS12(keyFilename, passwd);
-            trustFilename = Utils.revertJKSToPKCS12(trustFilename, passwd);
+        if (SecurityUtils.isFIPS()) {
+            keyFilename = SecurityUtils.revertJKSToPKCS12(keyFilename, passwd);
+            trustFilename = SecurityUtils.revertJKSToPKCS12(trustFilename, passwd);
         }
 
         System.setProperty("javax.net.ssl.keyStore", keyFilename);

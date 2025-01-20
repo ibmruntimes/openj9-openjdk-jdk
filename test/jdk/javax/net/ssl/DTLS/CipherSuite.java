@@ -69,7 +69,7 @@ public class CipherSuite extends DTLSOverDatagram {
 
     public static void main(String[] args) throws Exception {
         if (args.length > 1 && "re-enable".equals(args[1]) 
-        && !(Utils.isFIPS())) {
+        && !(SecurityUtils.isFIPS())) {
             Security.setProperty("jdk.tls.disabledAlgorithms", "");
             reenable = true;
         }
@@ -80,7 +80,7 @@ public class CipherSuite extends DTLSOverDatagram {
         try {
             testCase.runTest(testCase);
         } catch (javax.net.ssl.SSLHandshakeException sslhe) {
-            if (Utils.isFIPS()) {
+            if (SecurityUtils.isFIPS()) {
                 if(!SecurityUtils.TLS_CIPHERSUITES.containsKey(cipherSuite)) {
                     if ("No appropriate protocol (protocol is disabled or cipher suites are inappropriate)".equals(sslhe.getMessage())) {
                         System.out.println("Expected exception msg: <No appropriate protocol (protocol is disabled or cipher suites are inappropriate)> is caught");
