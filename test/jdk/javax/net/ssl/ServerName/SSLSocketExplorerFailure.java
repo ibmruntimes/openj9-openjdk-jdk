@@ -49,6 +49,7 @@ import javax.net.ssl.*;
 import java.security.Security;
 
 import jdk.test.lib.Utils;
+import jdk.test.lib.security.SecurityUtils;
 
 public class SSLSocketExplorerFailure {
 

@@ -60,6 +60,7 @@ import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 
 import jdk.test.lib.Utils;
+import jdk.test.lib.security.SecurityUtils;
 
 public class ClientExcOnAlert {
     // This is a PKCS#12 keystore created with the following command:
