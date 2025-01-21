@@ -41,6 +41,7 @@ import java.security.*;
 import java.nio.*;
 
 import jdk.test.lib.Utils;
+import jdk.test.lib.security.SecurityUtils;
 
 public class CheckTlsEngineResults {
 

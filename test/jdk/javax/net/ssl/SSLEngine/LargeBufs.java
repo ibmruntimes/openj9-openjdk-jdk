@@ -44,6 +44,7 @@ import java.nio.*;
 import java.util.Random;
 
 import jdk.test.lib.Utils;
+import jdk.test.lib.security.SecurityUtils;
 
 public class LargeBufs {
 

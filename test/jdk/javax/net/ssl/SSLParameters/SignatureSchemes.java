@@ -29,6 +29,7 @@
  * @bug 8280494
  * @summary (D)TLS signature schemes
  * @library /javax/net/ssl/templates
+ *          /test/lib
  * @run main/othervm SignatureSchemes
  */
 
