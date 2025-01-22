@@ -25,7 +25,7 @@
 
 /*
  * ===========================================================================
- * (c) Copyright IBM Corp. 2022, 2024 All Rights Reserved
+ * (c) Copyright IBM Corp. 2022, 2025 All Rights Reserved
  * ===========================================================================
  */
 
@@ -868,7 +868,7 @@ public final class SunPKCS11 extends AuthProvider {
         d(KPG, "DH",            P11KeyPairGenerator,
                 dhAlias,
                 m(CKM_DH_PKCS_KEY_PAIR_GEN));
-        dA(KPG, "EC",            P11KeyPairGenerator,
+        d(KPG, "EC",            P11KeyPairGenerator,
                 m(CKM_EC_KEY_PAIR_GEN));
 
         dA(KG,  "ARCFOUR",       P11KeyGenerator,
@@ -918,7 +918,7 @@ public final class SunPKCS11 extends AuthProvider {
         d(KF, "DH",             P11DHKeyFactory,
                 dhAlias,
                 m(CKM_DH_PKCS_KEY_PAIR_GEN, CKM_DH_PKCS_DERIVE));
-        dA(KF, "EC",             P11ECKeyFactory,
+        d(KF, "EC",             P11ECKeyFactory,
                 m(CKM_EC_KEY_PAIR_GEN, CKM_ECDH1_DERIVE,
                     CKM_ECDSA, CKM_ECDSA_SHA1));
 
