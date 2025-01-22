@@ -23,7 +23,7 @@
 # questions.
 #
 # ===========================================================================
-# (c) Copyright IBM Corp. 2019, 2021 All Rights Reserved
+# (c) Copyright IBM Corp. 2019, 2025 All Rights Reserved
 # ===========================================================================
 
 include CopyFiles.gmk
@@ -181,6 +181,7 @@ define SetupBuildLauncherBody
       JDK_LIBS := $$($1_JDK_LIBS), \
       JDK_LIBS_windows := $$($1_JDK_LIBS_windows), \
       LIBS := $$($1_LIBS), \
+      LIBS_unix := $(LIBZ_LIBS), \
       LINK_TYPE := $$($1_LINK_TYPE), \
       OUTPUT_DIR := $$($1_OUTPUT_DIR), \
       OBJECT_DIR := $$($1_OBJECT_DIR), \
