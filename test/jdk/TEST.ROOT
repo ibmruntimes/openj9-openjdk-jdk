@@ -1,3 +1,7 @@
+#
+# Copyright (c) 2005, 2025, Oracle and/or its affiliates. All rights reserved.
+# DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
+#
 # ===========================================================================
 # Portions Copyright 2018, 2022 IBM Corporation.
 # ===========================================================================
@@ -17,10 +21,10 @@
 # You should have received a copy of the GNU General Public License version
 # 2 along with this work; if not, see <http://www.gnu.org/licenses/>.
 # ===========================================================================
-
+#
 # This file identifies the root of the test-suite hierarchy.
 # It also contains test-suite configuration information.
-
+#
 # The list of keywords supported in the entire test suite.  The
 # "intermittent" keyword marks tests known to fail intermittently.
 # The "randomness" keyword marks tests using randomness with test
@@ -92,7 +96,10 @@ requires.extraPropDefns.libs = \
     ../lib/jdk/test/lib/Container.java
 requires.extraPropDefns.javacOpts = --add-exports java.base/jdk.internal.foreign=ALL-UNNAMED
 requires.extraPropDefns.vmOpts = \
-    -XX:+UnlockDiagnosticVMOptions -XX:+WhiteBoxAPI \
+    -XX:+UnlockDiagnosticVMOptions \
+    -XX:+LogVMOutput -XX:-DisplayVMOutput -XX:LogFile=vmprops.flags.final.vm.log \
+    -XX:+PrintFlagsFinal \
+    -XX:+WhiteBoxAPI \
     --add-exports java.base/jdk.internal.foreign=ALL-UNNAMED
 requires.properties= \
     sun.arch.data.model \
