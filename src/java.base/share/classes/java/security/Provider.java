@@ -1155,8 +1155,7 @@ public abstract class Provider extends Properties {
             s = legacyMap.get(key);
             if (s != null && (!s.isValid() || !RestrictedSecurity.isServiceAllowed(s))) {
                 legacyMap.remove(key, s);
-                // don't return invalid or disallowed legacy services
-                s = null;
+                return null;
             }
         }
 
