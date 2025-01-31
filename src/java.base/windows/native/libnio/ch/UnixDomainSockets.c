@@ -23,6 +23,12 @@
  * questions.
  */
 
+/*
+ * ===========================================================================
+ * (c) Copyright IBM Corp. 2025, 2025 All Rights Reserved
+ * ===========================================================================
+ */
+
 #include <windows.h>
 #include <winsock2.h>
 
@@ -37,6 +43,8 @@
 #include "java_net_InetAddress.h"
 #include "sun_nio_ch_Net.h"
 #include "sun_nio_ch_PollArrayWrapper.h"
+
+#include "ut_jcl_nio.h"
 
 /* The winsock provider ID of the Microsoft AF_UNIX implementation */
 static GUID MS_PROVIDER_ID  = {0xA00943D9,0x9C2E,0x4633,{0x9B,0x59,0,0x57,0xA3,0x16,0x09,0x94}};
@@ -195,12 +203,16 @@ Java_sun_nio_ch_UnixDomainSockets_connect0(JNIEnv *env, jclass clazz, jobject fd
     struct sockaddr_un sa;
     int sa_len = 0;
     int rv;
+    int fd;
 
     if (unixSocketAddressToSockaddr(env, addr, &sa, &sa_len) != 0) {
         return IOS_THROWN;
     }
 
-    rv = connect(fdval(env, fdo), (const struct sockaddr *)&sa, sa_len);
+    fd = fdval(env, fdo);
+    Trc_nio_ch_UnixDomainSockets_connect(fd, sa.sun_path, sa_len);
+
+    rv = connect(fd, (const struct sockaddr *)&sa, sa_len);
     if (rv != 0) {
         int err = WSAGetLastError();
         if (err == WSAEINPROGRESS || err == WSAEWOULDBLOCK) {

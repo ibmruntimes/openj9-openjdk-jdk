@@ -23,6 +23,12 @@
  * questions.
  */
 
+/*
+ * ===========================================================================
+ * (c) Copyright IBM Corp. 2025, 2025 All Rights Reserved
+ * ===========================================================================
+ */
+
 #include <poll.h>
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -40,6 +46,8 @@
 #include "sun_nio_ch_Net.h"
 #include "nio_util.h"
 #include "nio.h"
+
+#include "ut_jcl_nio.h"
 
 /* Subtle platform differences in how unnamed sockets (empty path)
  * are returned from getsockname()
@@ -132,12 +140,16 @@ Java_sun_nio_ch_UnixDomainSockets_connect0(JNIEnv *env, jclass clazz, jobject fd
     struct sockaddr_un sa;
     int sa_len = 0;
     int rv;
+    int fd;
 
     if (unixSocketAddressToSockaddr(env, path, &sa, &sa_len) != 0) {
         return IOS_THROWN;
     }
 
-    rv = connect(fdval(env, fdo), (struct sockaddr *)&sa, sa_len);
+    fd = fdval(env, fdo);
+    Trc_nio_ch_UnixDomainSockets_connect(fd, sa.sun_path, sa_len);
+
+    rv = connect(fd, (struct sockaddr *)&sa, sa_len);
     if (rv != 0) {
         if (errno == EINPROGRESS) {
             return IOS_UNAVAILABLE;

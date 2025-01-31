@@ -22,6 +22,13 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
+
+/*
+ * ===========================================================================
+ * (c) Copyright IBM Corp. 2025, 2025 All Rights Reserved
+ * ===========================================================================
+ */
+
 #include "jni.h"
 #include "jni_util.h"
 #include "jvm.h"
@@ -38,6 +45,8 @@
 #include <linux/fs.h>
 #include <sys/stat.h>
 #endif
+
+#include "ut_jcl_java.h"
 
 #ifdef MACOSX
 
@@ -89,6 +98,11 @@ handleOpen(const char *path, int oflag, int mode) {
             close(fd);
             fd = -1;
         }
+    }
+    if (-1 == fd) {
+        Trc_io_handleOpen_err(path, oflag, mode, 0, 0, errno);
+    } else {
+        Trc_io_handleOpen(path, oflag, mode, 0, 0, (jlong)fd);
     }
     return fd;
 }
@@ -167,6 +181,7 @@ fileDescriptorClose(JNIEnv *env, jobject this)
             dup2(devnull, fd);
             close(devnull);
         }
+        Trc_io_fileDescriptorClose((jlong)fd);
     } else {
         int result;
 #if defined(_AIX)
@@ -176,7 +191,10 @@ fileDescriptorClose(JNIEnv *env, jobject this)
         result = close(fd);
 #endif
         if (result == -1 && errno != EINTR) {
+            Trc_io_fileDescriptorClose_err((jlong)fd, errno);
             JNU_ThrowIOExceptionWithLastError(env, "close failed");
+        } else {
+            Trc_io_fileDescriptorClose((jlong)fd);
         }
     }
 }
