@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2025, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -19,39 +19,35 @@
  * Please contact Oracle, 500 Oracle Parkway, Redwood Shores, CA 94065 USA
  * or visit www.oracle.com if you need additional information or have any
  * questions.
- */
-
-/**
- * @test
- * @bug 6968348
- * @summary Byteswapped memory access can point to wrong location after JIT
- * @modules java.base/jdk.internal.misc
  *
- * @run main compiler.c2.Test6968348
  */
 
-package compiler.c2;
+super public class BadOldClassB
+    version 49:0
+{
 
-import jdk.internal.misc.Unsafe;
 
-import java.lang.reflect.Field;
-
-public class Test6968348 {
-    static Unsafe unsafe = Unsafe.getUnsafe();
-    static final long[] buffer = new long[4096];
-    static long array_long_base_offset;
-
-    public static void main(String[] args) throws Exception {
-        array_long_base_offset = unsafe.arrayBaseOffset(long[].class);
-
-        for (int n = 0; n < 100000; n++) {
-            test();
-        }
-    }
-
-    public static void test() {
-        for (long i = array_long_base_offset; i < 4096; i += 8) {
-            unsafe.putLong(buffer, i, Long.reverseBytes(i));
-        }
-    }
+public Method "<init>":"()V"
+    stack 1 locals 1
+{
+        aload_0;
+        invokespecial    Method java/lang/Object."<init>":"()V";
+        return;
 }
+
+    /*
+     * The following method tries to return an Object as a String.
+     * Verifier should fail.
+     */
+public Method doit:"()Ljava/lang/String;"
+    stack 2 locals 1
+{
+        new              class java/lang/Object;
+        dup;
+        invokespecial    Method java/lang/Object."<init>":"()V";
+        astore_0;
+        aload_0;
+        areturn;   // tries to return an Object as a String
+}
+
+} // end Class BadOldClassB
