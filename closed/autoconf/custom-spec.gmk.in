@@ -87,8 +87,6 @@ include $(TOPDIR)/closed/openjdk-tag.gmk
 J9JDK_EXT_VERSION       := $(VERSION_NUMBER_FOUR_POSITIONS)-ea
 J9JDK_EXT_NAME          := Extensions for OpenJDK for Eclipse OpenJ9
 
-# required by UMA
-FREEMARKER_JAR          := @FREEMARKER_JAR@
 OPENJ9_BUILDSPEC        := @OPENJ9_BUILDSPEC@
 
 # required by JPP
