@@ -1,5 +1,5 @@
 # ===========================================================================
-# (c) Copyright IBM Corp. 2017, 2024 All Rights Reserved
+# (c) Copyright IBM Corp. 2017, 2025 All Rights Reserved
 # ===========================================================================
 # This code is free software; you can redistribute it and/or modify it
 # under the terms of the GNU General Public License version 2 only, as
@@ -87,11 +87,6 @@ include $(TOPDIR)/closed/openjdk-tag.gmk
 J9JDK_EXT_VERSION       := $(VERSION_NUMBER_FOUR_POSITIONS)-ea
 J9JDK_EXT_NAME          := Extensions for OpenJDK for Eclipse OpenJ9
 
-# required by CMake
-OPENJ9_ENABLE_CMAKE     := @OPENJ9_ENABLE_CMAKE@
-
-# required by UMA
-FREEMARKER_JAR          := @FREEMARKER_JAR@
 OPENJ9_BUILDSPEC        := @OPENJ9_BUILDSPEC@
 
 # required by JPP
@@ -169,11 +164,7 @@ PERL                    := @PERL@
 WITH_OPENSSL            := @WITH_OPENSSL@
 
 # Use '=' instead of ':=' because bootcycle-spec.gmk overrides OUTPUTDIR.
-ifeq (true,$(OPENJ9_ENABLE_CMAKE))
-  OPENJ9_VM_BUILD_DIR = $(OUTPUTDIR)/vm/runtime
-else
-  OPENJ9_VM_BUILD_DIR = $(OUTPUTDIR)/vm
-endif
+OPENJ9_VM_BUILD_DIR = $(OUTPUTDIR)/vm/runtime
 
 # Enable use of j9cfg.h in openjdk native code.
 $(foreach var, \
