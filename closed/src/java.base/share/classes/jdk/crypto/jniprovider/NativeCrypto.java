@@ -117,9 +117,8 @@ public class NativeCrypto {
         return osslVersion;
     }
 
-    @SuppressWarnings("removal")
     private NativeCrypto() {
-        ossl_ver = AccessController.doPrivileged((PrivilegedAction<Long>) () -> loadCryptoLibraries()).longValue();
+        ossl_ver = loadCryptoLibraries();
         if (ossl_ver != -1) {
             isOpenSSLFIPS = isOpenSSLFIPS();
         } else {

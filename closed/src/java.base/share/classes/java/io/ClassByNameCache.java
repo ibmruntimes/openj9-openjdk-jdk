@@ -1,6 +1,6 @@
 /*
  * ===========================================================================
- * (c) Copyright IBM Corp. 2017, 2022 All Rights Reserved
+ * (c) Copyright IBM Corp. 2017, 2025 All Rights Reserved
  * ===========================================================================
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -26,8 +26,6 @@ package java.io;
 
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 /* ClassByNameCache is Primarily responsible for Caching the results of the className lookups and hence to avoid
@@ -63,8 +61,11 @@ final class ClassByNameCache {
             loader = loader.getParent();
         }
         setCanonicalSystemLoaderRef(null);
-        AccessController.doPrivileged(
-                new CreateReaperAction(this, staleLoaderRefs)).start();
+
+        Reaper reaper = new Reaper(this, staleLoaderRefs);
+        com.ibm.oti.vm.VM.getVMLangAccess()
+                .createThread(reaper, "ClassByNameCache Reaper", true, false, true, null)
+                .start();
     }
     /*
      * sets Canonical Loader reference for the loader
@@ -194,22 +195,6 @@ final class ClassByNameCache {
             }
 
             return value;
-        }
-    }
-
-    private static final class CreateReaperAction
-            implements PrivilegedAction<Thread> {
-        private final ClassByNameCache cache;
-        private final ReferenceQueue<Object> queue;
-
-        CreateReaperAction(ClassByNameCache cache, ReferenceQueue<Object> queue) {
-            this.cache = cache;
-            this.queue = queue;
-        }
-
-        public Thread run() {
-            Reaper reaper = new Reaper(cache, queue);
-            return com.ibm.oti.vm.VM.getVMLangAccess().createThread(reaper, "ClassByNameCache Reaper", true, false, true, null);
         }
     }
 
