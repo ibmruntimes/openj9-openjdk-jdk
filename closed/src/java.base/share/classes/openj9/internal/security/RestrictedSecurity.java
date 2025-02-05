@@ -1,6 +1,6 @@
 /*
  * ===========================================================================
- * (c) Copyright IBM Corp. 2022, 2024 All Rights Reserved
+ * (c) Copyright IBM Corp. 2022, 2025 All Rights Reserved
  * ===========================================================================
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -24,10 +24,8 @@
 package openj9.internal.security;
 
 import java.nio.charset.StandardCharsets;
-import java.security.AccessController;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.security.PrivilegedAction;
 import java.security.Provider;
 import java.security.Provider.Service;
 import java.time.LocalDate;
@@ -93,30 +91,20 @@ public final class RestrictedSecurity {
         supportedPlatformsOpenJCEPlus.put("Arch", List.of("amd64", "ppc64", "s390x"));
         supportedPlatformsOpenJCEPlus.put("OS", List.of("Linux", "AIX", "Windows"));
 
-        @SuppressWarnings("removal")
-        String[] props = AccessController.doPrivileged(
-                new PrivilegedAction<>() {
-                    @Override
-                    public String[] run() {
-                        return new String[] { System.getProperty("semeru.fips"),
-                                System.getProperty("semeru.customprofile"),
-                                System.getProperty("os.name"),
-                                System.getProperty("os.arch"),
-                                System.getProperty("semeru.fips.allowsetproperties") };
-                    }
-                });
+        String osName = System.getProperty("os.name");
+        String osArch = System.getProperty("os.arch");
 
         boolean isOsSupported, isArchSupported;
         // Check whether the NSS FIPS solution is supported.
         isOsSupported = false;
         for (String os: supportedPlatformsNSS.get("OS")) {
-            if (props[2].contains(os)) {
+            if (osName.contains(os)) {
                 isOsSupported = true;
             }
         }
         isArchSupported = false;
         for (String arch: supportedPlatformsNSS.get("Arch")) {
-            if (props[3].contains(arch)) {
+            if (osArch.contains(arch)) {
                 isArchSupported = true;
             }
         }
@@ -125,13 +113,13 @@ public final class RestrictedSecurity {
         // Check whether the OpenJCEPlus FIPS solution is supported.
         isOsSupported = false;
         for (String os: supportedPlatformsOpenJCEPlus.get("OS")) {
-            if (props[2].contains(os)) {
+            if (osName.contains(os)) {
                 isOsSupported = true;
             }
         }
         isArchSupported = false;
         for (String arch: supportedPlatformsOpenJCEPlus.get("Arch")) {
-            if (props[3].contains(arch)) {
+            if (osArch.contains(arch)) {
                 isArchSupported = true;
             }
         }
@@ -140,8 +128,8 @@ public final class RestrictedSecurity {
         // Check the default solution to see if FIPS is supported.
         isFIPSSupported = isNSSSupported;
 
-        userEnabledFIPS = Boolean.parseBoolean(props[0]);
-        allowSetProperties = Boolean.parseBoolean(props[4]);
+        userEnabledFIPS = Boolean.getBoolean("semeru.fips");
+        allowSetProperties = Boolean.getBoolean("semeru.fips.allowsetproperties");
 
         if (userEnabledFIPS) {
             if (isFIPSSupported) {
@@ -151,12 +139,8 @@ public final class RestrictedSecurity {
         }
 
         // If user has specified a profile, use that
-        if (props[1] != null) {
-            selectedProfile = props[1];
-            userSetProfile = true;
-        } else {
-            userSetProfile = false;
-        }
+        selectedProfile = System.getProperty("semeru.customprofile");
+        userSetProfile = selectedProfile != null;
 
         // Check if FIPS is supported on this platform without explicitly setting a profile.
         if (userEnabledFIPS && !isFIPSSupported && !userSetProfile) {
