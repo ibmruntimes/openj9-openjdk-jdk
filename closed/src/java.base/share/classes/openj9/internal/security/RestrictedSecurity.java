@@ -79,6 +79,8 @@ public final class RestrictedSecurity {
 
     private static RestrictedSecurityProperties restricts;
 
+    private static boolean profileHashChecked = false;
+
     private static final Set<String> unmodifiableProperties = new HashSet<>();
 
     private static final Map<String, List<String>> supportedPlatformsNSS = new HashMap<>();
@@ -244,6 +246,10 @@ public final class RestrictedSecurity {
      */
     public static boolean isServiceAllowed(Service service) {
         if (securityEnabled) {
+            if (!(profileHashChecked || isJarVerifierinStackTrace())) {
+                profileHashChecked = true;
+                checkHashValues();
+            }
             return restricts.isRestrictedServiceAllowed(service, true);
         }
         return true;
@@ -257,6 +263,10 @@ public final class RestrictedSecurity {
      */
     public static boolean canServiceBeRegistered(Service service) {
         if (securityEnabled) {
+            if (!(profileHashChecked || isJarVerifierinStackTrace())) {
+                profileHashChecked = true;
+                checkHashValues();
+            }
             return restricts.isRestrictedServiceAllowed(service, false);
         }
         return true;
@@ -270,6 +280,10 @@ public final class RestrictedSecurity {
      */
     public static boolean isProviderAllowed(String providerName) {
         if (securityEnabled) {
+            if (!(profileHashChecked || isJarVerifierinStackTrace())) {
+                profileHashChecked = true;
+                checkHashValues();
+            }
             // Remove argument, e.g. -NSS-FIPS, if present.
             int pos = providerName.indexOf('-');
             if (pos >= 0) {
@@ -289,6 +303,10 @@ public final class RestrictedSecurity {
      */
     public static boolean isProviderAllowed(Class<?> providerClazz) {
         if (securityEnabled) {
+            if (!(profileHashChecked || isJarVerifierinStackTrace())) {
+                profileHashChecked = true;
+                checkHashValues();
+            }
             String providerClassName = providerClazz.getName();
 
             // Check if the specified class extends java.security.Provider.
@@ -376,6 +394,18 @@ public final class RestrictedSecurity {
                 profileID = defaultMatch;
             }
         }
+    }
+
+    private static boolean isJarVerifierinStackTrace() {
+        StackTraceElement[] elements = Thread.currentThread().getStackTrace();
+        for (int i = 1; i < elements.length; i++) {
+            StackTraceElement stackTraceElement = elements[i];
+            if ("java.util.jar.JarVerifier".equals(stackTraceElement.getClassName())
+                && "java.base".equals(stackTraceElement.getModuleName())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private static void checkIfKnownProfileSupported() {
