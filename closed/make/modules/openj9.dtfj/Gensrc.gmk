@@ -1,5 +1,5 @@
 # ===========================================================================
-# (c) Copyright IBM Corp. 2021, 2022 All Rights Reserved
+# (c) Copyright IBM Corp. 2021, 2025 All Rights Reserved
 # ===========================================================================
 # This code is free software; you can redistribute it and/or modify it
 # under the terms of the GNU General Public License version 2 only, as
@@ -20,7 +20,11 @@
 
 include GensrcCommon.gmk
 
-all :
 ifeq (true,$(OPENJ9_ENABLE_DDR))
+  .PHONY : ddr-generate
+
+  ddr-generate :
 	@+$(MAKE) $(MAKE_ARGS) -f $(TOPDIR)/closed/DDR.gmk generate
+
+  TARGETS += ddr-generate
 endif # OPENJ9_ENABLE_DDR
