@@ -1,5 +1,5 @@
 # ===========================================================================
-# (c) Copyright IBM Corp. 2021, 2021 All Rights Reserved
+# (c) Copyright IBM Corp. 2017, 2025 All Rights Reserved
 # ===========================================================================
 # This code is free software; you can redistribute it and/or modify it
 # under the terms of the GNU General Public License version 2 only, as
@@ -18,4 +18,23 @@
 # 2 along with this work; if not, see <http://www.gnu.org/licenses/>.
 # ===========================================================================
 
-EXCLUDES += sun
+TOP_SRC_DIRS += \
+	$(J9JCL_SOURCES_DIR) \
+	#
+
+ifeq (true,$(BUILD_OPENJCEPLUS))
+  TOP_SRC_DIRS += $(OPENJCEPLUS_TOPDIR)/src/main
+endif
+
+.PHONY : generate-j9jcl-sources
+
+generate-j9jcl-sources $(J9JCL_SOURCES_DONEFILE) :
+	@+$(MAKE) $(MAKE_ARGS) -f $(TOPDIR)/closed/GensrcJ9JCL.gmk
+
+# When building multiple configurations at once (e.g. 'make CONF= images')
+# the 'create-main-targets-include' target will only be considered for the
+# first configuration; J9JCL source generation will be delayed for other
+# configurations. In order to produce a complete module-deps.gmk, we need
+# to ensure that the J9JCL source has been generated.
+
+-include $(J9JCL_SOURCES_DONEFILE)

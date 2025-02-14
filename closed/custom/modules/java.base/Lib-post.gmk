@@ -1,5 +1,5 @@
 # ===========================================================================
-# (c) Copyright IBM Corp. 2018, 2020 All Rights Reserved
+# (c) Copyright IBM Corp. 2018, 2025 All Rights Reserved
 # ===========================================================================
 # This code is free software; you can redistribute it and/or modify it
 # under the terms of the GNU General Public License version 2 only, as
@@ -10,7 +10,7 @@
 #
 # This code is distributed in the hope that it will be useful, but WITHOUT
 # ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-# FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+# FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
 # version 2 for more details (a copy is included in the LICENSE file that
 # accompanied this code).
 #
@@ -18,14 +18,17 @@
 # 2 along with this work; if not, see <http://www.gnu.org/licenses/>.
 # ===========================================================================
 
-FindSrcDirsForLib += \
-	$(call uniq, $(wildcard \
-		$(TOPDIR)/closed/src/$(strip $1)/$(OPENJDK_TARGET_OS)/native/lib$(strip $2) \
-		$(TOPDIR)/closed/src/$(strip $1)/$(OPENJDK_TARGET_OS_TYPE)/native/lib$(strip $2) \
-		$(TOPDIR)/closed/src/$(strip $1)/share/native/lib$(strip $2)))
-
-FindSrcDirsForComponent += \
-	$(call uniq, $(wildcard \
-		$(TOPDIR)/closed/src/$(strip $1)/$(OPENJDK_TARGET_OS)/native/$(strip $2) \
-		$(TOPDIR)/closed/src/$(strip $1)/$(OPENJDK_TARGET_OS_TYPE)/native/$(strip $2) \
-		$(TOPDIR)/closed/src/$(strip $1)/share/native/$(strip $2)))
+# Create the Java Native crypto library
+ifeq ($(WITH_OPENSSL), yes)
+  $(eval $(call SetupJdkLibrary, BUILD_JNCRYPTO, \
+      NAME := jncrypto, \
+      OPTIMIZATION := LOW, \
+      CFLAGS := $(CFLAGS_JDKLIB) $(OPENSSL_CFLAGS), \
+      DISABLED_WARNINGS_gcc := sign-compare implicit-fallthrough unused-value, \
+      DISABLED_WARNINGS_clang := sign-compare, \
+      DISABLED_WARNINGS_microsoft := 4101 4244 4146 4018, \
+      LDFLAGS := $(LDFLAGS_JDKLIB) $(call SET_SHARED_LIBRARY_ORIGIN), \
+      LIBS_unix := $(LIBDL), \
+  ))
+  TARGETS += $(BUILD_JNCRYPTO)
+endif
