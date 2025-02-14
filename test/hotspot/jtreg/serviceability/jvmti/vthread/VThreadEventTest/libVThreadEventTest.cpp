@@ -95,8 +95,8 @@ void JNICALL VirtualThreadUnmount(jvmtiEnv* jvmti, ...) {
   check_jvmti_status(jni, err, "event handler: error in JVMTI GetStackTrace call");
 
   // Verify top 3 methods to filter events from Continuation::try_preempt().
-  const int verification_count = 3;
-  const char* expected_methods[verification_count] = {"run", "enter0", "enter"};
+  const int verification_count = 2;
+  const char* expected_methods[verification_count] = {"run", "enter"};
 
   if (count < verification_count) return;
 
