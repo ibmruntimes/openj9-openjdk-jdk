@@ -1,5 +1,5 @@
 # ===========================================================================
-# (c) Copyright IBM Corp. 2020, 2025 All Rights Reserved
+# (c) Copyright IBM Corp. 2025, 2025 All Rights Reserved
 # ===========================================================================
 # This code is free software; you can redistribute it and/or modify it
 # under the terms of the GNU General Public License version 2 only, as
@@ -20,4 +20,7 @@
 
 include $(TOPDIR)/closed/CopySupport.gmk
 
-$(call openj9_copy_shlibs, cuda4j29)
+$(call openj9_copy_files,, \
+	$(addsuffix /com/ibm/gpu/ibm_gpu_thresholds.properties, \
+		$(J9JCL_SOURCES_DIR)/openj9.gpu/share/classes \
+		$(JDK_OUTPUTDIR)/modules/openj9.gpu))
