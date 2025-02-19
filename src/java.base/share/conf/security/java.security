@@ -212,7 +212,7 @@ RestrictedSecurity.NSS.140-2.securerandom.algorithm = PKCS11
 RestrictedSecurity.OpenJCEPlusFIPS.FIPS140-3.desc.name = OpenJCEPlusFIPS Cryptographic Module FIPS 140-3
 RestrictedSecurity.OpenJCEPlusFIPS.FIPS140-3.desc.default = false
 RestrictedSecurity.OpenJCEPlusFIPS.FIPS140-3.desc.fips = true
-RestrictedSecurity.OpenJCEPlusFIPS.FIPS140-3.desc.hash = SHA256:bea1b7da967ac27720b7bc439ccd2d4250ebe783a6919a8e7047e6a6b862a116
+RestrictedSecurity.OpenJCEPlusFIPS.FIPS140-3.desc.hash = SHA256:d817223b9a608c35ee1301ee8a42fcca0ca5c6a9b830c5658c18dc7818fd5f27
 RestrictedSecurity.OpenJCEPlusFIPS.FIPS140-3.desc.number = Certificate #XXX
 RestrictedSecurity.OpenJCEPlusFIPS.FIPS140-3.desc.policy = https://csrc.nist.gov/projects/cryptographic-module-validation-program/certificate/
 RestrictedSecurity.OpenJCEPlusFIPS.FIPS140-3.desc.sunsetDate = 2026-09-21
@@ -325,7 +325,17 @@ RestrictedSecurity.OpenJCEPlusFIPS.FIPS140-3.jce.provider.2 = sun.security.provi
     {CertStore, com.sun.security.IndexedCollection, ImplementedIn=Software}, \
     {Configuration, JavaLoginConfig, *}, \
     {Policy, JavaPolicy, *}]
-RestrictedSecurity.OpenJCEPlusFIPS.FIPS140-3.jce.provider.3 = sun.security.ssl.SunJSSE
+RestrictedSecurity.OpenJCEPlusFIPS.FIPS140-3.jce.provider.3 = sun.security.ssl.SunJSSE [ \
+    {KeyManagerFactory, NewSunX509, *}, \
+    {KeyManagerFactory, SunX509, *}, \
+    {SSLContext, Default, *}, \
+    {SSLContext, DTLS, *}, \
+    {SSLContext, DTLSv1.2, *}, \
+    {SSLContext, TLS, *}, \
+    {SSLContext, TLSv1.2, *}, \
+    {SSLContext, TLSv1.3, *}, \
+    {TrustManagerFactory, PKIX, *}, \
+    {TrustManagerFactory, SunX509, *}]
 
 RestrictedSecurity.OpenJCEPlusFIPS.FIPS140-3.javax.net.ssl.keyStore = NONE
 RestrictedSecurity.OpenJCEPlusFIPS.FIPS140-3.securerandom.provider = OpenJCEPlusFIPS
