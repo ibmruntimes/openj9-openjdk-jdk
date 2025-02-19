@@ -89,7 +89,7 @@ static void check_stack_trace(JNIEnv* jni, jthread thr) {
   check_jvmti_status(jni, err, "event handler: error in JVMTI GetStackTrace call");
 
   const int expected_count = 8;
-  const char* expected_methods[expected_count] = {"wait0", "wait", "run", "runWith", "run", "run", "enter0", "enter"};
+  const char* expected_methods[expected_count] = {"waitImpl", "wait", "wait", "run", "runWith", "run", "run", "enter"};
 
   if (count != expected_count) {
     LOG("Expected 8 methods in the stack but found %d", count);
