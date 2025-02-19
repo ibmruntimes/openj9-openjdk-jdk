@@ -1,5 +1,5 @@
 # ===========================================================================
-# (c) Copyright IBM Corp. 2018, 2024 All Rights Reserved
+# (c) Copyright IBM Corp. 2018, 2025 All Rights Reserved
 # ===========================================================================
 # This code is free software; you can redistribute it and/or modify it
 # under the terms of the GNU General Public License version 2 only, as
@@ -37,9 +37,8 @@ ifeq ($(OPENJDK_TARGET_OS), windows)
   # Configure produces a makefile intended for use with nmake.
   OPENSSL_MAKE := nmake
 
-  # LIB cannot have the surrounding double-quotes provided by custom-spec.gmk.
   # MAKEFLAGS uses unix-style options (with a dash) which won't be understood by nmake.
-  OPENSSL_MAKE_SETUP := export LIB='$(OPENJ9_VS_LIB)' && unset MAKEFLAGS &&
+  OPENSSL_MAKE_SETUP := export INCLUDE='$(OPENJ9_VS_INCLUDE)' LIB='$(OPENJ9_VS_LIB)' && unset MAKEFLAGS &&
 
   # The makefile produced by OpenSSL 3+ during the configure step needs to be
   # patched. Patching involves adding double-quotes around the name of perl
