@@ -1,5 +1,5 @@
 # ===========================================================================
-# (c) Copyright IBM Corp. 2023, 2024 All Rights Reserved
+# (c) Copyright IBM Corp. 2023, 2025 All Rights Reserved
 # ===========================================================================
 # This code is free software; you can redistribute it and/or modify it
 # under the terms of the GNU General Public License version 2 only, as
@@ -52,8 +52,8 @@ else ifeq ($(call isTargetOs, macosx), true)
   endif
   OPENJCEPLUS_JGSKIT_MAKE := jgskit.mac.mak
 else ifeq ($(call isTargetOs, windows), true)
+  EXPORT_COMPILER_ENV_VARS := INCLUDE='$(OPENJ9_VS_INCLUDE)' LIB='$(OPENJ9_VS_LIB)'
   ifeq ($(call isTargetCpu, x86_64), true)
-    EXPORT_COMPILER_ENV_VARS := LIB='$(OPENJ9_VS_LIB)'
     OPENJCEPLUS_JDK := $(call MixedPath,$(OPENJCEPLUS_JDK))
     OPENJCEPLUS_GSKIT_HOME := $(call MixedPath,$(OPENJCEPLUS_GSKIT_HOME))
     OPENJCEPLUS_HEADER_FILES := $(call MixedPath,$(OPENJCEPLUS_HEADER_FILES))
