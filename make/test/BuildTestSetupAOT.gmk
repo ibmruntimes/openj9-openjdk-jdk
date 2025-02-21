@@ -23,24 +23,47 @@
 # questions.
 #
 
+include MakeFileStart.gmk
+
 ################################################################################
-# MakeSnippetStart.gmk should be included before including a makefile snippet
+# This file builds the TestSetupAOT.class, which is used by SetupAOT
+# in ../RunTests.gmk
 ################################################################################
 
-ifeq ($(THIS_SNIPPET), )
-  $(error Internal makefile error: THIS_SNIPPET is not defined)
-endif
+include CopyFiles.gmk
+include JavaCompilation.gmk
 
-# Print an indented message, also counting the top-level makefile as a level
-ifeq ($(LOG_FLOW), true)
-  $(info :$(foreach s, top $(INCLUDE_STACK) $(SNIPPET_STACK),    )Enter $(THIS_SNIPPET) [snippet])
-endif
+################################################################################
 
-# Push our helper name onto the stack
-SNIPPET_STACK := $(THIS_SNIPPET) $(SNIPPET_STACK)
+SETUP_AOT_BASEDIR := $(TOPDIR)/test/setup_aot
+SETUP_AOT_SUPPORT := $(SUPPORT_OUTPUTDIR)/test/setup_aot
+SETUP_AOT_CLASS := $(SETUP_AOT_SUPPORT)/classes/TestSetupAOT.class
 
-# Hook to include the corresponding custom file, if present.
-ifneq ($(NO_CUSTOM_EXTENSIONS), true)
-  CUSTOM_PRE_NAME := $(subst .gmk,-pre.gmk, $(THIS_SNIPPET))
-  $(eval $(call IncludeCustomExtension, $(CUSTOM_PRE_NAME)))
-endif
+$(eval $(call SetupJavaCompilation, BUILD_SETUP_AOT, \
+    TARGET_RELEASE := $(TARGET_RELEASE_NEWJDK_UPGRADED), \
+    SRC := $(SETUP_AOT_BASEDIR), \
+    BIN := $(SETUP_AOT_SUPPORT)/classes, \
+))
+
+TARGETS += $(BUILD_SETUP_AOT)
+
+################################################################################
+# Targets for building test-image.
+################################################################################
+
+# Copy to hotspot jtreg test image
+$(eval $(call SetupCopyFiles, COPY_SETUP_AOT, \
+    SRC := $(SETUP_AOT_SUPPORT)/classes, \
+    DEST := $(TEST_IMAGE_DIR)/setup_aot, \
+    FILES := TestSetupAOT.class, \
+))
+
+IMAGES_TARGETS += $(COPY_SETUP_AOT)
+
+images: $(IMAGES_TARGETS)
+
+.PHONY: images
+
+################################################################################
+
+include MakeFileEnd.gmk
