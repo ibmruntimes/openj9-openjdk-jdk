@@ -94,16 +94,20 @@ requires.extraPropDefns.bootlibs = ../lib/jdk/test/whitebox
 requires.extraPropDefns.libs = \
     ../lib/jdk/test/lib/Platform.java \
     ../lib/jdk/test/lib/Container.java
-requires.extraPropDefns.javacOpts = --add-exports java.base/jdk.internal.foreign=ALL-UNNAMED
+requires.extraPropDefns.javacOpts = \
+    --add-exports java.base/jdk.internal.foreign=ALL-UNNAMED \
+    --add-exports java.base/jdk.internal.misc=ALL-UNNAMED
 requires.extraPropDefns.vmOpts = \
     -XX:+UnlockDiagnosticVMOptions \
     -XX:+LogVMOutput -XX:-DisplayVMOutput -XX:LogFile=vmprops.flags.final.vm.log \
     -XX:+PrintFlagsFinal \
     -XX:+WhiteBoxAPI \
-    --add-exports java.base/jdk.internal.foreign=ALL-UNNAMED
+    --add-exports java.base/jdk.internal.foreign=ALL-UNNAMED \
+    --add-exports java.base/jdk.internal.misc=ALL-UNNAMED
 requires.properties= \
     sun.arch.data.model \
     java.runtime.name \
+    java.enablePreview \
     vm.flagless \
     vm.gc.G1 \
     vm.gc.Serial \
@@ -132,7 +136,8 @@ requires.properties= \
     jdk.containerized \
     jdk.foreign.linker \
     jlink.runtime.linkable \
-    jlink.packagedModules
+    jlink.packagedModules \
+    jdk.static
 
 # Unset Hotspot VMProps ProdDefns requires class and replace with optional OpenJ9 class
 requires.extraPropDefns = [../../closed/test/jtreg-ext/requires/OpenJ9PropsExt.java]
