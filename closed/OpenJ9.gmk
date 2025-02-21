@@ -97,8 +97,8 @@ ifeq ($(call isTargetOs, windows), true)
   # convert windows path to unix path
   UnixPath = $(shell $(PATHTOOL) -u $1)
   # set up Visual Studio environment
-  # - wrap LIB in single-quotes to hide backslashes from make
-  EXPORT_COMPILER_ENV_VARS := LIB='$(OPENJ9_VS_LIB)'
+  # - single-quotes hide backslashes from make
+  EXPORT_COMPILER_ENV_VARS := INCLUDE='$(OPENJ9_VS_INCLUDE)' LIB='$(OPENJ9_VS_LIB)'
 else ifeq ($(call isTargetOs, zos), true)
   UnixPath = $1
   # allow options to follow the input file name
