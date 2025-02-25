@@ -1,6 +1,6 @@
 #!/bin/sh
 # ===========================================================================
-# (c) Copyright IBM Corp. 2019, 2024 All Rights Reserved
+# (c) Copyright IBM Corp. 2019, 2025 All Rights Reserved
 # ===========================================================================
 #
 # This code is free software; you can redistribute it and/or modify it
@@ -46,11 +46,11 @@ check () {
 
   CHECK=0
   case "$1" in
-     # Comment out to check the test directory files.
+    # Comment out to check the test directory files.
     test/*)
       trace "Ignoring $1 because it appears to match case parameter expansion test/*"
       CHECK=0;;
-    # Ignore binary files
+    # Ignore binary files.
     *.gif)
       trace "Ignoring $1 because it appears to match case parameter expansion *.gif"
       CHECK=0;;
@@ -124,8 +124,8 @@ check () {
 
   # File needs checking
 
-  # If we are checking this file or the pull request copyright checker limit
-  # the number of lines processed otherwise, since all the copyright search
+  # If we are checking this file or the pull request copyright checker, limit
+  # the number of lines processed, otherwise, since all the copyright search
   # strings are in these files, errors would be reported.
   case "$1" in
     *copyrightCheckDir.sh)
@@ -359,7 +359,6 @@ check () {
     *) CLOSED=0;;
   esac
 
-
   if [ "$CLOSED" -eq 1 ]; then
     trace "$1 is in the closed directory"
     if [ "$FOUND_IBM_COPYRIGHT" -eq 0 ]; then
@@ -507,7 +506,6 @@ check () {
       e=$((e+1))
     fi
   fi
-
 }
 
 # Main logic here
@@ -544,7 +542,7 @@ if [ $ARGS_ERROR -eq 1 ]; then
   echo
   echo copyrightCheck.sh REPO=git_repository ROOTDIR=root_directory VERBOSE=1
   echo REPO:    a github repository. Mandatory
-  echo ROOTDIR: check only this durectory and subdirectories
+  echo ROOTDIR: check only this directory and subdirectories
   echo VERBOSE: output logging
   echo
   echo Example: to check the entire repository github.com:ibmruntimes/openj9-openjdk-jdk
@@ -629,7 +627,6 @@ echo "jdk/src/solaris/native/sun/security/smartcardio/MUSCLE/COPYING" >>$TEMPFIL
 # The following file was written by IBM, and then later some oracle code has been added to this file,
 # After legal consideration, decesion was top add oracle copyrights where ever the oracle code is written which result IBM copyrights on top and later oracle.
 echo "closed/adds/jdk/src/windows/native/jdk/crypto/jniprovider/NativeCrypto_md.c" >>$TEMPFILE
-
 
 cat $TEMPFILE
 
