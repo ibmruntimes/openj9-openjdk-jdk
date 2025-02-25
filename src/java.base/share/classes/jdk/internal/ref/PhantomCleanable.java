@@ -23,12 +23,22 @@
  * questions.
  */
 
+/*
+ * ===========================================================================
+ * (c) Copyright IBM Corp. 2025, 2025 All Rights Reserved
+ * ===========================================================================
+ */
+
 package jdk.internal.ref;
 
 import java.lang.ref.Cleaner;
 import java.lang.ref.Reference;
 import java.lang.ref.PhantomReference;
 import java.util.Objects;
+
+/*[IF CRIU_SUPPORT]*/
+import openj9.internal.criu.NotCheckpointSafe;
+/*[ENDIF] CRIU_SUPPORT */
 
 /**
  * PhantomCleanable subclasses efficiently encapsulate cleanup state and
@@ -69,6 +79,9 @@ public abstract class PhantomCleanable<T> extends PhantomReference<T>
      * @param referent the referent to track
      * @param cleaner  the {@code Cleaner} to register with
      */
+    /*[IF CRIU_SUPPORT]*/
+    @NotCheckpointSafe
+    /*[ENDIF] CRIU_SUPPORT */
     @SuppressWarnings("this-escape")
     public PhantomCleanable(T referent, Cleaner cleaner) {
         super(Objects.requireNonNull(referent), CleanerImpl.getCleanerImpl(cleaner).queue);
