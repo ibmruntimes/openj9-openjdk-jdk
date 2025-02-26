@@ -24,6 +24,7 @@
 /*
  * @test
  * @summary Test behavior related to finalize
+ * @library /test/lib
  * @run main/othervm  SSLSessionFinalizeTest
  */
 
@@ -40,6 +41,9 @@ import javax.net.ssl.SSLSessionBindingEvent;
 import javax.net.ssl.SSLSessionBindingListener;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
+
+import jdk.test.lib.Utils;
+import jdk.test.lib.security.SecurityUtils;
 
 public class SSLSessionFinalizeTest {
 
@@ -103,6 +107,7 @@ public class SSLSessionFinalizeTest {
 
         while (serverReady) {
             SSLSocket sslSocket = (SSLSocket) sslServerSocket.accept();
+
 //            System.out.printf("  accept: %s%n", sslSocket);
             InputStream sslIS = sslSocket.getInputStream();
             OutputStream sslOS = sslSocket.getOutputStream();
@@ -190,6 +195,11 @@ public class SSLSessionFinalizeTest {
         String trustFilename =
             System.getProperty("test.src", "./") + "/" + pathToStores +
                 "/" + trustStoreFile;
+
+        if (SecurityUtils.isFIPS()) {
+            keyFilename = SecurityUtils.revertJKSToPKCS12(keyFilename, passwd);
+            trustFilename = SecurityUtils.revertJKSToPKCS12(trustFilename, passwd);
+        }
 
         System.setProperty("javax.net.ssl.keyStore", keyFilename);
         System.setProperty("javax.net.ssl.keyStorePassword", passwd);

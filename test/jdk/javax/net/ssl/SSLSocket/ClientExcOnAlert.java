@@ -31,6 +31,7 @@
  * @bug 8242294
  * @summary JSSE Client does not throw SSLException when an alert occurs during
  *          handshaking.
+ * @library /test/lib
  * @run main/othervm ClientExcOnAlert TLSv1.2
  * @run main/othervm ClientExcOnAlert TLSv1.3
  */
@@ -55,6 +56,12 @@ import javax.net.ssl.SSLServerSocketFactory;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
+
+import jdk.test.lib.Utils;
+import jdk.test.lib.security.SecurityUtils;
+
 public class ClientExcOnAlert {
     // This is a PKCS#12 keystore created with the following command:
     // keytool -genkeypair -alias testcert -keyalg rsa -keysize 2048
@@ -66,6 +73,62 @@ public class ClientExcOnAlert {
     // file.
     private static int serverPort = -1;
     private static final String KEYSTORE_PASS = "password";
+    private static final String KEYSTORE_PEM_FIPS =
+        "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";
     private static final String KEYSTORE_PEM =
         "MIIJrwIBAzCCCWgGCSqGSIb3DQEHAaCCCVkEgglVMIIJUTCCBW0GCSqGSIb3DQEH\n" +
         "AaCCBV4EggVaMIIFVjCCBVIGCyqGSIb3DQEMCgECoIIE+zCCBPcwKQYKKoZIhvcN\n" +
@@ -124,6 +187,8 @@ public class ClientExcOnAlert {
     static final Condition serverReady = lock.newCondition();
 
     public static void main(String[] args) throws Exception {
+        System.setProperty("javax.net.ssl.trustStore", "keystore.p12");
+        System.setProperty("javax.net.ssl.trustStorePassword", KEYSTORE_PASS);
         Thread serverThread = new Thread(() -> {
                     try {
                         doServerSide();
@@ -134,7 +199,6 @@ public class ClientExcOnAlert {
                 }
         );
         serverThread.start();
-
         try {
             doClientSide((args == null || args.length < 1) ? null : args[0]);
             throw new RuntimeException("Expected SSLException did not occur!");
@@ -143,19 +207,23 @@ public class ClientExcOnAlert {
         } finally {
             serverThread.join();
         }
-
     }
 
     static void doServerSide() throws Exception {
         Thread.currentThread().setName("ServerThread");
         SSLContext sslc = SSLContext.getInstance("TLS");
         log("doServerSide start");
-        KeyManagerFactory kmf = createKeyManagerFactory(KEYSTORE_PEM,
+        KeyManagerFactory kmf;
+        if (!(SecurityUtils.isFIPS())) {
+            kmf = createKeyManagerFactory(KEYSTORE_PEM,
                 KEYSTORE_PASS);
+        } else {
+            kmf = createKeyManagerFactory(KEYSTORE_PEM_FIPS,
+                KEYSTORE_PASS);
+        }    
         sslc.init(kmf.getKeyManagers(), null, null);
         SSLServerSocketFactory ssf =
                 (SSLServerSocketFactory)sslc.getServerSocketFactory();
-
         try (SSLServerSocket sslServerSocket =
                 (SSLServerSocket)ssf.createServerSocket(0)) {
             sslServerSocket.setReuseAddress(true);

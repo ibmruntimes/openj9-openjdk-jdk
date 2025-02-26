@@ -27,7 +27,7 @@
  * @summary Add scatter/gather APIs for SSLEngine
  *
  * Check to see if the args are being parsed properly.
- *
+ * @library /test/lib
  */
 
 import javax.net.ssl.*;

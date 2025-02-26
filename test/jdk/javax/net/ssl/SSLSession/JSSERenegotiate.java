@@ -24,6 +24,7 @@
 /*
  * @test
  * @bug 4280338
+ * @library /test/lib
  * @summary "Unsupported SSL message version" SSLProtocolException
  *      w/SSL_RSA_WITH_NULL_MD5
  * @run main/othervm JSSERenegotiate
@@ -40,10 +41,13 @@ import java.net.*;
 import java.security.Security;
 import javax.net.ssl.*;
 
+import jdk.test.lib.Utils;
+import jdk.test.lib.security.SecurityUtils;
+
 public class JSSERenegotiate {
 
-    static final String suite1 = "SSL_RSA_WITH_NULL_MD5";
-    static final String suite2 = "SSL_RSA_WITH_NULL_SHA";
+    static String suite1;
+    static String suite2;
 
     static final String dataString = "This is a test";
 
@@ -193,7 +197,9 @@ public class JSSERenegotiate {
     public static void main(String[] args) throws Exception {
         // reset the security property to make sure that the cipher suites
         // used in this test are not disabled
-        Security.setProperty("jdk.tls.disabledAlgorithms", "");
+        if (!(SecurityUtils.isFIPS())) {
+            Security.setProperty("jdk.tls.disabledAlgorithms", "");
+        }
 
         String keyFilename =
             System.getProperty("test.src", "./") + "/" + pathToStores +
@@ -201,6 +207,16 @@ public class JSSERenegotiate {
         String trustFilename =
             System.getProperty("test.src", "./") + "/" + pathToStores +
                 "/" + trustStoreFile;
+
+        if (SecurityUtils.isFIPS()) {
+            keyFilename = SecurityUtils.revertJKSToPKCS12(keyFilename, passwd);
+            trustFilename = SecurityUtils.revertJKSToPKCS12(trustFilename, passwd);
+            suite1 = "TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256";
+            suite2 = "TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384";
+        } else {
+            suite1 = "SSL_RSA_WITH_NULL_MD5";
+            suite2 = "SSL_RSA_WITH_NULL_SHA";
+        }
 
         System.setProperty("javax.net.ssl.keyStore", keyFilename);
         System.setProperty("javax.net.ssl.keyStorePassword", passwd);

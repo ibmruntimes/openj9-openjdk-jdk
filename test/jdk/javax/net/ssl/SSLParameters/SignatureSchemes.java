@@ -29,6 +29,7 @@
  * @bug 8280494
  * @summary (D)TLS signature schemes
  * @library /javax/net/ssl/templates
+ *          /test/lib
  * @run main/othervm SignatureSchemes
  */
 
@@ -36,6 +37,9 @@ import javax.net.ssl.SSLParameters;
 import javax.net.ssl.SSLServerSocket;
 import javax.net.ssl.SSLSocket;
 import java.security.Security;
+
+import jdk.test.lib.Utils;
+import jdk.test.lib.security.SecurityUtils;
 
 public class SignatureSchemes extends SSLSocketTemplate {
     private final String[] serverSignatureSchemes;
@@ -91,7 +95,9 @@ public class SignatureSchemes extends SSLSocketTemplate {
     }
 
     public static void main(String[] args) throws Exception {
-        Security.setProperty("jdk.tls.disabledAlgorithms", "");
+        if (!(SecurityUtils.isFIPS())) {
+            Security.setProperty("jdk.tls.disabledAlgorithms", "");
+        }
 
         runTest(new String[] {
                         "ecdsa_secp256r1_sha256",
