@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, 2025, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2025, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -19,27 +19,12 @@
  * Please contact Oracle, 500 Oracle Parkway, Redwood Shores, CA 94065 USA
  * or visit www.oracle.com if you need additional information or have any
  * questions.
+ *
  */
 
-package jdk.jfr.event.gc.collection;
-import jdk.test.lib.jfr.GCHelper;
-
-/**
- * @test
- * @requires vm.flagless
- * @requires vm.hasJFR
- *
- * @requires vm.gc == "Parallel" | vm.gc == null
- * @library /test/lib /test/jdk
- *
- * @run driver jdk.jfr.event.gc.collection.TestGCCauseWithParallelOld
- */
-public class TestGCCauseWithParallelOld {
-    public static void main(String[] args) throws Exception {
-        String testID = "ParallelOld";
-        String[] vmFlags = {"-XX:+UseParallelGC"};
-        String[] gcNames = {GCHelper.gcParallelScavenge, GCHelper.gcParallelOld};
-        String[] gcCauses = {"Allocation Failure", "System.gc()", "CodeCache GC Threshold"};
-        GCGarbageCollectionUtil.test(testID, vmFlags, gcNames, gcCauses);
+// This is a test class to be loaded by the boot loader.
+public class BootClass {
+    public void func(String s) {
+        System.out.println(s);
     }
 }
