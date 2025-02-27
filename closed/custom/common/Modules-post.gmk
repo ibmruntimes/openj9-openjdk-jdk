@@ -56,3 +56,8 @@ MODULES_FILTER += \
 	jdk.internal.vm.compiler.management \
 	jdk.jstatd \
 	#
+
+NATIVE_ACCESS_MODULES += \
+	openj9.cuda \
+	openj9.dtfj \
+	#
