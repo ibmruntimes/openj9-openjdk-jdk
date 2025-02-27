@@ -836,7 +836,8 @@ public final class RestrictedSecurity {
                                     + "\nagainst the service attribute value: " + sValue);
                         }
                         if ((sValue == null) || !cValue.equalsIgnoreCase(sValue)) {
-                            // If any attribute doesn't match, return service is not allowed.
+                            // If any of the attributes doesn't match,
+                            // then this constraint doesn't match so move on.
                             if (debug != null) {
                                 debug.println("Attributes don't match!");
                                 debug.println("The following service:"
@@ -845,7 +846,7 @@ public final class RestrictedSecurity {
                                             + "\n\tAttribute: " + cAttribute
                                             + "\nis NOT allowed in provider: " + providerClassName);
                             }
-                            return false;
+                            continue;
                         }
                         if (debug != null) {
                             debug.println("Attributes match!");
@@ -903,7 +904,7 @@ public final class RestrictedSecurity {
                     }
 
                     // If nothing matching the accepted uses is found in the call stack,
-                    // this service is not allowed.
+                    // then this constraint doesn't match so move on.
                     if (!found) {
                         if (debug != null) {
                             debug.println("Classes in call stack are not part of accepted uses!");
@@ -914,7 +915,7 @@ public final class RestrictedSecurity {
                                         + "\n\tAccepted uses: " + cAcceptedUses
                                         + "\nis NOT allowed in provider: " + providerClassName);
                         }
-                        return false;
+                        continue;
                     }
                 }
 
