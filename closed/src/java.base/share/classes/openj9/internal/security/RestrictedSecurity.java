@@ -789,6 +789,7 @@ public final class RestrictedSecurity {
             if (debug != null) {
                 debug.println("Security constraints check of provider.");
             }
+            constraints:
             for (Constraint constraint : constraints) {
                 String cType = constraint.type;
                 String cAlgorithm = constraint.algorithm;
@@ -814,7 +815,7 @@ public final class RestrictedSecurity {
                     if (debug != null) {
                         debug.println("The constraint doesn't apply to the service algorithm.");
                     }
-                    continue;
+                    continue constraints;
                 }
 
                 // For type and algorithm match, and attribute is not *.
@@ -846,7 +847,7 @@ public final class RestrictedSecurity {
                                             + "\n\tAttribute: " + cAttribute
                                             + "\nis NOT allowed in provider: " + providerClassName);
                             }
-                            continue;
+                            continue constraints;
                         }
                         if (debug != null) {
                             debug.println("Attributes match!");
