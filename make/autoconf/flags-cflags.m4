@@ -518,6 +518,17 @@ AC_DEFUN([FLAGS_SETUP_CFLAGS_HELPER],
       # so for debug we build with '-qpic=large -bbigtoc'.
       DEBUG_CFLAGS_JVM="-qpic=large"
     fi
+
+    if test "x$TOOLCHAIN_TYPE" = xgcc || test "x$TOOLCHAIN_TYPE" = xclang ; then
+      INIT_PATTERN_FLAG="-ftrivial-auto-var-init=pattern"
+      FLAGS_COMPILER_CHECK_ARGUMENTS(ARGUMENT: [$INIT_PATTERN_FLAG],
+          IF_TRUE: [
+            DEBUG_CFLAGS_JDK="$DEBUG_CFLAGS_JDK $INIT_PATTERN_FLAG"
+            DEBUG_CFLAGS_JVM="$INIT_PATTERN_FLAG"
+          ]
+      )
+    fi
+
     if test "x$TOOLCHAIN_TYPE" = xclang && test "x$OPENJDK_TARGET_OS" = xaix; then
       DEBUG_CFLAGS_JVM="-fpic -mcmodel=large"
     fi
@@ -628,7 +639,7 @@ AC_DEFUN([FLAGS_SETUP_CFLAGS_HELPER],
   elif test "x$TOOLCHAIN_TYPE" = xmicrosoft; then
     LANGSTD_CXXFLAGS="-std:c++14"
   else
-    AC_MSG_ERROR([Don't know how to enable C++14 for this toolchain])
+    AC_MSG_ERROR([Cannot enable C++14 for this toolchain])
   fi
   TOOLCHAIN_CFLAGS_JDK_CXXONLY="$TOOLCHAIN_CFLAGS_JDK_CXXONLY $LANGSTD_CXXFLAGS"
   TOOLCHAIN_CFLAGS_JVM="$TOOLCHAIN_CFLAGS_JVM $LANGSTD_CXXFLAGS"
