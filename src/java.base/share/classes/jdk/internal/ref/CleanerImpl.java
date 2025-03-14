@@ -23,6 +23,12 @@
  * questions.
  */
 
+/*
+ * ===========================================================================
+ * (c) Copyright IBM Corp. 2025, 2025 All Rights Reserved
+ * ===========================================================================
+ */
+
 package jdk.internal.ref;
 
 import java.lang.ref.Cleaner;
@@ -35,6 +41,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 
 import jdk.internal.misc.InnocuousThread;
+
+/*[IF CRIU_SUPPORT]*/
+import openj9.internal.criu.NotCheckpointSafe;
+/*[ENDIF] CRIU_SUPPORT */
 
 /**
  * CleanerImpl manages a set of object references and corresponding cleaning actions.
@@ -265,6 +275,9 @@ public final class CleanerImpl implements Runnable {
          *
          * @return true if the list is empty
          */
+        /*[IF CRIU_SUPPORT]*/
+        @NotCheckpointSafe
+        /*[ENDIF] CRIU_SUPPORT */
         public synchronized boolean isEmpty() {
             // Head node size is zero only when the entire list is empty.
             return head.size == 0;
@@ -273,6 +286,9 @@ public final class CleanerImpl implements Runnable {
         /**
          * Insert this PhantomCleanable in the list.
          */
+        /*[IF CRIU_SUPPORT]*/
+        @NotCheckpointSafe
+        /*[ENDIF] CRIU_SUPPORT */
         public synchronized void insert(PhantomCleanable<?> phc) {
             if (head.size == NODE_CAPACITY) {
                 // Head node is full, insert new one.
@@ -303,6 +319,9 @@ public final class CleanerImpl implements Runnable {
          * @return true if Cleanable was removed or false if not because
          * it had already been removed before
          */
+        /*[IF CRIU_SUPPORT]*/
+        @NotCheckpointSafe
+        /*[ENDIF] CRIU_SUPPORT */
         public synchronized boolean remove(PhantomCleanable<?> phc) {
             if (phc.node == null) {
                 // Not in the list.
