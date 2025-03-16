@@ -29,6 +29,7 @@
 /*
  * @test
  * @bug 7068321
+ * @library /test/lib
  * @summary Support TLS Server Name Indication (SNI) Extension in JSSE Server
  * @run main/othervm SSLSocketSNISensitive PKIX www.example.com
  * @run main/othervm SSLSocketSNISensitive SunX509 www.example.com
@@ -51,6 +52,11 @@ import java.security.cert.CertificateFactory;
 import java.security.spec.*;
 import java.security.interfaces.*;
 import java.util.Base64;
+
+import java.io.ByteArrayInputStream;
+
+import jdk.test.lib.Utils;
+import jdk.test.lib.security.SecurityUtils;
 
 // Note: this test case works only on TLS 1.2 and prior versions because of
 // the use of MD5withRSA signed certificate.
@@ -247,6 +253,8 @@ public class SSLSocketSNISensitive {
      */
     static boolean debug = false;
 
+    static String[] signatureAlgos = new String[5];
+
     /*
      * Define the server side of the test.
      *
@@ -432,10 +440,12 @@ public class SSLSocketSNISensitive {
 
     public static void main(String[] args) throws Exception {
         // MD5 is used in this test case, don't disable MD5 algorithm.
-        Security.setProperty("jdk.certpath.disabledAlgorithms",
-                "MD2, RSA keySize < 1024");
-        Security.setProperty("jdk.tls.disabledAlgorithms",
-                "SSLv3, RC4, DH keySize < 768");
+        if (!(SecurityUtils.isFIPS())) {
+            Security.setProperty("jdk.certpath.disabledAlgorithms",
+                    "MD2, RSA keySize < 1024");
+            Security.setProperty("jdk.tls.disabledAlgorithms",
+                    "SSLv3, RC4, DH keySize < 768");
+        }
 
         if (debug)
             System.setProperty("javax.net.debug", "all");
@@ -448,7 +458,36 @@ public class SSLSocketSNISensitive {
         /*
          * Start the tests.
          */
-        new SSLSocketSNISensitive();
+        try {
+            new SSLSocketSNISensitive();
+        } catch (Exception e) {
+            if (SecurityUtils.isFIPS()) {
+                // for (int i=0; i<signatureAlgos.length; i++) {
+                //     if (signatureAlgos[i].contains("MD5") 
+                //      && e instanceof javax.net.ssl.SSLHandshakeException
+                //      && "no cipher suites in common".equals(e.getMessage())) {
+                //         System.out.println("Expected exception msg: <no cipher suites in common> is caught.");
+                //         return;
+                //     }
+                // }
+                if (e instanceof javax.net.ssl.SSLHandshakeException) {
+                    if ("no cipher suites in common".equals(e.getMessage())) {
+                        System.out.println("Expected exception msg: <no cipher suites in common> is caught.");
+                        return;
+                    } else {
+                        System.out.println("Unexpected exception msg: <" + e.getMessage() + "> is caught.");
+                        return;
+                    }
+                } else {
+                    System.out.println("Unexpected exception msg is caught.");
+                    return;
+                }
+            } else {
+                System.out.println("failure is not in FIPS mode.");
+                e.printStackTrace();
+                return;
+            }
+        }
     }
 
     Thread clientThread = null;
