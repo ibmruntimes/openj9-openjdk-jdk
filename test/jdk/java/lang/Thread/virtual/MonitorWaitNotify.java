@@ -20,6 +20,11 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
+/*
+ * ===========================================================================
+ * (c) Copyright IBM Corp. 2025, 2025 All Rights Reserved
+ * ===========================================================================
+ */
 
 /*
  * @test id=default
@@ -514,7 +519,7 @@ class MonitorWaitNotify {
                     }
                 } catch (InterruptedException e) {
                     // check stack trace has the expected frames
-                    Set<String> expected = Set.of("wait0", "wait", "run");
+                    Set<String> expected = Set.of("wait", "run");
                     Set<String> methods = Stream.of(e.getStackTrace())
                             .map(StackTraceElement::getMethodName)
                             .collect(Collectors.toSet());
