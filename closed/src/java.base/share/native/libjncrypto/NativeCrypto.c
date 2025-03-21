@@ -751,8 +751,8 @@ find_crypto_library(jboolean traceEnabled, const char *chomepath)
         /* Identify and load the latest version from the available libraries.
          * This logic depends upon the order in which libnames are defined.
          * It only loads the libraries which can possibly be the latest versions.
-         * Once any library is loaded, everything after it will be a lower version
-         * due to the order so we can stop.
+         * Once any library is loaded, everything after it will probably be a
+         * lower version due to the order so we can stop.
          */
         tempVersion = get_crypto_library_version(traceEnabled, result, "\tLoaded OpenSSL version");
         if (tempVersion > 0) {
@@ -760,7 +760,7 @@ find_crypto_library(jboolean traceEnabled, const char *chomepath)
         }
     }
 
-    /* If we reach here, it means that none of the libraries where found. */
+    /* If we reach here, it means that none of the libraries were found. */
     return NULL;
 }
 
