@@ -1,6 +1,6 @@
 /*
  * ===========================================================================
- * (c) Copyright IBM Corp. 2023, 2024 All Rights Reserved
+ * (c) Copyright IBM Corp. 2023, 2025 All Rights Reserved
  * ===========================================================================
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -33,7 +33,7 @@
 static void *funcs[] = {
     &bcopy, &endfsent, &getfsent, &getfsfile, &getfsspec, &longjmp,
     &memcpy, &memmove, &setfsent, &setjmp, &siglongjmp, &strcat,
-    &strcpy, &strncat, &strncpy
+    &strcmp, &strcpy, &strncat, &strncpy
 };
 
 __attribute__((visibility("default"))) void **
