@@ -25,7 +25,7 @@
 
 /*
  * ===========================================================================
- * (c) Copyright IBM Corp. 2022, 2024 All Rights Reserved
+ * (c) Copyright IBM Corp. 2022, 2025 All Rights Reserved
  * ===========================================================================
  */
 
@@ -291,7 +291,7 @@ public final class SystemLookup implements SymbolLookup {
     public enum AixFuncSymbols {
         bcopy, endfsent, getfsent, getfsfile, getfsspec, longjmp,
         memcpy, memmove, setfsent, setjmp, siglongjmp, strcat,
-        strcpy, strncat, strncpy
+        strcmp, strcpy, strncat, strncpy
         ;
 
         static AixFuncSymbols valueOfOrNull(String name) {
