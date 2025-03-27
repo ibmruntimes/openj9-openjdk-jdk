@@ -21,6 +21,12 @@
  * questions.
  */
 
+/*
+ * ===========================================================================
+ * (c) Copyright IBM Corp. 2025, 2025 All Rights Reserved
+ * ===========================================================================
+ */
+
 import java.lang.management.ManagementFactory;
 import com.sun.management.HotSpotDiagnosticMXBean;
 
@@ -31,9 +37,6 @@ class LockingMode {
      * Returns true if using legacy locking mode.
      */
     static boolean isLegacy() {
-        return ManagementFactory.getPlatformMXBean(HotSpotDiagnosticMXBean.class)
-                .getVMOption("LockingMode")
-                .getValue()
-                .equals("1");
+        return true;
     }
 }

@@ -22,6 +22,12 @@
  */
 
 /*
+ * ===========================================================================
+ * (c) Copyright IBM Corp. 2025, 2025 All Rights Reserved
+ * ===========================================================================
+ */
+
+/*
  * @test id=default
  * @summary Verifies JVMTI StopThread support for virtual threads.
  * @requires vm.continuations
@@ -277,8 +283,7 @@ public class StopThreadTest {
     }
 
     static boolean preemptableVirtualThread() {
-        boolean legacyLockingMode = ManagementFactory.getPlatformMXBean(HotSpotDiagnosticMXBean.class)
-                                        .getVMOption("LockingMode").getValue().equals("1");
+        boolean legacyLockingMode = true;
         return is_virtual && !isBoundVThread && !legacyLockingMode;
     }
 }
