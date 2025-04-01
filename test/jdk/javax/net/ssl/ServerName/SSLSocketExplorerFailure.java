@@ -31,6 +31,7 @@
  * @bug 7068321
  * @summary Support TLS Server Name Indication (SNI) Extension in JSSE Server
  * @library ../templates
+ * @library /test/lib
  * @build SSLCapabilities SSLExplorer
  * @run main/othervm SSLSocketExplorerFailure SSLv2Hello,SSLv3
  * @run main/othervm SSLSocketExplorerFailure SSLv3
@@ -46,6 +47,9 @@ import java.util.*;
 import java.net.*;
 import javax.net.ssl.*;
 import java.security.Security;
+
+import jdk.test.lib.Utils;
+import jdk.test.lib.security.SecurityUtils;
 
 public class SSLSocketExplorerFailure {
 
@@ -233,9 +237,11 @@ public class SSLSocketExplorerFailure {
     volatile Exception clientException = null;
 
     public static void main(String[] args) throws Exception {
-        Security.setProperty("jdk.tls.disabledAlgorithms", "");
-        Security.setProperty("jdk.certpath.disabledAlgorithms", "");
-
+        if (!(SecurityUtils.isFIPS())) {
+            Security.setProperty("jdk.tls.disabledAlgorithms", "");
+            Security.setProperty("jdk.certpath.disabledAlgorithms", "");
+        }
+        
         String keyFilename =
             System.getProperty("test.src", ".") + "/" + pathToStores +
                 "/" + keyStoreFile;

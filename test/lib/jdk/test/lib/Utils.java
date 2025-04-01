@@ -161,6 +161,7 @@ public final class Utils {
      * Contains the seed value used for {@link java.util.Random} creation.
      */
     public static final long SEED;
+
     static {
        var seed = Long.getLong(SEED_PROPERTY_NAME);
        if (seed != null) {
