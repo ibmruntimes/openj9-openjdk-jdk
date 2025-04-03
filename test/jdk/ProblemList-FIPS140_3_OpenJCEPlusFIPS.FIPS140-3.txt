@@ -715,7 +715,6 @@ javax/net/ssl/sanity/interop/ClientJSSEServerJSSE.java https://github.com/eclips
 javax/net/ssl/sanity/pluggability/CheckSSLContextExport.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 javax/net/ssl/templates/SSLEngineTemplate.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 javax/net/ssl/templates/SSLSocketTemplate.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
-javax/security/auth/Destroyable/KeyDestructionTest.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 javax/security/auth/PrivateCredentialPermission/MoreThenOnePrincipals.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 javax/security/auth/Subject/Compat.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 javax/security/auth/Subject/SubjectNullTests.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
