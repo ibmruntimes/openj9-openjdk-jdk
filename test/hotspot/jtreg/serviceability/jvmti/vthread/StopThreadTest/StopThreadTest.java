@@ -36,13 +36,6 @@
  */
 
 /*
- * @test id=no-vmcontinuations
- * @summary Verifies JVMTI StopThread support for bound virtual threads.
- * @library /test/lib
- * @run main/othervm/native -agentlib:StopThreadTest -XX:+UnlockExperimentalVMOptions -XX:-VMContinuations -DboundVThread=true StopThreadTest
- */
-
-/*
  * @test id=platform
  * @summary Verifies JVMTI StopThread support for platform threads.
  * @library /test/lib
@@ -283,7 +276,6 @@ public class StopThreadTest {
     }
 
     static boolean preemptableVirtualThread() {
-        boolean legacyLockingMode = true;
-        return is_virtual && !isBoundVThread && !legacyLockingMode;
+        return is_virtual && !isBoundVThread;
     }
 }
