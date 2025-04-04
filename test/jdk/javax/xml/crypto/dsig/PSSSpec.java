@@ -21,6 +21,12 @@
  * questions.
  */
 
+/*
+ * ===========================================================================
+ * (c) Copyright IBM Corp. 2025, 2025 All Rights Reserved
+ * ===========================================================================
+ */
+
 import jdk.test.lib.Asserts;
 import jdk.test.lib.Utils;
 import jdk.test.lib.security.XMLUtils;
@@ -34,6 +40,7 @@ import javax.xml.crypto.dsig.XMLSignatureFactory;
 import javax.xml.crypto.dsig.dom.DOMValidateContext;
 import javax.xml.crypto.dsig.spec.RSAPSSParameterSpec;
 import java.security.KeyPairGenerator;
+import java.security.Signature;
 import java.security.spec.MGF1ParameterSpec;
 import java.security.spec.PSSParameterSpec;
 
@@ -54,7 +61,20 @@ public class PSSSpec {
 
     public static void main(String[] args) throws Exception {
         unmarshal();
-        marshal();
+        try {
+            marshal();
+        } catch (javax.xml.crypto.dsig.XMLSignatureException xmlse) {
+            Throwable cause = xmlse.getCause();
+            if (cause instanceof java.security.InvalidAlgorithmParameterException) {
+                if (Signature.getInstance("RSA-PSS").getProvider().getName().equals("OpenJCEPlus")
+                && cause.getMessage().equals("The message digest within the PSSParameterSpec does not match the MGF message digest.")
+                ) {
+                    System.out.println("Expected error message is caught for OpenJCEPlus provider.");
+                    return;
+                }
+            }
+            throw xmlse;
+        }
         spec();
     }
 

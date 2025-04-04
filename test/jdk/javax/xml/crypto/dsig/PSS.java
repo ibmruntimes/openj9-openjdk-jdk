@@ -21,6 +21,12 @@
  * questions.
  */
 
+/*
+ * ===========================================================================
+ * (c) Copyright IBM Corp. 2025, 2025 All Rights Reserved
+ * ===========================================================================
+ */
+
 import jdk.test.lib.Asserts;
 import jdk.test.lib.security.XMLUtils;
 
@@ -28,6 +34,7 @@ import javax.xml.crypto.dsig.DigestMethod;
 import javax.xml.crypto.dsig.SignatureMethod;
 import javax.xml.crypto.dsig.spec.RSAPSSParameterSpec;
 import java.security.KeyPairGenerator;
+import java.security.Signature;
 import java.security.spec.MGF1ParameterSpec;
 import java.security.spec.PSSParameterSpec;
 
@@ -51,11 +58,23 @@ public class PSS {
                 MGF1ParameterSpec.SHA512, 48,
                 PSSParameterSpec.TRAILER_FIELD_BC);
 
-        var signed = XMLUtils.signer(keyPair.getPrivate(), keyPair.getPublic())
+        var signer = XMLUtils.signer(keyPair.getPrivate(), keyPair.getPublic())
                 .dm(DigestMethod.SHA384)
-                .sm(SignatureMethod.RSA_PSS, new RSAPSSParameterSpec(pspec))
-                .sign(doc);
-
-        Asserts.assertTrue(XMLUtils.validator().validate(signed));
+                .sm(SignatureMethod.RSA_PSS, new RSAPSSParameterSpec(pspec));
+        try {
+            var signed = signer.sign(doc);
+            Asserts.assertTrue(XMLUtils.validator().validate(signed));
+        } catch (javax.xml.crypto.dsig.XMLSignatureException xmlse) {
+            Throwable cause = xmlse.getCause();
+            if (cause instanceof java.security.InvalidAlgorithmParameterException) {
+                if (Signature.getInstance("RSA-PSS").getProvider().getName().equals("OpenJCEPlus")
+                && cause.getMessage().equals("The message digest within the PSSParameterSpec does not match the MGF message digest.")
+                ) {
+                    System.out.println("Expected error message is caught for OpenJCEPlus provider.");
+                    return;
+                }
+            }
+            throw xmlse;
+        }
     }
 }
