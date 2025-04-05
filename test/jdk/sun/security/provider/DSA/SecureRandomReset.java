@@ -22,6 +22,12 @@
  */
 
 /*
+ * ===========================================================================
+ * (c) Copyright IBM Corp. 2025, 2025 All Rights Reserved
+ * ===========================================================================
+ */
+
+/*
  * @test
  * @bug 8308474
  * @summary Test that calling initSign resets RNG
@@ -49,6 +55,16 @@ public class SecureRandomReset {
         // Re-initialize deterministic RNG and sign
         s.initSign(sk, deterministic());
         byte[] sig2 = s.sign();
+
+        // The OpenJCEPlus provider does not honor a secure random
+        // generator when used to initialize a signature.
+        if (s.getProvider().getName().equals("OpenJCEPlus")) {
+            if (Arrays.equals(sig1, sig2)) {
+                System.out.println("Expected non-equal signatures for OpenJCEPlus provider");
+                throw new RuntimeException("initSign not properly ignoring RNG");
+            }
+            return;
+        }
 
         if (!Arrays.equals(sig1,sig2)) {
             System.out.println("Expected equal signatures");
