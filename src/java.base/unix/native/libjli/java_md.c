@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1998, 2024, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1998, 2025, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -362,7 +362,6 @@ CreateExecutionEnvironment(int *pargc, char ***pargv,
          *
          *     o          $JVMPATH (directory portion only)
          *     o          $JDK/lib
-         *     o          $JDK/../lib
          *     o          ZLIBNX_PATH (for AIX P9 or newer systems with NX, when enabled)
          *
          * followed by the user's previous effective LD_LIBRARY_PATH, if
@@ -419,14 +418,12 @@ CreateExecutionEnvironment(int *pargc, char ***pargv,
 
                 snprintf(new_runpath, new_runpath_size, LD_LIBRARY_PATH "="
                         "%s:"
-                        "%s/lib:"
-                        "%s/../lib"
+                        "%s/lib"
 #ifdef AIX
                         "%s" /* For zlibNX on eligible AIX systems */
 #endif
                         ,
                         new_jvmpath,
-                        jdkroot,
                         jdkroot
 #ifdef AIX
                         , (useZlibNX ? (":" ZLIBNX_PATH) : "")
