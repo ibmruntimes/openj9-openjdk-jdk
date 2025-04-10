@@ -56,7 +56,7 @@ WARNING_MODULES := \
 	#
 
 ifneq (,$(filter $(WARNING_MODULES),$(MODULE)))
-  JAVA_WARNINGS_ARE_ERRORS :=
+  JAVA_WARNINGS_AS_ERRORS := false
 endif
 
 # CUDA

@@ -182,6 +182,8 @@ generate : $(DDR_POINTERS_MARKER) $(DDR_STRUCTURES_MARKER)
 
 ifneq (,$(wildcard $(DDR_GENSRC_DIR)))
 
+JAVA_WARNINGS_AS_ERRORS := false
+
 # Compile DDR code again, to ensure compatibility with class files
 # as they would be dynamically generated from the blob.
 $(eval $(call SetupJavaCompilation,BUILD_J9DDR_TEST_CLASSES, \
