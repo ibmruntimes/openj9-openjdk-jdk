@@ -23,12 +23,6 @@
  * questions.
  */
 
-/*
- * ===========================================================================
- * (c) Copyright IBM Corp. 2024, 2024 All Rights Reserved
- * ===========================================================================
- */
-
 package com.sun.tools.javac.comp;
 
 import java.util.*;
@@ -1325,7 +1319,7 @@ public class Check {
     private void warnOnExplicitStrictfp(JCTree tree) {
         deferredLintHandler.push(tree);
         try {
-            deferredLintHandler.report(_l -> lint.logIfEnabled(tree.pos(), LintWarnings.Strictfp));
+            deferredLintHandler.report(_ -> lint.logIfEnabled(tree.pos(), LintWarnings.Strictfp));
         } finally {
             deferredLintHandler.pop();
         }
@@ -4130,7 +4124,7 @@ public class Check {
             int opc = ((OperatorSymbol)operator).opcode;
             if (opc == ByteCodes.idiv || opc == ByteCodes.imod
                 || opc == ByteCodes.ldiv || opc == ByteCodes.lmod) {
-                deferredLintHandler.report(_l -> lint.logIfEnabled(pos, LintWarnings.DivZero));
+                deferredLintHandler.report(_ -> lint.logIfEnabled(pos, LintWarnings.DivZero));
             }
         }
     }
@@ -4143,7 +4137,7 @@ public class Check {
      */
     void checkLossOfPrecision(final DiagnosticPosition pos, Type found, Type req) {
         if (found.isNumeric() && req.isNumeric() && !types.isAssignable(found, req)) {
-            deferredLintHandler.report(_l ->
+            deferredLintHandler.report(_ ->
                 lint.logIfEnabled(pos, LintWarnings.PossibleLossOfPrecision(found, req)));
         }
     }
@@ -4343,7 +4337,7 @@ public class Check {
                             // Warning may be suppressed by
                             // annotations; check again for being
                             // enabled in the deferred context.
-                            deferredLintHandler.report(_l ->
+                            deferredLintHandler.report(_ ->
                                 lint.logIfEnabled(pos, LintWarnings.MissingExplicitCtor(c, pkg, modle)));
                         } else {
                             return;
@@ -4678,7 +4672,7 @@ public class Check {
 
     void checkModuleExists(final DiagnosticPosition pos, ModuleSymbol msym) {
         if (msym.kind != MDL) {
-            deferredLintHandler.report(_l ->
+            deferredLintHandler.report(_ ->
                 lint.logIfEnabled(pos, LintWarnings.ModuleNotFound(msym)));
         }
     }
@@ -4686,14 +4680,14 @@ public class Check {
     void checkPackageExistsForOpens(final DiagnosticPosition pos, PackageSymbol packge) {
         if (packge.members().isEmpty() &&
             ((packge.flags() & Flags.HAS_RESOURCE) == 0)) {
-            deferredLintHandler.report(_l ->
+            deferredLintHandler.report(_ ->
                 lint.logIfEnabled(pos, LintWarnings.PackageEmptyOrNotFound(packge)));
         }
     }
 
     void checkModuleRequires(final DiagnosticPosition pos, final RequiresDirective rd) {
         if ((rd.module.flags() & Flags.AUTOMATIC_MODULE) != 0) {
-            deferredLintHandler.report(_l -> {
+            deferredLintHandler.report(_ -> {
                 if (rd.isTransitive() && lint.isEnabled(LintCategory.REQUIRES_TRANSITIVE_AUTOMATIC)) {
                     log.warning(pos, LintWarnings.RequiresTransitiveAutomatic);
                 } else {

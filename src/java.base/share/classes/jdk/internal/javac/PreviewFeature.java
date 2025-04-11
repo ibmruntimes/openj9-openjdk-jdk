@@ -22,11 +22,6 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-/*
- * ===========================================================================
- * (c) Copyright IBM Corp. 2024, 2024 All Rights Reserved
- * ===========================================================================
- */
 
 package jdk.internal.javac;
 
@@ -86,12 +81,6 @@ public @interface PreviewFeature {
         @JEP(number=478, title="Key Derivation Function API", status="Preview")
         KEY_DERIVATION,
         LANGUAGE_MODEL,
-        // Not used, but required by interim javac with Java 21 bootjdk.
-        @JEP(number=445, title="Unnamed Classes and Instance Main Methods", status="Deprecated")
-        UNNAMED_CLASSES,
-        FOREIGN,
-        @JEP(number=459, title="String Templates", status="Second Preview")
-        STRING_TEMPLATES,
         /**
          * A key for testing.
          */
