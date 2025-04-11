@@ -24,9 +24,9 @@
  */
 
 /*
- * =======================================================================
- * (c) Copyright IBM Corp. 2018, 2022 All Rights Reserved
- * =======================================================================
+ * ===========================================================================
+ * (c) Copyright IBM Corp. 2018, 2024 All Rights Reserved
+ * ===========================================================================
  */
 
 package java.io;
@@ -356,33 +356,21 @@ public class ObjectInputStream
      */
     private boolean streamFilterSet;
 
-    /**
-     * cache LUDCL (Latest User Defined Class Loader) till completion of
-     * read* requests
+    /* Cache LUDCL (Latest User-Defined Class Loader) until completion of read requests.
+     * If true LUDCL/forName results would be cached, true by default starting with Java 8.
      */
-
-    @SuppressWarnings("removal")
     private static final boolean isClassCachingEnabled =
-            AccessController.doPrivileged(new GetClassCachingSettingAction());
-    /* ClassByNameCache Entry for caching class.forName results upon enableClassCaching */
+            Boolean.parseBoolean(System.getProperty("com.ibm.enableClassCaching", "true"));
+    /* ClassByNameCache Entry for caching class.forName results upon enableClassCaching. */
     private static final ClassByNameCache classByNameCache =
             isClassCachingEnabled ? new ClassByNameCache() : null;
 
-    /** if true LUDCL/forName results would be cached, true by default starting Java8 */
-    private static final class GetClassCachingSettingAction
-    implements PrivilegedAction<Boolean> {
-        public Boolean run() {
-            String property =
-                System.getProperty("com.ibm.enableClassCaching", "true");
-            return property.equalsIgnoreCase("true");
-        }
-    }
     private ClassLoader cachedLudcl;
     /* If user code is invoked in the middle of a call to readObject the cachedLudcl
      * must be refreshed as the ludcl could have been changed while in user code.
      */
-    private boolean refreshLudcl = false;
-    private Object startingLudclObject = null;
+    private boolean refreshLudcl;
+    private Object startingLudclObject;
 
     /**
      * Creates an ObjectInputStream that reads from the specified InputStream.
@@ -498,9 +486,7 @@ public class ObjectInputStream
      * @throws  ClassNotFoundException if the class of a serialized object
      *     could not be found.
      * @throws  IOException if an I/O error occurs.
-     *
      */
-
     private static Object redirectedReadObject(ObjectInputStream iStream, Class<?> caller)
             throws ClassNotFoundException, IOException
     {
@@ -560,10 +546,10 @@ public class ObjectInputStream
             // Otherwise use the class loader provided by JIT as the cachedLudcl.
 
             if (caller == null) {
-                 refreshLudcl = true;
+                refreshLudcl = true;
             } else {
-                 cachedLudcl = caller.getClassLoader();
-                 refreshLudcl = false;
+                cachedLudcl = caller.getClassLoader();
+                refreshLudcl = false;
             }
 
             if (null == startingLudclObject) {
@@ -668,7 +654,6 @@ public class ObjectInputStream
      * @since   1.4
      */
     public Object readUnshared() throws IOException, ClassNotFoundException {
-
         ClassLoader oldCachedLudcl = null;
         boolean setCached = false;
 
