@@ -89,9 +89,6 @@ public @interface PreviewFeature {
         // Not used, but required by interim javac with Java 21 bootjdk.
         @JEP(number=445, title="Unnamed Classes and Instance Main Methods", status="Deprecated")
         UNNAMED_CLASSES,
-        FOREIGN,
-        @JEP(number=459, title="String Templates", status="Second Preview")
-        STRING_TEMPLATES,
         /**
          * A key for testing.
          */
