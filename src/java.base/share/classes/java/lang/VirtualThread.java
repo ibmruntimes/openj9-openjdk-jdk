@@ -24,7 +24,7 @@
  */
 /*
  * ===========================================================================
- * (c) Copyright IBM Corp. 2022, 2024 All Rights Reserved
+ * (c) Copyright IBM Corp. 2022, 2025 All Rights Reserved
  * ===========================================================================
  */
 package java.lang;
@@ -480,6 +480,7 @@ final class VirtualThread extends BaseVirtualThread {
      * return, the current thread is the virtual thread.
      */
     @ChangesCurrentThread
+    @JvmtiMountTransition
     @ReservedStackAccess
     private void mount() {
         // notify JVMTI before mount
@@ -510,6 +511,7 @@ final class VirtualThread extends BaseVirtualThread {
      * current thread is the current platform thread.
      */
     @ChangesCurrentThread
+    @JvmtiMountTransition
     @ReservedStackAccess
     private void unmount() {
         assert !Thread.holdsLock(interruptLock);
