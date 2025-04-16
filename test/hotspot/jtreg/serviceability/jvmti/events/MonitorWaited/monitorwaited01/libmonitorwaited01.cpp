@@ -20,6 +20,11 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
+/*
+ * ===========================================================================
+ * (c) Copyright IBM Corp. 2025, 2025 All Rights Reserved
+ * ===========================================================================
+ */
 
 #include <stdio.h>
 #include <string.h>
@@ -88,11 +93,11 @@ static void check_stack_trace(JNIEnv* jni, jthread thr) {
   err = jvmti->GetStackTrace(thr, 0, MAX_COUNT, frameInfo, &count);
   check_jvmti_status(jni, err, "event handler: error in JVMTI GetStackTrace call");
 
-  const int expected_count = 8;
-  const char* expected_methods[expected_count] = {"waitImpl", "wait", "wait", "run", "runWith", "run", "run", "enter"};
+  const int expected_count = 7;
+  const char* expected_methods[expected_count] = {"wait", "wait", "run", "runWith", "run", "run", "enter"};
 
   if (count != expected_count) {
-    LOG("Expected 8 methods in the stack but found %d", count);
+    LOG("Expected 7 methods in the stack but found %d", count);
     jni->FatalError("Unexpected method count");
   }
 
