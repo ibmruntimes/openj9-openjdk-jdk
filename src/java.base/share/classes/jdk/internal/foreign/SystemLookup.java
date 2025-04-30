@@ -106,7 +106,7 @@ public final class SystemLookup implements SymbolLookup {
         /* Directly load the specified library only once with the inlined libc functions
          * missing in the default library.
          */
-        SymbolLookup funcsLibLookup = libLookup(libs -> libs.load(jdkLibraryPath("syslookup")));
+        SymbolLookup funcsLibLookup = sysLookup();
 
         /* Perform a FFI downcall to obtain the address of the inlined function list. */
         MemorySegment funcs_addr = funcsLibLookup.findOrThrow("funcs_addr");
