@@ -91,7 +91,6 @@ $(eval $(call SetupJavaCompilation,BUILD_DDR_TOOLS_BOOT, \
 	TARGET_RELEASE := $(TARGET_RELEASE_BOOTJDK), \
 	BIN := $(DDR_TOOLS_BIN_BOOT), \
 	CLASSPATH := $(JDK_OUTPUTDIR)/modules/java.base, \
-	JAVAC_FLAGS := --add-exports=java.base/jdk.internal.org.objectweb.asm=ALL-UNNAMED, \
 	SRC := $(DDR_SUPPORT_DIR)/interim, \
 	INCLUDE_FILES := $(DDR_TOOLS_SOURCE_FILES), \
 	))
