@@ -383,7 +383,9 @@ abstract class P11Key implements Key, Length {
         return new P11SecretKey(session, keyID, algorithm, keyLength, attrs);
     }
 
-    static SecretKey pbeKey(Session session, long keyID, String algorithm,
+    // for PBKDF2 and the deprecated PBE-based key derivation method defined
+    // in RFC 7292 PKCS#12 B.2
+    static SecretKey pbkdfKey(Session session, long keyID, String algorithm,
             int keyLength, CK_ATTRIBUTE[] attrs, char[] password, byte[] salt,
             int iterationCount) {
         attrs = getAttributes(session, keyID, attrs, new CK_ATTRIBUTE[] {
@@ -399,14 +401,14 @@ abstract class P11Key implements Key, Length {
             try {
                 byte[] key = SunPKCS11.mysunpkcs11.exportKey(session.id(), attrs, keyID);
                 SecretKey secretKey = new SecretKeySpec(key, algorithm);
-                return new P11PBEKey(session, keyID, algorithm, keyLength, attrs, password, salt, iterationCount, secretKey);
+                return new P11PBKDFKey(session, keyID, algorithm, keyLength, attrs, password, salt, iterationCount, secretKey);
             } catch (PKCS11Exception e) {
                 if (debug != null) {
-                    debug.println("Attempt failed, creating a regular P11PBEKey for " + algorithm);
+                    debug.println("Attempt failed, creating a regular P11PBKDFKey for " + algorithm);
                 }
             }
         }
-        return new P11PBEKey(session, keyID, algorithm, keyLength,
+        return new P11PBKDFKey(session, keyID, algorithm, keyLength,
                 attrs, password, salt, iterationCount);
     }
 
@@ -610,23 +612,23 @@ abstract class P11Key implements Key, Length {
         }
     }
 
-    static final class P11PBEKey extends P11SecretKey
+    static final class P11PBKDFKey extends P11SecretKey
             implements PBEKey {
         private static final long serialVersionUID = 6847576994253634876L;
         private char[] password;
         private final byte[] salt;
         private final int iterationCount;
-        P11PBEKey(Session session, long keyID, String algorithm,
+        P11PBKDFKey(Session session, long keyID, String keyAlgo,
                 int keyLength, CK_ATTRIBUTE[] attributes,
                 char[] password, byte[] salt, int iterationCount) {
-            super(session, keyID, algorithm, keyLength, attributes);
+            super(session, keyID, keyAlgo, keyLength, attributes);
             this.password = password.clone();
             this.salt = salt.clone();
             this.iterationCount = iterationCount;
         }
 
         // fips
-        P11PBEKey(Session session, long keyID, String algorithm,
+        P11PBKDFKey(Session session, long keyID, String algorithm,
                 int keyLength, CK_ATTRIBUTE[] attributes,
                 char[] password, byte[] salt, int iterationCount, SecretKey key) {
             super(session, keyID, algorithm, keyLength, attributes, key);
