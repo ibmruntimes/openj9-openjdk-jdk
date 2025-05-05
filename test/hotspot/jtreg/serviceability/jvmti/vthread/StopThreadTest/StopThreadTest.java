@@ -113,6 +113,8 @@ public class StopThreadTest {
                 testTaskThread = Thread.ofPlatform().name("TestTaskThread").start(testTask);
             }
             TestTask.ensureBlockedAfterPointA(testTaskThread);
+            /* Sleep for 2 seconds to allow the virtual thread to preempt and unmount. */
+            TestTask.sleep(2000);
 
             if (is_virtual) { // this check is for virtual target thread only
                 log("\nMain #A.1: unsuspended");
