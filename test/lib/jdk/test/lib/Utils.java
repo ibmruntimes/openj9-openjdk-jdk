@@ -73,6 +73,13 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static java.lang.System.lineSeparator;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.security.KeyStore;
+import java.security.Key;
+import java.security.cert.Certificate;
+import java.util.Enumeration;
+
 import static jdk.test.lib.Asserts.assertTrue;
 import jdk.test.lib.process.ProcessTools;
 import jdk.test.lib.process.OutputAnalyzer;
@@ -161,6 +168,7 @@ public final class Utils {
      * Contains the seed value used for {@link java.util.Random} creation.
      */
     public static final long SEED;
+
     static {
        var seed = Long.getLong(SEED_PROPERTY_NAME);
        if (seed != null) {
