@@ -4,9 +4,7 @@
  *
  * This code is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License version 2 only, as
- * published by the Free Software Foundation.  Oracle designates this
- * particular file as subject to the "Classpath" exception as provided
- * by Oracle in the LICENSE file that accompanied this code.
+ * published by the Free Software Foundation.
  *
  * This code is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
@@ -22,32 +20,44 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-package jdk.internal.net.http.common;
 
-import java.net.http.HttpHeaders;
+/*
+ * This file models a few cases where Elements.overrides produces a false
+ * positive which warrants @apiNote.
+ */
 
-public class HeaderDecoder extends ValidatingHeadersConsumer {
+// S.java does not compile because it violates the JLS rules for overrides
+class S {
 
-    private final HttpHeadersBuilder headersBuilder;
+    public void m() { }
+}
 
-    public HeaderDecoder(Context context) {
-        super(context);
-        this.headersBuilder = new HttpHeadersBuilder();
-    }
+// `protected` is a weaker modifier than `public`
+class T1 extends S {
 
-    @Override
-    public void onDecoded(CharSequence name, CharSequence value) {
-        String n = name.toString();
-        String v = value.toString();
-        super.onDecoded(n, v);
-        addHeader(n, v);
-    }
+    protected void m() { }
+}
 
-    protected void addHeader(String name, String value) {
-        headersBuilder.addHeader(name, value);
-    }
+// `package-private` is a weaker modifier than `public`
+class T2 extends S {
 
-    public HttpHeaders headers() {
-        return headersBuilder.build();
-    }
+    void m() { }
+}
+
+// `private` methods cannot override public method
+class T3 extends S {
+
+    private void m() { }
+}
+
+// return type int is not compatible with void
+class T4 extends S {
+
+    public int m() { return 0; }
+}
+
+// adding a checked exception violates the override rule
+class T5 extends S {
+
+    public void m() throws Exception { }
 }
