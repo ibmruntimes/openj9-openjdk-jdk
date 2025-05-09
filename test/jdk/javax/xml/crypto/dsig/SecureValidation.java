@@ -87,7 +87,7 @@ public class SecureValidation {
         } catch (javax.xml.crypto.dsig.XMLSignatureException xmlse) {
             Throwable cause = xmlse.getCause();
             if (cause instanceof java.security.InvalidAlgorithmParameterException) {
-                if (Signature.getInstance("RSA-PSS").getProvider().getName().equals("OpenJCEPlus")
+                if (Signature.getInstance("RSASSA-PSS").getProvider().getName().equals("OpenJCEPlus")
                 && cause.getMessage().equals("The message digest within the PSSParameterSpec does not match the MGF message digest.")
                 ) {
                     System.out.println("Expected error message is caught for OpenJCEPlus provider.");
