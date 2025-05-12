@@ -42,7 +42,7 @@ OPENJ9_MAKE := $(MAKE) $(MAKE_ARGS) -f $(TOPDIR)/closed/OpenJ9.gmk
 create-main-targets-include java.base-gensrc : generate-j9jcl-sources
 
 j9vm-build : buildtools-langtools
-  ifeq ($(BUILD_OPENSSL),yes)
+  ifeq ($(BUILD_OPENSSL), true)
 	@+$(MAKE) $(MAKE_ARGS) -f $(TOPDIR)/closed/openssl.gmk
   endif # BUILD_OPENSSL
 	@+$(OPENJ9_MAKE) build-j9

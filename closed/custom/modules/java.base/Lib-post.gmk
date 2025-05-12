@@ -18,8 +18,8 @@
 # 2 along with this work; if not, see <http://www.gnu.org/licenses/>.
 # ===========================================================================
 
-# Create the Java Native crypto library
-ifeq ($(WITH_OPENSSL), yes)
+ifeq ($(WITH_OPENSSL), true)
+  # Create the Java Native crypto library.
   $(eval $(call SetupJdkLibrary, BUILD_JNCRYPTO, \
       NAME := jncrypto, \
       OPTIMIZATION := LOW, \
