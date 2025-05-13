@@ -1,12 +1,10 @@
 /*
- * Copyright (c) 2003, 2014, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2025, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License version 2 only, as
- * published by the Free Software Foundation.  Oracle designates this
- * particular file as subject to the "Classpath" exception as provided
- * by Oracle in the LICENSE file that accompanied this code.
+ * published by the Free Software Foundation.
  *
  * This code is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
@@ -23,19 +21,29 @@
  * questions.
  */
 
-package sun.awt.X11;
-
-/**
- * Signals that some Xlib routine failed.
- *
- * @since 1.5
+/*
+ * @test
+ * @bug 8347515
+ * @summary Regression test for an assert triggered during elimination of OuterStripMinedLoop node. This happens
+ * due to a MaxL node being added to the macro list during refining of the OuterStripMinedLoop node prior to its
+ * elimination.
+ * @run main/othervm -XX:-TieredCompilation compiler.macronodes.TestLoopStripMiningInMacroElimination
  */
-@SuppressWarnings("serial") // JDK-implementation class
-public final class XException extends RuntimeException {
-    public XException() {
-        super();
+package compiler.macronodes;
+
+public class TestLoopStripMiningInMacroElimination {
+    static long l1 = 3434;
+    static long l2;
+    public static void main(String[] strArr) {
+        for (int i = 0; i < 1000; i++) {
+            test();
+        }
     }
-    public XException(String message) {
-        super(message);
+
+    static void test() {
+        for (int i = 0; i < 100; i++) {
+            l2 = Math.max(i, 56 % l1);
+        }
     }
+
 }
