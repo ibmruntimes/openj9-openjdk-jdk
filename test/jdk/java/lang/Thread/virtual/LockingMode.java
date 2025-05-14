@@ -37,6 +37,6 @@ class LockingMode {
      * Returns true if using legacy locking mode.
      */
     static boolean isLegacy() {
-        return true;
+        return !com.ibm.oti.vm.VM.isYieldBlockedVirtualThreadsEnabled();
     }
 }

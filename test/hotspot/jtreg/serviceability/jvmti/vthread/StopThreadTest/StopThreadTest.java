@@ -30,6 +30,7 @@
 /*
  * @test id=default
  * @summary Verifies JVMTI StopThread support for virtual threads.
+ * @modules java.base/com.ibm.oti.vm
  * @requires vm.continuations
  * @library /test/lib
  * @run main/othervm/native -agentlib:StopThreadTest StopThreadTest
@@ -38,6 +39,7 @@
 /*
  * @test id=platform
  * @summary Verifies JVMTI StopThread support for platform threads.
+ * @modules java.base/com.ibm.oti.vm
  * @library /test/lib
  * @run main/othervm/native -agentlib:StopThreadTest StopThreadTest platform
  */
@@ -276,6 +278,6 @@ public class StopThreadTest {
     }
 
     static boolean preemptableVirtualThread() {
-        return is_virtual && !isBoundVThread;
+        return is_virtual && !isBoundVThread && com.ibm.oti.vm.VM.isYieldBlockedVirtualThreadsEnabled();
     }
 }
