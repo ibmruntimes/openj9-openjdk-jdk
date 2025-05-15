@@ -21,6 +21,12 @@
  * questions.
  */
 
+/*
+ * ===========================================================================
+ * (c) Copyright IBM Corp. 2025, 2025 All Rights Reserved
+ * ===========================================================================
+ */
+
 import com.sun.beans.finder.MethodFinder;
 
 import java.lang.reflect.Method;
@@ -35,7 +41,7 @@ import java.util.List;
  * @author Sergey Malenkov
  * @modules java.desktop/com.sun.beans.finder
  * @compile -XDignore.symbol.file TestMethodFinder.java
- * @run main TestMethodFinder
+ * @run main/timeout=300 TestMethodFinder
  */
 
 public class TestMethodFinder {
