@@ -22,10 +22,16 @@
  */
 
 /*
+ * ===========================================================================
+ * (c) Copyright IBM Corp. 2025, 2025 All Rights Reserved
+ * ===========================================================================
+ */
+
+/*
  * @test id=default
  * @bug 8284161 8286788 8321270
  * @summary Test Thread API with virtual threads
- * @modules java.base/java.lang:+open jdk.management
+ * @modules java.base/com.ibm.oti.vm java.base/java.lang:+open jdk.management
  * @library /test/lib
  * @build LockingMode
  * @run junit/othervm/native --enable-native-access=ALL-UNNAMED ThreadAPI
@@ -34,7 +40,7 @@
 /*
  * @test id=no-vmcontinuations
  * @requires vm.continuations
- * @modules java.base/java.lang:+open jdk.management
+ * @modules java.base/com.ibm.oti.vm java.base/java.lang:+open jdk.management
  * @library /test/lib
  * @build LockingMode
  * @run junit/othervm/native -XX:+UnlockExperimentalVMOptions -XX:-VMContinuations

@@ -22,9 +22,15 @@
  */
 
 /*
+ * ===========================================================================
+ * (c) Copyright IBM Corp. 2025, 2025 All Rights Reserved
+ * ===========================================================================
+ */
+
+/*
  * @test id=default
  * @summary Test virtual threads using park/unpark
- * @modules java.base/java.lang:+open jdk.management
+ * @modules java.base/com.ibm.oti.vm java.base/java.lang:+open jdk.management
  * @library /test/lib
  * @build LockingMode
  * @run junit Parking
@@ -32,7 +38,7 @@
 
 /*
  * @test id=Xint
- * @modules java.base/java.lang:+open jdk.management
+ * @modules java.base/com.ibm.oti.vm java.base/java.lang:+open jdk.management
  * @library /test/lib
  * @build LockingMode
  * @run junit/othervm -Xint Parking
@@ -40,7 +46,7 @@
 
 /*
  * @test id=Xcomp
- * @modules java.base/java.lang:+open jdk.management
+ * @modules java.base/com.ibm.oti.vm java.base/java.lang:+open jdk.management
  * @library /test/lib
  * @build LockingMode
  * @run junit/othervm -Xcomp Parking
@@ -48,7 +54,7 @@
 
 /*
  * @test id=Xcomp-noTieredCompilation
- * @modules java.base/java.lang:+open jdk.management
+ * @modules java.base/com.ibm.oti.vm java.base/java.lang:+open jdk.management
  * @library /test/lib
  * @build LockingMode
  * @run junit/othervm -Xcomp -XX:-TieredCompilation Parking
