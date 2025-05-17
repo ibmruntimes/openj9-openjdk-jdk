@@ -86,6 +86,7 @@ import jdk.internal.util.StaticProperty;
  *
  * - ML-KEM
  *
+ * - HKDF-SHA256, HKDF-SHA384, and HKDF-SHA512
  */
 
 public final class SunJCE extends Provider {
@@ -105,7 +106,7 @@ public final class SunJCE extends Provider {
 
     private static final String info = "SunJCE Provider " +
     "(implements RSA, DES, Triple DES, AES, Blowfish, ARCFOUR, RC2, PBE, "
-    + "Diffie-Hellman, HMAC, ChaCha20, DHKEM, and ML-KEM)";
+    + "Diffie-Hellman, HMAC, ChaCha20, DHKEM, ML-KEM, and HKDF)";
 
     /* Are we debugging? -- for developers */
     static final boolean debug = false;
