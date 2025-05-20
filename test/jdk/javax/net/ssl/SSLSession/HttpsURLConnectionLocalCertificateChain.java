@@ -24,6 +24,7 @@
 /*
  * @test
  * @bug 4395238 4354003 4387961 4395266
+ * @library /test/lib
  * @summary A test of many of the new functionality to go into JSSE 1.1
  *      Fixed 4395238: The new certificate chains APIs should really be
  *          returning certs, not x509 certs
@@ -41,6 +42,9 @@ import java.io.*;
 import java.net.*;
 import javax.net.ssl.*;
 import java.security.cert.*;
+
+import jdk.test.lib.Utils;
+import jdk.test.lib.security.SecurityUtils;
 
 public class HttpsURLConnectionLocalCertificateChain
         implements HandshakeCompletedListener,
@@ -211,7 +215,6 @@ public class HttpsURLConnectionLocalCertificateChain
         myURLc = (HttpsURLConnection) myURL.openConnection();
         myURLc.setHostnameVerifier(this);
         myURLc.connect();
-
         InputStream sslIS = myURLc.getInputStream();
 
         System.out.println("Client reading...");
@@ -244,6 +247,11 @@ public class HttpsURLConnectionLocalCertificateChain
         String trustFilename =
             System.getProperty("test.src", "./") + "/" + pathToStores +
                 "/" + trustStoreFile;
+
+        if (SecurityUtils.isFIPS()) {
+            keyFilename = SecurityUtils.revertJKSToPKCS12(keyFilename, passwd);
+            trustFilename = SecurityUtils.revertJKSToPKCS12(trustFilename, passwd);
+        }
 
         System.setProperty("javax.net.ssl.keyStore", keyFilename);
         System.setProperty("javax.net.ssl.keyStorePassword", passwd);
