@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2025, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -21,12 +21,18 @@
  * questions.
  */
 
-// key: compiler.warn.attempt.to.synchronize.on.instance.of.value.based.class
-// options: -Xlint:identity
+/*
+ * @test
+ * @summary Tests file permission checks during the creation of a `FileServerHandler`
+ * @requires (os.family == "windows")
+ * @library /test/lib
+ * @build jdk.test.lib.net.URIBuilder
+ * @run main/manual/othervm -ea DocRootDirPermissionsWinTest true
+ * @run main/manual/othervm -ea DocRootDirPermissionsWinTest false
+ */
 
-class AttemptToSynchronizeOnInstanceOfVbc {
-    void foo(Integer i) {
-        synchronized(i) {
-        }
+public class DocRootDirPermissionsWinTest extends DocRootDirPermissionsTest{
+    public static void main(String[] args) throws Exception {
+        new DocRootDirPermissionsWinTest().run(args);
     }
 }
