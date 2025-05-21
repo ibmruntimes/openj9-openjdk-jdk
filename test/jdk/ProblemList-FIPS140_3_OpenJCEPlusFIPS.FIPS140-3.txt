@@ -1091,6 +1091,7 @@ sun/security/validator/PKIXValAndRevCheckTests.java https://github.com/eclipse-o
 sun/security/validator/certreplace.sh https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 sun/security/validator/samedn.sh https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 sun/security/x509/AlgorithmId/ExtensibleAlgorithmId.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
+sun/security/x509/AlgorithmId/NonStandardNames.java https://github.com/eclipse-openj9/openj9/issues/21778 generic-all
 sun/security/x509/AlgorithmId/OmitAlgIdParam.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 sun/security/x509/AlgorithmId/PBES2.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 sun/security/x509/AlgorithmId/Uppercase.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all

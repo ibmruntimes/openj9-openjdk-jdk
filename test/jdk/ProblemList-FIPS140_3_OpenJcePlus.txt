@@ -435,6 +435,7 @@ sun/security/provider/all/Deterministic.java https://github.com/eclipse-openj9/o
 #
 # Exclude tests list from extended.openjdk
 #
+com/sun/crypto/provider/KDF/HKDFDelayedPRK.java https://github.com/eclipse-openj9/openj9/issues/21754 generic-all
 com/sun/jdi/JdwpAttachTest.java.JdwpAttachTest https://github.com/eclipse-openj9/openj9/issues/20978 generic-all
 com/sun/jndi/dns/ConfigTests/PortUnreachable.java https://github.com/eclipse-openj9/openj9/issues/20978 generic-all
 com/sun/jndi/ldap/LdapCBPropertiesTest.java https://github.com/eclipse-openj9/openj9/issues/20978 generic-all
@@ -492,6 +493,7 @@ java/rmi/server/RMISocketFactory/useSocketFactory/unicast/UseCustomSocketFactory
 java/rmi/server/clientStackTrace/ClientStackTrace.java https://github.com/eclipse-openj9/openj9/issues/20978 generic-all
 java/rmi/server/useCustomRef/UseCustomRef.java https://github.com/eclipse-openj9/openj9/issues/20978 generic-all
 java/rmi/transport/dgcDeadLock/DGCDeadLock.java https://github.com/eclipse-openj9/openj9/issues/20978 generic-all
+javax/crypto/KDF/KDFDelayedProviderTest.java https://github.com/eclipse-openj9/openj9/issues/21754 generic-all
 javax/imageio/CachePremissionsTest/CachePermissionsTest.java https://github.com/eclipse-openj9/openj9/issues/20978 generic-all
 javax/net/ssl/ALPN/SSLEngineAlpnTest.java https://github.com/eclipse-openj9/openj9/issues/20978 generic-all
 javax/net/ssl/ALPN/SSLServerSocketAlpnTest.java https://github.com/eclipse-openj9/openj9/issues/20978 generic-all
