@@ -184,6 +184,7 @@ $(foreach file, \
 		memorywatcher29 \
 		migration \
 		osmemory29 \
+		sharedClasses \
 		SharedClassesNativeAgent \
 		softmxtest \
 		testjvmtiA \
