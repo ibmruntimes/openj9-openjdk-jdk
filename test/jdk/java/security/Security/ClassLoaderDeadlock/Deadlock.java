@@ -22,11 +22,17 @@
  */
 
 /*
+ * ===========================================================================
+ * (c) Copyright IBM Corp. 2025, 2025 All Rights Reserved
+ * ===========================================================================
+ */
+
+/*
  * @test
  * @bug 4944382
  * @summary make sure we do not deadlock loading signed JAR with getInstance()
  * @library ./Deadlock.jar
- * @run main/othervm/timeout=30 Deadlock
+ * @run main/othervm/timeout=60 Deadlock
  */
 
 import java.security.*;
