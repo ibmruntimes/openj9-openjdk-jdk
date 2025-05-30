@@ -25,7 +25,7 @@
 
 /*
  * ===========================================================================
- * (c) Copyright IBM Corp. 2021, 2024 All Rights Reserved
+ * (c) Copyright IBM Corp. 2021, 2025 All Rights Reserved
  * ===========================================================================
  */
 
@@ -1646,7 +1646,7 @@ public class Thread implements Runnable {
 
     final void clearInterrupt() {
         // assert Thread.currentCarrierThread() == this;
-        if (interrupted) {
+        if (interrupted || isInterruptedImpl()) {
             interrupted = false;
             clearInterruptEvent();
         }
@@ -1657,17 +1657,23 @@ public class Thread implements Runnable {
         if (com.ibm.oti.vm.VM.isJVMInSingleThreadedMode()) {
             return interruptedImpl();
         }
-        boolean oldValue = interrupted;
+
+        /*
+         * It is possible for the Java and native interrupt status to get out of sync. Sending
+         * two interrupts to the same thread in quick succession can cause this. It is critical
+         * that clearing the interrupt status also clears the native status. If the Java
+         * interrupt status is false, it is important to verify that this is consistent with the
+         * native status to prevent an unexpected interrupt exception the next time
+         * sleep() or wait() is called.
+         */
+        boolean oldValue = interrupted || isInterruptedImpl();
         if (oldValue) {
             synchronized (interruptLock) {
-                oldValue = interrupted;
                 // We may have been interrupted the moment after we read the field,
                 // so only clear the field if we saw that it was set and will return
                 // true; otherwise we could lose an interrupt.
-                if (oldValue) {
-                    interrupted = false;
-                    clearInterruptEvent();
-                }
+                interrupted = false;
+                clearInterruptEvent();
             }
         }
         return oldValue;
