@@ -431,7 +431,6 @@ sun/security/krb5/ktab/BufferBoundary.java https://github.com/eclipse-openj9/ope
 sun/security/krb5/ktab/FileKeyTab.java https://github.com/eclipse-openj9/openj9/issues/20978 generic-all
 sun/security/krb5/ktab/KeyTabIndex.java https://github.com/eclipse-openj9/openj9/issues/20978 generic-all
 sun/security/krb5/runNameEquals.sh https://github.com/eclipse-openj9/openj9/issues/20978 generic-all
-sun/security/provider/all/Deterministic.java https://github.com/eclipse-openj9/openj9/issues/20978 generic-all
 #
 # Exclude tests list from extended.openjdk
 #
@@ -782,7 +781,6 @@ sun/security/provider/SecureRandom/StrongSeedReader.java https://github.com/ecli
 sun/security/provider/SeedGenerator/SeedGeneratorChoice.java https://github.com/eclipse-openj9/openj9/issues/20978 generic-all
 sun/security/provider/X509Factory/BadPem.java https://github.com/eclipse-openj9/openj9/issues/20978 generic-all
 sun/security/provider/X509Factory/BigCRL.java https://github.com/eclipse-openj9/openj9/issues/20978 generic-all
-sun/security/provider/all/Deterministic.java https://github.com/eclipse-openj9/openj9/issues/20978 generic-all
 sun/security/provider/certpath/DisabledAlgorithms/CPBuilder.java https://github.com/eclipse-openj9/openj9/issues/20978 generic-all
 sun/security/provider/certpath/DisabledAlgorithms/CPBuilderWithMD5.java https://github.com/eclipse-openj9/openj9/issues/20978 generic-all
 sun/security/provider/certpath/DisabledAlgorithms/CPValidatorEndEntity.java https://github.com/eclipse-openj9/openj9/issues/20978 generic-all
