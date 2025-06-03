@@ -20,11 +20,7 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-/*
- * ===========================================================================
- * (c) Copyright IBM Corp. 2025, 2025 All Rights Reserved
- * ===========================================================================
- */
+
 
 /*
  * @test
@@ -80,9 +76,9 @@ public class contmon01 {
     public static volatile boolean waitingBarrier = true;
     static Object lockFld = new Object();
 
-    public static void doSleep(long millis) {
+    public static void doSleep() {
         try {
-            Thread.sleep(millis);
+            Thread.sleep(10);
         } catch (Exception e) {
             throw new Error("Unexpected " + e);
         }
@@ -112,7 +108,7 @@ public class contmon01 {
 
         System.out.println("\nWaiting for auxiliary thread ...");
         while (startingBarrier) {
-            doSleep(10);
+            doSleep();
         }
         System.out.println("Auxiliary thread is ready");
 
@@ -123,19 +119,13 @@ public class contmon01 {
         task.letItGo();
 
         while (waitingBarrier) {
-            doSleep(10);
+            doSleep();
         }
         synchronized (lockFld) {
             System.out.println("\nMain thread entered lockFld's monitor"
                     + "\n\tand calling lockFld.notifyAll() to awake auxiliary thread");
             lockFld.notifyAll();
-
             System.out.println("\nCheck #4: verifying a contended monitor of auxiliary thread ...");
-            while (thread.getState() != Thread.State.BLOCKED) {
-                doSleep(10);
-            }
-            // Wait for 2 seconds to allow the virtual thread to be contended.
-            doSleep(2000);
             checkMonitor(4, thread, lockFld);
             System.out.println("Check #4 done");
         }
