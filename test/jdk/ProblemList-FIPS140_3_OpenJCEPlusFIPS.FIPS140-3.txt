@@ -833,7 +833,6 @@ sun/security/pkcs12/StorePasswordTest.java https://github.com/eclipse-openj9/ope
 sun/security/pkcs12/StoreSecretKeyTest.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 sun/security/pkcs12/StoreTrustedCertTest.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 sun/security/pkcs12/WrongPBES2.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
-sun/security/provider/all/Deterministic.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 sun/security/provider/DSA/SecureRandomReset.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 sun/security/provider/DSA/SupportedDSAParamGen.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 sun/security/provider/DSA/SupportedDSAParamGenLongKey.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
@@ -873,7 +872,6 @@ sun/security/provider/SecureRandom/StrongSeedReader.java https://github.com/ecli
 sun/security/provider/SeedGenerator/SeedGeneratorChoice.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 sun/security/provider/X509Factory/BadPem.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 sun/security/provider/X509Factory/BigCRL.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
-sun/security/provider/all/Deterministic.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 sun/security/provider/certpath/CertId/CheckCertId.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 sun/security/provider/certpath/DisabledAlgorithms/CPBuilder.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 sun/security/provider/certpath/DisabledAlgorithms/CPBuilderWithMD5.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
