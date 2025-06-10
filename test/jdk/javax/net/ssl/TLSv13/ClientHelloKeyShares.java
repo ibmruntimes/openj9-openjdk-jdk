@@ -35,6 +35,7 @@
  * @test
  * @bug 8247630
  * @summary Use two key share entries
+ * @library /test/lib
  * @run main/othervm ClientHelloKeyShares 29 23
  * @run main/othervm -Djdk.tls.namedGroups=secp384r1,secp521r1,x448,ffdhe2048 ClientHelloKeyShares 24 30
  * @run main/othervm -Djdk.tls.namedGroups=brainpoolP512r1tls13,x448,ffdhe2048 ClientHelloKeyShares 33 30
@@ -50,6 +51,8 @@ import javax.net.ssl.SSLEngineResult.*;
 import java.nio.ByteBuffer;
 import java.util.*;
 
+import jdk.test.lib.Utils;
+import jdk.test.lib.security.SecurityUtils;
 
 public class ClientHelloKeyShares {
 
@@ -69,9 +72,28 @@ public class ClientHelloKeyShares {
         // values which will be the expected NamedGroup IDs in the key_share
         // extension.  Expected named group assertions may also be affected
         // by setting the jdk.tls.namedGroups System property.
+
         List<Integer> expectedKeyShares = new ArrayList<>();
         Arrays.stream(args).forEach(arg ->
                 expectedKeyShares.add(Integer.valueOf(arg)));
+        if (SecurityUtils.isFIPS()) {
+            expectedKeyShares.clear();
+            Map<String, Integer> supportKeyShares = new HashMap<>();
+            supportKeyShares.put("secp256r1", 23);
+            supportKeyShares.put("secp384r1", 24);
+            supportKeyShares.put("secp521r1", 25);
+
+            if (System.getProperty("jdk.tls.namedGroups") == null) {
+                expectedKeyShares.add(23);
+            } else {
+                for (String nameGroup: System.getProperty("jdk.tls.namedGroups").split(",")) {
+                    if (supportKeyShares.containsKey(nameGroup)) {
+                        expectedKeyShares.add(supportKeyShares.get(nameGroup));
+                        break;
+                    }
+                }
+            }
+        }
 
         SSLContext sslCtx = SSLContext.getDefault();
         SSLEngine engine = sslCtx.createSSLEngine();
@@ -82,7 +104,19 @@ public class ClientHelloKeyShares {
                 ByteBuffer.allocateDirect(session.getPacketBufferSize());
 
         // Create and check the ClientHello message
-        SSLEngineResult clientResult = engine.wrap(clientOut, cTOs);
+        SSLEngineResult clientResult = null;
+        try {
+            clientResult = engine.wrap(clientOut, cTOs);
+        } catch (java.lang.ExceptionInInitializerError eiie) {
+            Throwable cause = eiie.getCause();
+            if (cause instanceof java.lang.IllegalArgumentException) {
+                if (SecurityUtils.isFIPS() 
+                && ("System property jdk.tls.namedGroups(" + System.getProperty("jdk.tls.namedGroups") + ") contains no supported named groups").equals(cause.getMessage())) {
+                    System.out.println("Expected msg is caught.");
+                    return;
+                }
+            }
+        }
         logResult("client wrap: ", clientResult);
         if (clientResult.getStatus() != SSLEngineResult.Status.OK) {
             throw new RuntimeException("Client wrap got status: " +
@@ -217,7 +251,7 @@ public class ClientHelloKeyShares {
                     break;
                 case HELLO_EXT_SUPP_VERS:
                     foundSupVer = true;
-                    int supVerLen = Byte.toUnsignedInt(data.get());
+                    int supVerLen = Byte.toUnsignedInt(data.get()); // 04 
                     for (int remain = supVerLen; remain > 0; remain -= 2) {
                         foundTLS13 |= (Short.toUnsignedInt(data.getShort()) ==
                                 TLS_PROT_VER_13);
@@ -232,7 +266,8 @@ public class ClientHelloKeyShares {
                     foundKeyShare = true;
                     int ksListLen = Short.toUnsignedInt(data.getShort());
                     while (ksListLen > 0) {
-                        chKeyShares.add(Short.toUnsignedInt(data.getShort()));
+                        int ks = Short.toUnsignedInt(data.getShort());
+                        chKeyShares.add(ks);
                         int ksLen = Short.toUnsignedInt(data.getShort());
                         data.position(data.position() + ksLen);
                         ksListLen -= (4 + ksLen);

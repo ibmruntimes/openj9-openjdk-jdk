@@ -25,6 +25,7 @@
  * @test
  * @bug 4873188
  * @summary Support TLS 1.1
+ * @library /test/lib
  * @modules java.security.jgss
  *          java.security.jgss/sun.security.jgss.krb5
  *          java.security.jgss/sun.security.krb5:+open
@@ -48,6 +49,9 @@ import javax.net.ssl.SSLServerSocket;
 import javax.net.ssl.SSLServerSocketFactory;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
+
+import jdk.test.lib.Utils;
+import jdk.test.lib.security.SecurityUtils;
 
 public class GenericStreamCipher {
 
@@ -105,7 +109,7 @@ public class GenericStreamCipher {
 
         // enable a stream cipher
         sslServerSocket.setEnabledCipherSuites(
-            new String[] {"SSL_RSA_WITH_RC4_128_MD5"});
+                new String[] {"SSL_RSA_WITH_RC4_128_MD5"});
 
         serverPort = sslServerSocket.getLocalPort();
 
@@ -150,7 +154,7 @@ public class GenericStreamCipher {
 
         // enable a stream cipher
         sslSocket.setEnabledCipherSuites(
-            new String[] {"SSL_RSA_WITH_RC4_128_MD5"});
+                new String[] {"SSL_RSA_WITH_RC4_128_MD5"});
 
         InputStream sslIS = sslSocket.getInputStream();
         OutputStream sslOS = sslSocket.getOutputStream();
@@ -176,7 +180,9 @@ public class GenericStreamCipher {
     public static void main(String[] args) throws Exception {
         // reset the security property to make sure that the algorithms
         // and keys used in this test are not disabled.
-        Security.setProperty("jdk.tls.disabledAlgorithms", "");
+        if (!(SecurityUtils.isFIPS())) {
+            Security.setProperty("jdk.tls.disabledAlgorithms", "");
+        }
 
         String keyFilename =
             System.getProperty("test.src", ".") + "/" + pathToStores +
@@ -196,7 +202,19 @@ public class GenericStreamCipher {
         /*
          * Start the tests.
          */
-        new GenericStreamCipher();
+        try {
+            new GenericStreamCipher();
+        } catch (javax.net.ssl.SSLHandshakeException sslhe) {
+            if (SecurityUtils.isFIPS()) {
+                if ("No appropriate protocol (protocol is disabled or cipher suites are inappropriate)".equals(sslhe.getMessage())) {
+                    System.out.println("Expected exception msg: <No appropriate protocol (protocol is disabled or cipher suites are inappropriate)> is caught");
+                    return;
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return;
+        }
     }
 
     Thread clientThread = null;

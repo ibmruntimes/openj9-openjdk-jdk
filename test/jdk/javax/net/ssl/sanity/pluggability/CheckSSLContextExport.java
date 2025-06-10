@@ -25,10 +25,14 @@
  * @test
  * @bug 4635454 6208022 8130181
  * @summary Check pluggability of SSLContext class.
+ * @library /test/lib
  */
 import java.security.*;
 import java.net.*;
 import javax.net.ssl.*;
+
+import jdk.test.lib.Utils;
+import jdk.test.lib.security.SecurityUtils;
 
 public class CheckSSLContextExport extends Provider {
     private static String info = "test provider for JSSE pluggability";
@@ -45,8 +49,12 @@ public class CheckSSLContextExport extends Provider {
 
         String providerName = mySSLContext.getProvider().getName();
         if (!providerName.equals("TestJSSEPluggability")) {
-            System.out.println(providerName + "'s SSLContext is used");
-            throw new Exception("...used the wrong provider: " + providerName);
+            if (!(SecurityUtils.isFIPS())) {
+                System.out.println(providerName + "'s SSLContext is used");
+                throw new Exception("...used the wrong provider: " + providerName);
+            } else {
+                System.out.println("In FIPS mode, we dont support customized provider yet, " + providerName + "'s SSLContext is used");
+            }
         }
         for (int i = 0; i < 2; i++) {
             boolean standardCiphers = true;
@@ -112,7 +120,16 @@ public class CheckSSLContextExport extends Provider {
         try {
             for (int i = 0; i < protocols.length; i++) {
                 System.out.println("Testing " + protocols[i] + "'s SSLContext");
-                test(protocols[i]);
+                try {
+                    test(protocols[i]);
+                } catch (java.lang.IllegalStateException ise) {
+                    if (SecurityUtils.isFIPS()) {
+                        if (protocols[i].equals("SSL") && "SSLContext is not initialized".equals(ise.getMessage())) {
+                            System.out.println("SSL is not supported in FIPS140-3.");
+                            continue;
+                        }
+                    }
+                }
             }
             System.out.println("Test Passed");
         } finally {

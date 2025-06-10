@@ -27,6 +27,7 @@
 /*
  * @test
  * @bug 7106773
+ * @library /test/lib
  * @summary 512 bits RSA key cannot work with SHA384 and SHA512
  *
  *     SunJSSE does not support dynamic system properties, no way to re-use
@@ -41,6 +42,8 @@ import java.io.*;
 import javax.net.ssl.*;
 import java.security.Security;
 
+import jdk.test.lib.Utils;
+import jdk.test.lib.security.SecurityUtils;
 
 public class ShortRSAKey512 extends SSLContextTemplate {
 
@@ -168,9 +171,11 @@ public class ShortRSAKey512 extends SSLContextTemplate {
     public static void main(String[] args) throws Exception {
         // reset the security property to make sure that the algorithms
         // and keys used in this test are not disabled.
-        Security.setProperty("jdk.certpath.disabledAlgorithms", "MD2");
-        Security.setProperty("jdk.tls.disabledAlgorithms",
-                "SSLv3, RC4, DH keySize < 768");
+        if (!(SecurityUtils.isFIPS())) {
+            Security.setProperty("jdk.certpath.disabledAlgorithms", "MD2");
+            Security.setProperty("jdk.tls.disabledAlgorithms",
+                    "SSLv3, RC4, DH keySize < 768");
+        }
 
         if (debug)
             System.setProperty("javax.net.debug", "all");
@@ -183,7 +188,14 @@ public class ShortRSAKey512 extends SSLContextTemplate {
         /*
          * Start the tests.
          */
-        new ShortRSAKey512();
+        try {
+            new ShortRSAKey512();
+        } catch (java.security.spec.InvalidKeySpecException ikse) {
+            if (SecurityUtils.isFIPS()) {
+                System.out.println("Inappropriate key specification: RSA keys must be at least 1024 bits long");
+                return;
+            }
+        }
     }
 
     Thread clientThread = null;
