@@ -52,9 +52,13 @@ class ThreadSnapshot {
 
     /**
      * Take a snapshot of a Thread to get all information about the thread.
+     * @throws UnsupportedOperationException if not supported by VM
      */
     static ThreadSnapshot of(Thread thread) {
         ThreadSnapshot snapshot = create(thread);
+        if (snapshot == null) {
+            throw new UnsupportedOperationException();
+        }
         if (snapshot.stackTrace == null) {
             snapshot.stackTrace = EMPTY_STACK;
         }
@@ -171,7 +175,7 @@ class ThreadSnapshot {
     /**
      * Represents a locking operation of a thread at a specific stack depth.
      */
-    private class ThreadLock {
+    private static class ThreadLock {
         private static final OwnedLockType[] lockTypeValues = OwnedLockType.values(); // cache
 
         // set by the VM
