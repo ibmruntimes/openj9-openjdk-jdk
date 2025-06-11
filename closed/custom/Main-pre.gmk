@@ -39,7 +39,10 @@ OPENJ9_MAKE := $(MAKE) $(MAKE_ARGS) -f $(TOPDIR)/closed/OpenJ9.gmk
 # modules specific to OpenJ9 will be found and included in that set. The next two
 # rules make that happen.
 
-create-main-targets-include java.base-gensrc : generate-j9jcl-sources
+# We don't need to build the preprocessor and generate j9jcl code when cleaning.
+ifeq (,$(filter clean dist-clean, $(SEQUENTIAL_TARGETS)))
+  create-main-targets-include java.base-gensrc : generate-j9jcl-sources
+endif
 
 j9vm-build : buildtools-langtools
   ifeq ($(BUILD_OPENSSL), true)
