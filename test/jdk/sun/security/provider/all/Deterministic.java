@@ -169,7 +169,7 @@ public class Deterministic {
                 keyAlg = s.getAlgorithm(); // EdDSA etc
             }
         }
-        var sk = generateKeyPair(keyAlg, 0).getPrivate();
+        var sk = generateKeyPair(keyAlg, null, 0).getPrivate();
         var sig = Signature.getInstance(s.getAlgorithm(), s.getProvider());
         try {
             if (keyAlg.equals("RSASSA-PSS")) {
@@ -192,8 +192,8 @@ public class Deterministic {
     static void testKeyPairGenerator(Provider.Service s) throws Exception {
         System.out.println(s.getProvider().getName()
                 + " " + s.getType() + "." + s.getAlgorithm());
-        var kp1 = generateKeyPair(s.getAlgorithm(), 0);
-        var kp2 = generateKeyPair(s.getAlgorithm(), 0);
+        var kp1 = generateKeyPair(s.getAlgorithm(), s.getProvider(), 0);
+        var kp2 = generateKeyPair(s.getAlgorithm(), s.getProvider(), 0);
         Asserts.assertEqualsByteArray(
                 kp1.getPrivate().getEncoded(), kp2.getPrivate().getEncoded());
         Asserts.assertEqualsByteArray(
@@ -204,8 +204,13 @@ public class Deterministic {
         System.out.println("    Passed");
     }
 
-    static KeyPair generateKeyPair(String alg, int offset) throws Exception {
-        var g = KeyPairGenerator.getInstance(alg);
+    static KeyPair generateKeyPair(String alg, Provider provider, int offset) throws Exception {
+        KeyPairGenerator g;
+        if (provider != null) {
+            g = KeyPairGenerator.getInstance(alg, provider);
+        } else {
+            g = KeyPairGenerator.getInstance(alg);
+        }
         var size = switch (g.getAlgorithm()) {
             case "RSA", "RSASSA-PSS", "DSA", "DiffieHellman" -> 1024;
             case "EC" -> 256;
@@ -244,7 +249,7 @@ public class Deterministic {
             g.init(new SeededSecureRandom(SEED + 2));
             return g.generateKey();
         } if (s.equals("RSA")) {
-            return generateKeyPair("RSA", 3).getPublic();
+            return generateKeyPair("RSA", null, 3).getPublic();
         } else {
             var g = KeyGenerator.getInstance(s, p);
             g.init(new SeededSecureRandom(SEED + 4));
@@ -256,7 +261,7 @@ public class Deterministic {
         System.out.println(s.getProvider().getName()
                 + " " + s.getType() + "." + s.getAlgorithm());
         String keyAlg = getKeyAlgFromKEM(s.getAlgorithm());
-        var kp = generateKeyPair(keyAlg, 10);
+        var kp = generateKeyPair(keyAlg, null, 10);
         var kem = KEM.getInstance(s.getAlgorithm(), s.getProvider());
         var e1 = kem.newEncapsulator(kp.getPublic(), null, new SeededSecureRandom(SEED));
         var enc1 = e1.encapsulate();
@@ -273,8 +278,8 @@ public class Deterministic {
         System.out.println(s.getProvider().getName()
                 + " " + s.getType() + "." + s.getAlgorithm());
         String keyAlg = getKeyAlgFromKEM(s.getAlgorithm());
-        var kpS = generateKeyPair(keyAlg, 11);
-        var kpR = generateKeyPair(keyAlg, 12);
+        var kpS = generateKeyPair(keyAlg, null, 11);
+        var kpR = generateKeyPair(keyAlg, null, 12);
         var ka = KeyAgreement.getInstance(s.getAlgorithm(), s.getProvider());
         ka.init(kpS.getPrivate(), new SeededSecureRandom(SEED));
         ka.doPhase(kpR.getPublic(), true);
