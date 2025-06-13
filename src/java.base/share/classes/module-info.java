@@ -341,6 +341,7 @@ module java.base {
 /*[ENDIF] OPENJCEPLUS_SUPPORT */
         jdk.crypto.cryptoki;
     exports sun.security.jca to
+        java.security.sasl,
         java.smartcardio,
         jdk.crypto.cryptoki,
         jdk.naming.dns;
