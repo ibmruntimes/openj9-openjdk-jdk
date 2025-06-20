@@ -23,7 +23,7 @@
 
 /*
  * ===========================================================================
- * (c) Copyright IBM Corp. 2020, 2022 All Rights Reserved
+ * (c) Copyright IBM Corp. 2020, 2024 All Rights Reserved
  * ===========================================================================
  */
 
@@ -816,8 +816,9 @@ public class Basic {
      */
     private static String removeAixExpectedVars(String vars) {
         String cleanedVars = vars.replace("AIXTHREAD_GUARDPAGES=0,", "");
-        // OpenJ9 adds MALLOCOPTIONS
+        // OpenJ9 adds MALLOCOPTIONS and LDR_CNTRL
         cleanedVars = cleanedVars.replace("MALLOCOPTIONS=multiheap,considersize,", "");
+        cleanedVars = cleanedVars.replace("LDR_CNTRL=TEXTPSIZE=64K@DATAPSIZE=64K@STACKPSIZE=64K@SHMPSIZE=64K,", "");
         return cleanedVars;
     }
 
