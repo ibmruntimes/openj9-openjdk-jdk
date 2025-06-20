@@ -29,6 +29,7 @@
  * @bug 8281236
  * @summary Check TLS connection behaviors for named groups configuration
  * @library /javax/net/ssl/templates
+ *          /test/lib
  * @run main/othervm NamedGroups
  */
 
@@ -36,6 +37,9 @@ import javax.net.ssl.SSLParameters;
 import javax.net.ssl.SSLServerSocket;
 import javax.net.ssl.SSLSocket;
 import java.security.Security;
+
+import jdk.test.lib.Utils;
+import jdk.test.lib.security.SecurityUtils;
 
 public class NamedGroups extends SSLSocketTemplate {
     private final String[] serverNamedGroups;
@@ -91,7 +95,9 @@ public class NamedGroups extends SSLSocketTemplate {
     }
 
     public static void main(String[] args) throws Exception {
-        Security.setProperty("jdk.tls.disabledAlgorithms", "");
+        if (!(SecurityUtils.isFIPS())) {
+            Security.setProperty("jdk.tls.disabledAlgorithms", "");
+        }
 
         runTest(new String[] {
                         "x25519",

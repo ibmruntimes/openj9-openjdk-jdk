@@ -41,7 +41,9 @@ import javax.net.ssl.SSLEngineResult.*;
 import java.io.*;
 import java.security.*;
 import java.nio.*;
+import java.util.*;
 
+import jdk.test.lib.Utils;
 import jdk.test.lib.security.SecurityUtils;
 
 public class Arrays {
@@ -187,12 +189,14 @@ public class Arrays {
         contextVersion = args[0];
         // Re-enable context version if it is disabled.
         // If context version is SSLv3, TLSv1 needs to be re-enabled.
-        if (contextVersion.equals("SSLv3")) {
-            SecurityUtils.removeFromDisabledTlsAlgs("TLSv1");
-        } else if (contextVersion.equals("TLSv1") ||
-                   contextVersion.equals("TLSv1.1")) {
-            SecurityUtils.removeFromDisabledTlsAlgs(contextVersion);
-        }
+        if (!(SecurityUtils.isFIPS())) {
+            if (contextVersion.equals("SSLv3")) {
+                SecurityUtils.removeFromDisabledTlsAlgs("TLSv1");
+            } else if (contextVersion.equals("TLSv1") ||
+                    contextVersion.equals("TLSv1.1")) {
+                SecurityUtils.removeFromDisabledTlsAlgs(contextVersion);
+            }
+        } 
 
         Arrays test;
 
@@ -200,7 +204,32 @@ public class Arrays {
 
         test.createSSLEngines();
 
-        test.runTest();
+        try {
+            test.runTest();
+        } catch (javax.net.ssl.SSLHandshakeException sslhe) {
+            if (SecurityUtils.isFIPS()) {
+                if(!SecurityUtils.TLS_PROTOCOLS.contains(contextVersion)) {
+                    if ("No appropriate protocol (protocol is disabled or cipher suites are inappropriate)".equals(sslhe.getMessage())) {
+                        System.out.println("Expected exception msg: <No appropriate protocol (protocol is disabled or cipher suites are inappropriate)> is caught");
+                        return;
+                    } else {
+                        System.out.println("Unexpected exception msg: <" + sslhe.getMessage() + "> is caught");
+                        return;
+                    }
+                } else {
+                    System.out.println("Unexpected exception is caught");
+                    sslhe.printStackTrace();
+                    return;
+                }
+            } else {
+                System.out.println("Unexpected exception is caught in Non-FIPS mode");
+                sslhe.printStackTrace();
+                return;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return;
+        }
 
         System.err.println("Test Passed.");
     }
