@@ -40,6 +40,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -65,6 +66,7 @@ public final class RestrictedSecurity {
 
     private static final boolean isNSSSupported;
     private static final boolean isOpenJCEPlusSupported;
+    private static final boolean isOpenJCEPlusModuleExist;
 
     private static final boolean userSetProfile;
     private static final boolean shouldEnableSecurity;
@@ -126,6 +128,11 @@ public final class RestrictedSecurity {
             }
         }
         isOpenJCEPlusSupported = isOsSupported && isArchSupported;
+
+        // Check whether the OpenJCEPlus module exists.
+        ModuleLayer layer = ModuleLayer.boot();
+        Optional<Module> module = layer.findModule("openjceplus");
+        isOpenJCEPlusModuleExist = module.isPresent();
 
         // Check the default solution to see if FIPS is supported.
         isFIPSSupported = isNSSSupported;
@@ -415,6 +422,11 @@ public final class RestrictedSecurity {
         if (profileID.contains("OpenJCEPlus") && !isOpenJCEPlusSupported) {
             printStackTraceAndExit("OpenJCEPlus RestrictedSecurity profiles are not supported"
                     + " on this platform.");
+        }
+
+        if (!isOpenJCEPlusModuleExist && profileID.contains("OpenJCEPlus")) {
+            printStackTraceAndExit("FIPS 140-3 profile specified. Required OpenJCEPlus"
+                    + " module not found.");
         }
 
         if (debug != null) {
