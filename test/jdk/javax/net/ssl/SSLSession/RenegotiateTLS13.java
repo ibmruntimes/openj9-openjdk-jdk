@@ -23,6 +23,7 @@
 
 /*
  * @test
+ * @library /test/lib
  * @run main/othervm -Djavax.net.debug=ssl RenegotiateTLS13
  */
 
@@ -39,6 +40,9 @@ import java.io.File;
 import java.io.IOException;
 import java.security.KeyStore;
 import java.security.SecureRandom;
+
+import jdk.test.lib.Utils;
+import jdk.test.lib.security.SecurityUtils;
 
 public class RenegotiateTLS13 {
 
@@ -138,6 +142,11 @@ public class RenegotiateTLS13 {
         String trustFilename =
             System.getProperty("test.src", "./") + "/" + pathToStores +
                 "/" + trustStoreFile;
+
+        if (SecurityUtils.isFIPS()) {
+            keyFilename = SecurityUtils.revertJKSToPKCS12(keyFilename, passwd);
+            trustFilename = SecurityUtils.revertJKSToPKCS12(trustFilename, passwd);
+        }
 
         System.setProperty("javax.net.ssl.keyStore", keyFilename);
         System.setProperty("javax.net.ssl.keyStorePassword", passwd);
