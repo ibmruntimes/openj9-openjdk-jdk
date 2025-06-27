@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, 2024, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2023, 2025, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -30,7 +30,6 @@
 /*
  * @test id=default
  * @summary Verifies JVMTI StopThread support for virtual threads.
- * @modules java.base/com.ibm.oti.vm
  * @requires vm.continuations
  * @library /test/lib
  * @run main/othervm/native -agentlib:StopThreadTest StopThreadTest
@@ -39,16 +38,12 @@
 /*
  * @test id=platform
  * @summary Verifies JVMTI StopThread support for platform threads.
- * @modules java.base/com.ibm.oti.vm
  * @library /test/lib
  * @run main/othervm/native -agentlib:StopThreadTest StopThreadTest platform
  */
 
 import jdk.test.lib.Platform;
 import java.lang.AssertionError;
-
-import com.sun.management.HotSpotDiagnosticMXBean;
-import java.lang.management.ManagementFactory;
 
 /*
  *     The test exercises the JVMTI function: StopThread(jthread).
@@ -278,6 +273,6 @@ public class StopThreadTest {
     }
 
     static boolean preemptableVirtualThread() {
-        return is_virtual && !isBoundVThread && com.ibm.oti.vm.VM.isYieldBlockedVirtualThreadsEnabled();
+        return is_virtual && !isBoundVThread;
     }
 }
