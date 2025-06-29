@@ -23,6 +23,12 @@
  * questions.
  */
 
+/*
+ * ===========================================================================
+ * (c) Copyright IBM Corp. 2025, 2025 All Rights Reserved
+ * ===========================================================================
+ */
+
 package jdk.jfr.internal.tool;
 
 import java.io.IOException;
@@ -105,7 +111,18 @@ final class Print extends Command {
     @Override
     public void execute(Deque<String> options) throws UserSyntaxException, UserDataException {
         Path file = getJFRInputFile(options);
-        PrintWriter pw = new PrintWriter(System.out, false, UTF_8);
+        String osName = System.getProperty("os.name");
+        PrintWriter pw;
+        if (osName.contains("z/OS")) {
+            /*[IF JAVA_SPEC_VERSION >= 18]*/
+            pw = new PrintWriter(System.out, false, UTF_8);
+            /*[ELSE] JAVA_SPEC_VERSION >= 18 */
+            pw = new PrintWriter(System.out);
+            /*[ENDIF] JAVA_SPEC_VERSION >= 18 */
+        }
+        else {
+            pw = new PrintWriter(System.out, false, UTF_8);
+        }
         List<Predicate<EventType>> eventFilters = new ArrayList<>();
         int stackDepth = 5;
         EventPrintWriter eventWriter = null;
