@@ -271,10 +271,6 @@ RestrictedSecurity.OpenJCEPlusFIPS.FIPS140-3.jce.provider.1 = com.ibm.crypto.plu
     {KeyGenerator, HmacSHA256, *}, \
     {KeyGenerator, HmacSHA384, *}, \
     {KeyGenerator, HmacSHA512, *}, \
-    {KeyGenerator, kda-hkdf-with-sha224, *}, \
-    {KeyGenerator, kda-hkdf-with-sha256, *}, \
-    {KeyGenerator, kda-hkdf-with-sha384, *}, \
-    {KeyGenerator, kda-hkdf-with-sha512, *}, \
     {KeyGenerator, SunTls12KeyMaterial, *}, \
     {KeyGenerator, SunTls12MasterSecret, *}, \
     {KeyGenerator, SunTls12Prf, *}, \
@@ -286,6 +282,9 @@ RestrictedSecurity.OpenJCEPlusFIPS.FIPS140-3.jce.provider.1 = com.ibm.crypto.plu
     {KeyPairGenerator, EC, *}, \
     {KeyPairGenerator, RSA, *}, \
     {KeyPairGenerator, RSAPSS, *}, \
+    {KDF, HKDF-SHA256, *}, \
+    {KDF, HKDF-SHA384, *}, \
+    {KDF, HKDF-SHA512, *}, \
     {Mac, HmacSHA224, *}, \
     {Mac, HmacSHA256, *}, \
     {Mac, HmacSHA3-224, *}, \
