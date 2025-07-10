@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, 2024, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2025, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -20,47 +20,47 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-package org.openjdk.bench.vm.gc.systemgc;
+package org.openjdk.bench.java.io;
+
+import java.io.CharArrayReader;
+import java.io.IOException;
+import java.io.Reader;
+import java.util.List;
+import java.util.Random;
 
 import org.openjdk.jmh.annotations.Benchmark;
-import org.openjdk.jmh.annotations.BenchmarkMode;
-import org.openjdk.jmh.annotations.Fork;
-import org.openjdk.jmh.annotations.Level;
-import org.openjdk.jmh.annotations.Mode;
-import org.openjdk.jmh.annotations.Measurement;
-import org.openjdk.jmh.annotations.OutputTimeUnit;
 import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.State;
-import org.openjdk.jmh.annotations.Warmup;
 
-import java.util.concurrent.TimeUnit;
-
-@BenchmarkMode(Mode.SingleShotTime)
-@Warmup(iterations = 5)
-@Measurement(iterations = 5)
-@Fork(value=25, jvmArgs={"-Xmx5g", "-Xms5g", "-Xmn3g", "-XX:+AlwaysPreTouch"})
-@OutputTimeUnit(TimeUnit.MILLISECONDS)
 @State(Scope.Benchmark)
-public class NoObjects {
+public class ReaderReadAllLines {
 
-    /*
-     * Test the System GC when there are no additionally allocate
-     * objects.
-     *
-     * The heap settings provided are the same as for the other
-     * test for consistency.
-     */
+    private char[] chars = null;
 
-    @Setup(Level.Trial)
-    public void preRun() {
-        // Compact right now, kicking out all unrelated objects
-        System.gc();
+    @Setup
+    public void setup() throws IOException {
+        final int len = 128_000;
+        chars = new char[len];
+        Random rnd = new Random(System.nanoTime());
+        int off = 0;
+        while (off < len) {
+            int lineLen = 40 + rnd.nextInt(8192);
+            if (lineLen > len - off) {
+                off = len;
+            } else {
+                chars[off + lineLen] = '\n';
+                off += lineLen;
+            }
+        }
     }
 
     @Benchmark
-    public void gc() {
-        System.gc();
+    public List<String> readAllLines() throws IOException {
+        List<String> lines;
+        try (Reader reader = new CharArrayReader(chars)) {
+            lines = reader.readAllLines();
+        }
+        return lines;
     }
-
 }
