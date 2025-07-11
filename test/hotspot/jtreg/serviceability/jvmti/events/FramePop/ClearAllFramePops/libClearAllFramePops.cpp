@@ -21,12 +21,6 @@
  * questions.
  */
 
-/*
- * ===========================================================================
- * (c) Copyright IBM Corp. 2025, 2025 All Rights Reserved
- * ===========================================================================
- */
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -152,7 +146,7 @@ JNIEXPORT void JNICALL Java_ClearAllFramePops_clearAllFramePops(JNIEnv *jni, jcl
 
   char* tname = get_thread_name(jvmti, jni, nullptr);
 
-  /* check_jvmti_status(jni, jvmti->ClearAllFramePops(nullptr), "Error in ClearAllFramePops"); */
+  check_jvmti_status(jni, jvmti->ClearAllFramePops(nullptr), "Error in ClearAllFramePops");
   LOG("Called ClearAllFramePops for thread: %s\n", tname);
 
   deallocate(jvmti, jni, tname);
