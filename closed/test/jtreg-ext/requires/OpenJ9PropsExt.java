@@ -1,7 +1,10 @@
 /*
  * ===========================================================================
- * (c) Copyright IBM Corp. 2019, 2024 All Rights Reserved
+ * (c) Copyright IBM Corp. 2019, 2025 All Rights Reserved
  * ===========================================================================
+ *
+ * Copyright (c) 2016, 2025, Oracle and/or its affiliates. All rights reserved.
+ * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License version 2 only, as
@@ -28,16 +31,42 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
 
+import jdk.internal.misc.PreviewFeatures;
 import jdk.test.lib.Platform;
 
-public class OpenJ9PropsExt implements Callable<Map<String, String>> {
+public class OpenJ9PropsExt extends VMProps implements Callable<Map<String, String>> {
+    // value known to jtreg as an indicator of error state
+    private static final String ERROR_STATE = "__ERROR__";
+
+    private static class SafeMap {
+        private final Map<String, String> map = new HashMap<>();
+
+        public void put(String key, String value) {
+            map.put(key, value);
+        }
+
+        public void putHelper(String key, Supplier<String> s) {
+            String value;
+            try {
+                value = s.get();
+            } catch (Throwable t) {
+                System.err.println("failed to get value for " + key);
+                t.printStackTrace(System.err);
+                value = ERROR_STATE + t;
+            }
+            map.put(key, value);
+        }
+    }
 
     @Override
     public Map<String, String> call() {
-        Map<String, String> map = new HashMap<>();
+        SafeMap map = new SafeMap();
         try {
             map.put("container.support", "true");
+            map.putHelper("java.enablePreview", this::isPreviewEnabled);
+            map.put("jdk.static", "false");
             map.put("jlink.packagedModules", Boolean.toString(packagedModules()));
             map.put("systemd.support", Boolean.toString(systemdSupport()));
             map.put("vm.bits", vmBits());
@@ -65,7 +94,11 @@ public class OpenJ9PropsExt implements Callable<Map<String, String>> {
             e.printStackTrace();
             System.exit(1);
         }
-        return map;
+        return map.map;
+    }
+
+    protected String isPreviewEnabled() {
+        return "" + PreviewFeatures.isEnabled();
     }
 
     /**
