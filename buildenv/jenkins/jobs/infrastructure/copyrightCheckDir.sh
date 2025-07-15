@@ -378,24 +378,26 @@ check () {
           ERROR=1
         fi
       else
-        # The file is in the 'closed' directory and doesn't contain
-        # Oracle copyright with GPLv2 and Classpath Exception so should
-        # have IBM copyright with GPLv2 and CE at the top of the file
-        if [ "$FOUND_IBM_COPYRIGHT" -gt 5 ]; then
-          log "E003: $1: IBM Copyright with GPLv2 and IBM Classpath Exception should be at the top of the file"
-          ERROR=1
-        fi
         if [ "$FOUND_GPLV2" -eq 0 ]; then
           log "E004: $1: IBM Copyright should contain the GPLv2 license"
           ERROR=1
         fi
-        if [ "$FOUND_IBM_CPE" -eq 0 ]; then
-          log "E005: $1: IBM Copyright should contain the IBM Classpath Exception"
-          ERROR=1
-        fi
-        if [ "$FOUND_ORACLE_CPE" -gt 0 ]; then
-          log "E006: $1: IBM Copyright should not contain the Oracle Classpath Exception"
-          ERROR=1
+        if [ "$IN_JDK" -eq 1 ]; then
+          # The file is in the 'closed' directory and doesn't contain
+          # Oracle copyright with GPLv2 and Classpath Exception so should
+          # have IBM copyright with GPLv2 and CE at the top of the file.
+          if [ "$FOUND_IBM_COPYRIGHT" -gt 5 ]; then
+            log "E003: $1: IBM Copyright with GPLv2 and IBM Classpath Exception should be at the top of the file"
+            ERROR=1
+          fi
+          if [ "$FOUND_IBM_CPE" -eq 0 ]; then
+            log "E005: $1: IBM Copyright should contain the IBM Classpath Exception"
+            ERROR=1
+          fi
+          if [ "$FOUND_ORACLE_CPE" -gt 0 ]; then
+            log "E006: $1: IBM Copyright should not contain the Oracle Classpath Exception"
+            ERROR=1
+          fi
         fi
       fi
     fi
