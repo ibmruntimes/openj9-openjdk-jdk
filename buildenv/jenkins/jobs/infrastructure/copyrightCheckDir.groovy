@@ -1,6 +1,6 @@
 /*
  * ===========================================================================
- * (c) Copyright IBM Corp. 2019, 2024 All Rights Reserved
+ * (c) Copyright IBM Corp. 2019, 2025 All Rights Reserved
  * ===========================================================================
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -51,7 +51,7 @@ timeout(time: 6, unit: 'HOURS') {
                                                 shallow: false,
                                                 timeout: 30]],
                                 userRemoteConfigs: [[url: scm.getUserRemoteConfigs().get(0).getUrl()]]]
-                    sh (script: "sh buildenv/jenkins/jobs/infrastructure/copyrightCheckDir.sh REPO=${params.ghprbGhRepository} ${VERBOSE} ${ROOTDIR}")
+                    sh (script: "bash buildenv/jenkins/jobs/infrastructure/copyrightCheckDir.sh REPO=${params.ghprbGhRepository} ${VERBOSE} ${ROOTDIR}")
                 } catch (e) {
                     slackSend channel: '#jenkins-sandbox', color: 'danger', message: "Failed: ${JOB_NAME} #${BUILD_NUMBER} (<${BUILD_URL}|Open>)"
                     throw e
