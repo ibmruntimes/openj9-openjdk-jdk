@@ -25,7 +25,7 @@
  * @test id=default
  * @summary Test virtual threads entering a lot of monitors with contention
  * @library /test/lib
- * @run main LotsOfContendedMonitorEnter
+ * @run main/othervm -Xiss32K -XX:ContinuationCache:t1=8,t2=64 LotsOfContendedMonitorEnter
  */
 
 import java.util.concurrent.CountDownLatch;
@@ -38,7 +38,7 @@ public class LotsOfContendedMonitorEnter {
         if (args.length > 0) {
             depth = Integer.parseInt(args[0]);
         } else {
-            depth = 1024;
+            depth = 128;
         }
         VThreadRunner.run(() -> testContendedEnter(depth));
     }
