@@ -26,7 +26,6 @@
  * @bug 4981697
  * @summary Rework the X509KeyManager to avoid incompatibility issues
  * @author Brad R. Wetmore
- *
  * @run main/othervm -Djdk.tls.acknowledgeCloseNotify=true ExtendedKeyEngine
  */
 

@@ -21,6 +21,14 @@
  * questions.
  */
 
+import java.lang.reflect.Field;
+
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Map;
+import java.util.HashMap;
+
 import java.net.InetAddress;
 import java.security.Provider;
 import java.security.Security;
@@ -28,14 +36,38 @@ import java.security.Security;
 public class TestJSSE {
 
     private static final String LOCAL_IP = InetAddress.getLoopbackAddress().getHostAddress();
+    private static boolean isFIPS = Boolean.parseBoolean(System.getProperty("semeru.fips"));
+    private static final Map<String, String> TLS_CIPHERSUITES = new HashMap<>();
+
+    private static String checkIfProtocolIsUsedInCommonFIPS(String srvProtocol, String clnProtocol) {
+        String protocolUsedInHandShake;
+        List<String> srvProtocols = Arrays.asList(srvProtocol.split(","));
+        List<String> clnProtocols;
+        if (clnProtocol.equals("DEFAULT")) {
+            if (srvProtocols.contains("TLSv1.3")) {
+                protocolUsedInHandShake = "TLSv1.3";
+            } else if (srvProtocols.contains("TLSv1.2")) {
+                protocolUsedInHandShake = "TLSv1.2";
+            } else {
+                protocolUsedInHandShake = null;
+            }
+        } else {
+            clnProtocols = Arrays.asList(clnProtocol.split(","));
+            if (srvProtocols.contains("TLSv1.3") && clnProtocols.contains("TLSv1.3")) {
+                protocolUsedInHandShake = "TLSv1.3";
+            } else if (srvProtocols.contains("TLSv1.2") && clnProtocols.contains("TLSv1.2")) {
+                protocolUsedInHandShake = "TLSv1.2";
+            } else {
+                protocolUsedInHandShake = null;
+            }
+        }
+        return protocolUsedInHandShake;
+    }
 
     public static void main(String... args) throws Exception {
-        // reset the security property to make sure that the algorithms
-        // and keys used in this test are not disabled.
-        Security.setProperty("jdk.tls.disabledAlgorithms", "");
 
         // enable debug output
-        System.setProperty("javax.net.debug", "ssl,record");
+        // System.setProperty("javax.net.debug", "ssl,record");
 
         String srvProtocol = System.getProperty("SERVER_PROTOCOL");
         String clnProtocol = System.getProperty("CLIENT_PROTOCOL");
@@ -43,13 +75,50 @@ public class TestJSSE {
         if (srvProtocol == null || clnProtocol == null || cipher == null) {
             throw new IllegalArgumentException("Incorrect parameters");
         }
+        if (System.getProperty("jdk.tls.client.protocols") != null) {
+            clnProtocol = System.getProperty("jdk.tls.client.protocols");
+        }
 
         System.out.println("ServerProtocol = " + srvProtocol);
         System.out.println("ClientProtocol = " + clnProtocol);
         System.out.println("Cipher         = " + cipher);
 
+        // reset the security property to make sure that the algorithms
+        // and keys used in this test are not disabled.
+        String protocolUsedInHandShake = null;
+        if (!(isFIPS)) {
+            Security.setProperty("jdk.tls.disabledAlgorithms", "");
+        } else {
+            TLS_CIPHERSUITES.put("TLS_AES_128_GCM_SHA256", "TLSv1.3");
+            TLS_CIPHERSUITES.put("TLS_AES_256_GCM_SHA384", "TLSv1.3");
+            TLS_CIPHERSUITES.put("TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384", "TLSv1.2");
+            TLS_CIPHERSUITES.put("TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256", "TLSv1.2");
+            TLS_CIPHERSUITES.put("TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384", "TLSv1.2");
+            TLS_CIPHERSUITES.put("TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256", "TLSv1.2");
+            TLS_CIPHERSUITES.put("TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA384", "TLSv1.2");
+            TLS_CIPHERSUITES.put("TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384", "TLSv1.2");
+            TLS_CIPHERSUITES.put("TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256", "TLSv1.2");
+            TLS_CIPHERSUITES.put("TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256", "TLSv1.2");
+            protocolUsedInHandShake = checkIfProtocolIsUsedInCommonFIPS(srvProtocol, clnProtocol);
+        }
+
         try (CipherTestUtils.Server srv = server(srvProtocol, cipher, args)) {
             client(srv.getPort(), clnProtocol, cipher, args);
+        } catch (Exception e) {
+            if (isFIPS) {
+                if (protocolUsedInHandShake == null || !TLS_CIPHERSUITES.containsKey(cipher)
+                 || (protocolUsedInHandShake != null && !TLS_CIPHERSUITES.get(cipher).equals(protocolUsedInHandShake))) {
+                    if (CipherTestUtils.EXCEPTIONS.get(0) instanceof javax.net.ssl.SSLHandshakeException) {
+                        if ("No appropriate protocol (protocol is disabled or cipher suites are inappropriate)".equals(CipherTestUtils.EXCEPTIONS.get(0).getMessage())) {
+                            if (args.length >= 1 && args[0].equals("javax.net.ssl.SSLHandshakeException")) {
+                                System.out.println("Expected exception msg from client: <No appropriate protocol (protocol is disabled or cipher suites are inappropriate)> is caught");
+                            } else {
+                                System.out.println("Expected exception msg from client: <No appropriate protocol (protocol is disabled or cipher suites are inappropriate)> is caught");
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 
