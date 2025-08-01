@@ -64,7 +64,7 @@ public final class RestrictedSecurity {
     private static final boolean allowSetProperties;
 
     private static final boolean isNSSSupported;
-    private static final boolean isOpenJCEPlusSupported;
+    private static final boolean isOpenJCEPlusCertifiedPlatform;
 
     private static final boolean userSetProfile;
     private static final boolean shouldEnableSecurity;
@@ -83,49 +83,20 @@ public final class RestrictedSecurity {
 
     private static final Set<String> unmodifiableProperties = new HashSet<>();
 
-    private static final Map<String, List<String>> supportedPlatformsNSS = new HashMap<>();
-    private static final Map<String, List<String>> supportedPlatformsOpenJCEPlus = new HashMap<>();
-
     static {
-        supportedPlatformsNSS.put("Arch", List.of("amd64", "ppc64le", "s390x"));
-        supportedPlatformsNSS.put("OS", List.of("Linux"));
-
-        supportedPlatformsOpenJCEPlus.put("Arch", List.of("amd64", "ppc64", "s390x"));
-        supportedPlatformsOpenJCEPlus.put("OS", List.of("Linux", "AIX", "Windows"));
-
+        final List<String> nssSupportedArch = List.of("amd64", "ppc64le", "s390x");
+        final List<String> openjceplusCertifiedArch = List.of("amd64", "ppc64", "s390x");
+        final List<String> openjceplusCertifiedOS = List.of("AIX", "Linux", "Windows");
         String osName = System.getProperty("os.name");
         String osArch = System.getProperty("os.arch");
 
-        boolean isOsSupported, isArchSupported;
         // Check whether the NSS FIPS solution is supported.
-        isOsSupported = false;
-        for (String os: supportedPlatformsNSS.get("OS")) {
-            if (osName.contains(os)) {
-                isOsSupported = true;
-            }
-        }
-        isArchSupported = false;
-        for (String arch: supportedPlatformsNSS.get("Arch")) {
-            if (osArch.contains(arch)) {
-                isArchSupported = true;
-            }
-        }
-        isNSSSupported = isOsSupported && isArchSupported;
+        isNSSSupported = osName.contains("Linux")
+                && containsAny(osArch, nssSupportedArch);
 
-        // Check whether the OpenJCEPlus FIPS solution is supported.
-        isOsSupported = false;
-        for (String os: supportedPlatformsOpenJCEPlus.get("OS")) {
-            if (osName.contains(os)) {
-                isOsSupported = true;
-            }
-        }
-        isArchSupported = false;
-        for (String arch: supportedPlatformsOpenJCEPlus.get("Arch")) {
-            if (osArch.contains(arch)) {
-                isArchSupported = true;
-            }
-        }
-        isOpenJCEPlusSupported = isOsSupported && isArchSupported;
+        // Check whether the OpenJCEPlus FIPS solution is certified.
+        isOpenJCEPlusCertifiedPlatform = containsAny(osName, openjceplusCertifiedOS)
+                && containsAny(osArch, openjceplusCertifiedArch);
 
         // Check the default solution to see if FIPS is supported.
         isFIPSSupported = isNSSSupported;
@@ -412,12 +383,14 @@ public final class RestrictedSecurity {
                     + " on this platform.");
         }
 
-        if (profileID.contains("OpenJCEPlus") && !isOpenJCEPlusSupported) {
-            printStackTraceAndExit("OpenJCEPlus RestrictedSecurity profiles are not supported"
-                    + " on this platform.");
-        }
-
         if (debug != null) {
+            if (profileID.contains("OpenJCEPlus")) {
+                if (isOpenJCEPlusCertifiedPlatform) {
+                    debug.println("OpenJCEPlus RestrictedSecurity profile running on a certified platform.");
+                } else {
+                    debug.println("OpenJCEPlus RestrictedSecurity profile running in developer mode.");
+                }
+            }
             debug.println("RestrictedSecurity profile " + profileID
                     + " is supported on this platform.");
         }
@@ -707,6 +680,15 @@ public final class RestrictedSecurity {
      */
     private static boolean isAsterisk(String string) {
         return "*".equals(string);
+    }
+
+    private static boolean containsAny(String string, List<String> substrings) {
+        for (String substring : substrings) {
+            if (string.contains(substring)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
