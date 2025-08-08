@@ -273,7 +273,7 @@ javax/xml/crypto/dsig/SecureValidation.java https://github.com/ibmruntimes/openj
 javax/xml/crypto/dsig/SecurityManager/XMLDSigWithSecMgr.java https://github.com/ibmruntimes/openj9-openjdk-jdk17/issues/116 linux-x64,linux-ppc64le,linux-s390x
 javax/xml/crypto/dsig/TransformService/NullParent.java https://github.com/ibmruntimes/openj9-openjdk-jdk17/issues/116 linux-x64,linux-ppc64le,linux-s390x
 javax/xml/crypto/dsig/ValidationTests.java https://github.com/ibmruntimes/openj9-openjdk-jdk17/issues/116 linux-x64,linux-ppc64le,linux-s390x
-javax/xml/crypto/dsig/FileSocketPermissions.java https://github.com/ibmruntimes/openj9-openjdk-jdk17/issues/116 linux-x64,linux-ppc64le,linux-s390x
+javax/xml/crypto/dsig/ResolveReferenceURIs.java https://github.com/ibmruntimes/openj9-openjdk-jdk17/issues/116 linux-x64,linux-ppc64le,linux-s390x
 
 # Related to SunJCE or SunRsaSign, no such provider: SunJCE or no such provider: SunRsaSign
 javax/crypto/Cipher/CipherInputStreamExceptions.java https://github.com/ibmruntimes/openj9-openjdk-jdk17/issues/116 linux-x64,linux-ppc64le,linux-s390x
