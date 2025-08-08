@@ -324,7 +324,7 @@ javax/security/auth/kerberos/StandardNames.java https://github.com/eclipse-openj
 javax/xml/crypto/dsig/BadXPointer.java https://github.com/eclipse-openj9/openj9/issues/20978 generic-all
 javax/xml/crypto/dsig/Basic.java https://github.com/eclipse-openj9/openj9/issues/20978 generic-all
 javax/xml/crypto/dsig/ErrorHandlerPermissions.java https://github.com/eclipse-openj9/openj9/issues/20978 generic-all
-javax/xml/crypto/dsig/FileSocketPermissions.java https://github.com/eclipse-openj9/openj9/issues/20978 generic-all
+javax/xml/crypto/dsig/ResolveReferenceURIs.java https://github.com/eclipse-openj9/openj9/issues/20978 generic-all
 javax/xml/crypto/dsig/GenerationTests.java https://github.com/eclipse-openj9/openj9/issues/20978 generic-all
 javax/xml/crypto/dsig/GetInstanceTests.java https://github.com/eclipse-openj9/openj9/issues/20978 generic-all
 javax/xml/crypto/dsig/HereFunction.java https://github.com/eclipse-openj9/openj9/issues/20978 generic-all
