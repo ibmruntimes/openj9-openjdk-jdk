@@ -18,6 +18,10 @@
 # 2 along with this work; if not, see <http://www.gnu.org/licenses/>.
 # ===========================================================================
 
+ifeq ($(INCLUDE), true)
+
+CUSTOM_MODULE_MAKE_ROOT := $(TOPDIR)/closed/make/modules
+
 TOP_SRC_DIRS += \
 	$(J9JCL_SOURCES_DIR) \
 	#
@@ -42,3 +46,5 @@ ifeq (,$(filter clean dist-clean, $(SEQUENTIAL_TARGETS)))
 
   -include $(J9JCL_SOURCES_DONEFILE)
 endif
+
+endif # include guard

@@ -22,9 +22,6 @@
 # or visit www.oracle.com if you need additional information or have any
 # questions.
 #
-# ===========================================================================
-# (c) Copyright IBM Corp. 2025, 2025 All Rights Reserved
-# ===========================================================================
 
 include MakeFileStart.gmk
 
@@ -88,14 +85,12 @@ CreateHkTargets = \
 ################################################################################
 # Include module specific build settings
 
-THIS_SNIPPET := modules/$(MODULE)/Java.gmk
+THIS_SNIPPET := $(call GetModuleSnippetName, Java)
 
-# Find the optional snippet via make's include path.
-FULL_SNIPPET := $(firstword $(wildcard $(addsuffix /$(notdir $(THIS_SNIPPET)), $(.INCLUDE_DIRS))))
-ifneq ($(FULL_SNIPPET), )
+ifneq ($(wildcard $(THIS_SNIPPET)), )
   include MakeSnippetStart.gmk
 
-  include $(FULL_SNIPPET)
+  include $(THIS_SNIPPET)
 
   include MakeSnippetEnd.gmk
 endif
@@ -120,6 +115,7 @@ $(eval $(call SetupJavaCompilation, $(MODULE), \
     EXCLUDE_FILES := $(EXCLUDE_FILES), \
     EXCLUDE_PATTERNS := -files, \
     KEEP_ALL_TRANSLATIONS := $(KEEP_ALL_TRANSLATIONS), \
+    TARGET_RELEASE := $(TARGET_RELEASE), \
     JAVAC_FLAGS := \
         $(DOCLINT) \
         $(JAVAC_FLAGS) \

@@ -18,4 +18,8 @@
 # 2 along with this work; if not, see <http://www.gnu.org/licenses/>.
 # ===========================================================================
 
-PHASE_MAKEDIRS := $(TOPDIR)/closed/make $(PHASE_MAKEDIRS)
+ifeq ($(INCLUDE), true)
+
+PHASE_MAKEDIRS := $(TOPDIR)/closed/make
+
+endif # include guard

@@ -18,6 +18,8 @@
 # 2 along with this work; if not, see <http://www.gnu.org/licenses/>.
 # ===========================================================================
 
+ifeq ($(INCLUDE), true)
+
 CLEAN_DIRS += vm
 
 .PHONY : \
@@ -142,3 +144,5 @@ openjceplus-clean :
 clean-openjceplus : openjceplus-clean
 
 endif # BUILD_OPENJCEPLUS
+
+endif # include guard

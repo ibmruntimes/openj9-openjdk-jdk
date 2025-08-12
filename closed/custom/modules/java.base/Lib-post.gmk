@@ -18,6 +18,8 @@
 # 2 along with this work; if not, see <http://www.gnu.org/licenses/>.
 # ===========================================================================
 
+ifeq ($(INCLUDE), true)
+
 ifeq ($(WITH_OPENSSL), true)
   # Create the Java Native crypto library.
   $(eval $(call SetupJdkLibrary, BUILD_JNCRYPTO, \
@@ -32,3 +34,5 @@ ifeq ($(WITH_OPENSSL), true)
   ))
   TARGETS += $(BUILD_JNCRYPTO)
 endif
+
+endif # include guard
