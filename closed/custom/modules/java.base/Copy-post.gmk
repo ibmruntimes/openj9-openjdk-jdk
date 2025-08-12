@@ -18,6 +18,8 @@
 # 2 along with this work; if not, see <http://www.gnu.org/licenses/>.
 # ===========================================================================
 
+ifeq ($(INCLUDE), true)
+
 include $(TOPDIR)/closed/CopySupport.gmk
 
 # header files
@@ -266,3 +268,5 @@ ifneq ($(filter linux-x86_64 linux-ppc64le linux-s390x, $(OPENJDK_TARGET_OS)-$(O
   TARGETS += $(NSS_FIPS_CFG_DST)
 endif
 ################################################################################
+
+endif # include guard

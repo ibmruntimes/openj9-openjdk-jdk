@@ -23,7 +23,7 @@
 # questions.
 #
 # ===========================================================================
-# (c) Copyright IBM Corp. 2023, 2024 All Rights Reserved
+# (c) Copyright IBM Corp. 2023, 2025 All Rights Reserved
 # ===========================================================================
 
 ################################################################################
@@ -526,6 +526,12 @@ AC_DEFUN([JVM_FEATURES_IS_ACTIVE],
 AC_DEFUN([JVM_FEATURES_VERIFY],
 [
   variant=$1
+
+  if true; then
+    : No special variant of OpenJ9 is needed for jfr support.
+  elif JVM_FEATURES_IS_ACTIVE(jfr) && ! JVM_FEATURES_IS_ACTIVE(services); then
+    AC_MSG_ERROR([Specified JVM feature 'jfr' requires feature 'services' for variant '$variant'])
+  fi
 
   if JVM_FEATURES_IS_ACTIVE(jvmci) && ! (JVM_FEATURES_IS_ACTIVE(compiler1) || \
       JVM_FEATURES_IS_ACTIVE(compiler2)); then

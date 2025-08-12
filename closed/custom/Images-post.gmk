@@ -1,5 +1,5 @@
 # ===========================================================================
-# (c) Copyright IBM Corp. 2021, 2021 All Rights Reserved
+# (c) Copyright IBM Corp. 2021, 2025 All Rights Reserved
 # ===========================================================================
 # This code is free software; you can redistribute it and/or modify it
 # under the terms of the GNU General Public License version 2 only, as
@@ -18,9 +18,13 @@
 # 2 along with this work; if not, see <http://www.gnu.org/licenses/>.
 # ===========================================================================
 
+ifeq ($(INCLUDE), true)
+
 ifeq (true,$(OPENJ9_ENABLE_DEMOS))
   # demos are wanted
 else ifneq (,$(filter jdk, $(MAKECMDGOALS)))
   # don't include demos in jdk image
   JDK_TARGETS := $(filter-out $(JDK_COPY_DEMOS), $(JDK_TARGETS))
 endif
+
+endif # include guard

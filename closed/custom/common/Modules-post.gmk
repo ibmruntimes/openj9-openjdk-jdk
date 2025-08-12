@@ -18,6 +18,8 @@
 # 2 along with this work; if not, see <http://www.gnu.org/licenses/>.
 # ===========================================================================
 
+ifeq ($(INCLUDE), true)
+
 BOOT_MODULES += \
 	$(if $(call equals, $(OPENJ9_ENABLE_CRIU_SUPPORT), true), openj9.criu) \
 	openj9.jvm \
@@ -62,3 +64,5 @@ NATIVE_ACCESS_MODULES += \
 	openj9.dtfj \
 	$(if $(call equals, $(BUILD_OPENJCEPLUS), true), openjceplus) \
 	#
+
+endif # include guard

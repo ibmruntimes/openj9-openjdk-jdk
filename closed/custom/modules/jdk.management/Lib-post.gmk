@@ -1,5 +1,5 @@
 # ===========================================================================
-# (c) Copyright IBM Corp. 2018, 2020 All Rights Reserved
+# (c) Copyright IBM Corp. 2018, 2025 All Rights Reserved
 # ===========================================================================
 # This code is free software; you can redistribute it and/or modify it
 # under the terms of the GNU General Public License version 2 only, as
@@ -18,5 +18,9 @@
 # 2 along with this work; if not, see <http://www.gnu.org/licenses/>.
 # ===========================================================================
 
+ifeq ($(INCLUDE), true)
+
 # We don't want to build the management_ext shared library from openjdk.
 TARGETS := $(filter-out $(BUILD_LIBMANAGEMENT_EXT),$(TARGETS))
+
+endif # include guard
