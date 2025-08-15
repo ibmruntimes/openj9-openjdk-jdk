@@ -159,8 +159,17 @@ public class NativeXDHKeyAgreement extends KeyAgreementSpi {
                     "Only two party agreement supported, lastPhase must be true");
             }
 
-            if (!(key instanceof XDHPublicKeyImpl)) {
+            if (!(key instanceof XECPublicKey)) {
                 throw new InvalidKeyException("Unsupported key type");
+            }
+
+            if (!(key instanceof XDHPublicKeyImpl)) {
+                try {
+                    XDHKeyFactory kf = new XDHKeyFactory();
+                    key = kf.engineTranslateKey(key);
+                } catch (Exception exception) {
+                    throw new InvalidKeyException("Unable to translate key", exception);
+                }
             }
 
             XDHPublicKeyImpl publicKey = (XDHPublicKeyImpl) key;
