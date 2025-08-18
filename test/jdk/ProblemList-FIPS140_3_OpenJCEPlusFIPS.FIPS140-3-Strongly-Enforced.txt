@@ -311,6 +311,7 @@ javax/crypto/CryptoPermission/LowercasePermCheck.java https://github.com/eclipse
 javax/crypto/CryptoPermission/RC2PermCheck.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 javax/crypto/CryptoPermission/RC4AliasPermCheck.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 javax/crypto/CryptoPermission/RSANoLimit.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
+javax/crypto/CryptoPermissions/InconsistentEntries.java https://github.com/eclipse-openj9/openj9/issues/20978 generic-all
 javax/crypto/EncryptedPrivateKeyInfo/GetAlgName.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 javax/crypto/EncryptedPrivateKeyInfo/GetEncoded.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 javax/crypto/EncryptedPrivateKeyInfo/GetKeySpec.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
@@ -324,6 +325,7 @@ javax/crypto/KEM/KemTest.java https://github.com/eclipse-openj9/openj9/issues/20
 javax/crypto/KEM/RSA_KEM.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 javax/crypto/KeyGenerator/CompareKeys.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 javax/crypto/KeyGenerator/TestGetInstance.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
+javax/crypto/KeyGenerator/TestKGParity.java https://github.com/eclipse-openj9/openj9/issues/20978 generic-all
 javax/crypto/Mac/ByteBuffers.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 javax/crypto/Mac/TestGetInstance.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 javax/crypto/SealedObject/NullKeySealedObject.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
@@ -351,6 +353,7 @@ javax/xml/crypto/dsig/SecurityManager/XMLDSigWithSecMgr.java https://github.com/
 javax/xml/crypto/dsig/TransformService/NullParent.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 javax/xml/crypto/dsig/ValidationTests.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 javax/xml/crypto/dsig/keyinfo/KeyInfo/Marshal.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
+javax/xml/crypto/dsig/PSS.java https://github.com/eclipse-openj9/openj9/issues/20978 generic-all
 sun/security/jgss/GssMemoryIssues.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 sun/security/jgss/spnego/MSOID.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 sun/security/jgss/spnego/NotPreferredMech.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
