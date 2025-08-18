@@ -591,6 +591,8 @@ javax/net/ssl/DTLSv10/DTLSv10RehandshakeWithCipherChangeTest.java https://github
 javax/net/ssl/DTLSv10/DTLSv10RehandshakeWithDataExTest.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 javax/net/ssl/DTLSv10/DTLSv10SequenceNumberTest.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 javax/net/ssl/DTLSv10/DTLSv10UnsupportedCiphersTest.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
+javax/net/ssl/ExtendedSSLSession/ExportKeyingMaterialTests.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
+javax/net/ssl/finalize/SSLSessionFinalizeTest.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 javax/net/ssl/FixingJavadocs/ImplicitHandshake.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 javax/net/ssl/FixingJavadocs/KMTMGetNothing.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 javax/net/ssl/FixingJavadocs/SSLSessionNulls.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
@@ -939,6 +941,12 @@ sun/security/ssl/HandshakeOutStream/NullCerts.java https://github.com/eclipse-op
 sun/security/ssl/InputRecord/ClientHelloRead.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 sun/security/ssl/InputRecord/SSLSocketTimeoutNulls.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 sun/security/ssl/ProtocolVersion/HttpsProtocols.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
+sun/security/ssl/SignatureScheme/DisableSHA1inHandshakeSignatureTLS13.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
+sun/security/ssl/SignatureScheme/DisableSignatureSchemePerScopeDTLS12.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
+sun/security/ssl/SignatureScheme/DisableSignatureSchemePerScopeTLS12.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
+sun/security/ssl/SignatureScheme/DisableSignatureSchemePerScopeTLS13.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
+sun/security/ssl/SignatureScheme/MD5NotAllowedInTLS13CertificateSignature.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
+sun/security/ssl/SignatureScheme/MixingTLSUsageConstraintsWithNonTLS.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 sun/security/ssl/SSLCipher/ReadOnlyEngine.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 sun/security/ssl/SSLContextImpl/CustomizedCipherSuites.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 sun/security/ssl/SSLContextImpl/CustomizedDTLSDefaultProtocols.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
@@ -968,6 +976,7 @@ sun/security/ssl/SSLEngineImpl/SSLEngineKeyLimit.java https://github.com/eclipse
 sun/security/ssl/SSLEngineImpl/TLS13BeginHandshake.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 sun/security/ssl/SSLEngineImpl/TestBadDNForPeerCA.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 sun/security/ssl/SSLEngineImpl/TestBadDNForPeerCA12.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
+sun/security/ssl/SSLLogger/DebugPropertyValuesTest.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 sun/security/ssl/SSLLogger/LoggingFormatConsistency.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 sun/security/ssl/SSLSessionImpl/HashCodeMissing.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 sun/security/ssl/SSLSessionImpl/InvalidateSession.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
@@ -994,6 +1003,7 @@ sun/security/ssl/SSLSocketImpl/InvalidateServerSessionRenegotiate.java https://g
 sun/security/ssl/SSLSocketImpl/LargePacketAfterHandshakeTest.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 sun/security/ssl/SSLSocketImpl/NewSocketMethods.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 sun/security/ssl/SSLSocketImpl/NoImpactServerRenego.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
+sun/security/ssl/SSLSocketImpl/NonAutoClose.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 sun/security/ssl/SSLSocketImpl/NotifyHandshakeTest.sh https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 sun/security/ssl/SSLSocketImpl/RejectClientRenego.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 sun/security/ssl/SSLSocketImpl/ReuseAddr.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
