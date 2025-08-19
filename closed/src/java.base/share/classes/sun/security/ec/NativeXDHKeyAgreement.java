@@ -160,7 +160,18 @@ public class NativeXDHKeyAgreement extends KeyAgreementSpi {
             }
 
             if (!(key instanceof XDHPublicKeyImpl)) {
-                throw new InvalidKeyException("Unsupported key type");
+                if (!(key instanceof XECPublicKey)) {
+                    throw new InvalidKeyException("Unsupported key type");
+                }
+                try {
+                    XDHKeyFactory kf = new XDHKeyFactory();
+                    key = kf.engineTranslateKey(key);
+                } catch (Exception exception) {
+                    throw new InvalidKeyException("Unable to translate key", exception);
+                }
+                if (!(key instanceof XDHPublicKeyImpl)) {
+                    throw new InvalidKeyException("Unsupported key type");
+                }
             }
 
             XDHPublicKeyImpl publicKey = (XDHPublicKeyImpl) key;
