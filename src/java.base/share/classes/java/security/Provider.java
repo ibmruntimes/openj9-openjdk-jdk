@@ -1157,6 +1157,10 @@ public abstract class Provider extends Properties {
                 legacyMap.remove(key, s);
                 return null;
             }
+        } else {
+            if (!RestrictedSecurity.isServiceAllowed(s)) {
+                return null;
+            }
         }
 
         if (s != null && SecurityProviderServiceEvent.isTurnedOn()) {
@@ -1193,7 +1197,12 @@ public abstract class Provider extends Properties {
         if (serviceSet == null || legacyChanged || servicesChanged) {
             Set<Service> set = new LinkedHashSet<>();
             if (!serviceMap.isEmpty()) {
-                set.addAll(serviceMap.values());
+                serviceMap.values().forEach(service -> {
+                    if (RestrictedSecurity.isServiceAllowed(service)) {
+                        // If allowed by RestrictedSecurity, add it to set.
+                        set.add(service);
+                    }
+                });
             }
             if (!legacyMap.isEmpty()) {
                 legacyMap.entrySet().forEach(entry -> {
@@ -1205,7 +1214,7 @@ public abstract class Provider extends Properties {
                 });
             }
             serviceSet = Collections.unmodifiableSet(set);
-            servicesChanged = false;
+            servicesChanged = RestrictedSecurity.isEnabled();
             legacyChanged = false;
         }
         return serviceSet;
