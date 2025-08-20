@@ -31,6 +31,7 @@
 
 package java.security;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -126,6 +127,9 @@ public final class Security {
         private static final String EXTRA_SYS_PROP =
                 "java.security.properties";
 
+        private static final String EXTRA_SYS_PROP_LIST =
+                "java.security.propertiesList";
+
         private static Path currentPath;
 
         private static final Set<Path> activePaths = new HashSet<>();
@@ -134,7 +138,15 @@ public final class Security {
             // first load the master properties file to
             // determine the value of OVERRIDE_SEC_PROP
             loadMaster();
-            loadExtra();
+
+            // If java.security.propertiesList is present, it always takes precedence
+            // and java.security.properties will be ignored.
+            String propList = System.getProperty(EXTRA_SYS_PROP_LIST);
+            if ((propList != null) && !propList.isBlank()) {
+                loadExtraFromList(propList);
+            } else {
+                loadExtra();
+            }
         }
 
         static boolean isInclude(String key) {
@@ -176,6 +188,33 @@ public final class Security {
                                     "properties from " + propFile);
                             e.printStackTrace();
                         }
+                    }
+                }
+            }
+        }
+
+        private static void loadExtraFromList(String propList) {
+            if ("true".equalsIgnoreCase(props.getProperty(OVERRIDE_SEC_PROP))) {
+                for (String file : propList.split(File.pathSeparator)) {
+                    // propertiesList does not support OVERRIDE mode
+                    if (file.startsWith("=")) {
+                        throw new IllegalArgumentException(
+                                "java.security.propertiesList does not support '=' prefix: " + file);
+                    }
+
+                    if (sdebug != null) {
+                        sdebug.println("java.security.propertiesList list file: " + file);
+                    }
+
+                    LoadingMode mode = LoadingMode.APPEND;
+                    try {
+                        loadExtraHelper(file, mode);
+                    } catch (Exception e) {
+                        if (sdebug != null) {
+                            sdebug.println("unable to load security properties from list file: " + file);
+                            e.printStackTrace();
+                        }
+                        throw new RuntimeException("Failed to load security properties from list file: " + file, e);
                     }
                 }
             }
