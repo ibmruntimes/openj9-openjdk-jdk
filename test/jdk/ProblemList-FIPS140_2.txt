@@ -941,7 +941,6 @@ sun/security/provider/PolicyFile/TrustedCert.java https://github.com/ibmruntimes
 # NoSuchAlgorithmException: DRBG, SHA1PRNG, NativePRNG SecureRandom not available.
 
 java/security/Security/ClassLoaderDeadlock/Deadlock.java https://github.com/eclipse-openj9/openj9/issues/21919 linux-x64,linux-ppc64le,linux-s390x
-java/security/Security/ClassLoaderDeadlock/Deadlock.sh https://github.com/ibmruntimes/openj9-openjdk-jdk17/issues/131 linux-x64,linux-ppc64le,linux-s390x
 sun/security/ec/ed/TestEdOps.java https://github.com/ibmruntimes/openj9-openjdk-jdk17/issues/131 linux-x64,linux-ppc64le,linux-s390x
 sun/security/provider/SecureRandom/AutoReseed.java https://github.com/ibmruntimes/openj9-openjdk-jdk17/issues/131 linux-x64,linux-ppc64le,linux-s390x
 sun/security/provider/SecureRandom/CommonSeeder.java https://github.com/ibmruntimes/openj9-openjdk-jdk17/issues/131 linux-x64,linux-ppc64le,linux-s390x
