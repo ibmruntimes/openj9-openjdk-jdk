@@ -243,7 +243,6 @@ java/security/SecureRandom/ThreadSafe.java https://github.com/eclipse-openj9/ope
 java/security/Security/AddProvider.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 java/security/Security/CaseInsensitiveAlgNames.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 java/security/Security/ClassLoaderDeadlock/Deadlock.java https://github.com/eclipse-openj9/openj9/issues/21919 generic-all
-java/security/Security/ClassLoaderDeadlock/Deadlock.sh https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 java/security/Security/ConfigFileTest.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 java/security/Security/ProviderFiltering.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 java/security/Security/removing/RemoveProviderByIdentity.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
