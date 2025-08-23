@@ -30,6 +30,9 @@ import java.nio.charset.StandardCharsets;
 import java.security.Security;
 import java.util.List;
 
+import jdk.test.lib.Utils;
+import jdk.test.lib.security.SecurityUtils;
+
 /*
  * @test id=Server
  * @bug 8301379
@@ -57,7 +60,7 @@ public class TLSWontNegotiateDisabledCipherAlgos {
 
     public static void main(String [] args) throws Exception {
         boolean useDisabledAlgo = Boolean.parseBoolean(args[1]);
-        if (useDisabledAlgo) {
+        if (useDisabledAlgo && !(SecurityUtils.isFIPS())) {
             Security.setProperty("jdk.tls.disabledAlgorithms", "");
         }
 
