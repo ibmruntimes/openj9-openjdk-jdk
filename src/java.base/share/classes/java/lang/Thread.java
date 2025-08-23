@@ -2460,20 +2460,48 @@ public class Thread implements Runnable {
     }
 
     /**
+     * Returns the translation from a J9VMThread state to a Thread::State.
+     *
+     * @return this thread's state.
+     *
+     * @see State
+     */
+    private State translateJ9VMThreadStateToThreadState(int status) {
+        switch (status) {
+            case 1: // J9VMTHREAD_STATE_RUNNING
+                return State.RUNNABLE;
+            case 2: // J9VMTHREAD_STATE_BLOCKED
+                return State.BLOCKED;
+            case 4: // J9VMTHREAD_STATE_WAITING
+            case 0x80: // J9VMTHREAD_STATE_PARKED
+                return State.WAITING;
+            case 8: // J9VMTHREAD_STATE_SLEEPING
+            case 64: // J9VMTHREAD_STATE_WAITING_TIMED
+            case 0x100: // J9VMTHREAD_STATE_PARKED_TIMED
+                return State.TIMED_WAITING;
+            case 32: // J9VMTHREAD_STATE_DEAD
+                return State.TERMINATED;
+            default:
+                // Fallback case: evaluate the state lazily.
+                synchronized (interruptLock) {
+                    return State.values()[getStateImpl(eetop)];
+                }
+        }
+    }
+
+    /**
      * Returns the state of this thread.
      * This method can be used instead of getState as getState is not final and
      * so can be overridden to run arbitrary code.
      */
     State threadState() {
-        synchronized (interruptLock) {
-            if (eetop == NO_REF) {
-                if (isDead()) {
-                    return State.TERMINATED;
-                }
-                return State.NEW;
+        if (eetop == NO_REF) {
+            if (isDead()) {
+                return State.TERMINATED;
             }
-            return State.values()[getStateImpl(eetop)];
+            return State.NEW;
         }
+        return translateJ9VMThreadStateToThreadState(holder.threadStatus);
     }
 
     /**
