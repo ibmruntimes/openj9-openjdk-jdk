@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, 2025, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2025, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -21,15 +21,41 @@
  * questions.
  */
 
-
-/*
+/**
  * @test
- * @requires os.family != "windows" & os.family != "aix" & vm.flagless
- *
- * @summary converted from VM testbase runtime/signal/sigalrm01.
- * VM testbase keywords: [signal, runtime, linux, macosx]
- *
- * @library /test/lib
- * @run main/native SigTestDriver SIGALRM
+ * @bug 8360561
+ * @summary Ranges can be proven to be disjoint but not orderable (thanks to unsigned range)
+ *          Comparing such values in such range with != should always be true.
+ * @library /test/lib /
+ * @run main compiler.igvn.CmpDisjointButNonOrderedRangesLong
  */
+package compiler.igvn;
 
+import compiler.lib.ir_framework.*;
+
+public class CmpDisjointButNonOrderedRangesLong {
+    static boolean bFld;
+    static double dFld1;
+    static double dFld2;
+
+    public static void main(String[] strArr) {
+        TestFramework.run();
+    }
+
+    @Test
+    @IR(failOn = {IRNode.PHI})
+    @Warmup(0)
+    static int test() {
+        long x = 7;
+        if (bFld) {
+            x = -195;
+        }
+
+        dFld1 = dFld2 % 2.5;
+
+        if (x == 0) {
+            return 0;
+        }
+        return 1;
+    }
+}
