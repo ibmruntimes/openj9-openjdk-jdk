@@ -399,8 +399,7 @@ public final class ProviderList {
                     continue;
                 }
                 Service s = p.getService(type, name);
-                if ((s != null) && RestrictedSecurity.isServiceAllowed(s)) {
-                    // We found a service that is allowed in restricted security mode.
+                if (s != null) {
                     return s;
                 }
             }
@@ -408,8 +407,7 @@ public final class ProviderList {
         for (i = 0; i < configs.length; i++) {
             Provider p = getProvider(i);
             Service s = p.getService(type, name);
-            if ((s != null) && RestrictedSecurity.isServiceAllowed(s)) {
-                // We found a service that is allowed in restricted security mode.
+            if (s != null) {
                 return s;
             }
         }
@@ -531,14 +529,14 @@ public final class ProviderList {
                 if (type != null) {
                     // simple lookup
                     Service s = p.getService(type, algorithm);
-                    if ((s != null) && RestrictedSecurity.isServiceAllowed(s)) {
+                    if (s != null) {
                         addService(s);
                     }
                 } else {
                     // parallel lookup
                     for (ServiceId id : ids) {
                         Service s = p.getService(id.type, id.algorithm);
-                        if ((s != null) && RestrictedSecurity.isServiceAllowed(s)) {
+                        if (s != null) {
                             addService(s);
                         }
                     }
