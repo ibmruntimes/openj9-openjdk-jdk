@@ -26,7 +26,7 @@
  * @bug 8350704
  * @summary Test behaviors with various bad EnclosingMethod attribute
  * @library /test/lib
- * @run junit BadEnclosingMethodTest
+ * @run junit/othervm -Xfuture BadEnclosingMethodTest
  */
 
 import jdk.test.lib.ByteCodeLoader;
@@ -104,14 +104,14 @@ class BadEnclosingMethodTest {
     @Test
     void testAbsentMethods() throws Exception {
         var absentMethodType = loadTestClass("methodName", "(Ldoes/not/Exist;)V");
-        var ex = assertThrows(TypeNotPresentException.class,
+        var ex = assertThrows(NoSuchMethodError.class,
                 absentMethodType::getEnclosingMethod);
-        assertEquals("does.not.Exist", ex.typeName());
+        assertTrue(ex.getMessage().contains("does/not/Exist"));
 
         var absentConstructorType = loadTestClass(INIT_NAME, "(Ldoes/not/Exist;)V");
-        ex = assertThrows(TypeNotPresentException.class,
+        ex = assertThrows(NoSuchMethodError.class,
                 absentConstructorType::getEnclosingConstructor);
-        assertEquals("does.not.Exist", ex.typeName());
+        assertTrue(ex.getMessage().contains("does/not/Exist"));
     }
 }
 
