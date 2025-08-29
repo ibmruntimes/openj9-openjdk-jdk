@@ -298,6 +298,8 @@ RestrictedSecurity.OpenJCEPlusFIPS.FIPS140-3.jce.provider.1 = com.ibm.crypto.plu
     {MessageDigest, SHA-256, *}, \
     {MessageDigest, SHA-384, *}, \
     {MessageDigest, SHA-512, *}, \
+    {MessageDigest, SHA-512/224, *}, \
+    {MessageDigest, SHA-512/256, *}, \
     {MessageDigest, SHA3-224, *}, \
     {MessageDigest, SHA3-256, *}, \
     {MessageDigest, SHA3-384, *}, \
