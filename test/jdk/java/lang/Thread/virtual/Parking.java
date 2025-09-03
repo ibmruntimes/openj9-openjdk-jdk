@@ -32,28 +32,28 @@
  * @summary Test virtual threads using park/unpark
  * @modules java.base/com.ibm.oti.vm java.base/java.lang:+open jdk.management
  * @library /test/lib
- * @run junit Parking
+ * @run junit/timeout=480 Parking
  */
 
 /*
  * @test id=Xint
  * @modules java.base/com.ibm.oti.vm java.base/java.lang:+open jdk.management
  * @library /test/lib
- * @run junit/othervm -Xint Parking
+ * @run junit/othervm/timeout=480 -Xint Parking
  */
 
 /*
  * @test id=Xcomp
  * @modules java.base/com.ibm.oti.vm java.base/java.lang:+open jdk.management
  * @library /test/lib
- * @run junit/othervm -Xcomp Parking
+ * @run junit/othervm/timeout=480 -Xcomp Parking
  */
 
 /*
  * @test id=Xcomp-noTieredCompilation
  * @modules java.base/com.ibm.oti.vm java.base/java.lang:+open jdk.management
  * @library /test/lib
- * @run junit/othervm -Xcomp -XX:-TieredCompilation Parking
+ * @run junit/othervm/timeout=480 -Xcomp -XX:-TieredCompilation Parking
  */
 
 import java.time.Duration;
