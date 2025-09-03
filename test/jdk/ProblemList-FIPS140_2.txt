@@ -251,6 +251,7 @@ sun/security/krb5/auto/UseCacheAndStoreKey.java https://github.com/ibmruntimes/o
 sun/security/krb5/auto/W83.java https://github.com/ibmruntimes/openj9-openjdk-jdk17/issues/116 linux-x64,linux-ppc64le,linux-s390x
 sun/security/krb5/etype/KerberosAesSha2.java https://github.com/ibmruntimes/openj9-openjdk-jdk17/issues/116 linux-x64,linux-ppc64le,linux-s390x
 sun/security/krb5/etype/WeakCrypto.java https://github.com/ibmruntimes/openj9-openjdk-jdk17/issues/116 linux-x64,linux-ppc64le,linux-s390x
+sun/security/krb5/Krb5NameEquals.java https://github.com/ibmruntimes/openj9-openjdk-jdk17/issues/116 linux-x64,linux-ppc64le,linux-s390x
 sun/security/krb5/KrbCredSubKey.java https://github.com/ibmruntimes/openj9-openjdk-jdk17/issues/116 linux-x64,linux-ppc64le,linux-s390x
 sun/security/krb5/ktab/BufferBoundary.java https://github.com/ibmruntimes/openj9-openjdk-jdk17/issues/116 linux-x64,linux-ppc64le,linux-s390x
 sun/security/krb5/ktab/FileKeyTab.java https://github.com/ibmruntimes/openj9-openjdk-jdk17/issues/116 linux-x64,linux-ppc64le,linux-s390x
