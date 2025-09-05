@@ -348,14 +348,15 @@ public class ObjectInputStream
      */
     private boolean streamFilterSet;
 
-    /* Cache LUDCL (Latest User-Defined Class Loader) until completion of read requests.
-     * If true LUDCL/forName results would be cached, true by default starting with Java 8.
+
+    /*
+     * Unless system property "com.ibm.enableClassCaching" is false, cache LUDCL
+     * (Latest User-Defined Class Loader) until completion of read requests.
      */
-    private static final boolean isClassCachingEnabled =
-            Boolean.parseBoolean(System.getProperty("com.ibm.enableClassCaching", "true"));
-    /* ClassByNameCache Entry for caching class.forName results upon enableClassCaching. */
     private static final ClassByNameCache classByNameCache =
-            isClassCachingEnabled ? new ClassByNameCache() : null;
+            Boolean.parseBoolean(System.getProperty("com.ibm.enableClassCaching", "true"))
+                ? new ClassByNameCache()
+                : null;
 
     /* If user code is invoked in the middle of a call to readObject the cachedLudcl
      * must be refreshed as the ludcl could have been changed while in user code.
@@ -529,7 +530,7 @@ public class ObjectInputStream
         ClassLoader oldCachedLudcl = null;
         boolean setCached = false;
 
-        if (((null == curContext) || (null == cachedLudcl)) && isClassCachingEnabled) {
+        if ((null != classByNameCache) && ((null == curContext) || (null == cachedLudcl))) {
             oldCachedLudcl = cachedLudcl;
             setCached = true;
 
@@ -646,7 +647,7 @@ public class ObjectInputStream
         ClassLoader oldCachedLudcl = null;
         boolean setCached = false;
 
-        if (((null == curContext) || (null == cachedLudcl)) && isClassCachingEnabled) {
+        if ((null != classByNameCache) && ((null == curContext) || (null == cachedLudcl))) {
             oldCachedLudcl = cachedLudcl;
             setCached = true;
             cachedLudcl = null;
