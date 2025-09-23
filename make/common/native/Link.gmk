@@ -23,6 +23,10 @@
 # questions.
 #
 
+# ===========================================================================
+# (c) Copyright IBM Corp. 2025, 2025 All Rights Reserved
+# ===========================================================================
+
 include MakeIncludeStart.gmk
 ifeq ($(INCLUDE), true)
 
@@ -49,6 +53,26 @@ GetEntitlementsFile = \
     $(foreach f, $(ENTITLEMENTS_DIR)/$(strip $(notdir $1))$(CODESIGN_PLIST_SUFFIX).plist, \
       $(if $(wildcard $f), $f, $(DEFAULT_ENTITLEMENTS_FILE)) \
     )
+
+ifeq ($(call isCompiler, gcc), true)
+  SetSharedLibraryName = \
+      -Wl,-soname=$1
+else ifeq ($(call isCompiler, clang), true)
+  ifeq ($(call isTargetOs, macosx), true)
+    SetSharedLibraryName = \
+        -Wl,-install_name,@rpath/$1
+  else ifeq ($(call isTargetOs, aix), true)
+    SetSharedLibraryName =
+  else
+    # Default works for linux, might work on other platforms as well.
+    SetSharedLibraryName = \
+        -Wl,-soname=$1
+  endif
+else ifeq ($(call isCompiler, microsoft xlc), true)
+  SetSharedLibraryName =
+else
+  $(error Unknown toolchain)
+endif
 
 ################################################################################
 define SetupLinking
@@ -131,7 +155,7 @@ define CreateDynamicLibraryOrExecutable
   # A shared dynamic library or an executable binary has been specified
   ifeq ($$($1_TYPE), LIBRARY)
     # Generating a dynamic library.
-    $1_EXTRA_LDFLAGS += $$(call SET_SHARED_LIBRARY_NAME,$$($1_BASENAME))
+    $1_EXTRA_LDFLAGS += $$(call SetSharedLibraryName,$$($1_BASENAME))
 
     # Create loadmap on AIX. Helps in diagnosing some problems.
     ifneq ($(COMPILER_BINDCMD_FILE_FLAG), )
