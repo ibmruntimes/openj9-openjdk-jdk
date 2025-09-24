@@ -23,6 +23,12 @@
  * questions.
  */
 
+/*
+ * ===========================================================================
+ * (c) Copyright IBM Corp. 2025, 2025 All Rights Reserved
+ * ===========================================================================
+ */
+
 package sun.print;
 
 import java.io.BufferedReader;
@@ -876,6 +882,7 @@ public final class PrintServiceLookupProvider extends PrintServiceLookup
                     FileReader reader = new FileReader(f);
                     bufferedReader = new BufferedReader(reader);
                     String line;
+                    results = new ArrayList<>();
                     while ((line = bufferedReader.readLine())
                            != null) {
                         results.add(line);
