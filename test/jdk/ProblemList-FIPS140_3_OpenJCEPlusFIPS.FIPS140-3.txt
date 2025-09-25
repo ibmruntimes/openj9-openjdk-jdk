@@ -499,7 +499,6 @@ javax/net/ssl/DTLSv10/DTLSv10SequenceNumberTest.java https://github.com/eclipse-
 javax/net/ssl/DTLSv10/DTLSv10UnsupportedCiphersTest.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 javax/net/ssl/ExtendedSSLSession/ExportKeyingMaterialTests.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 javax/net/ssl/finalize/SSLSessionFinalizeTest.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
-javax/net/ssl/finalize/SSLSessionFinalizeTest.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 javax/net/ssl/FixingJavadocs/ImplicitHandshake.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 javax/net/ssl/FixingJavadocs/KMTMGetNothing.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 javax/net/ssl/FixingJavadocs/SSLSessionNulls.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
