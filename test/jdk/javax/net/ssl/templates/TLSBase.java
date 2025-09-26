@@ -67,10 +67,15 @@ abstract public class TLSBase {
     public String name;
 
     TLSBase() {
-
         String keyFilename = TESTROOT +  "/" + pathToStores + "/" + keyStoreFile;
         String trustFilename = TESTROOT + "/" + pathToStores + "/" +
             trustStoreFile;
+
+        if (NetSslUtils.isFIPS()) {
+            keyFilename = NetSslUtils.revertJKSToPKCS12(keyFilename, passwd);
+            trustFilename = NetSslUtils.revertJKSToPKCS12(trustFilename, passwd);
+        }
+
         System.setProperty("javax.net.ssl.keyStore", keyFilename);
         System.setProperty("javax.net.ssl.keyStorePassword", passwd);
         System.setProperty("javax.net.ssl.trustStore", trustFilename);
