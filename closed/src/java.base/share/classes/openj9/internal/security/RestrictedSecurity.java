@@ -42,6 +42,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
+import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -135,15 +136,22 @@ public final class RestrictedSecurity {
     }
 
     private static boolean isJarVerifierInStackTrace() {
-        java.util.function.Predicate<Class<?>> isJarVerifier =
-                clazz -> "java.util.jar.JarVerifier".equals(clazz.getName())
-                      && "java.base".equals(clazz.getModule().getName());
+        final String targetClass = "java.util.jar.JarVerifier";
+        final String targetModule = "java.base";
 
-        java.util.function.Function<Stream<StackWalker.StackFrame>, Boolean> matcher =
-                stream -> stream.map(StackWalker.StackFrame::getDeclaringClass)
-                                .anyMatch(isJarVerifier);
-
-        return StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE).walk(matcher);
+        for (java.util.Map.Entry<Thread, StackTraceElement[]> e : Thread.getAllStackTraces().entrySet()) {
+            StackTraceElement[] stack = e.getValue();
+            if (stack == null)
+                continue;
+            for (StackTraceElement ste : stack) {
+                if (targetClass.equals(ste.getClassName())) {
+                    if (targetModule.equals(ste.getModuleName())) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
     }
 
     /**
@@ -640,7 +648,7 @@ public final class RestrictedSecurity {
         if (!isNullOrBlank(descSunsetDate)) {
             try {
                 isSunset = LocalDate.parse(descSunsetDate, DateTimeFormatter.ofPattern("yyyy-MM-dd"))
-                        .isBefore(LocalDate.now());
+                        .isBefore(getTodayWithoutUsingZoneID());
             } catch (DateTimeParseException except) {
                 printStackTraceAndExit(
                         "Restricted security policy sunset date is incorrect, the correct format is yyyy-MM-dd.");
@@ -651,6 +659,12 @@ public final class RestrictedSecurity {
             debug.println("Restricted security policy is sunset: " + isSunset);
         }
         return isSunset;
+    }
+
+    private static LocalDate getTodayWithoutUsingZoneID() {
+        long nowMillis = System.currentTimeMillis();
+        int offsetMillis = TimeZone.getDefault().getOffset(nowMillis);
+        return LocalDate.ofEpochDay(Math.floorDiv(nowMillis + offsetMillis, 86_400_000L));
     }
 
     /**
