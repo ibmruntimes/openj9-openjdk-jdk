@@ -22,6 +22,12 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
+
+/*
+ * ===========================================================================
+ * (c) Copyright IBM Corp. 2024, 2024 All Rights Reserved
+ * ===========================================================================
+ */
 package jdk.jfr.internal;
 
 import java.io.IOException;
@@ -155,7 +161,7 @@ public final class JVMSupport {
         String pid = JVM.getPid();
         String date = ValueFormatter.formatDateTime(LocalDateTime.now());
         String idText = recording == null ? "" :  "-id-" + Long.toString(recording.getId());
-        return "hotspot-" + "pid-" + pid + idText + "-" + date + ".jfr";
+        return "openj9-" + "pid-" + pid + idText + "-" + date + ".jfr";
     }
 
     public static boolean createFailedNativeJFR() throws IllegalStateException {
