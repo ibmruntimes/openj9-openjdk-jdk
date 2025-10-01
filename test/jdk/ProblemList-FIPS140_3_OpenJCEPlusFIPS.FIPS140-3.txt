@@ -546,7 +546,7 @@ javax/net/ssl/SSLEngine/FinishedPresent.java https://github.com/eclipse-openj9/o
 javax/net/ssl/SSLEngine/HandshakeWithInvalidRecordVersion.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 javax/net/ssl/SSLEngine/IllegalHandshakeMessage.java https://github.ibm.com/runtimes/backlog/issues/1089 generic-all
 javax/net/ssl/SSLEngine/LargeBufs.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
-javax/net/ssl/SSLEngine/LargePacket.java https://github.com/eclipse-openj9/openj9/issues/20343 mac-aarch64, mac-x64
+javax/net/ssl/SSLEngine/LargePacket.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 javax/net/ssl/SSLEngine/NoAuthClientAuth.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 javax/net/ssl/SSLEngine/TestAllSuites.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 javax/net/ssl/SSLParameters/NamedGroups.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
@@ -1151,8 +1151,8 @@ sun/security/util/InternalPrivateKey/Correctness.java https://github.com/eclipse
 sun/security/util/Oid/S11N.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 sun/security/util/Pem/PemEncoding.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 sun/security/util/Resources/early/EarlyResources.java https://github.ibm.com/runtimes/backlog/issues/1089 generic-all
-sun/security/validator/CertReplace.java#certreplace.CertReplace_certreplace https://github.ibm.com/runtimes/backlog/issues/1089 generic-all
-sun/security/validator/CertReplace.java#samedn.CertReplace_samedn https://github.ibm.com/runtimes/backlog/issues/1089 generic-all
+sun/security/validator/CertReplace.java#certreplace https://github.ibm.com/runtimes/backlog/issues/1089 generic-all
+sun/security/validator/CertReplace.java#samedn https://github.ibm.com/runtimes/backlog/issues/1089 generic-all
 sun/security/validator/certreplace.sh https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 sun/security/validator/EndEntityExtensionCheck.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
 sun/security/validator/PKIXValAndRevCheckTests.java https://github.com/eclipse-openj9/openj9/issues/20343 generic-all
