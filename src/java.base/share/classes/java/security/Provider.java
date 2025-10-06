@@ -25,7 +25,7 @@
 
 /*
  * ===========================================================================
- * (c) Copyright IBM Corp. 2022, 2025 All Rights Reserved
+ * (c) Copyright IBM Corp. 2022, 2026 All Rights Reserved
  * ===========================================================================
  */
 
@@ -161,6 +161,12 @@ public abstract class Provider extends Properties {
     private transient boolean initialized;
 
     private static final Object[] EMPTY = new Object[0];
+
+    private static final List<String> providerInfoKeys = new ArrayList<>(Arrays.asList(
+                                                                    "Provider.id name",
+                                                                    "Provider.id version",
+                                                                    "Provider.id info",
+                                                                    "Provider.id className"));
 
     private static double parseVersionStr(String s) {
         try {
@@ -428,6 +434,28 @@ public abstract class Provider extends Properties {
         if (entrySetCallCount != 2)
             throw new RuntimeException("Internal error.");
 
+        if (RestrictedSecurity.isEnabled()) {
+            Set<Map.Entry<Object, Object>> toRemove = new HashSet<>();
+            for (Map.Entry<Object, Object> entry : entrySet) {
+                Object key = entry.getKey();
+                if (isProviderInfoKey(key)) {
+                    // This is a value pertaining to provider info.
+                    continue;
+                }
+                Service service = createServiceFromKey(key);
+                if ((service != null) && !RestrictedSecurity.isServiceAllowed(service)) {
+                    // We're in restricted security mode which does not allow this service,
+                    // mark it to be removed from returned set.
+                    toRemove.add(entry);
+                }
+            }
+            if (!toRemove.isEmpty()) {
+                Set<Map.Entry<Object, Object>> modifiableSet = new HashSet<>(entrySet);
+                modifiableSet.removeAll(toRemove);
+                entrySet = Collections.unmodifiableSet(modifiableSet);
+            }
+        }
+
         return entrySet;
     }
 
@@ -452,7 +480,25 @@ public abstract class Provider extends Properties {
     @Override
     public Collection<Object> values() {
         checkInitialized();
-        return Collections.unmodifiableCollection(super.values());
+        Collection<Object> values = super.values();
+
+        if (RestrictedSecurity.isEnabled()) {
+            Set<Map.Entry<Object, Object>> entrySet = entrySet();
+            for (Map.Entry<Object, Object> entry : entrySet) {
+                if (isProviderInfoKey(entry.getKey())) {
+                    // This is a value pertaining to provider info.
+                    continue;
+                }
+                Service service = createServiceFromKey(entry.getKey());
+                if ((service != null) && !RestrictedSecurity.isServiceAllowed(service)) {
+                    // We're in restricted security mode which does not allow this service,
+                    // remove it from returned collection.
+                    values.remove(entry.getValue());
+                }
+            }
+        }
+
+        return Collections.unmodifiableCollection(values);
     }
 
     /**
@@ -645,6 +691,16 @@ public abstract class Provider extends Properties {
     @Override
     public Object get(Object key) {
         checkInitialized();
+
+        if (RestrictedSecurity.isEnabled() && !isProviderInfoKey(key)) {
+            // This is not a value pertaining to provider info.
+            Service service = createServiceFromKey(key);
+            if ((service != null) && !RestrictedSecurity.isServiceAllowed(service)) {
+                // We're in restricted security mode which does not allow this service,
+                // return null.
+                return null;
+            }
+        }
         return super.get(key);
     }
     /**
@@ -653,6 +709,17 @@ public abstract class Provider extends Properties {
     @Override
     public synchronized Object getOrDefault(Object key, Object defaultValue) {
         checkInitialized();
+
+        if (RestrictedSecurity.isEnabled() && !isProviderInfoKey(key)) {
+            // This is not a value pertaining to provider info.
+            Service service = createServiceFromKey(key);
+            if ((service != null) && !RestrictedSecurity.isServiceAllowed(service)) {
+                // We're in restricted security mode which does not allow this service,
+                // return null.
+                return null;
+            }
+        }
+
         return super.getOrDefault(key, defaultValue);
     }
 
@@ -677,12 +744,42 @@ public abstract class Provider extends Properties {
     @Override
     public Enumeration<Object> elements() {
         checkInitialized();
-        return super.elements();
+        Enumeration<Object> elements;
+
+        if (RestrictedSecurity.isEnabled()) {
+            List<Object> list = new ArrayList<>();
+            Set<Map.Entry<Object, Object>> entrySet = entrySet();
+            for (Map.Entry<Object, Object> entry : entrySet) {
+                Service service = createServiceFromKey(entry.getKey());
+                if ((service == null) || isProviderInfoKey(entry.getKey())
+                        || RestrictedSecurity.isServiceAllowed(service)) {
+                    // We're in restricted security mode which allows this service
+                    // or provider info, so add it to list to be returned.
+                    list.add(entry.getValue());
+                }
+            }
+            elements = Collections.enumeration(list);
+        } else {
+            elements = super.elements();
+        }
+
+        return elements;
     }
 
     // let javadoc show doc from superclass
     public String getProperty(String key) {
         checkInitialized();
+
+        if (RestrictedSecurity.isEnabled() && !isProviderInfoKey(key)) {
+            // This is not a value pertaining to provider info.
+            Service service = createServiceFromKey(key);
+            if ((service != null) && !RestrictedSecurity.isServiceAllowed(service)) {
+                // We're in restricted security mode which does not allow this service,
+                // return null.
+                return null;
+            }
+        }
+
         return super.getProperty(key);
     }
 
@@ -808,6 +905,13 @@ public abstract class Provider extends Properties {
     private boolean implReplace(Object key, Object oldValue, Object newValue) {
         if (!checkLegacy(key)) return false;
 
+        Service service = createServiceFromKey(key);
+        if ((service != null) && !RestrictedSecurity.canServiceBeRegistered(service)) {
+            // We're in restricted security mode which does not allow this service,
+            // return without replacing anything.
+            return false;
+        }
+
         boolean result = super.replace(key, oldValue, newValue);
         if (result && key instanceof String sk) {
             if (newValue instanceof String sv) {
@@ -821,6 +925,13 @@ public abstract class Provider extends Properties {
 
     private Object implReplace(Object key, Object value) {
         if (!checkLegacy(key)) return null;
+
+        Service service = createServiceFromKey(key);
+        if ((service != null) && !RestrictedSecurity.canServiceBeRegistered(service)) {
+            // We're in restricted security mode which does not allow this service,
+            // return without replacing anything.
+            return null;
+        }
 
         Object o = super.replace(key, value);
         if (key instanceof String sk) {
@@ -850,6 +961,14 @@ public abstract class Provider extends Properties {
                 if (!checkLegacy(sk)) {
                     continue;
                 }
+
+                Service service = createServiceFromKey(key);
+                if ((service != null) && !RestrictedSecurity.canServiceBeRegistered(service)) {
+                    // We're in restricted security mode which does not allow this service,
+                    // return without replacing anything.
+                    continue;
+                }
+
                 parseLegacy(sk, sv, OPType.ADD);
             }
         }
@@ -860,6 +979,13 @@ public abstract class Provider extends Properties {
             BiFunction<? super Object, ? super Object, ? extends Object>
             remappingFunction) {
         if (!checkLegacy(key)) return null;
+
+        Service service = createServiceFromKey(key);
+        if ((service != null) && !RestrictedSecurity.canServiceBeRegistered(service)) {
+            // We're in restricted security mode which does not allow this service,
+            // return without merging anything.
+            return null;
+        }
 
         Object o = super.merge(key, value, remappingFunction);
         if (key instanceof String sk) {
@@ -878,6 +1004,13 @@ public abstract class Provider extends Properties {
 
         if (!checkLegacy(key)) return null;
 
+        Service service = createServiceFromKey(key);
+        if ((service != null) && !RestrictedSecurity.isServiceAllowed(service)) {
+            // We're in restricted security mode which does not allow this service,
+            // return without computing anything.
+            return null;
+        }
+
         Object o = super.compute(key, remappingFunction);
         if (key instanceof String sk) {
             if (o == null) {
@@ -894,6 +1027,13 @@ public abstract class Provider extends Properties {
             ? extends Object> mappingFunction) {
         if (!checkLegacy(key)) return null;
 
+        Service service = createServiceFromKey(key);
+        if ((service != null) && !RestrictedSecurity.isServiceAllowed(service)) {
+            // We're in restricted security mode which does not allow this service,
+            // return without computing anything.
+            return null;
+        }
+
         Object o = super.computeIfAbsent(key, mappingFunction);
         if (o instanceof String so && key instanceof String sk) {
             parseLegacy(sk, so, OPType.ADD);
@@ -906,6 +1046,13 @@ public abstract class Provider extends Properties {
             ? super Object, ? extends Object> remappingFunction) {
         if (!checkLegacy(key)) return null;
 
+        Service service = createServiceFromKey(key);
+        if ((service != null) && !RestrictedSecurity.isServiceAllowed(service)) {
+            // We're in restricted security mode which does not allow this service,
+            // return without computing anything.
+            return null;
+        }
+
         Object o = super.computeIfPresent(key, remappingFunction);
         if (o instanceof String so && key instanceof String sk) {
             parseLegacy(sk, so, OPType.ADD);
@@ -916,6 +1063,13 @@ public abstract class Provider extends Properties {
     private Object implPut(Object key, Object value) {
         if (!checkLegacy(key)) return null;
 
+        Service service = createServiceFromKey(key);
+        if ((service != null) && !RestrictedSecurity.canServiceBeRegistered(service)) {
+            // We're in restricted security mode which does not allow this service,
+            // return without putting.
+            return null;
+        }
+
         Object o = super.put(key, value);
         if (key instanceof String sk && value instanceof String sv) {
             parseLegacy(sk, sv, OPType.ADD);
@@ -925,6 +1079,13 @@ public abstract class Provider extends Properties {
 
     private Object implPutIfAbsent(Object key, Object value) {
         if (!checkLegacy(key)) return null;
+
+        Service service = createServiceFromKey(key);
+        if ((service != null) && !RestrictedSecurity.canServiceBeRegistered(service)) {
+            // We're in restricted security mode which does not allow this service,
+            // return without putting.
+            return null;
+        }
 
         Object o = super.putIfAbsent(key, value);
         if (o == null && key instanceof String sk &&
@@ -943,6 +1104,26 @@ public abstract class Provider extends Properties {
         prngAlgos.clear();
         super.clear();
         putId();
+    }
+
+    private static boolean isProviderInfoKey(Object key) {
+        if (key instanceof String sk) {
+            return providerInfoKeys.contains(sk);
+        }
+        return false;
+    }
+
+    private Service createServiceFromKey(Object key) {
+        if (key instanceof String sk) {
+            String[] typeAndAlg = getTypeAndAlgorithm(sk);
+            if (typeAndAlg != null) {
+                String type = typeAndAlg[0];
+                String algorithm = typeAndAlg[1];
+                return new Service(this, type, algorithm);
+            }
+        }
+
+        return null;
     }
 
     // used as key in the serviceMap and legacyMap HashMaps
