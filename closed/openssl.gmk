@@ -68,12 +68,9 @@ ifeq ($(OPENJDK_TARGET_OS), aix)
   else ifeq ($(call isCompiler, xlc), true)
     OPENSSL_TARGET := aix64-cc
   endif
-else ifeq ($(OPENJDK_TARGET_OS), linux)
-  ifneq (,$(filter aarch64 ppc64le x86_64, $(OPENJDK_TARGET_CPU)))
-    OPENSSL_TARGET := linux-$(OPENJDK_TARGET_CPU)
-  else ifneq (,$(filter riscv64 s390x, $(OPENJDK_TARGET_CPU)))
-    OPENSSL_TARGET := linux64-$(OPENJDK_TARGET_CPU)
-  endif
+else ifeq ($(call isTargetOs, linux), true)
+  OPENSSL_TARGET := semeru-$(OPENJ9_PLATFORM_CODE)
+  export OPENSSL_LOCAL_CONFIG_DIR := $(TOPDIR)/closed/openssl-conf
 else ifeq ($(OPENJDK_TARGET_OS), macosx)
   ifneq (,$(filter arm64 x86_64, $(OPENJDK_TARGET_CPU)))
     OPENSSL_TARGET := darwin64-$(OPENJDK_TARGET_CPU)-cc
