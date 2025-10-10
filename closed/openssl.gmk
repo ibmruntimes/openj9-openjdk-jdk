@@ -98,6 +98,20 @@ else
   OPENSSL_CONFIG_CFLAGS :=
 endif
 
+ifeq ($(OPENJDK_TARGET_OS), linux)
+	ifeq ($(OPENJDK_TARGET_CPU), ppc64le)
+		OPENSSL_TARGET_EFFECTIVE := semeru-xl64
+	else ifeq ($(OPENJDK_TARGET_CPU), s390x)
+		OPENSSL_TARGET_EFFECTIVE := semeru-xz64
+	else ifeq ($(OPENJDK_TARGET_CPU), x86_64)
+		OPENSSL_TARGET_EFFECTIVE := semeru-xa64
+	else ifeq ($(OPENJDK_TARGET_CPU), aarch64)
+		OPENSSL_TARGET_EFFECTIVE := semeru-xr64
+	endif
+	OPENSSL_LOCAL_CFG_DIR    := $(TOPDIR)/closed/openssl-conf
+	OPENSSL_CONFIG_ENV_EXTRA := export OPENSSL_LOCAL_CONFIG_DIR='$(OPENSSL_LOCAL_CFG_DIR)' &&
+endif
+
 ifneq (,$(CCACHE))
   # If ccache is enabled and the environment contains either CC or CXX, their
   # values (as defined in this make) are propagated to the instance of make
@@ -107,8 +121,14 @@ ifneq (,$(CCACHE))
 endif # CCACHE
 
 build_openssl :
+ifeq ($(OPENJDK_TARGET_OS), linux)
+	@$(ECHO) Compiling OpenSSL in $(OPENSSL_DIR) for $(OPENSSL_TARGET_EFFECTIVE)$(if $(OPENSSL_CONFIG_CFLAGS), with additional CFLAGS $(OPENSSL_CONFIG_CFLAGS))
+	( $(OPENSSL_CONFIG_SETUP) $(OPENSSL_CONFIG_ENV_EXTRA) $(CD) $(OPENSSL_DIR) && \
+	  $(PERL) Configure $(OPENSSL_CONFIG_CFLAGS) $(OPENSSL_TARGET_EFFECTIVE) no-makedepend no-tests shared )
+else
 	@$(ECHO) Compiling OpenSSL in $(OPENSSL_DIR) for $(OPENSSL_TARGET)$(if $(OPENSSL_CONFIG_CFLAGS), with additional CFLAGS $(OPENSSL_CONFIG_CFLAGS))
 	( $(OPENSSL_CONFIG_SETUP) $(CD) $(OPENSSL_DIR) && $(PERL) Configure $(OPENSSL_CONFIG_CFLAGS) $(OPENSSL_TARGET) no-makedepend no-tests shared )
+endif
 	$(OPENSSL_PATCH)
 	+ ( $(OPENSSL_MAKE_SETUP) $(CD) $(OPENSSL_DIR) && $(OPENSSL_MAKE) )
 
