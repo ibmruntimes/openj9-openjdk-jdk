@@ -98,7 +98,7 @@ else
   OPENSSL_CONFIG_CFLAGS :=
 endif
 
-ifeq ($(OPENJDK_TARGET_OS), linux)
+ifeq ($(call isTargetOs, linux), true)
 	ifeq ($(OPENJDK_TARGET_CPU), ppc64le)
 		OPENSSL_TARGET_EFFECTIVE := semeru-xl64
 	else ifeq ($(OPENJDK_TARGET_CPU), s390x)
@@ -108,8 +108,7 @@ ifeq ($(OPENJDK_TARGET_OS), linux)
 	else ifeq ($(OPENJDK_TARGET_CPU), aarch64)
 		OPENSSL_TARGET_EFFECTIVE := semeru-xr64
 	endif
-	OPENSSL_LOCAL_CFG_DIR    := $(TOPDIR)/closed/openssl-conf
-	OPENSSL_CONFIG_ENV_EXTRA := export OPENSSL_LOCAL_CONFIG_DIR='$(OPENSSL_LOCAL_CFG_DIR)' &&
+	export OPENSSL_LOCAL_CONFIG_DIR := $(TOPDIR)/closed/openssl-conf
 endif
 
 ifneq (,$(CCACHE))
