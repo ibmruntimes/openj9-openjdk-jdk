@@ -28,6 +28,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.Provider;
 import java.security.Provider.Service;
+import java.time.Clock;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -135,15 +136,22 @@ public final class RestrictedSecurity {
     }
 
     private static boolean isJarVerifierInStackTrace() {
-        java.util.function.Predicate<Class<?>> isJarVerifier =
-                clazz -> "java.util.jar.JarVerifier".equals(clazz.getName())
-                      && "java.base".equals(clazz.getModule().getName());
+        final String targetClass = "java.util.jar.JarVerifier";
+        final String targetModule = "java.base";
 
-        java.util.function.Function<Stream<StackWalker.StackFrame>, Boolean> matcher =
-                stream -> stream.map(StackWalker.StackFrame::getDeclaringClass)
-                                .anyMatch(isJarVerifier);
-
-        return StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE).walk(matcher);
+        for (java.util.Map.Entry<Thread, StackTraceElement[]> e : Thread.getAllStackTraces().entrySet()) {
+            StackTraceElement[] stack = e.getValue();
+            if (stack == null)
+                continue;
+            for (StackTraceElement ste : stack) {
+                if (targetClass.equals(ste.getClassName())) {
+                    if (targetModule.equals(ste.getModuleName())) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
     }
 
     /**
@@ -640,7 +648,7 @@ public final class RestrictedSecurity {
         if (!isNullOrBlank(descSunsetDate)) {
             try {
                 isSunset = LocalDate.parse(descSunsetDate, DateTimeFormatter.ofPattern("yyyy-MM-dd"))
-                        .isBefore(LocalDate.now());
+                        .isBefore(LocalDate.now(Clock.systemUTC()));
             } catch (DateTimeParseException except) {
                 printStackTraceAndExit(
                         "Restricted security policy sunset date is incorrect, the correct format is yyyy-MM-dd.");
