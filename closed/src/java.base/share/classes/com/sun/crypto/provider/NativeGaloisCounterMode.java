@@ -24,13 +24,13 @@
  */
 /*
  * ===========================================================================
- * (c) Copyright IBM Corp. 2018, 2023 All Rights Reserved
+ * (c) Copyright IBM Corp. 2018, 2025 All Rights Reserved
  * ===========================================================================
  */
 
 package com.sun.crypto.provider;
 
-import com.sun.crypto.provider.AESCrypt;
+import com.sun.crypto.provider.AES_Crypt;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -273,7 +273,7 @@ abstract class NativeGaloisCounterMode extends CipherSpi {
     protected int engineGetKeySize(Key key) throws InvalidKeyException {
         byte[] encoded = key.getEncoded();
         Arrays.fill(encoded, (byte)0);
-        if (!AESCrypt.isKeySizeValid(encoded.length)) {
+        if (!AES_Crypt.isKeySizeValid(encoded.length)) {
             throw new InvalidKeyException("Invalid key length: " +
                                           encoded.length + " bytes");
         }
@@ -1089,25 +1089,25 @@ abstract class NativeGaloisCounterMode extends CipherSpi {
 
     public static final class AESGCM extends NativeGaloisCounterMode {
         public AESGCM() {
-            super(-1, new AESCrypt());
+            super(-1, new AES_Crypt());
         }
     }
 
     public static final class AES128 extends NativeGaloisCounterMode {
         public AES128() {
-            super(16, new AESCrypt());
+            super(16, new AES_Crypt());
         }
     }
 
     public static final class AES192 extends NativeGaloisCounterMode {
         public AES192() {
-            super(24, new AESCrypt());
+            super(24, new AES_Crypt());
         }
     }
 
     public static final class AES256 extends NativeGaloisCounterMode {
         public AES256() {
-            super(32, new AESCrypt());
+            super(32, new AES_Crypt());
         }
     }
 }

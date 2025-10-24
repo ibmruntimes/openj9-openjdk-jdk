@@ -35,7 +35,7 @@ import java.security.ProviderException;
 import java.util.ArrayDeque;
 import java.util.Arrays;
 
-import com.sun.crypto.provider.AESCrypt;
+import com.sun.crypto.provider.AES_Crypt;
 
 import jdk.crypto.jniprovider.NativeCrypto;
 import jdk.internal.ref.CleanerFactory;
@@ -205,7 +205,7 @@ class NativeCipherBlockChaining extends FeedbackCipher  {
             throw new InvalidKeyException("Internal error");
         }
 
-        if (!AESCrypt.isKeySizeValid(key.length)) {
+        if (!AES_Crypt.isKeySizeValid(key.length)) {
             throw new InvalidKeyException("Invalid AES key length: " +
                 key.length + " bytes");
         }
