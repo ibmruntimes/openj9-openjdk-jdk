@@ -28,6 +28,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.Provider;
 import java.security.Provider.Service;
+import java.time.Clock;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -640,7 +641,7 @@ public final class RestrictedSecurity {
         if (!isNullOrBlank(descSunsetDate)) {
             try {
                 isSunset = LocalDate.parse(descSunsetDate, DateTimeFormatter.ofPattern("yyyy-MM-dd"))
-                        .isBefore(LocalDate.now());
+                        .isBefore(LocalDate.now(Clock.systemUTC()));
             } catch (DateTimeParseException except) {
                 printStackTraceAndExit(
                         "Restricted security policy sunset date is incorrect, the correct format is yyyy-MM-dd.");
