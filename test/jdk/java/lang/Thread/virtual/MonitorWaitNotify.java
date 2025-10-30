@@ -425,7 +425,7 @@ class MonitorWaitNotify {
     }
 
     /**
-     * Testing invoking Object.wait with interrupt status set.
+     * Testing invoking Object.wait with interrupted status set.
      */
     @ParameterizedTest
     @ValueSource(ints = { 0, 30000, Integer.MAX_VALUE })
