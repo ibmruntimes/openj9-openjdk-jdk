@@ -234,7 +234,7 @@ public class Thread implements Runnable {
     // thread name
     private volatile String name;
 
-    // interrupt status (read/written by VM)
+    // interrupted status (read/written by VM)
     volatile boolean interrupted;
 
     // context ClassLoader
@@ -361,7 +361,7 @@ public class Thread implements Runnable {
 
     /* The object in which this thread is blocked in an interruptible I/O
      * operation, if any.  The blocker's interrupt method should be invoked
-     * after setting this thread's interrupt status.
+     * after setting this thread's interrupted status.
      */
     private Interruptible nioBlocker;
 
@@ -1553,22 +1553,22 @@ public class Thread implements Runnable {
      * Object#wait(long, int) wait(long, int)} methods of the {@link Object}
      * class, or of the {@link #join()}, {@link #join(long)}, {@link
      * #join(long, int)}, {@link #sleep(long)}, or {@link #sleep(long, int)}
-     * methods of this class, then its interrupt status will be cleared and it
+     * methods of this class, then its interrupted status will be cleared and it
      * will receive an {@link InterruptedException}.
      *
      * <p> If this thread is blocked in an I/O operation upon an {@link
      * java.nio.channels.InterruptibleChannel InterruptibleChannel}
-     * then the channel will be closed, the thread's interrupt
+     * then the channel will be closed, the thread's interrupted
      * status will be set, and the thread will receive a {@link
      * java.nio.channels.ClosedByInterruptException}.
      *
      * <p> If this thread is blocked in a {@link java.nio.channels.Selector}
-     * then the thread's interrupt status will be set and it will return
+     * then the thread's interrupted status will be set and it will return
      * immediately from the selection operation, possibly with a non-zero
      * value, just as if the selector's {@link
      * java.nio.channels.Selector#wakeup wakeup} method were invoked.
      *
-     * <p> If none of the previous conditions hold then this thread's interrupt
+     * <p> If none of the previous conditions hold then this thread's interrupted
      * status will be set. </p>
      *
      * <p> Interrupting a thread that is not alive need not have any effect.
@@ -1578,7 +1578,7 @@ public class Thread implements Runnable {
      * will report it via {@link #interrupted()} and {@link #isInterrupted()}.
      */
     public void interrupt() {
-        // Setting the interrupt status must be done before reading nioBlocker.
+        // Setting the interrupted status must be done before reading nioBlocker.
         synchronized (interruptLock) {
             interrupted = true;
             interrupt0();  // inform VM of interrupt
@@ -1656,10 +1656,10 @@ public class Thread implements Runnable {
         }
 
         /*
-         * It is possible for the Java and native interrupt status to get out of sync. Sending
+         * It is possible for the Java and native interrupted status to get out of sync. Sending
          * two interrupts to the same thread in quick succession can cause this. It is critical
-         * that clearing the interrupt status also clears the native status. If the Java
-         * interrupt status is false, it is important to verify that this is consistent with the
+         * that clearing the interrupted status also clears the native status. If the Java
+         * interrupted status is false, it is important to verify that this is consistent with the
          * native status to prevent an unexpected interrupt exception the next time
          * sleep() or wait() is called.
          */
