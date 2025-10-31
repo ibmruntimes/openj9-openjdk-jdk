@@ -136,15 +136,26 @@ public final class RestrictedSecurity {
     }
 
     private static boolean isJarVerifierInStackTrace() {
-        java.util.function.Predicate<Class<?>> isJarVerifier =
-                clazz -> "java.util.jar.JarVerifier".equals(clazz.getName())
-                      && "java.base".equals(clazz.getModule().getName());
+        final String targetClass = "java.util.jar.JarVerifier";
+        final String targetModule = "java.base";
 
-        java.util.function.Function<Stream<StackWalker.StackFrame>, Boolean> matcher =
-                stream -> stream.map(StackWalker.StackFrame::getDeclaringClass)
-                                .anyMatch(isJarVerifier);
+        for (java.util.Map.Entry<Thread, StackTraceElement[]> e : Thread.getAllStackTraces().entrySet()) {
+            Thread th = e.getKey();
+            boolean isVmThread = th.isDaemon() || th.getPriority() > 7;
+            if (isVmThread) continue; // Skip VM service threads.
 
-        return StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE).walk(matcher);
+            StackTraceElement[] stack = e.getValue();
+            if (stack == null)
+                continue;
+            for (StackTraceElement ste : stack) {
+                if (targetClass.equals(ste.getClassName())) {
+                    if (targetModule.equals(ste.getModuleName())) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
     }
 
     /**
