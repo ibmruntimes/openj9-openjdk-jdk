@@ -40,7 +40,6 @@ import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -425,21 +424,13 @@ enum SignatureScheme {
             List<ProtocolVersion> activeProtocols,
             Set<SSLScope> scopes) {
         List<SignatureScheme> supported = new LinkedList<>();
-
-        // If config.signatureSchemes is non-null then it means that
-        // it was defined by a system property.  Per
-        // SSLConfiguration.getCustomizedSignatureScheme() the list will
-        // only contain schemes that are in the enum.
-        // Otherwise, use the enum constants (converted to a list).
-        //
-        // Additional logic is added here to remove the ecdsa_brainpoolP512r1tls13_sha512
-        // signature scheme by default. We only want to make use of ecdsa_brainpoolP512r1tls13_sha512
-        // when explicitly set via system properties jdk.tls.client.SignatureSchemes or
-        // jdk.tls.server.SignatureSchemes.
         List<SignatureScheme> schemesToCheck;
-        if (config.signatureSchemes != null) {
-            schemesToCheck = namesOfAvailable(config.signatureSchemes);
-        } else {
+
+        // No need to look up the names of the default signature schemes.
+        if (config.signatureSchemes == SupportedSigSchemes.DEFAULT) {
+            // We only want to make use of ECDSA_BRAINPOOLP512R1TLS13_SHA512 when
+            // explicitly set via system properties jdk.tls.client.SignatureSchemes
+            // or jdk.tls.server.SignatureSchemes.
             SignatureScheme[] schemes = SignatureScheme.values();
             schemesToCheck = new ArrayList<>(schemes.length);
             for (SignatureScheme scheme : schemes) {
@@ -447,10 +438,21 @@ enum SignatureScheme {
                     schemesToCheck.add(scheme);
                 } else {
                     if (SSLLogger.isOn &&
-                        SSLLogger.isOn("ssl,handshake,verbose")) {
+                            SSLLogger.isOn("ssl,handshake,verbose")) {
                         SSLLogger.finest("Ignore " + ECDSA_BRAINPOOLP512R1TLS13_SHA512.name
                                 + " from supported signature schemes");
                     }
+                }
+            }
+        } else {
+            schemesToCheck = new ArrayList<>();
+            for (String name : config.signatureSchemes) {
+                var ss = SignatureScheme.nameOf(name);
+                if (ss != null) {
+                    schemesToCheck.add(ss);
+                } else {
+                    SSLLogger.logWarning("ssl,handshake", "Unavailable "
+                            + "configured signature scheme: " + name);
                 }
             }
         }
@@ -506,8 +508,8 @@ enum SignatureScheme {
                             "Unsupported signature scheme: " +
                             SignatureScheme.nameOf(ssid));
                 }
-            } else if ((config.signatureSchemes == null
-                        || Utilities.contains(config.signatureSchemes, ss.name))
+            } else if ((config.signatureSchemes == SupportedSigSchemes.DEFAULT
+                    || Utilities.contains(config.signatureSchemes, ss.name))
                     && ss.isAllowed(constraints, protocolVersion, scopes)) {
                 supported.add(ss);
             } else {
@@ -650,33 +652,6 @@ enum SignatureScheme {
         return new String[0];
     }
 
-    private static List<SignatureScheme> namesOfAvailable(
-                String[] signatureSchemes) {
-
-        if (signatureSchemes == null || signatureSchemes.length == 0) {
-            return Collections.emptyList();
-        }
-
-        List<SignatureScheme> sss = new ArrayList<>(signatureSchemes.length);
-        for (String ss : signatureSchemes) {
-            SignatureScheme scheme = SignatureScheme.nameOf(ss);
-            if (scheme == null || !scheme.isAvailable) {
-                if (SSLLogger.isOn &&
-                        SSLLogger.isOn("ssl,handshake,verbose")) {
-                    SSLLogger.finest(
-                            "Ignore the signature algorithm (" + ss
-                          + "), unsupported or unavailable");
-                }
-
-                continue;
-            }
-
-            sss.add(scheme);
-        }
-
-        return sss;
-    }
-
     // This method is used to get the signature instance of this signature
     // scheme for the specific public key.  Unlike getSigner(), the exception
     // is bubbled up.  If the public key does not support this signature
@@ -721,5 +696,16 @@ enum SignatureScheme {
         }
 
         return null;
+    }
+
+    // Default signature schemes for SSLConfiguration.
+    static final class SupportedSigSchemes {
+
+        static final String[] DEFAULT = Arrays.stream(
+                        SignatureScheme.values())
+                .filter(ss -> ss.isAvailable
+                        && ss.isPermitted(
+                        SSLAlgorithmConstraints.DEFAULT, null))
+                .map(ss -> ss.name).toArray(String[]::new);
     }
 }
