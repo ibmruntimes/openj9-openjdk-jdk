@@ -21,6 +21,12 @@
  * questions.
  */
 
+/*
+ * ===========================================================================
+ * (c) Copyright IBM Corp. 2025, 2025 All Rights Reserved
+ * ===========================================================================
+ */
+
 #include <jvmti.h>
 
 #include <string.h>
@@ -102,7 +108,8 @@ Agent_OnLoad(JavaVM *vm, char *options, void *reserved) {
     return jni_err;
   }
 
-  jvmtiCapabilities capabilities{};
+  jvmtiCapabilities capabilities;
+  memset(&capabilities, 0, sizeof(capabilities));
   capabilities.can_generate_method_exit_events = 1;
 
   jvmtiError err = env->AddCapabilities(&capabilities);
