@@ -21,6 +21,12 @@
  * questions.
  */
 
+/*
+ * ===========================================================================
+ * (c) Copyright IBM Corp. 2025, 2025 All Rights Reserved
+ * ===========================================================================
+ */
+
 import java.lang.reflect.Field;
 
 import org.junit.jupiter.api.Test;
@@ -90,15 +96,13 @@ public class AddressComputationContractTest {
     void arrayBaseOffset() {
         assertDoesNotThrow(() -> getUnsafe().arrayBaseOffset(int[].class));
         assertThrows(NullPointerException.class, () -> getUnsafe().arrayBaseOffset(null));
-        // Caused by VM trying to throw java.lang.InvalidClassException (there's one in java.io instead)
-        assertThrows(NoClassDefFoundError.class, () -> getUnsafe().arrayBaseOffset(AddressComputationContractTest.class));
+        assertThrows(IllegalArgumentException.class, () -> getUnsafe().arrayBaseOffset(AddressComputationContractTest.class));
     }
 
     @Test
     void arrayIndexScale() {
         assertDoesNotThrow(() -> getUnsafe().arrayIndexScale(int[].class));
         assertThrows(NullPointerException.class, () -> getUnsafe().arrayIndexScale(null));
-        // Caused by VM trying to throw java.lang.InvalidClassException (there's one in java.io instead)
-        assertThrows(NoClassDefFoundError.class, () -> getUnsafe().arrayIndexScale(AddressComputationContractTest.class));
+        assertThrows(IllegalArgumentException.class, () -> getUnsafe().arrayIndexScale(AddressComputationContractTest.class));
     }
 }
