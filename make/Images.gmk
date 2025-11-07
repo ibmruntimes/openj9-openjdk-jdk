@@ -22,6 +22,9 @@
 # or visit www.oracle.com if you need additional information or have any
 # questions.
 #
+# ===========================================================================
+# (c) Copyright IBM Corp. 2021, 2025 All Rights Reserved
+# ===========================================================================
 
 include MakeFileStart.gmk
 
@@ -224,7 +227,9 @@ JDK_TARGETS += $(JDK_IMAGE_DIR)/lib/src.zip
 ################################################################################
 # /demo dir
 # Avoid doing the expensive find unless called with "jdk" as target.
-ifneq ($(filter jdk, $(MAKECMDGOALS)), )
+ifeq ($(OPENJ9_ENABLE_DEMOS), false)
+  # demos are unwanted
+else ifneq ($(filter jdk, $(MAKECMDGOALS)), )
 
   DEMO_FILES := \
       $(if $(wildcard $(SUPPORT_OUTPUTDIR)/demos/image), \
