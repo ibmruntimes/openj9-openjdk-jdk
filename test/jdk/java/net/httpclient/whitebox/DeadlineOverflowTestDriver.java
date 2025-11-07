@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2025, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -21,16 +21,10 @@
  * questions.
  */
 
-// key: compiler.warn.try.resource.throws.interrupted.exc
-// key: compiler.warn.try.resource.can.throw.interrupted.exc
-// options: -Xlint:try
-
-class TryResourceThrowsInterruptedException implements AutoCloseable {
-    public void close() throws InterruptedException {}
-    {
-        try (var t = new TryResourceThrowsInterruptedException()) {
-            t.hashCode();
-        } catch (InterruptedException e) {
-        }
-    }
-}
+/*
+ * @test
+ * @bug 8368528
+ * @summary Verifies that `Deadline` returns extremums on numeric overflows
+ * @modules java.net.http/jdk.internal.net.http.common:+open
+ * @run junit java.net.http/jdk.internal.net.http.common.DeadlineOverflowTest
+ */
