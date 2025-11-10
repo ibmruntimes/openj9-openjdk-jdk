@@ -24,7 +24,7 @@
 #
 
 # ===========================================================================
-# (c) Copyright IBM Corp. 2021, 2021 All Rights Reserved
+# (c) Copyright IBM Corp. 2021, 2025 All Rights Reserved
 # ===========================================================================
 
 ################################################################################
@@ -221,6 +221,8 @@ AC_DEFUN_ONCE([LIB_SETUP_ZLIB],
     # On windows default is bundled
     DEFAULT_ZLIB=bundled
   elif test "x$OPENJDK_TARGET_OS" = xmacosx -a "x$OPENJDK_TARGET_CPU" = xaarch64; then
+    DEFAULT_ZLIB=bundled
+  elif test "x$OPENJDK_TARGET_OS" = xlinux -a "x$OPENJDK_TARGET_CPU" != xs390x; then
     DEFAULT_ZLIB=bundled
   fi
 
