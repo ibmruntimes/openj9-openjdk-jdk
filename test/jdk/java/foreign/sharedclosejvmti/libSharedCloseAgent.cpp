@@ -41,7 +41,7 @@ static const char* TARGET_METHOD_SIG = "()V";
 static const char* INTERCEPT_CLASS_NAME = "Ljdk/internal/foreign/MemorySessionImpl;";
 static const char* INTERCEPT_METHOD_NAME = "checkValidStateRaw";
 
-void start(jvmtiEnv *jvmti_env, JNIEnv* jni_env) {
+void start(jvmtiEnv*, JNIEnv* jni_env, jthread) {
 
   jclass cls = jni_env->FindClass(TARGET_CLASS_NAME);
   if (cls == nullptr) {
@@ -118,7 +118,7 @@ Agent_OnLoad(JavaVM *vm, char *options, void *reserved) {
   }
 
   jvmtiEventCallbacks callbacks;
-  callbacks.VMStart = start;
+  callbacks.VMInit = start;
   callbacks.MethodExit = method_exit;
 
   err = env->SetEventCallbacks(&callbacks, (jint) sizeof(callbacks));
@@ -131,7 +131,7 @@ Agent_OnLoad(JavaVM *vm, char *options, void *reserved) {
     return err;
   }
 
-  err = env->SetEventNotificationMode(JVMTI_ENABLE, JVMTI_EVENT_VM_START, nullptr);
+  err = env->SetEventNotificationMode(JVMTI_ENABLE, JVMTI_EVENT_VM_INIT, nullptr);
   if (err != JVMTI_ERROR_NONE) {
     return err;
   }
