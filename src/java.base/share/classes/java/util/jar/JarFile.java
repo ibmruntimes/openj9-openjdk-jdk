@@ -23,11 +23,18 @@
  * questions.
  */
 
+/*
+ * ===========================================================================
+ * (c) Copyright IBM Corp. 2025, 2025 All Rights Reserved
+ * ===========================================================================
+ */
+
 package java.util.jar;
 
 import jdk.internal.access.SharedSecrets;
 import jdk.internal.access.JavaUtilZipFileAccess;
 import jdk.internal.misc.ThreadTracker;
+import openj9.internal.security.RestrictedSecurity;
 import sun.security.util.ManifestEntryVerifier;
 import sun.security.util.SignatureFileVerifier;
 
@@ -1045,10 +1052,12 @@ public class JarFile extends ZipFile {
         }
         if (jv != null && !jvInitialized) {
             Object key = beginInit();
+            RestrictedSecurity.pauseHashCheck();
             try {
                 initializeVerifier();
                 jvInitialized = true;
             } finally {
+                RestrictedSecurity.resumeHashCheck();
                 endInit(key);
             }
         }

@@ -43,6 +43,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -82,6 +83,7 @@ public final class RestrictedSecurity {
 
     private static RestrictedSecurityProperties restricts;
 
+    private static final AtomicInteger hashPauseCount = new AtomicInteger(0);
     private static final Set<String> unmodifiableProperties = new HashSet<>();
 
     static {
@@ -164,11 +166,19 @@ public final class RestrictedSecurity {
             if (fromProviders) {
                 enableCheckHashes = true;
             }
-            if (enableCheckHashes && !isJarVerifierInStackTrace()) {
+            if (enableCheckHashes && !isJarVerifierInStackTrace() && (hashPauseCount.get() == 0)) {
                 profileParser = null;
                 parser.checkHashValues();
             }
         }
+    }
+
+    public static void pauseHashCheck() {
+        hashPauseCount.incrementAndGet();
+    }
+
+    public static void resumeHashCheck() {
+        hashPauseCount.decrementAndGet();
     }
 
     /**
