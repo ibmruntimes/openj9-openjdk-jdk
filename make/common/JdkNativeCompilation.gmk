@@ -23,10 +23,6 @@
 # questions.
 #
 
-# ===========================================================================
-# (c) Copyright IBM Corp. 2025, 2025 All Rights Reserved
-# ===========================================================================
-
 include MakeIncludeStart.gmk
 ifeq ($(INCLUDE), true)
 
@@ -68,7 +64,7 @@ else ifeq ($(call isCompiler, clang), true)
           -Wl,-z,origin -Wl,-rpath,\$(DOLLAR)ORIGIN$1
     endif
   endif
-else ifeq ($(call isCompiler, microsoft xlc), true)
+else ifeq ($(call isCompiler, microsoft), true)
   SetExecutableOrigin =
   SetSharedLibraryOrigin =
 else
