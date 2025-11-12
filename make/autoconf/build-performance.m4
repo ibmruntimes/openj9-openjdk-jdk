@@ -355,9 +355,6 @@ AC_DEFUN_ONCE([BPERF_SETUP_PRECOMPILED_HEADERS],
   if test "x$ICECC" != "x"; then
     AC_MSG_RESULT([no, does not work effectively with icecc])
     PRECOMPILED_HEADERS_AVAILABLE=false
-  elif test "x$TOOLCHAIN_TYPE" = xxlc; then
-    AC_MSG_RESULT([no, does not work with xlc])
-    PRECOMPILED_HEADERS_AVAILABLE=false
   elif test "x$TOOLCHAIN_TYPE" = xgcc; then
     # Check that the compiler actually supports precomp headers.
     echo "int alfa();" > conftest.h

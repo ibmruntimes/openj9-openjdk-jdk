@@ -22,9 +22,8 @@
 # or visit www.oracle.com if you need additional information or have any
 # questions.
 #
-
 # ===========================================================================
-# (c) Copyright IBM Corp. 2025, 2025 All Rights Reserved
+# (c) Copyright IBM Corp. 2025, 2026 All Rights Reserved
 # ===========================================================================
 
 include MakeIncludeStart.gmk
@@ -68,7 +67,7 @@ else ifeq ($(call isCompiler, clang), true)
     SetSharedLibraryName = \
         -Wl,-soname=$1
   endif
-else ifeq ($(call isCompiler, microsoft xlc), true)
+else ifeq ($(call isCompiler, microsoft), true)
   SetSharedLibraryName =
 else
   $(error Unknown toolchain)
@@ -157,9 +156,9 @@ define CreateDynamicLibraryOrExecutable
     # Generating a dynamic library.
     $1_EXTRA_LDFLAGS += $$(call SetSharedLibraryName,$$($1_BASENAME))
 
-    # Create loadmap on AIX. Helps in diagnosing some problems.
-    ifneq ($(COMPILER_BINDCMD_FILE_FLAG), )
-      $1_EXTRA_LDFLAGS += $(COMPILER_BINDCMD_FILE_FLAG)$$($1_OBJECT_DIR)/$$($1_NOSUFFIX).loadmap
+    ifeq ($(call isTargetOs, aix), true)
+      # Create loadmap on AIX. Helps in diagnosing some problems.
+      $1_EXTRA_LDFLAGS += -Wl,-bloadmap:$$($1_OBJECT_DIR)/$$($1_NOSUFFIX).loadmap
     endif
   endif
 
