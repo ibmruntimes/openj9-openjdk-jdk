@@ -23,6 +23,12 @@
  * questions.
  */
 
+/*
+ * ===========================================================================
+ * (c) Copyright IBM Corp. 2025, 2025 All Rights Reserved
+ * ===========================================================================
+ */
+
 package java.nio;
 
 import java.lang.ref.PhantomReference;
@@ -30,6 +36,7 @@ import java.lang.ref.Reference;
 import java.lang.ref.ReferenceQueue;
 import java.util.Objects;
 import jdk.internal.misc.InnocuousThread;
+import jdk.internal.ref.CleanerShutdown;
 import sun.nio.Cleaner;
 
 /**
@@ -212,7 +219,9 @@ class BufferCleaner {
                     Cleaner c = (Cleaner) queue.remove();
                     c.clean();
                 } catch (InterruptedException e) {
-                    // Ignore InterruptedException in cleaner thread.
+                    if (CleanerShutdown.shuttingDown()) {
+                        break;
+                    }
                 }
             }
         }
@@ -243,7 +252,7 @@ class BufferCleaner {
             if (cleaningThread != null) {
                 return;
             }
-            cleaningThread = InnocuousThread.newThread(new CleaningRunnable());
+            cleaningThread = InnocuousThread.newThread("BufferCleaner", new CleaningRunnable());
         }
         cleaningThread.setDaemon(true);
         cleaningThread.start();
