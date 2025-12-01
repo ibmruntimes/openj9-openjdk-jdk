@@ -22,6 +22,12 @@
  */
 
 /*
+ * ===========================================================================
+ * (c) Copyright IBM Corp. 2025, 2025 All Rights Reserved
+ * ===========================================================================
+ */
+
+/*
  * @test
  * @bug 4898428 8368984
  * @summary test that the new getInstance() implementation works correctly
@@ -55,7 +61,8 @@ public class TestGetInstance {
 
         Cipher c;
 
-        c = Cipher.getInstance(pbeAlgo);
+        c = Cipher.getInstance(pbeAlgo,
+                System.getProperty("test.provider.name", "SunJCE"));
         same(p, c.getProvider());
 
         c = Cipher.getInstance(algoLC,
