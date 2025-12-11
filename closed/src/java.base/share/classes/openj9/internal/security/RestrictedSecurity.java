@@ -1710,7 +1710,9 @@ public final class RestrictedSecurity {
                     printStackTraceAndExit("Incorrect definition of hash value for " + profileID);
                 }
 
+                System.out.println("checkHashValues->hashInfo[0] is: " + hashInfo[0]);
                 String digestAlgo = hashInfo[0].trim();
+                System.out.println("checkHashValues->digestAlgo is: " + digestAlgo);
                 String expectedHash = hashInfo[1].trim();
                 try {
                     MessageDigest md = MessageDigest.getInstance(digestAlgo);

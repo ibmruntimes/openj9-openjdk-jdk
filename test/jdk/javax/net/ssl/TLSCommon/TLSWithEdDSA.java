@@ -47,6 +47,7 @@ import java.security.GeneralSecurityException;
 import java.security.KeyFactory;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
 import java.security.Principal;
 import java.security.PrivateKey;
 import java.security.PublicKey;
@@ -71,6 +72,7 @@ import javax.net.ssl.SSLSocket;
 import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509ExtendedKeyManager;
 import javax.net.ssl.X509KeyManager;
+import jdk.test.lib.Utils;
 import jdk.test.lib.security.SecurityUtils;
 
 public class TLSWithEdDSA extends SSLSocketTemplate {
@@ -81,7 +83,7 @@ public class TLSWithEdDSA extends SSLSocketTemplate {
     private static final String DEF_ALL_EE = "EE_ECDSA_SECP256R1:" +
             "EE_ECDSA_SECP384R1:EE_ECDSA_SECP521R1:EE_RSA_2048:" +
             "EE_EC_RSA_SECP256R1:EE_DSA_2048:EE_DSA_1024:EE_ED25519:EE_ED448";
-    private static final List<String> TEST_PROTOS = List.of(
+    private static List<String> TEST_PROTOS = List.of(
             "TLSv1.3", "TLSv1.2", "TLSv1.1", "TLSv1");
 
     private static CertificateFactory certFac;
@@ -342,7 +344,7 @@ public class TLSWithEdDSA extends SSLSocketTemplate {
      *      the private key or certificate entries.
      */
     private static KeyStore createKeyStore(String certEnumNames, char[] pass)
-            throws GeneralSecurityException {
+            throws GeneralSecurityException, NoSuchAlgorithmException {
         KeyStore.Builder keyStoreBuilder =
                 KeyStore.Builder.newInstance("PKCS12", null,
                         new KeyStore.PasswordProtection(pass));
@@ -393,7 +395,7 @@ public class TLSWithEdDSA extends SSLSocketTemplate {
      * @throws GeneralSecurityException if any decoding errors occur.
      */
     private static PrivateKey pem2PrivKey(String keyPem, String keyAlg)
-            throws GeneralSecurityException {
+            throws GeneralSecurityException, NoSuchAlgorithmException {
         PKCS8EncodedKeySpec p8Spec = new PKCS8EncodedKeySpec(
                 Base64.getMimeDecoder().decode(keyPem));
         KeyFactory keyFac = KeyFactory.getInstance(keyAlg);
@@ -556,13 +558,24 @@ public class TLSWithEdDSA extends SSLSocketTemplate {
     }
 
     public static void main(String[] args) throws Exception {
-        SecurityUtils.removeFromDisabledTlsAlgs("TLSv1.1", "TLSv1");
+        if (!(SecurityUtils.isFIPS())) {
+            SecurityUtils.removeFromDisabledTlsAlgs("TLSv1.1", "TLSv1");
+        }
         certFac = CertificateFactory.getInstance("X.509");
         String testFormat;
 
         System.out.println("===== Test KeyManager alias retrieval =====");
-        testKeyManager(DEF_ALL_EE, "EdDSA",
-                new String[] {"ee_ed25519", "ee_ed448"});
+        try {
+            testKeyManager(DEF_ALL_EE, "EdDSA",
+                    new String[] {"ee_ed25519", "ee_ed448"});
+        } catch (NoSuchAlgorithmException nsae) {
+            if (SecurityUtils.isFIPS()) {
+                if ("EdDSA KeyFactory not available".equals(nsae.getMessage())){
+                    System.out.println("Expected exception msg: <EdDSA KeyFactory not available> is caught.");
+                    return;
+                }
+            }
+        }
 
         testFormat =
                 "===== Basic Ed25519 Server-side Authentication: %s =====\n";
@@ -593,7 +606,7 @@ public class TLSWithEdDSA extends SSLSocketTemplate {
 
     private static void testKeyManager(String keyStoreSpec, String keyType,
             String[] expAliases)
-            throws GeneralSecurityException, IOException {
+            throws GeneralSecurityException, NoSuchAlgorithmException, IOException {
         char[] passChar = PASSWD.toCharArray();
 
         // Create the KeyManager factory and resulting KeyManager
@@ -626,6 +639,10 @@ public class TLSWithEdDSA extends SSLSocketTemplate {
     private static void runtest(String testNameFmt, SessionChecker cliChk,
             Class<? extends Throwable> cliExpExc, SessionChecker servChk,
             Class<? extends Throwable> servExpExc) {
+        // if (!(SecurityUtils.isFIPS())) {
+        //     TEST_PROTOS = List.of(
+        //         "TLSv1.3", "TLSv1.2");
+        // }
         TEST_PROTOS.forEach(protocol -> {
             clientParameters.put(ParamType.PROTOS, protocol);
             TLSWithEdDSA testObj = new TLSWithEdDSA(cliChk, cliExpExc, servChk,

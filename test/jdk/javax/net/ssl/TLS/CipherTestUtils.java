@@ -72,7 +72,7 @@ public class CipherTestUtils {
     public static final SecureRandom secureRandom = new SecureRandom();
     public static char[] PASSWORD = "passphrase".toCharArray();
     private static final List<TestParameters> TESTS = new ArrayList<>(3);
-    private static final List<Exception> EXCEPTIONS
+    public static final List<Exception> EXCEPTIONS
             = Collections.synchronizedList(new ArrayList<>(1));
 
     private static final String CLIENT_PUBLIC_KEY

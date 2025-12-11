@@ -29,7 +29,7 @@
  *
  * This is to test larger buffer arrays, and make sure the maximum
  * is being passed.
- *
+ * @library /test/lib
  * @run main/othervm -Djsse.enableCBCProtection=false LargeBufs
  *
  * @author Brad R. Wetmore
@@ -42,6 +42,9 @@ import java.io.*;
 import java.security.*;
 import java.nio.*;
 import java.util.Random;
+
+import jdk.test.lib.Utils;
+import jdk.test.lib.security.SecurityUtils;
 
 public class LargeBufs {
 
@@ -181,17 +184,22 @@ public class LargeBufs {
     }
 
     public static void main(String args[]) throws Exception {
-        // reset the security property to make sure that the algorithms
-        // and keys used in this test are not disabled.
-        Security.setProperty("jdk.tls.disabledAlgorithms", "");
-
         LargeBufs test;
 
-        test = new LargeBufs();
-        test.runTest("SSL_RSA_WITH_RC4_128_MD5");
-
-        test = new LargeBufs();
-        test.runTest("SSL_RSA_WITH_3DES_EDE_CBC_SHA");
+        if (!(SecurityUtils.isFIPS())) {
+            // reset the security property to make sure that the algorithms
+            // and keys used in this test are not disabled.
+            Security.setProperty("jdk.tls.disabledAlgorithms", "");
+            test = new LargeBufs();
+            test.runTest("SSL_RSA_WITH_RC4_128_MD5");
+            test = new LargeBufs();
+            test.runTest("SSL_RSA_WITH_3DES_EDE_CBC_SHA");
+        } else {
+            test = new LargeBufs();
+            test.runTest("TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256");
+            test = new LargeBufs();
+            test.runTest("TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384");
+        }
 
         System.out.println("Test Passed.");
     }

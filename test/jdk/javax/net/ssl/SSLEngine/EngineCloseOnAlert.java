@@ -39,6 +39,8 @@ import java.security.*;
 import static javax.net.ssl.SSLEngineResult.HandshakeStatus.*;
 import jdk.test.lib.security.SecurityUtils;
 
+import jdk.test.lib.Utils;
+
 public class EngineCloseOnAlert {
 
     private static final String PATH_TO_STORES = "../etc";
@@ -55,16 +57,20 @@ public class EngineCloseOnAlert {
     private static KeyManagerFactory KMF;
     private static TrustManagerFactory TMF;
 
-    private static final String[] ONECIPHER =
-            { "TLS_RSA_WITH_AES_128_CBC_SHA" };
+    private static final String[] ONECIPHER = (SecurityUtils.isFIPS()) ?
+        new String[] { "TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256" } : new String[] { "TLS_RSA_WITH_AES_128_CBC_SHA" };
+
 
     public interface TestCase {
         public void runTest() throws Exception;
     }
 
     public static void main(String[] args) throws Exception {
-        // Re-enable TLS_RSA_* since test depends on it.
-        SecurityUtils.removeFromDisabledTlsAlgs("TLS_RSA_*");
+        if (!(SecurityUtils.isFIPS())) {
+            // Re-enable TLS_RSA_* since test depends on it.
+            SecurityUtils.removeFromDisabledTlsAlgs("TLS_RSA_*");
+        }
+
         int failed = 0;
         List<TestCase> testMatrix = new LinkedList<TestCase>() {{
             add(clientReceivesAlert);

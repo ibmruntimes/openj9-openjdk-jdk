@@ -45,6 +45,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import jdk.test.lib.Utils;
+import jdk.test.lib.security.SecurityUtils;
 
 
 public class HRRKeyShares {
@@ -311,8 +312,9 @@ public class HRRKeyShares {
         if (!initialCh.suppVersions.contains(TLS_PROT_VER_13)) {
             throw new RuntimeException(
                     "Missing TLSv1.3 protocol in supported_versions");
-        } else if (!initialCh.keyShares.containsKey(NG_X25519) ||
-                !initialCh.keyShares.containsKey(NG_SECP256R1)) {
+        } else if (!(SecurityUtils.isFIPS()) &&
+                (!initialCh.keyShares.containsKey(NG_X25519) ||
+                !initialCh.keyShares.containsKey(NG_SECP256R1))) {
             throw new RuntimeException(
                     "Missing one or more expected KeyShares");
         }

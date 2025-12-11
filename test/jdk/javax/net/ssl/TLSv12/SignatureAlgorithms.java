@@ -31,6 +31,7 @@
  * @bug 8049321
  * @summary Support SHA256WithDSA in JSSE
  * @library /javax/net/ssl/templates
+ * @library /test/lib
  * @run main/othervm SignatureAlgorithms PKIX "SHA-224,SHA-256"
  *                   TLS_DHE_DSS_WITH_AES_128_CBC_SHA
  * @run main/othervm SignatureAlgorithms PKIX "SHA-1,SHA-224"
@@ -51,6 +52,9 @@ import javax.net.ssl.*;
 import java.security.Security;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
+
+import jdk.test.lib.Utils;
+import jdk.test.lib.security.SecurityUtils;
 
 public class SignatureAlgorithms extends SSLContextTemplate {
 
@@ -77,11 +81,11 @@ public class SignatureAlgorithms extends SSLContextTemplate {
      */
     volatile boolean serverReady = false;
 
-    private final Cert[] SERVER_CERTS = {
-            SSLContextTemplate.Cert.EE_DSA_SHA1_1024,
-            SSLContextTemplate.Cert.EE_DSA_SHA224_1024,
-            SSLContextTemplate.Cert.EE_DSA_SHA256_1024,
-    };
+    private static Cert[] SERVER_CERTS = {
+        SSLContextTemplate.Cert.EE_DSA_SHA1_1024,
+        SSLContextTemplate.Cert.EE_DSA_SHA224_1024,
+        SSLContextTemplate.Cert.EE_DSA_SHA256_1024,
+};
 
     /*
      * Define the server side of the test.
@@ -131,8 +135,14 @@ public class SignatureAlgorithms extends SSLContextTemplate {
         while (!serverReady) {
             Thread.sleep(50);
         }
+        Cert[] trustedCerts;
 
-        SSLContext context = createSSLContext(new Cert[]{Cert.CA_DSA_SHA1_1024}, null, getClientContextParameters());
+        if (SecurityUtils.isFIPS()) {
+            trustedCerts = new Cert[]{Cert.CA_RSA_2048};
+        } else {
+            trustedCerts = new Cert[]{Cert.CA_DSA_SHA1_1024};
+        }
+        SSLContext context = createSSLContext(trustedCerts, null, getClientContextParameters());
         SSLSocketFactory sslsf = context.getSocketFactory();
 
         try (SSLSocket sslSocket =
@@ -141,6 +151,7 @@ public class SignatureAlgorithms extends SSLContextTemplate {
             // enable TLSv1.2 only
             sslSocket.setEnabledProtocols(new String[] {"TLSv1.2"});
 
+            System.out.println("In client side, the cipherSuite is: " + cipherSuite);
             // enable a block cipher
             sslSocket.setEnabledCipherSuites(new String[] {cipherSuite});
 
@@ -260,17 +271,31 @@ public class SignatureAlgorithms extends SSLContextTemplate {
             return;
         }
 
-        /*
-         * Expose the target algorithms by diabling unexpected algorithms.
-         */
-        Security.setProperty(
-                "jdk.certpath.disabledAlgorithms", disabledAlgorithms);
+        if (!(SecurityUtils.isFIPS())) {
+            /*
+            * Expose the target algorithms by diabling unexpected algorithms.
+            */
+            Security.setProperty(
+                    "jdk.certpath.disabledAlgorithms", disabledAlgorithms);
 
-        /*
-         * Reset the security property to make sure that the algorithms
-         * and keys used in this test are not disabled by default.
-         */
-        Security.setProperty( "jdk.tls.disabledAlgorithms", "");
+            /*
+            * Reset the security property to make sure that the algorithms
+            * and keys used in this test are not disabled by default.
+            */
+            Security.setProperty( "jdk.tls.disabledAlgorithms", "");
+        } else {
+            if (!SecurityUtils.TLS_CIPHERSUITES.containsKey(cipherSuite)) {
+                System.out.println(cipherSuite + " is not available.");
+            } else if (!SecurityUtils.TLS_CIPHERSUITES.get(cipherSuite).equals("TLSv1.2")) {
+                System.out.println(cipherSuite + " does not match TLSv1.2");
+            }
+            SERVER_CERTS = new Cert[] {
+                SSLContextTemplate.Cert.EE_RSA_2048
+            };
+            disabledAlgorithms = "SHA-1";
+            // cipherSuite = "TLS_DHE_RSA_WITH_AES_128_CBC_SHA256";
+            cipherSuite = "TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256";
+        }
 
         /*
          * Start the tests.

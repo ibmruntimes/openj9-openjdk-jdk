@@ -176,6 +176,9 @@ public class SSLSocketTemplate extends SSLContextTemplate {
     protected void doServerSide() throws Exception {
         // kick start the server side service
         SSLContext context = createServerSSLContext();
+        // if (context == null) {
+        //     return;
+        // }
         SSLServerSocketFactory sslssf = context.getServerSocketFactory();
         SSLServerSocket sslServerSocket = (SSLServerSocket)sslssf.createServerSocket(
                 serverPort, 0, serverAddress);
@@ -263,6 +266,9 @@ public class SSLSocketTemplate extends SSLContextTemplate {
         }
 
         SSLContext context = createClientSSLContext();
+        // if (context == null) {
+        //     return;
+        // }
         SSLSocketFactory sslsf = context.getSocketFactory();
 
         try (SSLSocket sslSocket = (SSLSocket)sslsf.createSocket()) {

@@ -180,7 +180,7 @@ abstract public class SSLEngineTestCase {
     private static final String SERVER_NAME = "service.localhost";
     private static final String SNI_PATTERN = ".*";
 
-    private static final String[] TLS13_CIPHERS = {
+    private static String[] TLS13_CIPHERS = {
             "TLS_AES_256_GCM_SHA384",
             "TLS_AES_128_GCM_SHA256",
             "TLS_CHACHA20_POLY1305_SHA256"
@@ -188,7 +188,15 @@ abstract public class SSLEngineTestCase {
 
     private static final String[] SUPPORTED_NON_KRB_CIPHERS;
 
+    private static final boolean ISFIPS = Boolean.parseBoolean(System.getProperty("semeru.fips"));
+
     static {
+        if (ISFIPS) {
+            TLS13_CIPHERS = new String[] {
+                "TLS_AES_256_GCM_SHA384",
+                "TLS_AES_128_GCM_SHA256"
+            };
+        }
         try {
             String[] allSupportedCiphers = getContext()
                     .createSSLEngine().getSupportedCipherSuites();
@@ -796,10 +804,12 @@ abstract public class SSLEngineTestCase {
      */
     public static SSLContext getContext() {
         try {
-            java.security.Security.setProperty(
-                    "jdk.tls.disabledAlgorithms", "");
-            java.security.Security.setProperty(
-                    "jdk.certpath.disabledAlgorithms", "");
+            if (!(ISFIPS)) {
+                java.security.Security.setProperty(
+                            "jdk.tls.disabledAlgorithms", "");
+                java.security.Security.setProperty(
+                            "jdk.certpath.disabledAlgorithms", "");
+            }
             KeyStore ks = KeyStore.getInstance("JKS");
             KeyStore ts = KeyStore.getInstance("JKS");
             char[] passphrase = PASSWD.toCharArray();
@@ -848,7 +858,7 @@ abstract public class SSLEngineTestCase {
      * SSLEngineTestCase.TEST_MODE is "krb".
      */
     public static void setUpAndStartKDCIfNeeded() {
-        if (TEST_MODE.equals("krb")) {
+        if (TEST_MODE.equals("krb") && !ISFIPS) {
             setUpAndStartKDC();
         }
     }

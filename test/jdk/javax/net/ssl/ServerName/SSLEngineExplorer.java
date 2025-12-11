@@ -31,6 +31,7 @@
  * @bug 7068321 8190492
  * @summary Support TLS Server Name Indication (SNI) Extension in JSSE Server
  * @library ../SSLEngine ../templates
+ * @library /test/lib
  * @build SSLEngineService SSLCapabilities SSLExplorer
  * @run main/othervm SSLEngineExplorer SSLv2Hello,SSLv3
  * @run main/othervm SSLEngineExplorer SSLv3
@@ -45,6 +46,9 @@ import java.net.*;
 import java.util.*;
 import java.nio.channels.*;
 import java.security.Security;
+
+import jdk.test.lib.Utils;
+import jdk.test.lib.security.SecurityUtils;
 
 public class SSLEngineExplorer extends SSLEngineService {
 
@@ -220,7 +224,19 @@ public class SSLEngineExplorer extends SSLEngineService {
     private static String[] supportedProtocols;    // supported protocols
 
     private static void parseArguments(String[] args) {
-        supportedProtocols = args[0].split(",");
+        List<String> supportProtocols = new ArrayList<>();
+        for (String supportProtocol : args[0].split(",")) {
+            System.out.println("the args[0] is: " + supportProtocol);
+            if (!SecurityUtils.TLS_PROTOCOLS.contains(supportProtocol)) {
+                continue;
+            }
+            System.out.println("SupportProtocol is: " + supportProtocol);
+            supportProtocols.add(supportProtocol);
+        }
+        supportedProtocols = supportProtocols.toArray(new String[0]);
+        for (String s : supportedProtocols) {
+            System.out.println("SupportedProtocols is: " + s);
+        }
     }
 
 
@@ -237,7 +253,9 @@ public class SSLEngineExplorer extends SSLEngineService {
     public static void main(String args[]) throws Exception {
         // reset the security property to make sure that the algorithms
         // and keys used in this test are not disabled.
-        Security.setProperty("jdk.tls.disabledAlgorithms", "");
+        if (!(SecurityUtils.isFIPS())) {
+            Security.setProperty("jdk.tls.disabledAlgorithms", "");
+        }
 
         if (debug)
             System.setProperty("javax.net.debug", "all");
@@ -245,9 +263,35 @@ public class SSLEngineExplorer extends SSLEngineService {
         /*
          * Get the customized arguments.
          */
+        System.out.println("args is: " + args);
         parseArguments(args);
 
-        new SSLEngineExplorer();
+        try {
+            new SSLEngineExplorer();
+        } catch (javax.net.ssl.SSLHandshakeException sslhe) {
+            if (SecurityUtils.isFIPS()) {
+                if (supportedProtocols == null || supportedProtocols.length == 0) {
+                    if ("No appropriate protocol (protocol is disabled or cipher suites are inappropriate)".equals(sslhe.getMessage())) {
+                        System.out.println("Expected exception msg: <No appropriate protocol (protocol is disabled or cipher suites are inappropriate)> is caught");
+                        return;
+                    } else {
+                        System.out.println("Unexpected exception msg: <" + sslhe.getMessage() + "> is caught");
+                        return;
+                    }
+                } else {
+                    System.out.println("Unexpected exception is caught");
+                    sslhe.printStackTrace();
+                    return;
+                }
+            } else {
+                System.out.println("Unexpected exception is caught in Non-FIPS mode");
+                sslhe.printStackTrace();
+                return;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return;
+        }
     }
 
     Thread clientThread = null;

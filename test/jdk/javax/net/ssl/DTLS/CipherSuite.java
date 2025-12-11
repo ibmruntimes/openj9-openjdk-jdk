@@ -55,6 +55,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import jdk.test.lib.Utils;
+import jdk.test.lib.security.SecurityUtils;
+
 /**
  * Test common DTLS cipher suites.
  */
@@ -65,7 +68,8 @@ public class CipherSuite extends DTLSOverDatagram {
     private static boolean reenable;
 
     public static void main(String[] args) throws Exception {
-        if (args.length > 1 && "re-enable".equals(args[1])) {
+        if (args.length > 1 && "re-enable".equals(args[1]) 
+        && !(SecurityUtils.isFIPS())) {
             Security.setProperty("jdk.tls.disabledAlgorithms", "");
             reenable = true;
         }
@@ -73,7 +77,32 @@ public class CipherSuite extends DTLSOverDatagram {
         cipherSuite = args[0];
 
         CipherSuite testCase = new CipherSuite();
-        testCase.runTest(testCase);
+        try {
+            testCase.runTest(testCase);
+        } catch (javax.net.ssl.SSLHandshakeException sslhe) {
+            if (SecurityUtils.isFIPS()) {
+                if(!SecurityUtils.TLS_CIPHERSUITES.containsKey(cipherSuite)) {
+                    if ("No appropriate protocol (protocol is disabled or cipher suites are inappropriate)".equals(sslhe.getMessage())) {
+                        System.out.println("Expected exception msg: <No appropriate protocol (protocol is disabled or cipher suites are inappropriate)> is caught");
+                        return;
+                    } else {
+                        System.out.println("Unexpected exception msg: <" + sslhe.getMessage() + "> is caught");
+                        return;
+                    }
+                } else {
+                    System.out.println("Unexpected exception is caught");
+                    sslhe.printStackTrace();
+                    return;
+                }
+            } else {
+                System.out.println("Unexpected exception is caught in Non-FIPS mode");
+                sslhe.printStackTrace();
+                return;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return;
+        }
     }
 
     @Override

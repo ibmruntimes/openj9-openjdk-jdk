@@ -27,17 +27,22 @@
  * @summary Verify that all ciphersuites work in all configurations
  * @author Andreas Sterbenz
  * @library ../../TLSCommon
+ * @library /test/lib
  * @run main/othervm/timeout=300 ClientJSSEServerJSSE
  */
 import java.security.Security;
+import jdk.test.lib.Utils;
+import jdk.test.lib.security.SecurityUtils;
 
 public class ClientJSSEServerJSSE {
 
     public static void main(String[] args) throws Exception {
         // reset security properties to make sure that the algorithms
         // and keys used in this test are not disabled.
-        Security.setProperty("jdk.tls.disabledAlgorithms", "");
-        Security.setProperty("jdk.certpath.disabledAlgorithms", "");
+        if (!(SecurityUtils.isFIPS())) {
+            Security.setProperty("jdk.tls.disabledAlgorithms", "");
+            Security.setProperty("jdk.certpath.disabledAlgorithms", "");
+        }
 
         CipherTest.main(new JSSEFactory(), args);
     }

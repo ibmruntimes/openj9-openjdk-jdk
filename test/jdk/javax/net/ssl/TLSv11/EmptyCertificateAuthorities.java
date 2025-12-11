@@ -30,6 +30,7 @@
  * @test
  * @bug 4873188
  * @summary Support TLS 1.1
+ * @library /test/lib
  * @run main/othervm EmptyCertificateAuthorities
  * @modules java.security.jgss
  *          java.security.jgss/sun.security.jgss.krb5
@@ -59,6 +60,9 @@ import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509TrustManager;
+
+import jdk.test.lib.Utils;
+import jdk.test.lib.security.SecurityUtils;
 
 public class EmptyCertificateAuthorities {
 
@@ -248,10 +252,12 @@ public class EmptyCertificateAuthorities {
 
     public static void main(String[] args) throws Exception {
         // MD5 is used in this test case, don't disable MD5 algorithm.
-        Security.setProperty("jdk.certpath.disabledAlgorithms",
-                "MD2, RSA keySize < 1024");
-        Security.setProperty("jdk.tls.disabledAlgorithms",
-                "SSLv3, RC4, DH keySize < 768");
+        if (!(SecurityUtils.isFIPS())) {
+            Security.setProperty("jdk.certpath.disabledAlgorithms",
+                        "MD2, RSA keySize < 1024");
+            Security.setProperty("jdk.tls.disabledAlgorithms",
+                        "SSLv3, RC4, DH keySize < 768");
+        }
 
         String keyFilename =
             System.getProperty("test.src", ".") + "/" + pathToStores +
@@ -271,7 +277,19 @@ public class EmptyCertificateAuthorities {
         /*
          * Start the tests.
          */
-        new EmptyCertificateAuthorities();
+        try {
+            new EmptyCertificateAuthorities();
+        } catch (javax.net.ssl.SSLHandshakeException sslhe) {
+            if (SecurityUtils.isFIPS()) {
+                if ("No appropriate protocol (protocol is disabled or cipher suites are inappropriate)".equals(sslhe.getMessage())) {
+                    System.out.println("Expected exception msg: <No appropriate protocol (protocol is disabled or cipher suites are inappropriate)> is caught");
+                    return;
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return;
+        }
     }
 
     Thread clientThread = null;

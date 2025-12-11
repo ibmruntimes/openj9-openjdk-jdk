@@ -31,6 +31,7 @@
  * @bug 7030966
  * @summary Support AEAD CipherSuites
  * @library /javax/net/ssl/templates
+ * @library /test/lib
  * @run main/othervm ShortRSAKeyGCM PKIX TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
  * @run main/othervm ShortRSAKeyGCM PKIX TLS_RSA_WITH_AES_128_GCM_SHA256
  * @run main/othervm ShortRSAKeyGCM PKIX TLS_DHE_RSA_WITH_AES_128_GCM_SHA256
@@ -68,6 +69,8 @@ import java.security.cert.CertificateFactory;
 import java.security.spec.*;
 import java.security.interfaces.*;
 
+import jdk.test.lib.Utils;
+import jdk.test.lib.security.SecurityUtils;
 
 public class ShortRSAKeyGCM extends SSLContextTemplate {
 
@@ -194,9 +197,11 @@ public class ShortRSAKeyGCM extends SSLContextTemplate {
     public static void main(String[] args) throws Exception {
         // reset the security property to make sure that the algorithms
         // and keys used in this test are not disabled.
-        Security.setProperty("jdk.certpath.disabledAlgorithms", "MD2");
-        Security.setProperty("jdk.tls.disabledAlgorithms",
-                "SSLv3, RC4, DH keySize < 768");
+        if (!(SecurityUtils.isFIPS())) {
+            Security.setProperty("jdk.certpath.disabledAlgorithms", "MD2");
+            Security.setProperty("jdk.tls.disabledAlgorithms",
+                    "SSLv3, RC4, DH keySize < 768");
+        }
 
         if (debug) {
             System.setProperty("javax.net.debug", "all");
@@ -207,10 +212,29 @@ public class ShortRSAKeyGCM extends SSLContextTemplate {
          */
         parseArguments(args);
 
+        if (SecurityUtils.isFIPS()) {
+            if (!SecurityUtils.TLS_CIPHERSUITES.containsKey(cipherSuite)) {
+                System.out.println(cipherSuite + " is not supported.");
+                return;
+            }
+        }
+
         /*
          * Start the tests.
          */
-        new ShortRSAKeyGCM();
+        try {
+            new ShortRSAKeyGCM();
+        } catch (java.security.spec.InvalidKeySpecException ikse) {
+            if (SecurityUtils.isFIPS()) {
+                if ("Inappropriate key specification: RSA keys must be at least 1024 bits long".equals(ikse.getMessage())) {
+                    System.out.println("Expected exception msg: <Inappropriate key specification: RSA keys must be at least 1024 bits long> is caught");
+                    return;
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return;
+        }
     }
 
     Thread clientThread = null;
