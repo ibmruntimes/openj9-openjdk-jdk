@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1998, 2021, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1998, 2025, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -43,6 +43,7 @@ import com.sun.jdi.InternalException;
 import com.sun.jdi.Locatable;
 import com.sun.jdi.Location;
 import com.sun.jdi.Method;
+import com.sun.jdi.ObjectCollectedException;
 import com.sun.jdi.ObjectReference;
 import com.sun.jdi.ReferenceType;
 import com.sun.jdi.ThreadReference;
@@ -215,6 +216,19 @@ public class EventSetImpl extends ArrayList<Event> implements EventSet {
 
     }
 
+    /* Safely fetch the thread name in case there is an ObjectCollectedException.
+     * This can happen when dealing with SUSPEND_NONE events.
+     */
+    private static String getThreadName(ThreadReference thread) {
+        String name;
+        try {
+            name = thread.name();
+        } catch (ObjectCollectedException oce) {
+            name = "<thread collected>";
+        }
+        return name;
+    }
+
     abstract class ThreadedEventImpl extends EventImpl {
         private ThreadReference thread;
 
@@ -229,7 +243,7 @@ public class EventSetImpl extends ArrayList<Event> implements EventSet {
         }
 
         public String toString() {
-            return eventName() + " in thread " + thread.name();
+            return eventName() + " in thread " + getThreadName(thread);
         }
     }
 
@@ -258,7 +272,7 @@ public class EventSetImpl extends ArrayList<Event> implements EventSet {
         public String toString() {
             return eventName() + "@" +
                    ((location() == null) ? " null" : location().toString()) +
-                   " in thread " + thread().name();
+                   " in thread " + getThreadName(thread());
         }
     }
 
