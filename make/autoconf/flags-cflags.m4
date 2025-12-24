@@ -23,10 +23,6 @@
 # questions.
 #
 
-# ===========================================================================
-# (c) Copyright IBM Corp. 2025, 2025 All Rights Reserved
-# ===========================================================================
-
 ################################################################################
 #
 # Setup flags for C/C++ compiler
@@ -55,9 +51,6 @@ AC_DEFUN([FLAGS_SETUP_SHARED_LIBS],
       # Default works for linux, might work on other platforms as well.
       SHARED_LIBRARY_FLAGS='-shared'
     fi
-
-  elif test "x$TOOLCHAIN_TYPE" = xxlc; then
-    SHARED_LIBRARY_FLAGS="-qmkshrobj -bM:SRE -bnoentry"
 
   elif test "x$TOOLCHAIN_TYPE" = xmicrosoft; then
     SHARED_LIBRARY_FLAGS="-dll"
@@ -122,8 +115,6 @@ AC_DEFUN([FLAGS_SETUP_DEBUG_SYMBOLS],
 
     CFLAGS_DEBUG_SYMBOLS="-g ${GDWARF_FLAGS}"
     ASFLAGS_DEBUG_SYMBOLS="-g"
-  elif test "x$TOOLCHAIN_TYPE" = xxlc; then
-    CFLAGS_DEBUG_SYMBOLS="-g1"
   elif test "x$TOOLCHAIN_TYPE" = xmicrosoft; then
     CFLAGS_DEBUG_SYMBOLS="-Z7"
   fi
@@ -189,11 +180,7 @@ AC_DEFUN([DEBUG_PREFIX_MAP_GCC_INCLUDE_PATHS],
 AC_DEFUN([FLAGS_SETUP_WARNINGS],
 [
   # Set default value.
-  if test "x$TOOLCHAIN_TYPE" != xxlc; then
-    WARNINGS_AS_ERRORS_DEFAULT=true
-  else
-    WARNINGS_AS_ERRORS_DEFAULT=false
-  fi
+  WARNINGS_AS_ERRORS_DEFAULT=true
 
   UTIL_ARG_ENABLE(NAME: warnings-as-errors, DEFAULT: $WARNINGS_AS_ERRORS_DEFAULT,
       RESULT: WARNINGS_AS_ERRORS,
@@ -247,15 +234,6 @@ AC_DEFUN([FLAGS_SETUP_WARNINGS],
       # These warnings will never be turned on, since they generate too many
       # false positives.
       DISABLED_WARNINGS="unknown-warning-option unused-parameter"
-      ;;
-
-    xlc)
-      DISABLE_WARNING_PREFIX="-Wno-"
-      CFLAGS_WARNINGS_ARE_ERRORS="-qhalt=w"
-
-      # Possibly a better subset than "all" is "lan:trx:ret:zea:cmp:ret"
-      WARNINGS_ENABLE_ALL="-qinfo=all -qformat=all"
-      DISABLED_WARNINGS=""
       ;;
   esac
   AC_SUBST(DISABLE_WARNING_PREFIX)
@@ -337,15 +315,6 @@ AC_DEFUN([FLAGS_SETUP_OPTIMIZATION],
       C_O_FLAG_DEBUG_JVM="${C_O_FLAG_DEBUG_JVM} ${DISABLE_FORTIFY_CFLAGS}"
       C_O_FLAG_NONE="${C_O_FLAG_NONE} ${DISABLE_FORTIFY_CFLAGS}"
     fi
-  elif test "x$TOOLCHAIN_TYPE" = xxlc; then
-    C_O_FLAG_HIGHEST_JVM="-O3 -qhot=level=1 -qinline -qinlglue"
-    C_O_FLAG_HIGHEST="-O3 -qhot=level=1 -qinline -qinlglue"
-    C_O_FLAG_HI="-O3 -qinline -qinlglue"
-    C_O_FLAG_NORM="-O2"
-    C_O_FLAG_DEBUG="-qnoopt"
-    # FIXME: Value below not verified.
-    C_O_FLAG_DEBUG_JVM=""
-    C_O_FLAG_NONE="-qnoopt"
   elif test "x$TOOLCHAIN_TYPE" = xmicrosoft; then
     C_O_FLAG_HIGHEST_JVM="-O2 -Oy-"
     C_O_FLAG_HIGHEST="-O2"
@@ -494,13 +463,6 @@ AC_DEFUN([FLAGS_SETUP_CFLAGS_HELPER],
   else
     DEBUG_CFLAGS_JDK="-DDEBUG"
 
-    if test "x$TOOLCHAIN_TYPE" = xxlc; then
-      # We need '-qminimaltoc' or '-qpic=large -bbigtoc' if the TOC overflows.
-      # Hotspot now overflows its 64K TOC (currently only for debug),
-      # so for debug we build with '-qpic=large -bbigtoc'.
-      DEBUG_CFLAGS_JVM="-qpic=large"
-    fi
-
     if test "x$TOOLCHAIN_TYPE" = xgcc || test "x$TOOLCHAIN_TYPE" = xclang ; then
       INIT_PATTERN_FLAG="-ftrivial-auto-var-init=pattern"
       FLAGS_COMPILER_CHECK_ARGUMENTS(ARGUMENT: [$INIT_PATTERN_FLAG],
@@ -527,9 +489,6 @@ AC_DEFUN([FLAGS_SETUP_CFLAGS_HELPER],
     ALWAYS_DEFINES_JVM="-D_GNU_SOURCE -D_REENTRANT"
   elif test "x$TOOLCHAIN_TYPE" = xclang; then
     ALWAYS_DEFINES_JVM="-D_GNU_SOURCE"
-  elif test "x$TOOLCHAIN_TYPE" = xxlc; then
-    ALWAYS_DEFINES_JVM="-D_REENTRANT"
-    ALWAYS_DEFINES_JDK="-D_GNU_SOURCE -D_REENTRANT -DSTDC"
   elif test "x$TOOLCHAIN_TYPE" = xmicrosoft; then
     # _WIN32_WINNT=0x0602 means access APIs for Windows 8 and above. See
     # https://docs.microsoft.com/en-us/cpp/porting/modifying-winver-and-win32-winnt?view=msvc-170
@@ -594,12 +553,6 @@ AC_DEFUN([FLAGS_SETUP_CFLAGS_HELPER],
 
     TOOLCHAIN_CFLAGS_JDK="$TOOLCHAIN_CFLAGS_JDK -fvisibility=hidden -fstack-protector"
 
-  elif test "x$TOOLCHAIN_TYPE" = xxlc; then
-    # Suggested additions: -qsrcmsg to get improved error reporting
-    # set -qtbtable=full for a better traceback table/better stacks in hs_err when xlc16 is used
-    TOOLCHAIN_CFLAGS_JDK="-qtbtable=full -qchars=signed -qfullpath -qsaveopt -qstackprotect"  # add on both CFLAGS
-    TOOLCHAIN_CFLAGS_JVM="-qtbtable=full -qtune=balanced -fno-exceptions \
-        -qalias=noansi -qstrict -qtls=default -qnortti -qnoeh -qignerrno -qstackprotect"
   elif test "x$TOOLCHAIN_TYPE" = xmicrosoft; then
     TOOLCHAIN_CFLAGS_JVM="-nologo -MD -Zc:preprocessor -Zc:inline -Zc:throwingNew -permissive- -MP"
     TOOLCHAIN_CFLAGS_JDK="-nologo -MD -Zc:preprocessor -Zc:inline -Zc:throwingNew -permissive- -Zc:wchar_t-"
@@ -616,7 +569,7 @@ AC_DEFUN([FLAGS_SETUP_CFLAGS_HELPER],
   TOOLCHAIN_CFLAGS_JDK="$TOOLCHAIN_CFLAGS_JDK $CHARSET_CFLAGS"
 
   # CFLAGS C language level for JDK sources (hotspot only uses C++)
-  if test "x$TOOLCHAIN_TYPE" = xgcc || test "x$TOOLCHAIN_TYPE" = xclang || test "x$TOOLCHAIN_TYPE" = xxlc; then
+  if test "x$TOOLCHAIN_TYPE" = xgcc || test "x$TOOLCHAIN_TYPE" = xclang; then
     LANGSTD_CFLAGS="-std=c11"
   elif test "x$TOOLCHAIN_TYPE" = xmicrosoft; then
     LANGSTD_CFLAGS="-std:c11"
@@ -628,8 +581,6 @@ AC_DEFUN([FLAGS_SETUP_CFLAGS_HELPER],
     LANGSTD_CXXFLAGS="-std=c++17"
   elif test "x$TOOLCHAIN_TYPE" = xmicrosoft; then
     LANGSTD_CXXFLAGS="-std:c++17"
-  elif test "x$TOOLCHAIN_TYPE" = xxlc; then
-    LANGSTD_CXXFLAGS="-std=c++14"
   else
     AC_MSG_ERROR([Cannot enable C++17 for this toolchain])
   fi
@@ -650,8 +601,6 @@ AC_DEFUN([FLAGS_SETUP_CFLAGS_HELPER],
   elif test "x$TOOLCHAIN_TYPE" = xmicrosoft; then
     WARNING_CFLAGS="$WARNINGS_ENABLE_ALL"
 
-  elif test "x$TOOLCHAIN_TYPE" = xxlc; then
-    WARNING_CFLAGS=""  # currently left empty
   fi
 
   # Set some additional per-OS defines.
@@ -676,31 +625,16 @@ AC_DEFUN([FLAGS_SETUP_CFLAGS_HELPER],
   if test "x$TOOLCHAIN_TYPE" = xgcc || test "x$TOOLCHAIN_TYPE" = xclang; then
     PICFLAG="-fPIC"
     PIEFLAG="-fPIE"
-  elif test "x$TOOLCHAIN_TYPE" = xclang && test "x$OPENJDK_TARGET_OS" = xaix; then
-    JVM_PICFLAG="-fpic -mcmodel=large -Wl,-bbigtoc
-    JDK_PICFLAG="-fpic
-  elif test "x$TOOLCHAIN_TYPE" = xxlc; then
-    # '-qpic' defaults to 'qpic=small'. This means that the compiler generates only
-    # one instruction for accessing the TOC. If the TOC grows larger than 64K, the linker
-    # will have to patch this single instruction with a call to some out-of-order code which
-    # does the load from the TOC. This is of course slower, and we also would have
-    # to use '-bbigtoc' for linking anyway so we could also change the PICFLAG to 'qpic=large'.
-    # With 'qpic=large' the compiler will by default generate a two-instruction sequence which
-    # can be patched directly by the linker and does not require a jump to out-of-order code.
-    #
-    # Since large TOC causes perf. overhead, only pay it where we must. Currently this is
-    # for all libjvm variants (both gtest and normal) but no other binaries. So, build
-    # libjvm with -qpic=large and link with -bbigtoc.
-    JVM_PICFLAG="-qpic=large"
-    JDK_PICFLAG="-qpic"
   elif test "x$TOOLCHAIN_TYPE" = xmicrosoft; then
     PICFLAG=""
   fi
 
-  if test "x$TOOLCHAIN_TYPE" != xxlc; then
+  if test "x$TOOLCHAIN_TYPE" = xclang && test "x$OPENJDK_TARGET_OS" = xaix; then
+    JVM_PICFLAG="-fpic -mcmodel=large"
+  else
     JVM_PICFLAG="$PICFLAG"
-    JDK_PICFLAG="$PICFLAG"
   fi
+  JDK_PICFLAG="$PICFLAG"
 
   if test "x$OPENJDK_TARGET_OS" = xmacosx; then
     # Linking is different on macOS
@@ -730,8 +664,7 @@ AC_DEFUN([FLAGS_SETUP_CFLAGS_CPU_DEP],
   $1_DEFINES_CPU_JDK="${$1_DEFINES_CPU_JDK} -DARCH='\"$FLAGS_CPU_LEGACY\"' \
       -D$FLAGS_CPU_LEGACY"
 
-  if test "x$FLAGS_CPU_BITS" = x64 && test "x$FLAGS_OS" != xaix; then
-    # xlc on AIX defines _LP64=1 by default and issues a warning if we redefine it.
+  if test "x$FLAGS_CPU_BITS" = x64; then
     $1_DEFINES_CPU_JDK="${$1_DEFINES_CPU_JDK} -D_LP64=1"
     $1_DEFINES_CPU_JVM="${$1_DEFINES_CPU_JVM} -D_LP64=1"
   fi
@@ -819,11 +752,6 @@ AC_DEFUN([FLAGS_SETUP_CFLAGS_CPU_DEP],
     fi
     if test "x$OPENJDK_TARGET_OS" = xaix; then
       $1_CFLAGS_CPU="-mcpu=pwr8"
-    fi
-
-  elif test "x$TOOLCHAIN_TYPE" = xxlc; then
-    if test "x$FLAGS_CPU" = xppc64; then
-      $1_CFLAGS_CPU_JVM="-qarch=ppc64"
     fi
 
   elif test "x$TOOLCHAIN_TYPE" = xmicrosoft; then
