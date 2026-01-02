@@ -69,6 +69,7 @@ public class OpenJ9PropsExt implements Callable<Map<String, String>> {
         map.put("jdk.static", "false");
         map.put("jlink.packagedModules", this::packagedModules);
         map.put("systemd.support", this::systemdSupport);
+        map.put("vm.asan", "false");
         map.put("vm.bits", this::vmBits);
         map.put("vm.cds", "false");
         map.put("vm.cds.write.archived.java.heap", "false");
