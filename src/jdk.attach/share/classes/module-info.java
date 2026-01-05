@@ -25,7 +25,7 @@
 
 /*
  * ===========================================================================
- * (c) Copyright IBM Corp. 2018, 2022 All Rights Reserved
+ * (c) Copyright IBM Corp. 2018, 2026 All Rights Reserved
  * ===========================================================================
  */
 
@@ -38,6 +38,8 @@
  * @since 9
  */
 module jdk.attach {
+    requires jdk.internal.jvmstat;
+
     exports com.sun.tools.attach;
     exports com.sun.tools.attach.spi;
 
