@@ -24,7 +24,7 @@
 #
 
 # ===========================================================================
-# (c) Copyright IBM Corp. 2025, 2025 All Rights Reserved
+# (c) Copyright IBM Corp. 2025, 2026 All Rights Reserved
 # ===========================================================================
 
 include MakeIncludeStart.gmk
@@ -85,7 +85,6 @@ $(eval $(call SetupJdkLibrary, BUILD_LIBJAVA, \
         -I$(OPENJ9_TOPDIR)/runtime/jcl \
         -I$(OPENJ9_TOPDIR)/runtime/util \
         -I$(OPENJ9_VM_BUILD_DIR)/jcl, \
-    WARNINGS_AS_ERRORS_xlc := false, \
     DISABLED_WARNINGS_gcc_ProcessImpl_md.c := unused-result, \
     DISABLED_WARNINGS_clang_TimeZone_md.c := unused-variable, \
     JDK_LIBS := libjvm, \
