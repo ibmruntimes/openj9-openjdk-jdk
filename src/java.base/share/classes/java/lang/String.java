@@ -1299,7 +1299,7 @@ public final class String
         int sp = 0;
         int sl = len;
         while (sp < sl) {
-            int ret = StringCoding.encodeISOArray(val, sp, dst, dp, len);
+            int ret = StringCoding.implEncodeISOArray(val, sp, dst, dp, len);
             sp = sp + ret;
             dp = dp + ret;
             if (ret != len) {
