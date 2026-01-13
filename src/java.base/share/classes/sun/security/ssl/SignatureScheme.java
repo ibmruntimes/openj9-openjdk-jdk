@@ -25,7 +25,7 @@
 
 /*
  * ===========================================================================
- * (c) Copyright IBM Corp. 2024, 2024 All Rights Reserved
+ * (c) Copyright IBM Corp. 2024, 2026 All Rights Reserved
  * ===========================================================================
  */
 
@@ -706,6 +706,27 @@ enum SignatureScheme {
                 .filter(ss -> ss.isAvailable
                         && ss.isPermitted(
                         SSLAlgorithmConstraints.DEFAULT, null))
+                .filter(brainpoolFilter())
                 .map(ss -> ss.name).toArray(String[]::new);
+
+        private static java.util.function.Predicate<SignatureScheme> brainpoolFilter() {
+            // Check if ecdsa_brainpoolP512r1tls13_sha512 was explicitly
+            // configured via system properties. If any of the properties
+            // indicate the user wants to use ecdsa_brainpoolP512r1tls13_sha512,
+            // then allow for this.
+            if (propertyContainsBrainpool("jdk.tls.client.SignatureSchemes")
+            ||  propertyContainsBrainpool("jdk.tls.server.SignatureSchemes")
+            ) {
+                return ss -> true;
+            } else {
+                return ss -> ss != ECDSA_BRAINPOOLP512R1TLS13_SHA512;
+            }
+        }
+
+        private static boolean propertyContainsBrainpool(String propertyName) {
+            return System.getProperty(propertyName, "")
+                    .toLowerCase()
+                    .contains("ecdsa_brainpoolp512r1tls13_sha512");
+        }
     }
 }
