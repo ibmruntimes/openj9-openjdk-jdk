@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012, 2026, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2025, 2026, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -22,24 +22,30 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-
 package jdk.jpackage.internal.model;
 
 import java.util.Objects;
 
 /**
- * Generic jpackage exception with non-null message.
+ * App image bundle type.
+ *
+ * @see StandardPackageType
  */
-@SelfContainedException
-public class JPackageException extends RuntimeException {
+public enum AppImageBundleType implements BundleType {
 
-    public JPackageException(String msg) {
-        super(Objects.requireNonNull(msg));
+    WIN_APP_IMAGE("bundle-type.win-app"),
+    LINUX_APP_IMAGE("bundle-type.linux-app"),
+    MAC_APP_IMAGE("bundle-type.mac-app"),
+    ;
+
+    private AppImageBundleType(String key) {
+        this.key = Objects.requireNonNull(key);
     }
 
-    public JPackageException(String msg, Throwable cause) {
-        super(Objects.requireNonNull(msg), cause);
+    @Override
+    public String label() {
+        return I18N.getString(key);
     }
 
-    private static final long serialVersionUID = 1L;
+    private final String key;
 }
