@@ -22,6 +22,12 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
+
+/*
+ * ===========================================================================
+ * (c) Copyright IBM Corp. 2024, 2024 All Rights Reserved
+ * ===========================================================================
+ */
 package jdk.jfr.internal.dcmd;
 
 import java.io.IOException;
@@ -551,7 +557,7 @@ final class DCmdStart extends AbstractDCmd {
                 "BOOLEAN", false, true, "true", false),
             new Argument("filename",
                 "Resulting recording filename, e.g. \\\"" + exampleFilename() +  "\\\"",
-                "FILE", false, true, "hotspot-pid-xxxxx-id-y-YYYY_MM_dd_HH_mm_ss.jfr", false),
+                "FILE", false, true, "openj9-pid-xxxxx-id-y-YYYY_MM_dd_HH_mm_ss.jfr", false),
             new Argument("maxage",
                 "Maximum time to keep recorded data (on disk) in (s)econds, (m)inutes, (h)ours, or (d)ays, e.g. 60m, or 0 for no limit",
                 "NANOTIME", false, true, "0", false),
