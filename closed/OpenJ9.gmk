@@ -1,5 +1,5 @@
 # ===========================================================================
-# (c) Copyright IBM Corp. 2017, 2025 All Rights Reserved
+# (c) Copyright IBM Corp. 2017, 2026 All Rights Reserved
 # ===========================================================================
 # This code is free software; you can redistribute it and/or modify it
 # under the terms of the GNU General Public License version 2 only, as
@@ -335,10 +335,12 @@ else # OPENJ9_ENABLE_CUDA
 endif # OPENJ9_ENABLE_CUDA
 
 ifeq (true,$(OPENJ9_ENABLE_INLINE_TYPES))
+  CMAKE_ARGS += -DJ9VM_OPT_VALHALLA_COMPACT_LAYOUTS=ON
   CMAKE_ARGS += -DJ9VM_OPT_VALHALLA_FLATTENABLE_VALUE_TYPES=ON
   CMAKE_ARGS += -DJ9VM_OPT_VALHALLA_STRICT_FIELDS=ON
   CMAKE_ARGS += -DJ9VM_OPT_VALHALLA_VALUE_TYPES=ON
 else # OPENJ9_ENABLE_INLINE_TYPES
+  CMAKE_ARGS += -DJ9VM_OPT_VALHALLA_COMPACT_LAYOUTS=OFF
   CMAKE_ARGS += -DJ9VM_OPT_VALHALLA_FLATTENABLE_VALUE_TYPES=OFF
   CMAKE_ARGS += -DJ9VM_OPT_VALHALLA_STRICT_FIELDS=OFF
   CMAKE_ARGS += -DJ9VM_OPT_VALHALLA_VALUE_TYPES=OFF
