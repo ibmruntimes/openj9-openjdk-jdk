@@ -1,6 +1,6 @@
 /*
  * ===========================================================================
- * (c) Copyright IBM Corp. 2019, 2025 All Rights Reserved
+ * (c) Copyright IBM Corp. 2019, 2026 All Rights Reserved
  * ===========================================================================
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -31,13 +31,13 @@ timeout(time: 6, unit: 'HOURS') {
         timestamps {
             node ('worker') {
                 try {
-                    if ( params.ghprbGhRepository == "") {
+                    if (params.ghprbGhRepository == "") {
                         error("Repository to check not specified.  Rerun with the ghprbGhRepository parameter pointing to a valid git repository.")
                     }
-                    if ( params.verbose == true) {
+                    if (params.verbose == true) {
                         VERBOSE="VERBOSE=1"
                     }
-                    if ( params.rootDir != "") {
+                    if (params.rootDir != "") {
                         ROOTDIR="ROOTDIR=${params.rootDir}"
                     }
                     checkout changelog: false, poll: false,

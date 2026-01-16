@@ -1,6 +1,6 @@
 #!/bin/sh
 # ===========================================================================
-# (c) Copyright IBM Corp. 2019, 2025 All Rights Reserved
+# (c) Copyright IBM Corp. 2019, 2026 All Rights Reserved
 # ===========================================================================
 #
 # This code is free software; you can redistribute it and/or modify it
@@ -114,7 +114,6 @@ ignored=(
   "closed/jfr-metadata.blob"
   "src/hotspot/share/jfr/metadata/metadata.xml"
   "src/hotspot/share/jfr/metadata/metadata.xsd"
-  "test/*"
 )
 
 # Patterns of file names not built into a JDK.
