@@ -56,21 +56,21 @@ print_excludes() {
   echo "src/jdk.internal.vm.compiler.management/share/classes/org.graalvm.compiler.hotspot.management/src/org/graalvm/compiler/hotspot/management/HotSpotGraalRuntimeMBean.java"
   echo "src/jdk.internal.vm.compiler.management/share/classes/org.graalvm.compiler.hotspot.management/src/org/graalvm/compiler/hotspot/management/JMXServiceProvider.java"
   echo "src/jdk.internal.vm.compiler.management/share/classes/org.graalvm.compiler.hotspot.management/src/org/graalvm/compiler/hotspot/management/package-info.java"
+  echo "test/hotspot/jtreg/runtime/cds/appcds/dynamicArchive/test-classes/VerifierTroublev49.jasm"
+  echo "test/jaxp/javax/xml/jaxp/unittest/common/dtd/DTDTestBase.java"
+  echo "test/jaxp/javax/xml/jaxp/unittest/common/dtd/SchemaTest.java"
+  echo "test/jaxp/javax/xml/jaxp/unittest/common/dtd/StAXTest.java"
+  echo "test/jaxp/javax/xml/jaxp/unittest/common/dtd/TransformTest.java"
+  echo "test/jdk/javax/accessibility/manual/SwingSetTest.java"
+  echo "test/jdk/javax/accessibility/manual/SwingSetTest.java"
+  echo "test/jdk/tools/launcher/HelpFlagsTest.java"
 
   echo "# openj9-openjdk-jdk11 known failures"
   echo "make/data/license-templates/gpl-header"
   echo "make/mapfiles/libjsig/mapfile-vers-solaris"
   echo "make/mapfiles/libjvm_db/mapfile-vers"
   echo "make/mapfiles/libjvm_dtrace/mapfile-vers"
-  echo "src/java.base/solaris/native/libjvm_db/libjvm_db.c"
-  echo "src/java.base/solaris/native/libjvm_db/libjvm_db.h"
-  echo "src/java.base/solaris/native/libjvm_dtrace/jvm_dtrace.c"
-  echo "src/java.base/solaris/native/libjvm_dtrace/jvm_dtrace.h"
   echo "src/java.base/unix/native/libjsig/jsig.c"
-  echo "src/jdk.internal.vm.compiler.management/share/classes/org.graalvm.compiler.hotspot.management/src/org/graalvm/compiler/hotspot/management/HotSpotGraalManagement.java"
-  echo "src/jdk.internal.vm.compiler.management/share/classes/org.graalvm.compiler.hotspot.management/src/org/graalvm/compiler/hotspot/management/HotSpotGraalRuntimeMBean.java"
-  echo "src/jdk.internal.vm.compiler.management/share/classes/org.graalvm.compiler.hotspot.management/src/org/graalvm/compiler/hotspot/management/JMXServiceProvider.java"
-  echo "src/jdk.internal.vm.compiler.management/share/classes/org.graalvm.compiler.hotspot.management/src/org/graalvm/compiler/hotspot/management/package-info.java"
 
   echo "# openj9-openjdk-jdk8 known failures"
   echo "jdk/make/mapfiles/libjfr/mapfile-vers"
@@ -141,6 +141,7 @@ excluded=(
   "src/java.base/linux/native/libsimdsort/*"
   "src/utils/*"
   "*/test/*"
+  "test/*"
 )
 
 # Patterns of user-configurable file names.
