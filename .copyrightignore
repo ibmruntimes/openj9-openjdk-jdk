@@ -31,6 +31,7 @@
 # 8. *job* # all things at contains characters in between stars
 # ===========================================================================
 
+/closed/jfr-metadata_blob-notices
 /src/bsd/doc/
 /src/hotspot/share/jfr/metadata/metadata.xml
 /src/hotspot/share/jfr/metadata/metadata.xsd
