@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001, 2022, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2001, 2026, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -214,8 +214,7 @@ final class JsseJce {
                 // FIPS solutions are expected to have an algorithm such as
                 // "SHA512withECDSA", "SHA384withECDSA", "SHA256withECDSA", or
                 // "SHA224withECDSA" available so we will also check for these algorithms.
-                mediator = isSignatureAlgorithmAvailable(SIGNATURE_ECDSA)
-                    || isSignatureAlgorithmAvailable(SIGNATURE_ECDSA_224)
+                mediator = isSignatureAlgorithmAvailable(SIGNATURE_ECDSA_224)
                     || isSignatureAlgorithmAvailable(SIGNATURE_ECDSA_256)
                     || isSignatureAlgorithmAvailable(SIGNATURE_ECDSA_384)
                     || isSignatureAlgorithmAvailable(SIGNATURE_ECDSA_512);
