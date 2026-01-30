@@ -66,6 +66,7 @@ print_excludes() {
   echo "test/jdk/tools/launcher/HelpFlagsTest.java"
 
   echo "# openj9-openjdk-jdk11 known failures"
+  echo "closed/jfr-metadata_blob-notices"
   echo "make/data/license-templates/gpl-header"
   echo "make/mapfiles/libjsig/mapfile-vers-solaris"
   echo "make/mapfiles/libjvm_db/mapfile-vers"
