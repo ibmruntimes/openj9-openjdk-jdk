@@ -25,7 +25,7 @@
 
 /*
  * ===========================================================================
- * (c) Copyright IBM Corp. 1997, 2025 All Rights Reserved
+ * (c) Copyright IBM Corp. 1997, 2026 All Rights Reserved
  * ===========================================================================
  */
 
@@ -189,7 +189,7 @@ public class URLClassPath {
             sharedClassServiceProvider = helper;                                //OpenJ9-shared_classes_misc
         }                                                                       //OpenJ9-shared_classes_misc
         if (usingSharedClasses() && null == loaderURLs) {                       //OpenJ9-shared_classes_misc
-            loaderURLs = new ArrayList<>(path.size());                          //OpenJ9-shared_classes_misc
+            loaderURLs = new ArrayList<>(searchPath.size());                    //OpenJ9-shared_classes_misc
         }                                                                       //OpenJ9-shared_classes_misc
     }                                                                           //OpenJ9-shared_classes_misc
                                                                                 //OpenJ9-shared_classes_misc
@@ -549,7 +549,7 @@ public class URLClassPath {
                      * update loaderURLs in this case.                                   //OpenJ9-shared_classes_misc
                      */                                                                  //OpenJ9-shared_classes_misc
                     if (null == loaderURLs) {                                            //OpenJ9-shared_classes_misc
-                        loaderURLs = new ArrayList<>(path.size());                       //OpenJ9-shared_classes_misc
+                        loaderURLs = new ArrayList<>(searchPath.size());                 //OpenJ9-shared_classes_misc
                     }                                                                    //OpenJ9-shared_classes_misc
                     loaderURLs.add(url);                                                 //OpenJ9-shared_classes_misc
                 }                                                                        //OpenJ9-shared_classes_misc
