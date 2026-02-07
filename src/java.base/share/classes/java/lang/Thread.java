@@ -292,6 +292,9 @@ public class Thread implements Runnable {
         volatile boolean daemon;
         volatile int threadStatus;
 
+        // Used by NativeThread for signalling
+        @Stable long nativeThreadID;
+
         // This map is maintained by the ThreadLocal class
         ThreadLocal.ThreadLocalMap terminatingThreadLocals;
 
@@ -316,6 +319,14 @@ public class Thread implements Runnable {
 
     void setTerminatingThreadLocals(ThreadLocal.ThreadLocalMap map) {
         holder.terminatingThreadLocals = map;
+    }
+
+    long nativeThreadID() {
+        return holder.nativeThreadID;
+    }
+
+    void setNativeThreadID(long id) {
+        holder.nativeThreadID = id;
     }
 
     /*
