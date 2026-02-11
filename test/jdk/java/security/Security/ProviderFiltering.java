@@ -22,6 +22,12 @@
  */
 
 /*
+ * ===========================================================================
+ * (c) Copyright IBM Corp. 2026, 2026 All Rights Reserved
+ * ===========================================================================
+ */
+
+/*
  * @test
  * @library /test/lib
  * @bug 6447816
@@ -85,9 +91,13 @@ public class ProviderFiltering {
         }
 
         String p = "SUN";
+        List<String> providers = new ArrayList<>();
+        providers.add(p);
+        ModuleLayer.boot().findModule("openjceplus")
+            .ifPresent(m -> providers.add("OpenJCEPlus"));
 
         // test alias
-        doit("Signature.NONEwithDSA", p);
+        doit("Signature.NONEwithDSA", providers.toArray(new String[0]));
 
         String sigService = "Signature.SHA256withDSA";
         // javadoc allows extra spaces in between
@@ -117,7 +127,7 @@ public class ProviderFiltering {
         // try non-attribute filters
         filters.clear();
         filters.put(sigService, "");
-        doit(filters, p);
+        doit(filters, providers.toArray(new String[0]));
         filters.put("Cipher.RC2", "");
         doit(filters);
 
@@ -130,9 +140,10 @@ public class ProviderFiltering {
                 customValue);
         Security.insertProviderAt(testProv, 1);
         // should find both TestProv and SUN and in this order
-        doit(sigService, pName, "SUN");
+        providers.add(0, pName);
+        doit(sigService, providers.toArray(new String[0]));
         filters.put(sigService, "");
-        doit(filters, pName, "SUN");
+        doit(filters, providers.toArray(new String[0]));
 
         String specAttr = sigService + "  " + customKey + ":" + customValue;
         // should find only TestProv
