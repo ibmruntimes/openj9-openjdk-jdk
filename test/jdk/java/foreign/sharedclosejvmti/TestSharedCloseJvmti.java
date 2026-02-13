@@ -22,6 +22,12 @@
  */
 
 /*
+ * ===========================================================================
+ * (c) Copyright IBM Corp. 2026, 2026 All Rights Reserved
+ * ===========================================================================
+ */
+
+/*
  * @test
  * @bug 8370344
  * @library /test/lib
@@ -71,9 +77,9 @@ public class TestSharedCloseJvmti {
         static final int ADDED_FRAMES = 10;
 
         static final CountDownLatch MAIN_LATCH = new CountDownLatch(1);
-        static final CountDownLatch TARGET_LATCH = new CountDownLatch(1);
 
         static volatile int SINK;
+        static volatile boolean CLOSED = false;
 
         public static void main(String[] args) throws Throwable {
             try (Arena arena = Arena.ofShared()) {
@@ -89,7 +95,7 @@ public class TestSharedCloseJvmti {
                 MAIN_LATCH.await();
             }
             // Notify trigger thread that arena was closed
-            TARGET_LATCH.countDown();
+            CLOSED = true;
         }
 
         static boolean reentrant = false;
@@ -121,11 +127,8 @@ public class TestSharedCloseJvmti {
             if (depth >= ADDED_FRAMES) {
                 // notify main thread to close the arena
                 MAIN_LATCH.countDown();
-                try {
-                    // wait here until main thread has closed arena
-                    TARGET_LATCH.await();
-                } catch (InterruptedException ex) {
-                    throw new RuntimeException("Unexpected interruption");
+                while (!CLOSED) {
+                    Thread.onSpinWait();
                 }
                 return;
             }
