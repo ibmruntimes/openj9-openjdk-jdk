@@ -440,7 +440,7 @@ enum SignatureScheme {
                     schemesToCheck.add(scheme);
                 } else {
                     if (SSLLogger.isOn() &&
-                            SSLLogger.isOn("ssl,handshake,verbose")) {
+                            SSLLogger.isOn(SSLLogger.Opt.HANDSHAKE_VERBOSE)) {
                         SSLLogger.finest("Ignore " + ECDSA_BRAINPOOLP512R1TLS13_SHA512.name
                                 + " from supported signature schemes");
                     }
