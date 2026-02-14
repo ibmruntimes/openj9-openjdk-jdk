@@ -111,6 +111,7 @@ security.provider.tbd=SunMSCAPI
 security.provider.tbd=Apple
 #endif
 security.provider.tbd=SunPKCS11
+security.provider.tbd=OpenJCEPlus
 
 #if defined aix-ppc || defined linux-ppc || defined linux-s390 || defined linux-x86 || defined windows
 #
