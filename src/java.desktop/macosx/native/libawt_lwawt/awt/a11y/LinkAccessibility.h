@@ -22,12 +22,21 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-package jdk.jpackage.internal;
 
-@FunctionalInterface
-public interface ExecutorFactory {
+#ifndef LINK_ACCESSIBILITY
+#define LINK_ACCESSIBILITY
 
-    Executor executor();
+#import "CommonTextAccessibility.h"
 
-    public static final ExecutorFactory DEFAULT = Executor::new;
-}
+#import <AppKit/NSAccessibility.h>
+
+
+@interface LinkAccessibility : CommonTextAccessibility<NSAccessibilityStaticText> {
+
+};
+- (NSAccessibilityRole _Nonnull)accessibilityRole;
+- (NSString * _Nullable)accessibilityAttributedStringForRange:(NSRange)range;
+- (NSString * _Nullable)accessibilityValue;
+- (NSRange)accessibilityVisibleCharacterRange;
+@end
+#endif

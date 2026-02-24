@@ -22,12 +22,39 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-package jdk.jpackage.internal;
 
-@FunctionalInterface
-public interface ExecutorFactory {
+#import "LinkAccessibility.h"
 
-    Executor executor();
+@implementation LinkAccessibility
 
-    public static final ExecutorFactory DEFAULT = Executor::new;
+- (NSAccessibilityRole _Nonnull)accessibilityRole
+{
+    return NSAccessibilityLinkRole;
 }
+
+- (NSString * _Nullable)accessibilityAttributedStringForRange:(NSRange)range
+{
+    return [self accessibilityStringForRangeAttribute:range];
+}
+
+- (NSString * _Nullable)accessibilityValue
+{
+    return [self accessibilityValueAttribute];
+}
+
+- (NSRange)accessibilityVisibleCharacterRange
+{
+    return [self accessibilityVisibleCharacterRangeAttribute];
+}
+
+- (NSRect)accessibilityFrame
+{
+    return [super accessibilityFrame];
+}
+
+- (id)accessibilityParent
+{
+    return [super accessibilityParent];
+}
+
+@end
