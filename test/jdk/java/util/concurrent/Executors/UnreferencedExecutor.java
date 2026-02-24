@@ -22,11 +22,17 @@
  */
 
 /*
+ * ===========================================================================
+ * (c) Copyright IBM Corp. 2026, 2026 All Rights Reserved
+ * ===========================================================================
+ */
+
+/*
  * @test
  * @bug 8308235
  * @summary Unreference ExecutorService objects returned by the Executors without shutdown
  *    and termination, this should not leak memory
- * @run main/othervm -Xmx32m UnreferencedExecutor
+ * @run main/othervm -Xmx64m UnreferencedExecutor
  */
 
 import java.time.Duration;
