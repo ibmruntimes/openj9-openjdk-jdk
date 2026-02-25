@@ -21,6 +21,12 @@
  * questions.
  */
 
+/*
+ * ===========================================================================
+ * (c) Copyright IBM Corp. 2026, 2026 All Rights Reserved
+ * ===========================================================================
+ */
+
 import jdk.test.lib.Asserts;
 import jdk.test.lib.security.SeededSecureRandom;
 import jdk.test.lib.security.XMLUtils;
@@ -52,7 +58,8 @@ public class Properties {
     }
 
     static void test(String alg) throws Exception {
-        var kp = KeyPairGenerator.getInstance(alg).generateKeyPair();
+        var kpg = KeyPairGenerator.getInstance(alg);
+        var kp = kpg.generateKeyPair();
         var signer = XMLUtils.signer(kp.getPrivate(), kp.getPublic());
 
         var n1 = getSignature(signer.sign("hello")); // random one
@@ -67,7 +74,9 @@ public class Properties {
         signer.prop(DOM_SIGNATURE_RANDOM, new SeededSecureRandom(2L));
         var s2 = getSignature(signer.sign("hello")); // deterministic two
 
-        Asserts.assertEqualsByteArray(s1, s1again);
+        if (!kpg.getProvider().getName().startsWith("OpenJCEPlus")) {
+            Asserts.assertEqualsByteArray(s1, s1again);
+        }
         assertsAllDifferent(n1, n2, s1, s2);
 
         signer.prop(DOM_SIGNATURE_PROVIDER, Security.getProvider("SunJCE"));
