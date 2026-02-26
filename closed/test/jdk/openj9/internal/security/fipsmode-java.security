@@ -1,0 +1,56 @@
+# ===========================================================================
+# (c) Copyright IBM Corp. 2026, 2026 All Rights Reserved
+# ===========================================================================
+# This code is free software; you can redistribute it and/or modify it
+# under the terms of the GNU General Public License version 2 only, as
+# published by the Free Software Foundation.
+#
+# IBM designates this particular file as subject to the "Classpath" exception
+# as provided by IBM in the LICENSE file that accompanied this code.
+#
+# This code is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+# version 2 for more details (a copy is included in the LICENSE file that
+# accompanied this code).
+#
+# You should have received a copy of the GNU General Public License version
+# 2 along with this work; if not, see <http://www.gnu.org/licenses/>.
+# ===========================================================================
+
+RestrictedSecurity.FIPSEnabled140-2.Version.desc.name = Test Base FIPS140-2 Enabled Profile
+RestrictedSecurity.FIPSEnabled140-2.Version.desc.fips = true
+RestrictedSecurity.FIPSEnabled140-2.Version.desc.default = true
+RestrictedSecurity.FIPSEnabled140-2.Version.fips.mode = 140-2
+RestrictedSecurity.FIPSEnabled140-2.Version.securerandom.provider = OpenJCEPlusFIPS
+RestrictedSecurity.FIPSEnabled140-2.Version.securerandom.algorithm = SHA512DRBG
+RestrictedSecurity.FIPSEnabled140-2.Version.desc.hash = SHA256:d6d51cf16e5d857c8e08d480ec014edce7c5fad87047370c68bc85207a87e837
+RestrictedSecurity.FIPSEnabled140-2.Version.desc.number = Certificate #XXX
+RestrictedSecurity.FIPSEnabled140-2.Version.desc.policy = https://csrc.nist.gov/projects/cryptographic-module-validation-program/certificate/
+RestrictedSecurity.FIPSEnabled140-2.Version.desc.sunsetDate = 2026-09-21
+RestrictedSecurity.FIPSEnabled140-2.Version.jce.provider.1 = sun.security.provider.Sun
+RestrictedSecurity.FIPSEnabled140-2.Version.jce.provider.2 = com.sun.crypto.provider.SunJCE
+RestrictedSecurity.FIPSEnabled140-2.Version.jce.provider.3 = sun.security.ssl.SunJSSE
+
+RestrictedSecurity.FIPSEnabled140-3.Version.desc.name = Test Base FIPS140-3 Enabled Profile
+RestrictedSecurity.FIPSEnabled140-3.Version.desc.fips = true
+RestrictedSecurity.FIPSEnabled140-3.Version.desc.default = true
+RestrictedSecurity.FIPSEnabled140-3.Version.fips.mode = 140-3
+RestrictedSecurity.FIPSEnabled140-3.Version.securerandom.provider = OpenJCEPlusFIPS
+RestrictedSecurity.FIPSEnabled140-3.Version.securerandom.algorithm = SHA512DRBG
+RestrictedSecurity.FIPSEnabled140-3.Version.desc.hash = SHA256:d173d0f1a227df1924333e814befa47d20810cdcf6ce9820b516da07aea97656
+RestrictedSecurity.FIPSEnabled140-3.Version.desc.number = Certificate #XXX
+RestrictedSecurity.FIPSEnabled140-3.Version.desc.policy = https://csrc.nist.gov/projects/cryptographic-module-validation-program/certificate/
+RestrictedSecurity.FIPSEnabled140-3.Version.desc.sunsetDate = 2026-09-21
+RestrictedSecurity.FIPSEnabled140-3.Version.jce.provider.1 = sun.security.provider.Sun
+RestrictedSecurity.FIPSEnabled140-3.Version.jce.provider.2 = com.sun.crypto.provider.SunJCE
+RestrictedSecurity.FIPSEnabled140-3.Version.jce.provider.3 = sun.security.ssl.SunJSSE
+
+RestrictedSecurity.FIPSDisabled.Version.desc.name = Test Base FIPS Disabled Profile
+RestrictedSecurity.FIPSDisabled.Version.desc.fips = false
+RestrictedSecurity.FIPSDisabled.Version.securerandom.provider = SUN
+RestrictedSecurity.FIPSDisabled.Version.securerandom.algorithm = SHA512DRBG
+RestrictedSecurity.FIPSDisabled.Version.desc.hash = SHA256:9d53dd38fbaf02a6efe83309ac193826d37253c48b2f58fb82cbf7960fffa65f
+RestrictedSecurity.FIPSDisabled.Version.jce.provider.1 = sun.security.provider.Sun
+RestrictedSecurity.FIPSDisabled.Version.jce.provider.2 = com.sun.crypto.provider.SunJCE
+RestrictedSecurity.FIPSDisabled.Version.jce.provider.3 = sun.security.ssl.SunJSSE

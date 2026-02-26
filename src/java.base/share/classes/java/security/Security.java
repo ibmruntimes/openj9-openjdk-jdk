@@ -25,7 +25,7 @@
 
 /*
  * ===========================================================================
- * (c) Copyright IBM Corp. 2022, 2025 All Rights Reserved
+ * (c) Copyright IBM Corp. 2022, 2026 All Rights Reserved
  * ===========================================================================
  */
 
@@ -1158,5 +1158,9 @@ public final class Security {
     @SuppressWarnings("deprecation")
     private static URL newURL(String spec) throws MalformedURLException {
         return new URL(spec);
+    }
+
+    public static String getFIPSmode() {
+        return RestrictedSecurity.getFIPSmode();
     }
 }
