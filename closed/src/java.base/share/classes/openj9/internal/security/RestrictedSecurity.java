@@ -249,6 +249,23 @@ public final class RestrictedSecurity {
     }
 
     /**
+     * Get restricted security mode.
+     *
+     * FIPS mode is available when FIPS is enabled.
+     * It is specified in the successfully initialized FIPS profile
+     * in RestrictedSecurity mode.
+     *
+     * @return the FIPS mode
+     */
+    public static String getFIPSmode() {
+        if (isFIPSEnabled()) {
+            return restricts.jdkFipsMode;
+        }
+
+        return null;
+    }
+
+    /**
      * Check if the FIPS 140-2 mode is enabled.
      *
      * FIPS 140-2 mode will be enabled when the semeru.fips system property
