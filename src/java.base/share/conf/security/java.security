@@ -210,7 +210,7 @@ RestrictedSecurity.NSS.140-2.securerandom.algorithm = PKCS11
 RestrictedSecurity.OpenJCEPlusFIPS.FIPS140-3.desc.name = OpenJCEPlusFIPS Cryptographic Module FIPS 140-3
 RestrictedSecurity.OpenJCEPlusFIPS.FIPS140-3.desc.default = false
 RestrictedSecurity.OpenJCEPlusFIPS.FIPS140-3.desc.fips = true
-RestrictedSecurity.OpenJCEPlusFIPS.FIPS140-3.desc.hash = SHA256:db77222175971874d5681342bb2ee2f95258e6bc7e9957a7c027a7a41b03af90
+RestrictedSecurity.OpenJCEPlusFIPS.FIPS140-3.desc.hash = SHA256:488826302be498c47d45f798b8705297241434e522b983be5bd8abc759d8aab5
 RestrictedSecurity.OpenJCEPlusFIPS.FIPS140-3.desc.number = Certificate #4755
 RestrictedSecurity.OpenJCEPlusFIPS.FIPS140-3.desc.policy = https://csrc.nist.gov/projects/cryptographic-module-validation-program/certificate/4755
 RestrictedSecurity.OpenJCEPlusFIPS.FIPS140-3.desc.sunsetDate = 2029-08-08
@@ -350,6 +350,7 @@ RestrictedSecurity.OpenJCEPlusFIPS.FIPS140-3.jce.provider.3 = sun.security.ssl.S
 
 RestrictedSecurity.OpenJCEPlusFIPS.FIPS140-3.securerandom.provider = OpenJCEPlusFIPS
 RestrictedSecurity.OpenJCEPlusFIPS.FIPS140-3.securerandom.algorithm = SHA512DRBG
+RestrictedSecurity.OpenJCEPlusFIPS.FIPS140-3.securerandom.strongAlgorithms = SHA512DRBG:OpenJCEPlusFIPS
 
 # Strongly enforced restricted security mode profile for FIPS 140-3.
 #
