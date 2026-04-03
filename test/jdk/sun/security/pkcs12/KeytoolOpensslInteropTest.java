@@ -22,6 +22,12 @@
  */
 
 /*
+ * ===========================================================================
+ * (c) Copyright IBM Corp. 2026, 2026 All Rights Reserved
+ * ===========================================================================
+ */
+
+/*
  * @test id=GenerateOpensslPKCS12
  * @bug 8076190 8242151 8153005 8266182 8362894
  * @summary This is java keytool <-> openssl interop test. This test generates
@@ -68,6 +74,7 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.KeyStore;
+import java.security.Security;
 import java.util.Base64;
 import java.util.Objects;
 
@@ -139,6 +146,9 @@ public class KeytoolOpensslInteropTest {
                 "AES-256-CBC", "-macalg", "SHA512")
                 .shouldHaveExitValue(0);
 
+        if (Security.getProperty("com.ibm.fips.mode") != null) {
+            return;
+        }
         ProcessTools.executeCommand(opensslPath, "pkcs12", "-export", "-in",
                         "kandc", "-out", "os6", "-name", "a", "-passout",
                         "pass:changeit", "-pbmac1_pbkdf2", "-macalg", "sha256")
@@ -173,7 +183,9 @@ public class KeytoolOpensslInteropTest {
         // no storepass no cert
         check("os5", "a", null, "changeit", true, false, true);
 
-        check("os6", "a", "changeit", "changeit", true, true, true);
+        if (Security.getProperty("com.ibm.fips.mode") == null) {
+            check("os6", "a", "changeit", "changeit", true, true, true);
+        }
 
         // keytool
 
