@@ -22,6 +22,9 @@
 # or visit www.oracle.com if you need additional information or have any
 # questions.
 #
+# ===========================================================================
+# (c) Copyright IBM Corp. 2026, 2026 All Rights Reserved
+# ===========================================================================
 
 include MakeIncludeStart.gmk
 ifeq ($(INCLUDE), true)
@@ -53,20 +56,39 @@ ifneq ($(wildcard $(INCLUDE_SOURCE_DIR)/*), )
   TARGETS += $(COPY_EXPORTED_INCLUDE)
 endif
 
-# Use the most specific of OS and OS_TYPE.
+# Collect the names of OS-specific header files.
 INCLUDE_SOURCE_OS_DIR := $(TOPDIR)/src/$(MODULE)/$(OPENJDK_TARGET_OS)/native/include
-ifeq ($(wildcard $(INCLUDE_SOURCE_OS_DIR)/*), )
-  INCLUDE_SOURCE_OS_DIR := $(TOPDIR)/src/$(MODULE)/$(OPENJDK_TARGET_OS_TYPE)/native/include
-endif
+HEADER_FILE_NAMES_OS := \
+    $(filter %.h, $(call FindFiles, $(INCLUDE_SOURCE_OS_DIR)))
 
-ifneq ($(wildcard $(INCLUDE_SOURCE_OS_DIR)/*), )
+ifneq ($(HEADER_FILE_NAMES_OS), )
   $(eval $(call SetupCopyFiles, COPY_EXPORTED_INCLUDE_OS, \
       SRC := $(INCLUDE_SOURCE_OS_DIR), \
       DEST := $(INCLUDE_TARGET_DIR)/$(OPENJDK_TARGET_OS_INCLUDE_SUBDIR), \
-      FILES := $(filter %.h, $(call FindFiles, $(INCLUDE_SOURCE_OS_DIR))), \
+      FILES := $(HEADER_FILE_NAMES_OS), \
   ))
 
   TARGETS += $(COPY_EXPORTED_INCLUDE_OS)
+endif
+
+# Collect the names of OS-type header files, not overridden by an OS-specific version.
+INCLUDE_SOURCE_OS_TYPE_DIR := $(TOPDIR)/src/$(MODULE)/$(OPENJDK_TARGET_OS_TYPE)/native/include
+HEADER_FILE_NAMES_OS_TYPE := \
+    $(filter-out \
+        $(patsubst \
+            $(INCLUDE_SOURCE_OS_DIR)/%, \
+            $(INCLUDE_SOURCE_OS_TYPE_DIR)/%, \
+            $(HEADER_FILE_NAMES_OS)), \
+        $(filter %.h, $(call FindFiles, $(INCLUDE_SOURCE_OS_TYPE_DIR))))
+
+ifneq ($(HEADER_FILE_NAMES_OS_TYPE), )
+  $(eval $(call SetupCopyFiles, COPY_EXPORTED_INCLUDE_OS_TYPE, \
+      SRC := $(INCLUDE_SOURCE_OS_TYPE_DIR), \
+      DEST := $(INCLUDE_TARGET_DIR)/$(OPENJDK_TARGET_OS_INCLUDE_SUBDIR), \
+      FILES := $(HEADER_FILE_NAMES_OS_TYPE), \
+  ))
+
+  TARGETS += $(COPY_EXPORTED_INCLUDE_OS_TYPE)
 endif
 
 ################################################################################
