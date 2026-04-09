@@ -73,19 +73,34 @@ public class TestLegacyProviders {
             throw new RuntimeException("Incorrect response for get()");
         }
 
+        Set<String> acceptedKeys = Set.of(
+                "Signature.Test",
+                "Signature.Test2",
+                "Signature.Test4",
+                "Signature.Test5",
+                "Provider.id version",          // version from constructor
+                "Provider.id className",        // provider classname from constructor
+                "Provider.id name",             // provider name from constructor
+                "Provider.id info");            // info from constructor
+
         Set<String> acceptedValues = Set.of(
                 "example.class.MyClass",
                 "example.class.MyClass2",
                 "example.class.MyClass4",
                 "example.class.MyClass5",
-                "1",                                                         // version from constructor
-                "jdk.test.lib.LegacyProvider",                               // class name from constructor
-                "LegacyProvider",                                            // provider name from constructor
-                "Test provider");                                            // info from constructor
+                "1",                            // version from constructor
+                "jdk.test.lib.LegacyProvider",  // provider class name from constructor
+                "LegacyProvider",               // provider name from constructor
+                "Test provider");               // info from constructor
 
         // Check entrySet operation.
         Set<Map.Entry<Object, Object>> es = legacyProvider.entrySet();
         for (Map.Entry<Object, Object> entry : es) {
+            Object key = entry.getKey();
+            if (!acceptedKeys.contains(key)) {
+                throw new RuntimeException("Incorrect key returned from entrySet()");
+            }
+
             Object value = entry.getValue();
             if (!acceptedValues.contains(value)) {
                 throw new RuntimeException("Incorrect value returned from entrySet()");
@@ -168,16 +183,6 @@ public class TestLegacyProviders {
         if (response != null) {
             throw new RuntimeException("Incorrect response for computeIfPresent()");
         }
-
-        Set<String> acceptedKeys = Set.of(
-                "Signature.Test",
-                "Signature.Test2",
-                "Signature.Test4",
-                "Signature.Test5",
-                "Provider.id version",                                       // version from constructor
-                "Provider.id className",                                     // provider classname from constructor
-                "Provider.id info",                                          // info from constructor
-                "Provider.id name");                                         // provider name from constructor
 
         // Check keys operation.
         Enumeration<Object> keys = legacyProvider.keys();

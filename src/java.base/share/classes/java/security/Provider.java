@@ -480,26 +480,21 @@ public abstract class Provider extends Properties {
     @Override
     public Collection<Object> values() {
         checkInitialized();
-        Collection<Object> values = super.values();
 
         if (RestrictedSecurity.isEnabled()) {
             Set<Map.Entry<Object, Object>> entrySet = entrySet();
+            Collection<Object> valuesToReturn = new ArrayList<>(entrySet.size());
             for (Map.Entry<Object, Object> entry : entrySet) {
-                Object key = entry.getKey();
-                if (isProviderInfoKey(key)) {
-                    // This is a value pertaining to provider info.
-                    continue;
-                }
-                Service service = createServiceFromKey(key);
-                if ((service != null) && !RestrictedSecurity.isServiceAllowed(service)) {
-                    // We're in restricted security mode which does not allow this service,
-                    // remove it from returned collection.
-                    values.remove(entry.getValue());
+                if (checkRestrictedSecurityKey(entry.getKey())) {
+                    // We're in restricted security mode which allows this service
+                    // or provider info, so add it to list of values to be returned.
+                    valuesToReturn.add(entry.getValue());
                 }
             }
+            return Collections.unmodifiableCollection(valuesToReturn);
         }
 
-        return Collections.unmodifiableCollection(values);
+        return Collections.unmodifiableCollection(super.values());
     }
 
     /**
@@ -745,28 +740,21 @@ public abstract class Provider extends Properties {
     @Override
     public Enumeration<Object> elements() {
         checkInitialized();
-        Enumeration<Object> elements;
 
         if (RestrictedSecurity.isEnabled()) {
-            List<Object> list = new ArrayList<>();
             Set<Map.Entry<Object, Object>> entrySet = entrySet();
+            List<Object> list = new ArrayList<>(entrySet.size());
             for (Map.Entry<Object, Object> entry : entrySet) {
-                Object key = entry.getKey();
-                Service service = createServiceFromKey(key);
-                if ((service == null) || isProviderInfoKey(key)
-                    || RestrictedSecurity.isServiceAllowed(service)
-                ) {
+                if (checkRestrictedSecurityKey(entry.getKey())) {
                     // We're in restricted security mode which allows this service
                     // or provider info, so add it to list to be returned.
                     list.add(entry.getValue());
                 }
             }
-            elements = Collections.enumeration(list);
-        } else {
-            elements = super.elements();
+            return Collections.enumeration(list);
         }
 
-        return elements;
+        return super.elements();
     }
 
     // let javadoc show doc from superclass
@@ -1109,6 +1097,10 @@ public abstract class Provider extends Properties {
         putId();
     }
 
+    /*
+     * Checks whether the key pertains to an entry about
+     * provider information.
+     */
     private static boolean isProviderInfoKey(Object key) {
         if (key instanceof String sk) {
             return providerInfoKeys.contains(sk);
@@ -1116,6 +1108,9 @@ public abstract class Provider extends Properties {
         return false;
     }
 
+    /*
+     * Creates a Service instance based on the provided key.
+     */
     private Service createServiceFromKey(Object key) {
         if (key instanceof String sk) {
             String[] typeAndAlg = getTypeAndAlgorithm(sk);
@@ -1127,6 +1122,24 @@ public abstract class Provider extends Properties {
         }
 
         return null;
+    }
+
+    /*
+     * Checks if the provided key is one of the following:
+     *  - One that cannot be used to create a service
+     *  - Pertaining to information about the provider
+     *  - Corresponding to a service that is allowed
+     *    by the active RestrictedSecurity profile
+     *
+     * In any of this cases, the method returns true,
+     * indicating that the key and associated value can
+     * be returned.
+     */
+    private boolean checkRestrictedSecurityKey(Object key) {
+        Service service = createServiceFromKey(key);
+        return (service == null)
+                || isProviderInfoKey(key)
+                || RestrictedSecurity.isServiceAllowed(service);
     }
 
     // used as key in the serviceMap and legacyMap HashMaps
