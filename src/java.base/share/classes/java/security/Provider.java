@@ -754,7 +754,8 @@ public abstract class Provider extends Properties {
                 Object key = entry.getKey();
                 Service service = createServiceFromKey(key);
                 if ((service == null) || isProviderInfoKey(key)
-                        || RestrictedSecurity.isServiceAllowed(service)) {
+                    || RestrictedSecurity.isServiceAllowed(service)
+                ) {
                     // We're in restricted security mode which allows this service
                     // or provider info, so add it to list to be returned.
                     list.add(entry.getValue());
