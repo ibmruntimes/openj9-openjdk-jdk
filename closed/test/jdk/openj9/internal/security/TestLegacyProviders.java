@@ -73,71 +73,39 @@ public class TestLegacyProviders {
             throw new RuntimeException("Incorrect response for get()");
         }
 
-        String[] acceptedValues = {"example.class.MyClass",
-                                   "example.class.MyClass2",
-                                   "example.class.MyClass4",
-                                   "example.class.MyClass5"};
+        Set<String> acceptedValues = Set.of(
+                "example.class.MyClass",
+                "example.class.MyClass2",
+                "example.class.MyClass4",
+                "example.class.MyClass5",
+                "1",                                                         // version from constructor
+                "jdk.test.lib.LegacyProvider",                               // class name from constructor
+                "LegacyProvider",                                            // provider name from constructor
+                "Test provider");                                            // info from constructor
 
         // Check entrySet operation.
         Set<Map.Entry<Object, Object>> es = legacyProvider.entrySet();
         for (Map.Entry<Object, Object> entry : es) {
-            String stringValue = (String) entry.getValue();
-            boolean found = false;
-            for (String acceptedValue : acceptedValues) {
-                if (stringValue.equals(acceptedValue)
-                    || "1".equals(stringValue)                                      // Version from constructor
-                    || "jdk.test.lib.LegacyProvider".equals(stringValue)            // Classname from constructor
-                    || "LegacyProvider".equals(stringValue)                         // Provider name from constructor
-                    || "Test provider".equals(stringValue)                          // Info from constructor
-                ) {
-                    found = true;
-                    break;
-                }
-            }
-            if (!found) {
-                throw new RuntimeException("Incorrect values returned from entrySet()");
+            Object value = entry.getValue();
+            if (!acceptedValues.contains(value)) {
+                throw new RuntimeException("Incorrect value returned from entrySet()");
             }
         }
 
         // Check values operation.
         Collection<Object> values = legacyProvider.values();
         for (Object value : values) {
-            String stringValue = (String) value;
-            boolean found = false;
-            for (String acceptedValue : acceptedValues) {
-                if (stringValue.equals(acceptedValue)
-                    || "1".equals(stringValue)                                      // Version from constructor
-                    || "jdk.test.lib.LegacyProvider".equals(stringValue)            // Classname from constructor
-                    || "LegacyProvider".equals(stringValue)                         // Provider name from constructor
-                    || "Test provider".equals(stringValue)                          // Info from constructor
-                ) {
-                    found = true;
-                    break;
-                }
-            }
-            if (!found) {
-                throw new RuntimeException("Incorrect values returned from values()");
+            if (!acceptedValues.contains(value)) {
+                throw new RuntimeException("Incorrect value returned from values()");
             }
         }
 
         // Check elements operation.
         Enumeration<Object> elements = legacyProvider.elements();
         while (elements.hasMoreElements()) {
-            String stringElement = (String) elements.nextElement();
-            boolean found = false;
-            for (String acceptedValue : acceptedValues) {
-                if (stringElement.equals(acceptedValue)
-                    || "1".equals(stringElement)                                    // Version from constructor
-                    || "jdk.test.lib.LegacyProvider".equals(stringElement)          // Classname from constructor
-                    || "LegacyProvider".equals(stringElement)                       // Provider name from constructor
-                    || "Test provider".equals(stringElement)                        // Info from constructor
-                ) {
-                    found = true;
-                    break;
-                }
-            }
-            if (!found) {
-                throw new RuntimeException("Incorrect values returned from elements()");
+            Object value = elements.nextElement();
+            if (!acceptedValues.contains(value)) {
+                throw new RuntimeException("Incorrect value returned from elements()");
             }
         }
 
@@ -201,29 +169,22 @@ public class TestLegacyProviders {
             throw new RuntimeException("Incorrect response for computeIfPresent()");
         }
 
-        String[] acceptedKeys = {"Signature.Test",
-                                 "Signature.Test2",
-                                 "Signature.Test4",
-                                 "Signature.Test5"};
+        Set<String> acceptedKeys = Set.of(
+                "Signature.Test",
+                "Signature.Test2",
+                "Signature.Test4",
+                "Signature.Test5",
+                "Provider.id version",                                       // version from constructor
+                "Provider.id className",                                     // provider classname from constructor
+                "Provider.id info",                                          // info from constructor
+                "Provider.id name");                                         // provider name from constructor
 
         // Check keys operation.
         Enumeration<Object> keys = legacyProvider.keys();
         while (keys.hasMoreElements()) {
-            String stringKey = (String) keys.nextElement();
-            boolean found = false;
-            for (String acceptedKey : acceptedKeys) {
-                if (stringKey.equals(acceptedKey)
-                    || "Provider.id version".equals(stringKey)      // Version from constructor
-                    || "Provider.id className".equals(stringKey)    // Provider classname from constructor
-                    || "Provider.id info".equals(stringKey)         // Info from constructor
-                    || "Provider.id name".equals(stringKey)         // Provider name from constructor
-                ) {
-                    found = true;
-                    break;
-                }
-            }
-            if (!found) {
-                throw new RuntimeException("Incorrect values returned from keys()");
+            Object key = keys.nextElement();
+            if (!acceptedKeys.contains(key)) {
+                throw new RuntimeException("Incorrect value returned from keys()");
             }
         }
     }
@@ -240,7 +201,6 @@ public class TestLegacyProviders {
     }
 
     public static void main(String[] args) throws Exception {
-        Security.getProviders();
         Security.addProvider(new LegacyProvider());
         legacyProvider = Security.getProvider("LegacyProvider");
         useLegacyPaths();

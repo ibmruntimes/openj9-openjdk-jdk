@@ -46,6 +46,5 @@ public class LegacyProvider extends Provider {
         replace("Signature.Test3", "example.class.MyClass3", "example.class.MyClass3New");
 
         merge("Signature.Test5", "example.class.MyClass5", (a, b) -> b);
-
     }
 }

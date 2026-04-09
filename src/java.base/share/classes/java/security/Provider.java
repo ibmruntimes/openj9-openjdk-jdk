@@ -162,11 +162,11 @@ public abstract class Provider extends Properties {
 
     private static final Object[] EMPTY = new Object[0];
 
-    private static final List<String> providerInfoKeys = new ArrayList<>(Arrays.asList(
-                                                                    "Provider.id name",
-                                                                    "Provider.id version",
-                                                                    "Provider.id info",
-                                                                    "Provider.id className"));
+    private static final Set<String> providerInfoKeys = Set.of(
+            "Provider.id name",
+            "Provider.id version",
+            "Provider.id info",
+            "Provider.id className");
 
     private static double parseVersionStr(String s) {
         try {
@@ -485,11 +485,12 @@ public abstract class Provider extends Properties {
         if (RestrictedSecurity.isEnabled()) {
             Set<Map.Entry<Object, Object>> entrySet = entrySet();
             for (Map.Entry<Object, Object> entry : entrySet) {
-                if (isProviderInfoKey(entry.getKey())) {
+                Object key = entry.getKey();
+                if (isProviderInfoKey(key)) {
                     // This is a value pertaining to provider info.
                     continue;
                 }
-                Service service = createServiceFromKey(entry.getKey());
+                Service service = createServiceFromKey(key);
                 if ((service != null) && !RestrictedSecurity.isServiceAllowed(service)) {
                     // We're in restricted security mode which does not allow this service,
                     // remove it from returned collection.
@@ -750,8 +751,9 @@ public abstract class Provider extends Properties {
             List<Object> list = new ArrayList<>();
             Set<Map.Entry<Object, Object>> entrySet = entrySet();
             for (Map.Entry<Object, Object> entry : entrySet) {
-                Service service = createServiceFromKey(entry.getKey());
-                if ((service == null) || isProviderInfoKey(entry.getKey())
+                Object key = entry.getKey();
+                Service service = createServiceFromKey(key);
+                if ((service == null) || isProviderInfoKey(key)
                         || RestrictedSecurity.isServiceAllowed(service)) {
                     // We're in restricted security mode which allows this service
                     // or provider info, so add it to list to be returned.
