@@ -1109,7 +1109,7 @@ public abstract class Provider extends Properties {
     }
 
     /*
-     * Creates a Service instance based on the provided key.
+     * Creates a service instance based on the provided key.
      */
     private Service createServiceFromKey(Object key) {
         if (key instanceof String sk) {
@@ -1126,10 +1126,9 @@ public abstract class Provider extends Properties {
 
     /*
      * Checks if the provided key is one of the following:
-     *  - One that cannot be used to create a service
-     *  - Pertaining to information about the provider
-     *  - Corresponding to a service that is allowed
-     *    by the active RestrictedSecurity profile
+     *  - one that cannot be used to create a service
+     *  - pertains to information about the provider
+     *  - corresponds to a service that is allowed
      *
      * In any of this cases, the method returns true,
      * indicating that the key and associated value can

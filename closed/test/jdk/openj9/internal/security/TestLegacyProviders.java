@@ -79,7 +79,7 @@ public class TestLegacyProviders {
                 "Signature.Test4",
                 "Signature.Test5",
                 "Provider.id version",          // version from constructor
-                "Provider.id className",        // provider classname from constructor
+                "Provider.id className",        // provider class name from constructor
                 "Provider.id name",             // provider name from constructor
                 "Provider.id info");            // info from constructor
 
