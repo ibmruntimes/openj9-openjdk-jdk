@@ -437,22 +437,16 @@ public abstract class Provider extends Properties {
         if (RestrictedSecurity.isEnabled()) {
             Set<Map.Entry<Object, Object>> toRemove = new HashSet<>();
             for (Map.Entry<Object, Object> entry : entrySet) {
-                Object key = entry.getKey();
-                if (isProviderInfoKey(key)) {
-                    // This is a value pertaining to provider info.
-                    continue;
-                }
-                Service service = createServiceFromKey(key);
-                if ((service != null) && !RestrictedSecurity.isServiceAllowed(service)) {
-                    // We're in restricted security mode which does not allow this service,
-                    // mark it to be removed from returned set.
+                if (!checkRestrictedSecurityKey(entry.getKey())) {
+                    // We're in restricted security mode which  disallows this service,
+                    // so add it to list of values to be removed from the entrySet.
                     toRemove.add(entry);
                 }
             }
             if (!toRemove.isEmpty()) {
                 Set<Map.Entry<Object, Object>> modifiableSet = new HashSet<>(entrySet);
                 modifiableSet.removeAll(toRemove);
-                entrySet = Collections.unmodifiableSet(modifiableSet);
+                return Collections.unmodifiableSet(modifiableSet);
             }
         }
 
