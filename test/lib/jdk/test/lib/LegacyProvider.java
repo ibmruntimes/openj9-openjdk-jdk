@@ -22,14 +22,14 @@
  * ===========================================================================
  */
 
-/**
- * A provider created to test the restriction of legacy paths through
- * the RestrictedSecurity mode.
- */
 package jdk.test.lib;
 
 import java.security.Provider;
 
+/**
+ * A provider created to test the restriction of legacy paths through
+ * the RestrictedSecurity mode.
+ */
 public class LegacyProvider extends Provider {
     public LegacyProvider() {
         super("LegacyProvider", "1", "Test provider");
