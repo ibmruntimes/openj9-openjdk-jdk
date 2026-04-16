@@ -1,5 +1,5 @@
 # ===========================================================================
-# (c) Copyright IBM Corp. 2022, 2023 All Rights Reserved
+# (c) Copyright IBM Corp. 2022, 2026 All Rights Reserved
 # ===========================================================================
 # This code is free software; you can redistribute it and/or modify it
 # under the terms of the GNU General Public License version 2 only, as
@@ -150,6 +150,7 @@ security/infra/java/security/cert/CertPathValidator/certification/HaricaCA.java 
 security/infra/java/security/cert/CertPathValidator/certification/LetsEncryptCA.java https://github.com/ibmruntimes/openj9-openjdk-jdk17/issues/116 linux-x64,linux-ppc64le,linux-s390x
 security/infra/java/security/cert/CertPathValidator/certification/SSLCA.java https://github.com/ibmruntimes/openj9-openjdk-jdk17/issues/116 linux-x64,linux-ppc64le,linux-s390x
 security/infra/java/security/cert/CertPathValidator/certification/TeliaSoneraCA.java https://github.com/ibmruntimes/openj9-openjdk-jdk17/issues/116 linux-x64,linux-ppc64le,linux-s390x
+sun/rmi/runtime/Log/6409194/NoConsoleOutput.java https://github.com/eclipse-openj9/openj9/issues/23655 linux-ppc64le,linux-s390x,linux-x64
 sun/security/ssl/SSLSessionImpl/NoInvalidateSocketException.java https://github.com/ibmruntimes/openj9-openjdk-jdk17/issues/116 linux-x64,linux-ppc64le,linux-s390x
 sun/security/ssl/SSLSocketImpl/SSLSocketSSLEngineCloseInbound.java https://github.com/ibmruntimes/openj9-openjdk-jdk17/issues/116 linux-x64,linux-ppc64le,linux-s390x
 
