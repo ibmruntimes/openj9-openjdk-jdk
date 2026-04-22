@@ -22,6 +22,12 @@
  */
 
 /*
+ * ===========================================================================
+ * (c) Copyright IBM Corp. 2026, 2026 All Rights Reserved
+ * ===========================================================================
+ */
+
+/*
  * @test
  * @bug 8322818
  * @summary Stress test Thread.getStackTrace on a virtual thread that is pinned
@@ -56,8 +62,8 @@ public class GetStackTraceALotWhenPinned {
 
         int iterations;
         int value = Integer.parseInt(args[0]);
-        if (Platform.isOSX()) {
-            // reduced iterations on macosx
+        if (Platform.isOSX() || Platform.isWindows() || (Platform.isLinux() && Platform.isS390x())) {
+            // reduced iterations on macosx, windows, and zlinux
             iterations = Math.max(value / 4, 1);
         } else {
             iterations = value;
