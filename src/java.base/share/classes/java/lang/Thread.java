@@ -25,7 +25,7 @@
 
 /*
  * ===========================================================================
- * (c) Copyright IBM Corp. 2021, 2025 All Rights Reserved
+ * (c) Copyright IBM Corp. 2021, 2026 All Rights Reserved
  * ===========================================================================
  */
 
@@ -2255,7 +2255,7 @@ public class Thread implements Runnable {
             if (!isAlive()) {
                 return EMPTY_STACK_TRACE;
             }
-            StackTraceElement[] stackTrace = getStackTrace0();
+            StackTraceElement[] stackTrace = asyncGetStackTrace();
             if (stackTrace != null) {
                 return StackTraceElement.finishInit(stackTrace);
             }
@@ -2278,6 +2278,26 @@ public class Thread implements Runnable {
     }
 
     private native Throwable getStackTraceImpl();
+
+    /**
+     * Returns an array of stack trace elements representing the stack dump of
+     * this thread. Returns null if the stack trace cannot be obtained. In
+     * the default implementation, null is returned if the thread is a virtual
+     * thread that is not mounted or the thread is a platform thread that has
+     * terminated.
+     */
+    StackTraceElement[] asyncGetStackTrace() {
+        Object stackTrace = getStackTrace0();
+        if (stackTrace == null) {
+            return null;
+        }
+        StackTraceElement[] stes = (StackTraceElement[]) stackTrace;
+        if (stes.length == 0) {
+            return null;
+        } else {
+            return StackTraceElement.finishInit(stes);
+        }
+    }
 
     /**
      * Returns a map of stack traces for all live platform threads. The map
