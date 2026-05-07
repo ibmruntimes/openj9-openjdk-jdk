@@ -280,89 +280,6 @@ javax/xml/crypto/dsig/ValidationTests.java https://github.com/ibmruntimes/openj9
 # Related to SunJCE or SunRsaSign, no such provider: SunJCE or no such provider: SunRsaSign
 com/sun/crypto/provider/CICO/CICODESFuncTest.java https://github.com/ibmruntimes/openj9-openjdk-jdk17/issues/116 linux-ppc64le,linux-s390x,linux-x64
 com/sun/crypto/provider/CICO/PBEFunc/CICOPBEFuncTest.java https://github.com/ibmruntimes/openj9-openjdk-jdk17/issues/116 linux-ppc64le,linux-s390x,linux-x64
-com/sun/crypto/provider/Cipher/AEAD/Encrypt.java https://github.com/ibmruntimes/openj9-openjdk-jdk17/issues/116 linux-ppc64le,linux-s390x,linux-x64
-com/sun/crypto/provider/Cipher/AEAD/GCMLargeDataKAT.java https://github.com/ibmruntimes/openj9-openjdk-jdk17/issues/116 linux-ppc64le,linux-s390x,linux-x64
-com/sun/crypto/provider/Cipher/AEAD/GCMParameterSpecTest.java https://github.com/ibmruntimes/openj9-openjdk-jdk17/issues/116 linux-ppc64le,linux-s390x,linux-x64
-com/sun/crypto/provider/Cipher/AEAD/KeyWrapper.java https://github.com/ibmruntimes/openj9-openjdk-jdk17/issues/116 linux-ppc64le,linux-s390x,linux-x64
-com/sun/crypto/provider/Cipher/AEAD/ReadWriteSkip.java https://github.com/ibmruntimes/openj9-openjdk-jdk17/issues/116 linux-ppc64le,linux-s390x,linux-x64
-com/sun/crypto/provider/Cipher/AEAD/SameBuffer.java https://github.com/ibmruntimes/openj9-openjdk-jdk17/issues/116 linux-ppc64le,linux-s390x,linux-x64
-com/sun/crypto/provider/Cipher/AEAD/SealedObjectTest.java https://github.com/ibmruntimes/openj9-openjdk-jdk17/issues/116 linux-ppc64le,linux-s390x,linux-x64
-com/sun/crypto/provider/Cipher/AEAD/WrongAAD.java https://github.com/ibmruntimes/openj9-openjdk-jdk17/issues/116 linux-ppc64le,linux-s390x,linux-x64
-com/sun/crypto/provider/Cipher/AES/CICO.java https://github.com/ibmruntimes/openj9-openjdk-jdk17/issues/116 linux-ppc64le,linux-s390x,linux-x64
-com/sun/crypto/provider/Cipher/AES/CTR.java https://github.com/ibmruntimes/openj9-openjdk-jdk17/issues/116 linux-ppc64le,linux-s390x,linux-x64
-com/sun/crypto/provider/Cipher/AES/Padding.java https://github.com/ibmruntimes/openj9-openjdk-jdk17/issues/116 linux-ppc64le,linux-s390x,linux-x64
-com/sun/crypto/provider/Cipher/AES/Test4511676.java https://github.com/ibmruntimes/openj9-openjdk-jdk17/issues/116 linux-ppc64le,linux-s390x,linux-x64
-com/sun/crypto/provider/Cipher/AES/Test4512524.java https://github.com/ibmruntimes/openj9-openjdk-jdk17/issues/116 linux-ppc64le,linux-s390x,linux-x64
-com/sun/crypto/provider/Cipher/AES/Test4512704.java https://github.com/ibmruntimes/openj9-openjdk-jdk17/issues/116 linux-ppc64le,linux-s390x,linux-x64
-com/sun/crypto/provider/Cipher/AES/Test4513830.java https://github.com/ibmruntimes/openj9-openjdk-jdk17/issues/116 linux-ppc64le,linux-s390x,linux-x64
-com/sun/crypto/provider/Cipher/AES/Test4517355.java https://github.com/ibmruntimes/openj9-openjdk-jdk17/issues/116 linux-ppc64le,linux-s390x,linux-x64
-com/sun/crypto/provider/Cipher/AES/Test4626070.java https://github.com/ibmruntimes/openj9-openjdk-jdk17/issues/116 linux-ppc64le,linux-s390x,linux-x64
-com/sun/crypto/provider/Cipher/AES/TestAESCipher.java https://github.com/ibmruntimes/openj9-openjdk-jdk17/issues/116 linux-ppc64le,linux-s390x,linux-x64
-com/sun/crypto/provider/Cipher/AES/TestAESCiphers/TestAESWithDefaultProvider.java https://github.com/ibmruntimes/openj9-openjdk-jdk17/issues/116 linux-ppc64le,linux-s390x,linux-x64
-com/sun/crypto/provider/Cipher/AES/TestAESCiphers/TestAESWithRemoveAddProvider.java https://github.com/ibmruntimes/openj9-openjdk-jdk17/issues/116 linux-ppc64le,linux-s390x,linux-x64
-com/sun/crypto/provider/Cipher/AES/TestCICOWithGCM.java https://github.com/ibmruntimes/openj9-openjdk-jdk17/issues/116 linux-ppc64le,linux-s390x,linux-x64
-com/sun/crypto/provider/Cipher/AES/TestCICOWithGCMAndAAD.java https://github.com/ibmruntimes/openj9-openjdk-jdk17/issues/116 linux-ppc64le,linux-s390x,linux-x64
-com/sun/crypto/provider/Cipher/AES/TestCopySafe.java https://github.com/ibmruntimes/openj9-openjdk-jdk17/issues/116 linux-ppc64le,linux-s390x,linux-x64
-com/sun/crypto/provider/Cipher/AES/TestGCMKeyAndIvCheck.java https://github.com/ibmruntimes/openj9-openjdk-jdk17/issues/116 linux-ppc64le,linux-s390x,linux-x64
-com/sun/crypto/provider/Cipher/AES/TestISO10126Padding.java https://github.com/ibmruntimes/openj9-openjdk-jdk17/issues/116 linux-ppc64le,linux-s390x,linux-x64
-com/sun/crypto/provider/Cipher/AES/TestKATForECB_IV.java https://github.com/ibmruntimes/openj9-openjdk-jdk17/issues/116 linux-ppc64le,linux-s390x,linux-x64
-com/sun/crypto/provider/Cipher/AES/TestKATForECB_VK.java https://github.com/ibmruntimes/openj9-openjdk-jdk17/issues/116 linux-ppc64le,linux-s390x,linux-x64
-com/sun/crypto/provider/Cipher/AES/TestKATForECB_VT.java https://github.com/ibmruntimes/openj9-openjdk-jdk17/issues/116 linux-ppc64le,linux-s390x,linux-x64
-com/sun/crypto/provider/Cipher/AES/TestKATForGCM.java https://github.com/ibmruntimes/openj9-openjdk-jdk17/issues/116 linux-ppc64le,linux-s390x,linux-x64
-com/sun/crypto/provider/Cipher/AES/TestNonexpanding.java https://github.com/ibmruntimes/openj9-openjdk-jdk17/issues/116 linux-ppc64le,linux-s390x,linux-x64
-com/sun/crypto/provider/Cipher/AES/TestNoPaddingModes.java https://github.com/ibmruntimes/openj9-openjdk-jdk17/issues/116 linux-ppc64le,linux-s390x,linux-x64
-com/sun/crypto/provider/Cipher/AES/TestSameBuffer.java https://github.com/ibmruntimes/openj9-openjdk-jdk17/issues/116 linux-ppc64le,linux-s390x,linux-x64
-com/sun/crypto/provider/Cipher/AES/TestShortBuffer.java https://github.com/ibmruntimes/openj9-openjdk-jdk17/issues/116 linux-ppc64le,linux-s390x,linux-x64
-com/sun/crypto/provider/Cipher/Blowfish/BlowfishTestVector.java https://github.com/ibmruntimes/openj9-openjdk-jdk17/issues/116 linux-ppc64le,linux-s390x,linux-x64
-com/sun/crypto/provider/Cipher/Blowfish/TestCipherBlowfish.java https://github.com/ibmruntimes/openj9-openjdk-jdk17/issues/116 linux-ppc64le,linux-s390x,linux-x64
-com/sun/crypto/provider/Cipher/CTR/CounterMode.java https://github.com/ibmruntimes/openj9-openjdk-jdk17/issues/116 linux-ppc64le,linux-s390x,linux-x64
-com/sun/crypto/provider/Cipher/CTS/CTSMode.java https://github.com/ibmruntimes/openj9-openjdk-jdk17/issues/116 linux-ppc64le,linux-s390x,linux-x64
-com/sun/crypto/provider/Cipher/DES/DesAPITest.java https://github.com/ibmruntimes/openj9-openjdk-jdk17/issues/116 linux-ppc64le,linux-s390x,linux-x64
-com/sun/crypto/provider/Cipher/DES/DESKeyCleanupTest.java https://github.com/ibmruntimes/openj9-openjdk-jdk17/issues/116 linux-ppc64le,linux-s390x,linux-x64
-com/sun/crypto/provider/Cipher/DES/DESSecretKeySpec.java https://github.com/ibmruntimes/openj9-openjdk-jdk17/issues/116 linux-ppc64le,linux-s390x,linux-x64
-com/sun/crypto/provider/Cipher/DES/DoFinalReturnLen.java https://github.com/ibmruntimes/openj9-openjdk-jdk17/issues/116 linux-ppc64le,linux-s390x,linux-x64
-com/sun/crypto/provider/Cipher/DES/FlushBug.java https://github.com/ibmruntimes/openj9-openjdk-jdk17/issues/116 linux-ppc64le,linux-s390x,linux-x64
-com/sun/crypto/provider/Cipher/DES/KeyWrapping.java https://github.com/ibmruntimes/openj9-openjdk-jdk17/issues/116 linux-ppc64le,linux-s390x,linux-x64
-com/sun/crypto/provider/Cipher/DES/PaddingTest.java https://github.com/ibmruntimes/openj9-openjdk-jdk17/issues/116 linux-ppc64le,linux-s390x,linux-x64
-com/sun/crypto/provider/Cipher/DES/Sealtest.java https://github.com/ibmruntimes/openj9-openjdk-jdk17/issues/116 linux-ppc64le,linux-s390x,linux-x64
-com/sun/crypto/provider/Cipher/DES/TestCipherDES.java https://github.com/ibmruntimes/openj9-openjdk-jdk17/issues/116 linux-ppc64le,linux-s390x,linux-x64
-com/sun/crypto/provider/Cipher/DES/TestCipherDESede.java https://github.com/ibmruntimes/openj9-openjdk-jdk17/issues/116 linux-ppc64le,linux-s390x,linux-x64
-com/sun/crypto/provider/Cipher/DES/TextPKCS5PaddingTest.java https://github.com/ibmruntimes/openj9-openjdk-jdk17/issues/116 linux-ppc64le,linux-s390x,linux-x64
-com/sun/crypto/provider/Cipher/KeyWrap/NISTWrapKAT.java https://github.com/ibmruntimes/openj9-openjdk-jdk17/issues/116 linux-ppc64le,linux-s390x,linux-x64
-com/sun/crypto/provider/Cipher/KeyWrap/TestCipherKeyWrapperTest.java https://github.com/ibmruntimes/openj9-openjdk-jdk17/issues/116 linux-ppc64le,linux-s390x,linux-x64
-com/sun/crypto/provider/Cipher/KeyWrap/TestGeneral.java https://github.com/ibmruntimes/openj9-openjdk-jdk17/issues/116 linux-ppc64le,linux-s390x,linux-x64
-com/sun/crypto/provider/Cipher/KeyWrap/TestKeySizeCheck.java https://github.com/ibmruntimes/openj9-openjdk-jdk17/issues/116 linux-ppc64le,linux-s390x,linux-x64
-com/sun/crypto/provider/Cipher/KeyWrap/XMLEncKAT.java https://github.com/ibmruntimes/openj9-openjdk-jdk17/issues/116 linux-ppc64le,linux-s390x,linux-x64
-com/sun/crypto/provider/Cipher/PBE/CheckPBEKeySize.java https://github.com/ibmruntimes/openj9-openjdk-jdk17/issues/116 linux-ppc64le,linux-s390x,linux-x64
-com/sun/crypto/provider/Cipher/PBE/DecryptWithoutParameters.java https://github.com/ibmruntimes/openj9-openjdk-jdk17/issues/116 linux-ppc64le,linux-s390x,linux-x64
-com/sun/crypto/provider/Cipher/PBE/NegativeLength.java https://github.com/ibmruntimes/openj9-openjdk-jdk17/issues/116 linux-ppc64le,linux-s390x,linux-x64
-com/sun/crypto/provider/Cipher/PBE/PBEInvalidParamsTest.java https://github.com/ibmruntimes/openj9-openjdk-jdk17/issues/116 linux-ppc64le,linux-s390x,linux-x64
-com/sun/crypto/provider/Cipher/PBE/PBEKeyCleanupTest.java https://github.com/ibmruntimes/openj9-openjdk-jdk17/issues/116 linux-ppc64le,linux-s390x,linux-x64
-com/sun/crypto/provider/Cipher/PBE/PBEKeysAlgorithmNames.java https://github.com/ibmruntimes/openj9-openjdk-jdk17/issues/116 linux-ppc64le,linux-s390x,linux-x64
-com/sun/crypto/provider/Cipher/PBE/PBEKeyTest.java https://github.com/ibmruntimes/openj9-openjdk-jdk17/issues/116 linux-ppc64le,linux-s390x,linux-x64
-com/sun/crypto/provider/Cipher/PBE/PBEParametersTest.java https://github.com/ibmruntimes/openj9-openjdk-jdk17/issues/116 linux-ppc64le,linux-s390x,linux-x64
-com/sun/crypto/provider/Cipher/PBE/PBES2Test.java https://github.com/ibmruntimes/openj9-openjdk-jdk17/issues/116 linux-ppc64le,linux-s390x,linux-x64
-com/sun/crypto/provider/Cipher/PBE/PBESameBuffer/PBESameBuffer.java https://github.com/ibmruntimes/openj9-openjdk-jdk17/issues/116 linux-ppc64le,linux-s390x,linux-x64
-com/sun/crypto/provider/Cipher/PBE/PBESealedObject.java https://github.com/ibmruntimes/openj9-openjdk-jdk17/issues/116 linux-ppc64le,linux-s390x,linux-x64
-com/sun/crypto/provider/Cipher/PBE/PBKDF2Translate.java https://github.com/ibmruntimes/openj9-openjdk-jdk17/issues/116 linux-ppc64le,linux-s390x,linux-x64
-com/sun/crypto/provider/Cipher/PBE/PBMacBuffer.java https://github.com/ibmruntimes/openj9-openjdk-jdk17/issues/116 linux-ppc64le,linux-s390x,linux-x64
-com/sun/crypto/provider/Cipher/PBE/PBMacDoFinalVsUpdate.java https://github.com/ibmruntimes/openj9-openjdk-jdk17/issues/116 linux-ppc64le,linux-s390x,linux-x64
-com/sun/crypto/provider/Cipher/PBE/PKCS12Cipher.java https://github.com/ibmruntimes/openj9-openjdk-jdk17/issues/116 linux-ppc64le,linux-s390x,linux-x64
-com/sun/crypto/provider/Cipher/PBE/PKCS12CipherKAT.java https://github.com/ibmruntimes/openj9-openjdk-jdk17/issues/116 linux-ppc64le,linux-s390x,linux-x64
-com/sun/crypto/provider/Cipher/PBE/PKCS12Oid.java https://github.com/ibmruntimes/openj9-openjdk-jdk17/issues/116 linux-ppc64le,linux-s390x,linux-x64
-com/sun/crypto/provider/Cipher/PBE/TestCipherKeyWrapperPBEKey.java https://github.com/ibmruntimes/openj9-openjdk-jdk17/issues/116 linux-ppc64le,linux-s390x,linux-x64
-com/sun/crypto/provider/Cipher/PBE/TestCipherPBE.java https://github.com/ibmruntimes/openj9-openjdk-jdk17/issues/116 linux-ppc64le,linux-s390x,linux-x64
-com/sun/crypto/provider/Cipher/PBE/TestCipherPBECons.java https://github.com/ibmruntimes/openj9-openjdk-jdk17/issues/116 linux-ppc64le,linux-s390x,linux-x64
-com/sun/crypto/provider/Cipher/RC2ArcFour/CipherKAT.java https://github.com/ibmruntimes/openj9-openjdk-jdk17/issues/116 linux-ppc64le,linux-s390x,linux-x64
-com/sun/crypto/provider/Cipher/RSA/TestOAEP.java https://github.com/ibmruntimes/openj9-openjdk-jdk17/issues/116 linux-ppc64le,linux-s390x,linux-x64
-com/sun/crypto/provider/Cipher/RSA/TestOAEP_KAT.java https://github.com/ibmruntimes/openj9-openjdk-jdk17/issues/116 linux-ppc64le,linux-s390x,linux-x64
-com/sun/crypto/provider/Cipher/RSA/TestOAEPPadding.java https://github.com/ibmruntimes/openj9-openjdk-jdk17/issues/116 linux-ppc64le,linux-s390x,linux-x64
-com/sun/crypto/provider/Cipher/RSA/TestOAEPParameterSpec.java https://github.com/ibmruntimes/openj9-openjdk-jdk17/issues/116 linux-ppc64le,linux-s390x,linux-x64
-com/sun/crypto/provider/Cipher/RSA/TestOAEPWithParams.java https://github.com/ibmruntimes/openj9-openjdk-jdk17/issues/116 linux-ppc64le,linux-s390x,linux-x64
-com/sun/crypto/provider/Cipher/RSA/TestRSA.java https://github.com/ibmruntimes/openj9-openjdk-jdk17/issues/116 linux-ppc64le,linux-s390x,linux-x64
-com/sun/crypto/provider/Cipher/TextLength/SameBufferOverwrite.java https://github.com/ibmruntimes/openj9-openjdk-jdk17/issues/116 linux-ppc64le,linux-s390x,linux-x64
-com/sun/crypto/provider/Cipher/UTIL/StrongOrUnlimited.java https://github.com/ibmruntimes/openj9-openjdk-jdk17/issues/116 linux-ppc64le,linux-s390x,linux-x64
-com/sun/crypto/provider/Cipher/UTIL/SunJCEGetInstance.java https://github.com/ibmruntimes/openj9-openjdk-jdk17/issues/116 linux-ppc64le,linux-s390x,linux-x64
 com/sun/crypto/provider/KeyAgreement/DHGenSharedSecret.java https://github.com/ibmruntimes/openj9-openjdk-jdk17/issues/116 linux-ppc64le,linux-s390x,linux-x64
 com/sun/crypto/provider/KeyAgreement/DHKeyAgreement2.java https://github.com/ibmruntimes/openj9-openjdk-jdk17/issues/116 linux-ppc64le,linux-s390x,linux-x64
 com/sun/crypto/provider/KeyAgreement/DHKeyAgreement3.java https://github.com/ibmruntimes/openj9-openjdk-jdk17/issues/116 linux-ppc64le,linux-s390x,linux-x64
@@ -432,20 +349,11 @@ javax/crypto/SecretKeyFactory/SecKFTranslateTest.java https://github.com/ibmrunt
 javax/crypto/spec/DESKeySpec/CheckParity.java https://github.com/ibmruntimes/openj9-openjdk-jdk17/issues/116 linux-ppc64le,linux-s390x,linux-x64
 javax/crypto/spec/RC2ParameterSpec/RC2AlgorithmParameters.java https://github.com/ibmruntimes/openj9-openjdk-jdk17/issues/116 linux-ppc64le,linux-s390x,linux-x64
 
-# CHACHA20 related
-com/sun/crypto/provider/Cipher/ChaCha20/ChaCha20KAT.java https://github.com/ibmruntimes/openj9-openjdk-jdk17/issues/116 linux-ppc64le,linux-s390x,linux-x64
-com/sun/crypto/provider/Cipher/ChaCha20/ChaCha20KeyGeneratorTest.java https://github.com/ibmruntimes/openj9-openjdk-jdk17/issues/116 linux-ppc64le,linux-s390x,linux-x64
-com/sun/crypto/provider/Cipher/ChaCha20/ChaCha20NoReuse.java https://github.com/ibmruntimes/openj9-openjdk-jdk17/issues/116 linux-ppc64le,linux-s390x,linux-x64
-com/sun/crypto/provider/Cipher/ChaCha20/ChaCha20Poly1305ParamTest.java https://github.com/ibmruntimes/openj9-openjdk-jdk17/issues/116 linux-ppc64le,linux-s390x,linux-x64
-com/sun/crypto/provider/Cipher/ChaCha20/OutputSizeTest.java https://github.com/ibmruntimes/openj9-openjdk-jdk17/issues/116 linux-ppc64le,linux-s390x,linux-x64
-com/sun/crypto/provider/Cipher/ChaCha20/unittest/ChaCha20CipherUnitTest.java https://github.com/ibmruntimes/openj9-openjdk-jdk17/issues/116 linux-ppc64le,linux-s390x,linux-x64
-
 # java.security.NoSuchAlgorithmException: Cannot find any provider supporting Blowfish
 javax/crypto/Cipher/Turkish.java https://github.com/ibmruntimes/openj9-openjdk-jdk17/issues/116 linux-ppc64le,linux-s390x,linux-x64
 
 # Generated DES key, java.lang.NullPointerException. Or for DES/DESede ciphers
 com/sun/crypto/provider/CICO/CICOSkipTest.java https://github.com/ibmruntimes/openj9-openjdk-jdk17/issues/116 linux-ppc64le,linux-s390x,linux-x64
-com/sun/crypto/provider/Cipher/TextLength/TestCipherTextLength.java https://github.com/ibmruntimes/openj9-openjdk-jdk17/issues/116 linux-ppc64le,linux-s390x,linux-x64
 
 # FIPS not support SunJCE provider
 javax/crypto/Cipher/ByteBuffers.java https://github.com/ibmruntimes/openj9-openjdk-jdk17/issues/116 linux-ppc64le,linux-s390x,linux-x64
@@ -1230,8 +1138,6 @@ java/util/jar/JarFile/VerifySignedJar.java https://github.ibm.com/runtimes/backl
 javax/smartcardio/TerminalFactorySpiTest.java https://github.ibm.com/runtimes/backlog/issues/1089 linux-ppc64le,linux-s390x,linux-x64
 sun/security/krb5/auto/Cleaners.java https://github.ibm.com/runtimes/backlog/issues/1089 linux-ppc64le,linux-s390x,linux-x64
 sun/security/krb5/auto/S4U2selfNotF.java https://github.ibm.com/runtimes/backlog/issues/1089 linux-ppc64le,linux-s390x,linux-x64
-sun/security/krb5/auto/Unavailable.java https://github.ibm.com/runtimes/backlog/issues/1089 linux-ppc64le,linux-s390x,linux-x64
-sun/security/krb5/etype/WeakCrypto.java https://github.ibm.com/runtimes/backlog/issues/1089 linux-ppc64le,linux-s390x,linux-x64
 
 # Exclude the below tests from sanity.openjdk according to the issues:
 # https://github.ibm.com/runtimes/backlog/issues/1089
