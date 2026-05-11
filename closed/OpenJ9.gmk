@@ -367,6 +367,11 @@ else # OPENJ9_ENABLE_CONTINUATION_ALLOCATION_PROFILING
   CMAKE_ARGS += -DJ9VM_PROF_CONTINUATION_ALLOCATION=OFF
 endif # OPENJ9_ENABLE_CONTINUATION_ALLOCATION_PROFILING
 
+# Propagate configure option '--objcopy-debuginfo-compression' to OMR.
+ifneq (,$(OBJCOPY_COMPRESS_FLAGS))
+  CMAKE_ARGS += -DOMR_OBJCOPY_COMPRESS_FLAGS=$(OBJCOPY_COMPRESS_FLAGS)
+endif
+
 # Propagate configure option '--disable-warnings-as-errors-omr' to OMR.
 ifeq (false,$(WARNINGS_AS_ERRORS_OMR))
   CMAKE_ARGS += -DOMR_WARNINGS_AS_ERRORS=OFF
