@@ -22,6 +22,13 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
+
+/*
+ * ===========================================================================
+ * (c) Copyright IBM Corp. 2026, 2026 All Rights Reserved
+ * ===========================================================================
+ */
+
 package sun.security.ssl;
 
 import sun.security.util.RawKeySpec;
@@ -138,6 +145,12 @@ public class KAKeyDerivation implements SSLKeyDerivation {
                 earlySecret = hkdf.deriveKey("TlsEarlySecret",
                         HKDFParameterSpec.ofExtract().addSalt(zeros)
                         .addIKM(zeros).extractOnly());
+                if (SSLLogger.isOn()
+                    && (SSLLogger.isOn(SSLLogger.Opt.SSL) || SSLLogger.isOn(SSLLogger.Opt.HANDSHAKE))
+                ) {
+                    SSLLogger.finer("No PSK is in use, the KDF is from: " + hkdf.getProviderName()
+                            + ", the classname for earlySecret key is " + earlySecret.getClass().getName());
+                }
                 kd = new SSLSecretDerivation(context, earlySecret);
             }
 
@@ -155,8 +168,14 @@ public class KAKeyDerivation implements SSLKeyDerivation {
             } else {
                 spec = spec.addIKM(sharedSecret);
             }
-
-            return hkdf.deriveKey(label, spec.extractOnly());
+            SecretKey result = hkdf.deriveKey(label, spec.extractOnly());
+            if (SSLLogger.isOn()
+                && (SSLLogger.isOn(SSLLogger.Opt.SSL) || SSLLogger.isOn(SSLLogger.Opt.HANDSHAKE))
+            ) {
+                SSLLogger.finer("derive handshake secret, the KDF is from: "
+                        + hkdf.getProviderName() + ", the classname for sharedSecret key is " + result.getClass().getName());
+            }
+            return result;
         } finally {
             KeyUtil.destroySecretKeys(earlySecret, saltSecret);
         }
