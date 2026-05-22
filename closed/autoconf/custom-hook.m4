@@ -1,5 +1,5 @@
 # ===========================================================================
-# (c) Copyright IBM Corp. 2017, 2025 All Rights Reserved
+# (c) Copyright IBM Corp. 2017, 2026 All Rights Reserved
 # ===========================================================================
 # This code is free software; you can redistribute it and/or modify it
 # under the terms of the GNU General Public License version 2 only, as
@@ -681,7 +681,6 @@ AC_DEFUN_ONCE([CUSTOM_LATE_HOOK],
     AC_SUBST(OPENJ9_VS_INCLUDE)
     AC_SUBST(OPENJ9_VS_LIB)
   fi
-  AC_SUBST(SYSROOT)
   AC_CONFIG_FILES([$OUTPUTDIR/toolchain.cmake:$CLOSED_AUTOCONF_DIR/toolchain.cmake.in])
 ])
 
