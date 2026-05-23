@@ -22,6 +22,12 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
+
+/*
+ * ===========================================================================
+ * (c) Copyright IBM Corp. 2024, 2024 All Rights Reserved
+ * ===========================================================================
+ */
 package jdk.jfr.internal.dcmd;
 
 import java.io.IOException;
@@ -287,7 +293,7 @@ final class DCmdDump extends AbstractDCmd {
                "Maximum duration to dump, in (s)econds, (m)inutes, (h)ours, or (d)ays, e.g. 60m, or 0 for no limit",
                "NANOTIME", false, true, null, false),
            new Argument("maxsize", "Maximum amount of bytes to dump, in (M)B or (G)B, e.g. 500M, or 0 for no limit",
-               "MEMORY SIZE", false, true, "hotspot-pid-xxxxx-id-y-YYYY_MM_dd_HH_mm_ss.jfr", false),
+               "MEMORY SIZE", false, true, "openj9-pid-xxxxx-id-y-YYYY_MM_dd_HH_mm_ss.jfr", false),
            new Argument("begin",
                "Point in time to dump data from, e.g. 09:00, 21:35:00, 2018-06-03T18:12:56.827Z, 2018-06-03T20:13:46.832, -10m, -3h, or -1d",
                "STRING", false, true, null, false),
