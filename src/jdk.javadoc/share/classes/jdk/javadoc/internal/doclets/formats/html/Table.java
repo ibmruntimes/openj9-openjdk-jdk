@@ -22,6 +22,11 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
+/*
+ * ===========================================================================
+ * (c) Copyright IBM Corp. 2025, 2025 All Rights Reserved
+ * ===========================================================================
+ */
 
 package jdk.javadoc.internal.doclets.formats.html;
 
@@ -33,6 +38,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Predicate;
+import java.util.regex.Pattern;
 
 import jdk.javadoc.internal.doclets.formats.html.markup.HtmlStyles;
 import jdk.javadoc.internal.html.Content;
@@ -86,6 +92,7 @@ public class Table<T> extends Content {
     private HtmlStyle gridStyle;
     private final List<Content> bodyRows;
     private HtmlId id;
+    private static final Pattern checkFormElements = Pattern.compile("<(?:a|area|button|input|object|select|textarea)\\b");
 
     /**
      * A record containing the data for a table tab.
@@ -326,10 +333,19 @@ public class Table<T> extends Content {
             HtmlStyle cellStyle = columnStyles.get(colIndex);
             // Always add content to make sure the cell isn't dropped
             var cell = HtmlTree.DIV(cellStyle).addUnchecked(c.isEmpty() ? Text.EMPTY : c);
+            boolean matchFound = c.isEmpty() || checkFormElements.matcher(c.toString()).find();
             cell.addStyle(rowStyle);
+            if (!matchFound) {
+                cell.put(HtmlAttr.ROLE, "tablist")
+                    .put(HtmlAttr.TABINDEX, "0");
+            }
 
             for (String tabClass : tabClasses) {
                 cell.addStyle(tabClass);
+                if (!matchFound) {
+                    cell.put(HtmlAttr.ROLE, "tablist")
+                        .put(HtmlAttr.TABINDEX, "0");
+                }
             }
             row.add(cell);
             colIndex++;
