@@ -22,7 +22,7 @@
  */
 /*
  * ===========================================================================
- * (c) Copyright IBM Corp. 2019, 2025 All Rights Reserved
+ * (c) Copyright IBM Corp. 2019, 2026 All Rights Reserved
  * ===========================================================================
  */
 package requires;
@@ -84,9 +84,7 @@ public class OpenJ9PropsExt implements Callable<Map<String, String>> {
         map.put("vm.gc.Z", "false");
         map.put("vm.gc.ZGenerational", "false");
         map.put("vm.gc.ZSinglegen", "false");
-        map.put("vm.graal.enabled", "false");
         map.put("vm.hasJFR", "false");
-        map.put("vm.jvmci", "false");
         map.put("vm.jvmti", "true");
         map.put("vm.musl", "false");
         map.put("vm.openj9", "true");

@@ -54,7 +54,6 @@ endif
 MODULES_FILTER += \
 	jdk.aot \
 	jdk.hotspot.agent \
-	jdk.internal.vm.ci \
 	jdk.internal.vm.compiler \
 	jdk.internal.vm.compiler.management \
 	jdk.jstatd \
