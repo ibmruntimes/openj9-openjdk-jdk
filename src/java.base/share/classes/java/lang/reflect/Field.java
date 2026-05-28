@@ -1554,8 +1554,7 @@ class Field extends AccessibleObject implements Member {
             VM.initialErr().println(sb);
         }
 
-        // record JFR event
-        FinalFieldMutationEvent.offer(getDeclaringClass(), getName());
+        FinalFieldMutationEvent.offer(root);
     }
 
     /**
