@@ -1,6 +1,6 @@
 /*
  * ===========================================================================
- * (c) Copyright IBM Corp. 2024, 2025 All Rights Reserved
+ * (c) Copyright IBM Corp. 2024, 2026 All Rights Reserved
  * ===========================================================================
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -202,6 +202,71 @@ public class TestProperties {
         return tests.build();
     }
 
+    private static Stream<Arguments> patternMatches_strongAlgorithms() {
+        Stream.Builder<Arguments> tests = Stream.builder();
+
+        if (isProviderPresent("OpenJCEPlusFIPS")) {
+            // 1 - Test property - base profile with securerandom.strongAlgorithms loads successfully.
+            tests.add(Arguments.of("Test-Profile-strongAlgorithms",
+                    System.getProperty("test.src") + "/property-java.security",
+                    "(?s)(?=.*OpenJCEPlusFIPS)(?=.*SUN)(?=.*SunJSSE)",
+                    0));
+            // 2 - Test property - securerandom.strongAlgorithms property with multiple algorithms.
+            tests.add(Arguments.of("Test-Profile-strongAlgorithms-MultipleEntries",
+                    System.getProperty("test.src") + "/property-java.security",
+                    "securerandom\\.strongAlgorithms: SHA512DRBG:OpenJCEPlusFIPS, SHA256DRBG:OpenJCEPlusFIPS",
+                    0));
+            // 3 - Test property - securerandom.strongAlgorithms append algorithm in extended profile.
+            tests.add(Arguments.of("Test-Profile-strongAlgorithms-Extension_1",
+                    System.getProperty("test.src") + "/property-java.security",
+                    "securerandom\\.strongAlgorithms: SHA512DRBG:OpenJCEPlusFIPS, SHA256DRBG:OpenJCEPlusFIPS",
+                    0));
+            // 4 - Test property - securerandom.strongAlgorithms remove algorithm in extended profile.
+            tests.add(Arguments.of("Test-Profile-strongAlgorithms-Extension_2",
+                    System.getProperty("test.src") + "/property-java.security",
+                    "securerandom\\.strongAlgorithms: (?=.*NativePRNGBlocking:SUN)(?=.*DRBG:SUN)",
+                    0));
+            // 5 - Test property - securerandom.strongAlgorithms invalid algorithm.
+            tests.add(Arguments.of("Test-Profile-strongAlgorithms-InvalidFormat",
+                    System.getProperty("test.src") + "/property-java.security",
+                    "FAILED: No strong SecureRandom impls available: .*",
+                    0));
+            // 6 - Test property - securerandom.strongAlgorithms missing algorithm.
+            tests.add(Arguments.of("Test-Profile-strongAlgorithms-MissingAlgo",
+                    System.getProperty("test.src") + "/property-java.security",
+                    "FAILED: No strong SecureRandom impls available: .*",
+                    0));
+            // 7 - Test property - securerandom.strongAlgorithms missing provider.
+            tests.add(Arguments.of("Test-Profile-strongAlgorithms-MissingProvider",
+                    System.getProperty("test.src") + "/property-java.security",
+                    "FAILED: missing provider",
+                    0));
+            // 8 - Test property - set invalid provider.
+            tests.add(Arguments.of("Test-Profile-strongAlgorithms-InvalidProvider",
+                    System.getProperty("test.src") + "/property-java.security",
+                    "FAILED: No strong SecureRandom impls available: .*",
+                    0));
+            // 9 - Test property - securerandom.strongAlgorithms when only algorithm is present.
+            tests.add(Arguments.of("Test-Profile-strongAlgorithms-Specify-Algo-Only",
+                    System.getProperty("test.src") + "/property-java.security",
+                    "securerandom\\.strongAlgorithms: SHA(256|512)DRBG$",
+                    0));
+            // 10 - Test property - invalid algorithm.
+            tests.add(Arguments.of("Test-Profile-strongAlgorithms-InvalidAlgorithm",
+                    System.getProperty("test.src") + "/property-java.security",
+                    "FAILED: No strong SecureRandom impls available: .*",
+                    0));
+            // 11 - Test property - securerandom.strongAlgorithms misspelled property name.
+            tests.add(Arguments.of("Test-Profile-strongAlgorithms-MisspelledPropertyName",
+                    System.getProperty("test.src") + "/property-java.security",
+                    "The property names: RestrictedSecurity.Test-Profile-strongAlgorithms-MisspelledPropertyName.securerandom.strongAlgorithmsWrong "
+                            + "in profile RestrictedSecurity.Test-Profile-strongAlgorithms-MisspelledPropertyName \\(or a base profile\\) are not recognized",
+                    1));
+        }
+
+        return tests.build();
+    }
+
     @ParameterizedTest
     @MethodSource("patternMatches_expectedExitValue0")
     public void shouldContain_expectedExitValue0(String customprofile, String securityPropertyFile, String expected) throws Exception {
@@ -241,6 +306,19 @@ public class TestProperties {
         outputAnalyzer.shouldHaveExitValue(exitValue).shouldMatch(expected);
     }
 
+    @ParameterizedTest
+    @MethodSource("patternMatches_strongAlgorithms")
+    public void shouldContain_strongAlgorithms(String customprofile, String securityPropertyFile, String expected, int exitValue) throws Exception {
+        OutputAnalyzer outputAnalyzer = ProcessTools.executeTestJava(
+                "-Dsemeru.fips=true",
+                "-Dsemeru.customprofile=" + customprofile,
+                "-Djava.security.properties=" + securityPropertyFile,
+                "TestProperties"
+        );
+        outputAnalyzer.reportDiagnosticSummary();
+        outputAnalyzer.shouldHaveExitValue(exitValue).shouldMatch(expected);
+    }
+
     private static boolean isProviderPresent(String providerName) {
         for (Provider provider : Security.getProviders()) {
             if (provider.getName().equalsIgnoreCase(providerName)) {
@@ -250,6 +328,20 @@ public class TestProperties {
         return false;
     }
 
+    private static void testStrongAlgorithms() {
+        if (isProviderPresent("OpenJCEPlusFIPS")) {
+            String strongAlgorithms = Security.getProperty("securerandom.strongAlgorithms");
+            if ((strongAlgorithms != null) && !strongAlgorithms.isEmpty()) {
+                try {
+                    java.security.SecureRandom.getInstanceStrong();
+                    System.out.println("securerandom.strongAlgorithms: " + strongAlgorithms);
+                } catch (java.security.NoSuchAlgorithmException | IllegalArgumentException e) {
+                    System.out.println("FAILED: " + e.getMessage());
+                }
+            }
+        }
+    }
+
     public static void main(String[] args) {
         // Something to trigger "properties" debug output.
         try {
@@ -257,6 +349,7 @@ public class TestProperties {
                 System.out.println("Provider Name: " + provider.getName());
                 System.out.println("Provider Version: " + provider.getVersionStr());
             }
+            testStrongAlgorithms();
         } catch (Exception e) {
             System.out.println(e);
         }
