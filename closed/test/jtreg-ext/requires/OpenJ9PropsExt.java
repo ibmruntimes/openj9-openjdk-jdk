@@ -72,6 +72,7 @@ public class OpenJ9PropsExt implements Callable<Map<String, String>> {
         map.put("vm.asan", "false");
         map.put("vm.bits", this::vmBits);
         map.put("vm.cds", "false");
+        map.put("vm.cds.nocoh.archive.available", "false");
         map.put("vm.cds.write.archived.java.heap", "false");
         map.put("vm.compiler2.enabled", "false");
         map.put("vm.continuations", "true");
