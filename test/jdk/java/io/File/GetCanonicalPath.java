@@ -21,6 +21,12 @@
  * questions.
  */
 
+/*
+ * ===========================================================================
+ * (c) Copyright IBM Corp. 2026, 2026 All Rights Reserved
+ * ===========================================================================
+ */
+
 /* @test
  * @bug 4899022 8003887 8355342
  * @summary Look for erroneous representation of drive letter
@@ -38,6 +44,7 @@ import java.util.stream.Stream;
 
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledOnOs;
 import org.junit.jupiter.api.condition.OS;
@@ -129,6 +136,7 @@ public class GetCanonicalPath {
     }
 
     @Test
+    @Disabled("Not supported by Semeru test infrastructure")
     @EnabledOnOs(OS.WINDOWS)
     void mappedDrive() throws IOException {
         // find the first unused drive letter
