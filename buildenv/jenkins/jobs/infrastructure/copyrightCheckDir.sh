@@ -56,6 +56,7 @@ print_excludes() {
   echo "src/jdk.internal.vm.compiler.management/share/classes/org.graalvm.compiler.hotspot.management/src/org/graalvm/compiler/hotspot/management/HotSpotGraalRuntimeMBean.java"
   echo "src/jdk.internal.vm.compiler.management/share/classes/org.graalvm.compiler.hotspot.management/src/org/graalvm/compiler/hotspot/management/JMXServiceProvider.java"
   echo "src/jdk.internal.vm.compiler.management/share/classes/org.graalvm.compiler.hotspot.management/src/org/graalvm/compiler/hotspot/management/package-info.java"
+  echo "src/jdk.jcmd/share/conf/bash-completion/jcmd"
   echo "test/hotspot/jtreg/runtime/cds/appcds/dynamicArchive/test-classes/VerifierTroublev49.jasm"
   echo "test/jaxp/javax/xml/jaxp/unittest/common/dtd/DTDTestBase.java"
   echo "test/jaxp/javax/xml/jaxp/unittest/common/dtd/SchemaTest.java"
