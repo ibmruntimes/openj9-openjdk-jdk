@@ -480,6 +480,183 @@ RestrictedSecurity.OpenJCEPlusFIPS.FIPS140-3-Weakly-Enforced.jce.provider.10 = s
 RestrictedSecurity.OpenJCEPlusFIPS.FIPS140-3-Weakly-Enforced.jce.provider.11 = sun.security.provider.certpath.ldap.JdkLDAP
 RestrictedSecurity.OpenJCEPlusFIPS.FIPS140-3-Weakly-Enforced.jce.provider.12 = com.sun.security.sasl.gsskerb.JdkSASL
 
+# Quantum safe restricted security mode test profile.
+#
+# This profile can be utilized to check whether a system uses quantum safe cryptography and
+# expose code that uses algorithms that could be replaced by their quantum resistant equivalents.
+# Highlights include:
+# + Allowance of TLS 1.3 only, since that's the only mode supporting hybrid PQC exchanges.
+# + Only ML-DSA and ML-KEM can be used for signature and key exchange respectively. Other
+#   algorithms can only be used for TLS signatures and hybrid key exchange.
+# + All other algorithms are allowed by default.
+RestrictedSecurity.QuantumSafe.BaseTest.desc.name = Quantum safe base test profile
+RestrictedSecurity.QuantumSafe.BaseTest.desc.default = true
+RestrictedSecurity.QuantumSafe.BaseTest.desc.fips = false
+#ifdef macosx
+RestrictedSecurity.QuantumSafe.BaseTest.desc.hash = SHA256:0d37bf6bf09a07e8c2ce66d12ae8683ba663a968e87c54ebad1353ae8f1ef45e
+#else
+#ifdef windows
+RestrictedSecurity.QuantumSafe.BaseTest.desc.hash = SHA256:e6005f2d67aff8b900900b7a2ff46794ff12dfc990e1c2c08a83a36694ff56f1
+#else
+RestrictedSecurity.QuantumSafe.BaseTest.desc.hash = SHA256:e76596dd56e97497141f6d64832ee2f3f11ffe2353cc19c07a6b5b00fcce3f60
+#endif
+#endif
+RestrictedSecurity.QuantumSafe.BaseTest.desc.number = NoCertificate
+RestrictedSecurity.QuantumSafe.BaseTest.desc.policy = NoPolicy
+RestrictedSecurity.QuantumSafe.BaseTest.desc.sunsetDate = 2100-01-01
+
+RestrictedSecurity.QuantumSafe.BaseTest.tls.disabledAlgorithms = + TLSv1.2, DTLSv1.2
+RestrictedSecurity.QuantumSafe.BaseTest.tls.namedGroups = X25519MLKEM768,SecP256r1MLKEM768,SecP384r1MLKEM1024
+
+RestrictedSecurity.QuantumSafe.BaseTest.jce.provider.1 = sun.security.provider.Sun [ \
+    {AlgorithmParameterGenerator, *, *}, \
+    {AlgorithmParameters, *, *}, \
+    {CertificateFactory, X.509, *}, \
+    {CertPathBuilder, PKIX, *}, \
+    {CertPathValidator, PKIX, *}, \
+    {CertStore, Collection, *}, \
+    {CertStore, com.sun.security.IndexedCollection, *}, \
+    {Configuration, JavaLoginConfig, *}, \
+    {KeyFactory, *, *}, \
+    {KeyPairGenerator, *, *}, \
+    {KeyStore, *, *}, \
+    {MessageDigest, *, *}, \
+    {Policy, JavaPolicy, *}, \
+    {SecureRandom, *, *}, \
+    {Signature, ML-DSA, *}, \
+    {Signature, ML-DSA-44, *}, \
+    {Signature, ML-DSA-65, *}, \
+    {Signature, ML-DSA-87, *}]
+RestrictedSecurity.QuantumSafe.BaseTest.jce.provider.2 = sun.security.rsa.SunRsaSign [ \
+    {AlgorithmParameters, *, *}, \
+    {KeyFactory, *, *}, \
+    {KeyPairGenerator, *, *}, \
+    {Signature, RSASSA-PSS, *, Package:sun.security.ssl}, \
+    {Signature, SHA224withRSA, *, Package:sun.security.ssl}, \
+    {Signature, SHA256withRSA, *, Package:sun.security.ssl}, \
+    {Signature, SHA384withRSA, *, Package:sun.security.ssl}, \
+    {Signature, SHA512withRSA, *, Package:sun.security.ssl}]
+RestrictedSecurity.QuantumSafe.BaseTest.jce.provider.3 = sun.security.ec.SunEC [ \
+    {AlgorithmParameters, *, *}, \
+    {KeyAgreement, ECDH, *, Package:sun.security.ssl}, \
+    {KeyAgreement, X25519, *, Package:sun.security.ssl}, \
+    {KeyAgreement, X448, *, Package:sun.security.ssl}, \
+    {KeyAgreement, XDH, *, Package:sun.security.ssl}, \
+    {KeyFactory, *, *}, \
+    {KeyPairGenerator, *, *}, \
+    {Signature, Ed25519, *, Package:sun.security.ssl}, \
+    {Signature, Ed448, *, Package:sun.security.ssl}, \
+    {Signature, EdDSA, *, Package:sun.security.ssl}, \
+    {Signature, SHA256withECDSA, *, Package:sun.security.ssl}, \
+    {Signature, SHA384withECDSA, *, Package:sun.security.ssl}, \
+    {Signature, SHA512withECDSA, *, Package:sun.security.ssl}]
+RestrictedSecurity.QuantumSafe.BaseTest.jce.provider.4 = sun.security.ssl.SunJSSE [ \
+    {KeyManagerFactory, *, *}, \
+    {KeyStore, *, *}, \
+    {SSLContext, Default, *}, \
+    {SSLContext, TLS, *}, \
+    {SSLContext, TLSv1.3, *}, \
+    {TrustManagerFactory, *, *}]
+RestrictedSecurity.QuantumSafe.BaseTest.jce.provider.5 = com.sun.crypto.provider.SunJCE [ \
+    {AlgorithmParameterGenerator, *, *}, \
+    {AlgorithmParameters, *, *}, \
+    {Cipher, *, *}, \
+    {KDF, *, *}, \
+    {KEM, ML-KEM, *}, \
+    {KEM, ML-KEM-512, *}, \
+    {KEM, ML-KEM-768, *}, \
+    {KEM, ML-KEM-1024, *}, \
+    {KeyFactory, *, *}, \
+    {KeyGenerator, *, *}, \
+    {KeyPairGenerator, *, *}, \
+    {KeyStore, *, *}, \
+    {Mac, *, *}, \
+    {SecretKeyFactory, *, *}]
+RestrictedSecurity.QuantumSafe.BaseTest.jce.provider.6 = sun.security.jgss.SunProvider
+RestrictedSecurity.QuantumSafe.BaseTest.jce.provider.7 = com.sun.security.sasl.Provider
+RestrictedSecurity.QuantumSafe.BaseTest.jce.provider.8 = org.jcp.xml.dsig.internal.dom.XMLDSigRI
+RestrictedSecurity.QuantumSafe.BaseTest.jce.provider.9 = sun.security.smartcardio.SunPCSC
+RestrictedSecurity.QuantumSafe.BaseTest.jce.provider.10 = sun.security.provider.certpath.ldap.JdkLDAP
+RestrictedSecurity.QuantumSafe.BaseTest.jce.provider.11 = com.sun.security.sasl.gsskerb.JdkSASL
+RestrictedSecurity.QuantumSafe.BaseTest.jce.provider.12 = sun.security.pkcs11.SunPKCS11 [ \
+    {AlgorithmParameters, *, *}, \
+    {Cipher, *, *}, \
+    {KDF, *, *}, \
+    {KeyFactory, *, *}, \
+    {KeyGenerator, *, *}, \
+    {KeyPairGenerator, *, *}, \
+    {Mac, *, *}, \
+    {MessageDigest, *, *}, \
+    {SecretKeyFactory, *, *}, \
+    {Signature, RSASSA-PSS, *, Package:sun.security.ssl}, \
+    {Signature, SHA224withRSA, *, Package:sun.security.ssl}, \
+    {Signature, SHA256withECDSA, *, Package:sun.security.ssl}, \
+    {Signature, SHA256withRSA, *, Package:sun.security.ssl}, \
+    {Signature, SHA384withECDSA, *, Package:sun.security.ssl}, \
+    {Signature, SHA384withRSA, *, Package:sun.security.ssl}, \
+    {Signature, SHA512withECDSA, *, Package:sun.security.ssl}, \
+    {Signature, SHA512withRSA, *, Package:sun.security.ssl}]
+RestrictedSecurity.QuantumSafe.BaseTest.jce.provider.13 = sun.security.ssl.HybridProvider$ProviderImpl
+#ifdef macosx
+RestrictedSecurity.QuantumSafe.BaseTest.jce.provider.14 = apple.security.AppleProvider
+#endif
+#ifdef windows
+RestrictedSecurity.QuantumSafe.BaseTest.jce.provider.14 = sun.security.mscapi.SunMSCAPI [ \
+    {Cipher, *, *}, \
+    {KeyPairGenerator, *, *}, \
+    {KeyStore, *, *}, \
+    {SecureRandom, *, *}, \
+    {Signature, RSASSA-PSS, *, Package:sun.security.ssl}, \
+    {Signature, SHA256withECDSA, *, Package:sun.security.ssl}, \
+    {Signature, SHA256withRSA, *, Package:sun.security.ssl}, \
+    {Signature, SHA384withECDSA, *, Package:sun.security.ssl}, \
+    {Signature, SHA384withRSA, *, Package:sun.security.ssl}, \
+    {Signature, SHA512withECDSA, *, Package:sun.security.ssl}, \
+    {Signature, SHA512withRSA, *, Package:sun.security.ssl}]
+#endif
+#if defined macosx || defined windows
+RestrictedSecurity.QuantumSafe.BaseTest.jce.provider.15 = com.ibm.crypto.plus.provider.OpenJCEPlus [ \
+#else
+RestrictedSecurity.QuantumSafe.BaseTest.jce.provider.14 = com.ibm.crypto.plus.provider.OpenJCEPlus [ \
+#endif
+    {AlgorithmParameterGenerator, *, *}, \
+    {AlgorithmParameters, *, *}, \
+    {Cipher, *, *}, \
+    {KDF, *, *}, \
+    {KEM, ML-KEM, *}, \
+    {KEM, ML-KEM-512, *}, \
+    {KEM, ML-KEM-768, *}, \
+    {KEM, ML-KEM-1024, *}, \
+    {KeyAgreement, ECDH, *, Package:sun.security.ssl}, \
+    {KeyAgreement, X25519, *, Package:sun.security.ssl}, \
+    {KeyAgreement, X448, *, Package:sun.security.ssl}, \
+    {KeyAgreement, XDH, *, Package:sun.security.ssl}, \
+    {KeyFactory, *, *}, \
+    {KeyGenerator, *, *}, \
+    {KeyPairGenerator, *, *}, \
+    {MAC, *, *}, \
+    {MessageDigest, *, *}, \
+    {SecretKeyFactory, *, *}, \
+    {SecureRandom, *, *}, \
+    {Signature, Ed25519, *, Package:sun.security.ssl}, \
+    {Signature, Ed448, *, Package:sun.security.ssl}, \
+    {Signature, EdDSA, *, Package:sun.security.ssl}, \
+    {Signature, ML-DSA-44, *}, \
+    {Signature, ML-DSA-65, *}, \
+    {Signature, ML-DSA-87, *}, \
+    {Signature, RSASSA-PSS, *, Package:sun.security.ssl}, \
+    {Signature, SHA224withRSA, *, Package:sun.security.ssl}, \
+    {Signature, SHA256withECDSA, *, Package:sun.security.ssl}, \
+    {Signature, SHA256withRSA, *, Package:sun.security.ssl}, \
+    {Signature, SHA384withECDSA, *, Package:sun.security.ssl}, \
+    {Signature, SHA384withRSA, *, Package:sun.security.ssl}, \
+    {Signature, SHA512withECDSA, *, Package:sun.security.ssl}, \
+    {Signature, SHA512withRSA, *, Package:sun.security.ssl}]
+
+RestrictedSecurity.QuantumSafe.BaseTest.securerandom.provider = OpenJCEPlus
+RestrictedSecurity.QuantumSafe.BaseTest.securerandom.algorithm = SHA512DRBG
+RestrictedSecurity.QuantumSafe.BaseTest.securerandom.strongAlgorithms = SHA512DRBG:OpenJCEPlus
+
 #
 # A list of preferred providers for specific algorithms. These providers will
 # be searched for matching algorithms before the list of registered providers.
