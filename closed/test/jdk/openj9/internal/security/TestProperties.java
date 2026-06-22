@@ -265,6 +265,21 @@ public class TestProperties {
         return tests.build();
     }
 
+    private static Stream<Arguments> patternMatches_systemProperties() {
+        return Stream.of(
+                // 1 - Test property - base profile with javax.net.ssl.keyStore loads successfully.
+                Arguments.of("TestBase.Version",
+                        System.getProperty("test.src") + "/property-java.security",
+                        "javax\\.net\\.ssl\\.keyStore: NONE",
+                        0),
+                // 2 - Test property - base profile with jdk.tls.namedGroups loads successfully.
+                Arguments.of("TestBase.Version",
+                        System.getProperty("test.src") + "/property-java.security",
+                        "jdk\\.tls\\.namedGroups: secp256r1",
+                        0)
+        );
+    }
+
     @ParameterizedTest
     @MethodSource("patternMatches_expectedExitValue0")
     public void shouldContain_expectedExitValue0(String customprofile, String securityPropertyFile, String expected) throws Exception {
@@ -317,6 +332,19 @@ public class TestProperties {
         outputAnalyzer.shouldHaveExitValue(exitValue).shouldMatch(expected);
     }
 
+    @ParameterizedTest
+    @MethodSource("patternMatches_systemProperties")
+    public void shouldContain_systemProperties(String customprofile, String securityPropertyFile, String expected, int exitValue) throws Exception {
+        OutputAnalyzer outputAnalyzer = ProcessTools.executeTestJava(
+                "-Dsemeru.fips=true",
+                "-Dsemeru.customprofile=" + customprofile,
+                "-Djava.security.properties=" + securityPropertyFile,
+                "TestProperties"
+        );
+        outputAnalyzer.reportDiagnosticSummary();
+        outputAnalyzer.shouldHaveExitValue(exitValue).shouldMatch(expected);
+    }
+
     private static boolean isProviderPresent(String providerName) {
         for (Provider provider : Security.getProviders()) {
             if (provider.getName().equalsIgnoreCase(providerName)) {
@@ -338,6 +366,20 @@ public class TestProperties {
         }
     }
 
+    private static void testSystemProperties() {
+        // Test javax.net.ssl.keyStore system property.
+        String keyStore = System.getProperty("javax.net.ssl.keyStore");
+        if (keyStore != null) {
+            System.out.println("javax.net.ssl.keyStore: " + keyStore);
+        }
+
+        // Test jdk.tls.namedGroups system property.
+        String namedGroups = System.getProperty("jdk.tls.namedGroups");
+        if (namedGroups != null) {
+            System.out.println("jdk.tls.namedGroups: " + namedGroups);
+        }
+    }
+
     public static void main(String[] args) {
         // Something to trigger "properties" debug output.
         try {
@@ -346,6 +388,7 @@ public class TestProperties {
                 System.out.println("Provider Version: " + provider.getVersionStr());
             }
             testStrongAlgorithms();
+            testSystemProperties();
         } catch (Exception e) {
             System.out.println(e);
         }
