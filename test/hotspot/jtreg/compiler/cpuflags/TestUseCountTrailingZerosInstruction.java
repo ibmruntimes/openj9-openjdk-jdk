@@ -20,34 +20,34 @@
  * or visit www.oracle.com if you need additional information or have any
  * questions.
  */
-package compiler.controldependency;
 
-/*
+/**
  * @test
- * @bug 8385420
- * @summary C2 correctly handles the case when the removed CastPPNode has a CMove use.
- * @run main ${test.main.class}
- * @run main/othervm -Xbatch -XX:CompileOnly=${test.main.class}::test
- *                   -XX:+UnlockDiagnosticVMOptions -XX:+StressGCM ${test.main.class}
- *
+ * @bug 8386656
+ * @summary Verify no assertions when running with -XX:-UseCountTrailingZerosInstruction
+ * @requires os.simpleArch == "x64"
+ * @run main/othervm -Xbatch -XX:-UseCountTrailingZerosInstruction ${test.main.class}
  */
-public class TestRemoveCastPPWithCMoveUse {
-    public static void main(String[] args) {
-        for (int i = 0; i < 10_000; i++) {
-            test(null, false);
-            test(null, true);
-            test("", false);
-            test("", true);
-        }
-    }
 
-    static int test(String a, boolean flag) {
-        StringBuilder sb = new StringBuilder();
-        if (a == null) {
-            sb.append("");
-        } else {
-            sb.append(flag ? a : "");
+/**
+ * @test
+ * @bug 8386656
+ * @summary Verify no assertions when running with -XX:+UseCountTrailingZerosInstruction
+ * @requires os.simpleArch == "x64"
+ * @run main/othervm -Xbatch -XX:+UseCountTrailingZerosInstruction ${test.main.class}
+ */
+
+package compiler.cpuflags;
+
+import java.util.Arrays;
+
+public class TestUseCountTrailingZerosInstruction {
+    public static void main(String[] args) {
+        byte[] a = new byte[32];
+        byte[] b = new byte[32];
+        for (int i = 0; i < 20_000; i++) {
+            Arrays.mismatch(a, b);
         }
-        return sb.length();
     }
 }
+
