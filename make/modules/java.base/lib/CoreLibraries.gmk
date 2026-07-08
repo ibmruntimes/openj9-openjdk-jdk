@@ -117,8 +117,6 @@ $(eval $(call SetupJdkLibrary, BUILD_LIBJAVA, \
         -I$(OPENJ9_TOPDIR)/runtime/util \
         -I$(OPENJ9_VM_BUILD_DIR)/jcl, \
     EXTRA_HEADER_DIRS := libfdlibm, \
-    DISABLED_WARNINGS_gcc_ProcessImpl_md.c := unused-result, \
-    DISABLED_WARNINGS_clang_TimeZone_md.c := unused-variable, \
     JDK_LIBS := libjvm, \
     LIBS := $(BUILD_LIBFDLIBM_TARGET), \
     LIBS_linux := $(LIBDL), \
