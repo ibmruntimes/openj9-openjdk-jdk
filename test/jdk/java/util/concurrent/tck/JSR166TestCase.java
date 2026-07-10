@@ -37,9 +37,7 @@
 /*
  * @test id=default
  * @summary Conformance testing variant of JSR-166 tck tests.
- * @library /test/lib
  * @build *
- * @build jdk.test.lib.Platform
  * @modules java.management java.base/jdk.internal.util
  * @run junit/othervm/timeout=1000
  *      -Xdump:system+java+snap:events=throw+systhrow,filter=java/lang/Exception,msg_filter=*JUnit*
@@ -51,9 +49,7 @@
  * @test id=forkjoinpool-common-parallelism
  * @summary Test implementation details variant of JSR-166
  *          tck tests with ForkJoinPool common parallelism.
- * @library /test/lib
  * @build *
- * @build jdk.test.lib.Platform
  * @modules java.management java.base/jdk.internal.util
  * @run junit/othervm/timeout=1000
  *      --add-opens java.base/java.util.concurrent=ALL-UNNAMED
@@ -79,9 +75,7 @@
  * @summary Remaining test implementation details variant of
  *          JSR-166 tck tests apart from ForkJoinPool common
  *          parallelism.
- * @library /test/lib
  * @build *
- * @build jdk.test.lib.Platform
  * @modules java.management java.base/jdk.internal.util
  * @run junit/othervm/timeout=1000
  *      --add-opens java.base/java.util.concurrent=ALL-UNNAMED
@@ -150,7 +144,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Pattern;
 
-import jdk.test.lib.Platform;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestResult;
@@ -640,13 +633,6 @@ public class JSR166TestCase extends TestCase {
                 "SynchronousQueue20Test",
                 "ReentrantReadWriteLock20Test"
             };
-
-            if (Platform.isS390x()) {
-                java20TestClassNames = new String[] {
-                    "ForkJoinPool20Test",
-                };
-            }
-
             addNamedTestClasses(suite, java20TestClassNames);
         }
 
