@@ -183,7 +183,7 @@ ifneq (,$(wildcard $(DDR_GENSRC_DIR)))
 
 # Compile DDR code again, to ensure compatibility with class files
 # as they would be dynamically generated from the blob.
-$(eval $(call SetupJavaCompilation,BUILD_J9DDR_TEST_CLASSES, \
+$(eval $(call SetupJavaCompilation,BUILD_DDR_TEST_CLASSES, \
 	DEPENDS := $(DDR_CLASSES_MARKER), \
 	JAVAC_FLAGS := \
 		--patch-module openj9.dtfj=$(DDR_CLASSES_BIN) \
@@ -196,6 +196,6 @@ $(eval $(call SetupJavaCompilation,BUILD_J9DDR_TEST_CLASSES, \
 
 .PHONY : compile_check
 
-compile_check : $(BUILD_J9DDR_TEST_CLASSES)
+compile_check : $(BUILD_DDR_TEST_CLASSES)
 
 endif # DDR_GENSRC_DIR
