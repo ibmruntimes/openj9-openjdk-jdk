@@ -1,12 +1,10 @@
 /*
- * Copyright (c) 2012, 2026, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2026, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License version 2 only, as
- * published by the Free Software Foundation.  Oracle designates this
- * particular file as subject to the "Classpath" exception as provided
- * by Oracle in the LICENSE file that accompanied this code.
+ * published by the Free Software Foundation.
  *
  * This code is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
@@ -23,30 +21,31 @@
  * questions.
  */
 
-package sun.util.locale.provider;
-
-import java.util.List;
-import java.util.Locale;
-import java.util.Set;
-
-import sun.util.resources.LocaleData;
-
 /**
- * Accessor for LocaleData
+ * @test
+ * @bug 8382536
+ * @summary C2: sharpen_type_after_if: assert(val->find_edge(con) > 0) failed: mismatch
  *
- * @author Naoto Sato
+ * @run main/othervm -Xcomp -XX:CompileCommand=compileonly,${test.main.class}::test ${test.main.class}
  */
-public interface ResourceBundleBasedAdapter {
-    public LocaleData getLocaleData();
+package compiler.types;
 
-    /**
-     * candidate locales customization
-     */
-    List<Locale> getCandidateLocales(String baseName, Locale locale);
+public class TestSubTypeCheckConstantCastII {
+    static class A {}
 
-    /**
-     * Returns the locales whose resource bundles are resolved from
-     * the java.base module for this adapter.
-     */
-    Set<Locale> baseModuleLocales();
+    static boolean isInstanceOfA(Object obj) {
+        return (obj instanceof A);
+    }
+
+    static void test(boolean b, Object obj) {
+        if (b) {
+            return;
+        }
+        // b == false
+        if (b != isInstanceOfA(obj)) {}
+    }
+
+    public static void main(String[] args) {
+        test(true, new A());
+    }
 }
