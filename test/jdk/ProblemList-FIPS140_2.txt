@@ -861,6 +861,7 @@ sun/security/provider/SeedGenerator/SeedGeneratorChoice.java https://github.com/
 # All the below hard coded static String keyStoreFile = "keystore"; in the test codes. In FIPS mode, keystore must be NONE.
 
 javax/rmi/ssl/SocketFactoryTest.java https://github.com/eclipse-openj9/openj9/issues/21756 linux-ppc64le,linux-s390x,linux-x64
+javax/rmi/ssl/SslRMIClientSocketFactoryPermissionTest.java https://github.com/eclipse-openj9/openj9/issues/23655 linux-ppc64le,linux-s390x,linux-x64
 sun/security/ssl/AppInputStream/ReadZeroBytes.java https://github.com/ibmruntimes/openj9-openjdk-jdk17/issues/131 linux-ppc64le,linux-s390x,linux-x64
 sun/security/ssl/AppInputStream/RemoveMarkReset.java https://github.com/ibmruntimes/openj9-openjdk-jdk17/issues/131 linux-ppc64le,linux-s390x,linux-x64
 sun/security/ssl/AppOutputStream/NoExceptionOnClose.java https://github.com/ibmruntimes/openj9-openjdk-jdk17/issues/131 linux-ppc64le,linux-s390x,linux-x64
