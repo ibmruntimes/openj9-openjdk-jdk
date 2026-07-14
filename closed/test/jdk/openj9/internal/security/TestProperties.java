@@ -223,7 +223,7 @@ public class TestProperties {
         // 4 - Test property - securerandom.strongAlgorithms remove algorithm in extended profile.
         tests.add(Arguments.of("Test-Profile-strongAlgorithms-Extension_2",
                 System.getProperty("test.src") + "/property-java.security",
-                "securerandom\\.strongAlgorithms: (?=.*NativePRNGBlocking:SUN)(?=.*DRBG:SUN)",
+                "securerandom\\.strongAlgorithms: (NativePRNGBlocking:SUN|Windows-PRNG:SunMSCAPI),DRBG:SUN",
                 0));
         // 5 - Test property - securerandom.strongAlgorithms invalid algorithm.
         tests.add(Arguments.of("Test-Profile-strongAlgorithms-InvalidFormat",
