@@ -3061,6 +3061,12 @@ assertEquals(""+l, (String) MH_this.invokeExact(subl)); // Listie method
          * <p>
          * If the returned method handle is invoked, the field's class will
          * be initialized, if it has not already been initialized.
+         * {@link ExceptionInInitializerError} is thrown if invoking the method handle
+         * provokes the class to be initialized and the initializer fails.
+         * {@link IllegalStateException} is thrown if the field is a {@linkplain
+         * Field#isStrictInit() strictly-initialized} static field and the method handle
+         * is invoked by the thread initializing the field's class before the field has
+         * been initialized.
          * @param refc the class or interface from which the method is accessed
          * @param name the field's name
          * @param type the field's type
@@ -3106,9 +3112,6 @@ assertEquals(""+l, (String) MH_this.invokeExact(subl)); // Listie method
          * Access checking is performed immediately on behalf of the lookup
          * class.
          * <p>
-         * If the returned VarHandle is operated on, the declaring class will be
-         * initialized, if it has not already been initialized.
-         * <p>
          * Certain access modes of the returned VarHandle are unsupported under
          * the following conditions:
          * <ul>
@@ -3134,6 +3137,15 @@ assertEquals(""+l, (String) MH_this.invokeExact(subl)); // Listie method
          * and atomic update access modes compare values using their bitwise
          * representation (see {@link Float#floatToRawIntBits} and
          * {@link Double#doubleToRawLongBits}, respectively).
+         * <p>
+         * If the returned VarHandle is operated on, the declaring class will be
+         * initialized, if it has not already been initialized.
+         * {@link ExceptionInInitializerError} is thrown if operating on the VarHandle
+         * provokes the class to be initialized and the initializer fails.
+         * {@link IllegalStateException} is thrown if the field is a {@linkplain
+         * Field#isStrictInit() strictly-initialized} static field and the VarHandle
+         * is operated on by the thread initializing the field's class to read the
+         * field before it has been initialized.
          * @apiNote
          * Bitwise comparison of {@code float} values or {@code double} values,
          * as performed by the numeric and atomic update access modes, differ
@@ -3396,9 +3408,14 @@ return mh1;
          * If the {@code Field} object's {@code accessible} flag is not set,
          * access checking is performed immediately on behalf of the lookup class.
          * <p>
-         * If the field is static, and
-         * if the returned method handle is invoked, the field's class will
-         * be initialized, if it has not already been initialized.
+         * If the field is static, and if the returned method handle is invoked, the
+         * field's class will be initialized, if it has not already been initialized.
+         * {@link ExceptionInInitializerError} is thrown if invoking the method handle
+         * provokes the class to be initialized and the initializer fails.
+         * {@link IllegalStateException} is thrown if the field is a {@linkplain
+         * Field#isStrictInit() strictly-initialized} static field and the method handle
+         * is invoked by the thread initializing the field's class before the field has
+         * been initialized.
          * @param f the reflected field
          * @return a method handle which can load values from the reflected field
          * @throws IllegalAccessException if access checking fails
@@ -3451,6 +3468,11 @@ return mh1;
                                                   : "final field has no write access";
                     throw field.makeAccessException(msg, this);
                 }
+                // strictly-initialized finals not trusted finals at this time
+                if (field.isStrictInit()) {
+                    throw field.makeAccessException("strictly-initialized final field has no write access", this);
+                }
+
                 // check if write access to final field allowed
                 if (!field.isStatic() && isAccessible) {
                     SharedSecrets.getJavaLangReflectAccess().checkAllowedToUnreflectFinalSetter(lookupClass, f);
@@ -3474,10 +3496,6 @@ return mh1;
          * Access checking is performed immediately on behalf of the lookup
          * class, regardless of the value of the field's {@code accessible}
          * flag.
-         * <p>
-         * If the field is static, and if the returned VarHandle is operated
-         * on, the field's declaring class will be initialized, if it has not
-         * already been initialized.
          * <p>
          * Certain access modes of the returned VarHandle are unsupported under
          * the following conditions:
@@ -3504,6 +3522,16 @@ return mh1;
          * and atomic update access modes compare values using their bitwise
          * representation (see {@link Float#floatToRawIntBits} and
          * {@link Double#doubleToRawLongBits}, respectively).
+         * <p>
+         * If the field is static, and if the returned VarHandle is operated
+         * on, the field's declaring class will be initialized, if it has not
+         * already been initialized.
+         * {@link ExceptionInInitializerError} is thrown if operating on the VarHandle
+         * provokes the class to be initialized and the initializer fails.
+         * {@link IllegalStateException} is thrown if the field is a {@linkplain
+         * Field#isStrictInit() strictly-initialized} static field and the VarHandle
+         * is operated on by the thread initializing the field's class to read the
+         * field before it has been initialized.
          * @apiNote
          * Bitwise comparison of {@code float} values or {@code double} values,
          * as performed by the numeric and atomic update access modes, differ
@@ -3967,7 +3995,7 @@ return mh1;
                 refc = lookupClass();
             }
             return VarHandles.makeFieldHandle(getField, refc,
-                                              this.allowedModes == TRUSTED && !getField.isTrustedFinalField());
+                                              this.allowedModes == TRUSTED);
         }
         /** Check access and get the requested constructor. */
         private MethodHandle getDirectConstructor(Class<?> refc, MemberName ctor) throws IllegalAccessException {
