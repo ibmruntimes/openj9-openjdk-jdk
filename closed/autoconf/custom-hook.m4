@@ -415,11 +415,11 @@ AC_DEFUN([OPENJ9_CONFIGURE_INLINE_TYPES],
 [
   AC_MSG_CHECKING([for inline types])
   AC_ARG_ENABLE([inline-types], [AS_HELP_STRING([--enable-inline-types], [enable Inline-Type support @<:@disabled@:>@])])
-  OPENJ9_ENABLE_INLINE_TYPES=false
+  OPENJ9_ENABLE_ENHANCED_INLINE_TYPES=false
 
   if test "x$enable_inline_types" = xyes ; then
     AC_MSG_RESULT([yes (explicitly enabled)])
-    OPENJ9_ENABLE_INLINE_TYPES=true
+    OPENJ9_ENABLE_ENHANCED_INLINE_TYPES=true
   elif test "x$enable_inline_types" = xno ; then
     AC_MSG_RESULT([no (explicitly disabled)])
   elif test "x$enable_inline_types" = x ; then
@@ -427,7 +427,7 @@ AC_DEFUN([OPENJ9_CONFIGURE_INLINE_TYPES],
   else
     AC_MSG_ERROR([--enable-inline-types accepts no argument])
   fi
-  AC_SUBST(OPENJ9_ENABLE_INLINE_TYPES)
+  AC_SUBST(OPENJ9_ENABLE_ENHANCED_INLINE_TYPES)
 ])
 
 AC_DEFUN([OPENJ9_CONFIGURE_JFR],
