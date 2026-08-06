@@ -21,6 +21,12 @@
  * questions.
  */
 
+/*
+ * ===========================================================================
+ * (c) Copyright IBM Corp. 2026, 2026 All Rights Reserved
+ * ===========================================================================
+ */
+
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -234,14 +240,15 @@ JNIEXPORT jint JNICALL
 Agent_OnLoad(JavaVM *jvm, char *options, void *reserved)
 {
     jvmtiError err;
-    jvmtiCapabilities caps = {};
-    jvmtiEventCallbacks callbacks = {};
+    jvmtiCapabilities caps;
+    jvmtiEventCallbacks callbacks;
     jint res = jvm->GetEnv((void **) &jvmti, JVMTI_VERSION_1_1);
     if (res != JNI_OK || jvmti == nullptr) {
         reportError("GetEnv failed", res);
         return JNI_ERR;
     }
 
+    memset(&caps, 0, sizeof(caps));
     caps.can_generate_field_modification_events = 1;
     caps.can_generate_field_access_events = 1;
     caps.can_tag_objects = 1;
@@ -251,6 +258,7 @@ Agent_OnLoad(JavaVM *jvm, char *options, void *reserved)
         return JNI_ERR;
     }
 
+    memset(&callbacks, 0, sizeof(callbacks));
     callbacks.FieldModification = &onFieldModification;
     callbacks.FieldAccess = &onFieldAccess;
 
