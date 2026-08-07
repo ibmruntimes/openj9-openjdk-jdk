@@ -279,6 +279,7 @@ public final class RestrictedSecurity {
      * Check if the service is allowed to be registered in restricted security mode.
      *
      * @param service the service to check
+     * @param aliases a list of aliases for the algorithm name of the service
      * @return true if the service is allowed to be registered
      */
     public static boolean canServiceBeRegistered(Service service, List<String> aliases) {
@@ -858,6 +859,7 @@ public final class RestrictedSecurity {
          *
          * @param service   the Service to check
          * @param checkUse  should its attempted use be checked against the accepted
+         * @param aliases   a list of aliases for the algorithm name of the service
          * @return true if the Service is allowed
          */
         boolean isRestrictedServiceAllowed(Service service, boolean checkUse, List<String> aliases) {
@@ -2052,7 +2054,7 @@ public final class RestrictedSecurity {
             this.acceptedUses = acceptedUses;
         }
 
-        public void setAlgorithm(String algorithm) {
+        private void setAlgorithm(String algorithm) {
             this.algorithm = algorithm;
         }
 
