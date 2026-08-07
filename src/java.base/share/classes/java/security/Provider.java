@@ -25,7 +25,7 @@
 
 /*
  * ===========================================================================
- * (c) Copyright IBM Corp. 2022, 2025 All Rights Reserved
+ * (c) Copyright IBM Corp. 2022, 2026 All Rights Reserved
  * ===========================================================================
  */
 
@@ -1254,10 +1254,13 @@ public abstract class Provider extends Properties {
             throw new IllegalArgumentException
                     ("service.getProvider() must match this Provider object");
         }
-        if (!RestrictedSecurity.canServiceBeRegistered(s)) {
-            // We're in restricted security mode which does not allow this service,
-            // return without registering.
-            return;
+        if (RestrictedSecurity.isEnabled()) {
+            List<String> aliases = s.getAliases();
+            if (!RestrictedSecurity.canServiceBeRegistered(s, aliases)) {
+                // We're in restricted security mode which does not allow this service,
+                // return without registering.
+                return;
+            }
         }
         String type = s.getType();
         String algorithm = s.getAlgorithm();
