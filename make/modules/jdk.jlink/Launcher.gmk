@@ -23,13 +23,6 @@
 # questions.
 #
 
-# ===========================================================================
-# (c) Copyright IBM Corp. 2026, 2026 All Rights Reserved
-# ===========================================================================
-
-# Workaround an apparent JIT issue; see https://github.com/eclipse-openj9/openj9/issues/24523.
-JIT_CONTROL := -Xjit:exclude={jdk/internal/util/ArraysSupport.*}
-
 ################################################################################
 
 include LauncherCommon.gmk
@@ -49,7 +42,7 @@ $(eval $(call SetupBuildLauncher, jimage, \
 
 $(eval $(call SetupBuildLauncher, jlink, \
     MAIN_CLASS := jdk.tools.jlink.internal.Main, \
-    JAVA_ARGS := $(JIT_CONTROL) --add-modules ALL-DEFAULT, \
+    JAVA_ARGS := --add-modules ALL-DEFAULT, \
     ENABLE_ARG_FILES := true, \
     EXPAND_CLASSPATH_WILDCARDS := true, \
 ))
@@ -60,7 +53,6 @@ $(eval $(call SetupBuildLauncher, jlink, \
 
 $(eval $(call SetupBuildLauncher, jmod, \
     MAIN_CLASS := jdk.tools.jmod.Main, \
-    JAVA_ARGS := $(JIT_CONTROL), \
     ENABLE_ARG_FILES := true, \
     EXPAND_CLASSPATH_WILDCARDS := true, \
 ))
