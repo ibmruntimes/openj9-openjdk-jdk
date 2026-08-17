@@ -22,6 +22,12 @@
  */
 
 /*
+ * ===========================================================================
+ * (c) Copyright IBM Corp. 2026, 2026 All Rights Reserved
+ * ===========================================================================
+ */
+
+/*
  * @test
  * @bug 8196182 8350481
  * @summary Test ServiceLoader iterating over service providers when linkage error is thrown
@@ -107,11 +113,11 @@ class LinkageErrorsTest {
     }
 
     /**
-     * Test iteration over service providers when finding the public no-arg constructor
+     * Test iteration over service providers when invoking the public no-arg constructor
      * of a provider fails with a linkage error.
      */
     @Test
-    void testFindConstructorThrows() throws Exception {
+    void testConstructorThrows() throws Exception {
         Map<String, String> sources = Map.of(
                 "Service",
                     """
@@ -130,14 +136,13 @@ class LinkageErrorsTest {
                 "Provider2",
                     """
                     public class Provider2 implements Service {
-                        public Provider2() {}
-                        public Provider2(Param p) { }
+                        public Provider2() { new Param(); }
                     }
                     """
         );
         Path classesDir = compile(sources);
 
-        // delete the class file for the parameter of Provider's 1-param ctor
+        // delete the class referenced by Provider2's no-arg constructor
         Files.delete(classesDir.resolve("Param.class"));
 
         // create services configuration file that lists two providers
@@ -157,7 +162,7 @@ class LinkageErrorsTest {
         assertEquals(1, providers.size());
         assertEquals("Provider1", providers.get(0).getClass().getName());
 
-        // loading Provider2 expected to fail with LinkageError
+        // instantiation of Provider2 should fail with a LinkageError
         assertEquals(1, errors.size());
         assertInstanceOf(LinkageError.class, errors.get(0).getCause());
     }
