@@ -23,12 +23,6 @@
  * questions.
  */
 
-/*
- * ===========================================================================
- * (c) Copyright IBM Corp. 2026, 2026 All Rights Reserved
- * ===========================================================================
- */
-
 package java.util.zip;
 
 import java.nio.ByteBuffer;
@@ -305,7 +299,7 @@ class ZipCoder {
         byte compare(String str, byte[] b, int off, int len, boolean matchDirectory) {
             try {
                 byte[] encoded = JLA.uncheckedGetBytesOrThrow(str, UTF_8.INSTANCE);
-                int mismatch = simple_mismatch(encoded, 0, encoded.length, b, off, off+len);
+                int mismatch = Arrays.mismatch(encoded, 0, encoded.length, b, off, off+len);
                 if (mismatch == -1) {
                     return EXACT_MATCH;
                 } else if (matchDirectory && len == mismatch + 1 && hasTrailingSlash(b, off + len)) {
@@ -315,24 +309,6 @@ class ZipCoder {
                 }
             } catch (CharacterCodingException e) {
                 return NO_MATCH;
-            }
-        }
-
-        // A replacement for Arrays.mismatch() to work around an apparent JIT issue.
-        // See https://github.com/eclipse-openj9/openj9/issues/24523.
-        private static int simple_mismatch(byte[] a, int aFromIndex, int aToIndex,
-                                           byte[] b, int bFromIndex, int bToIndex) {
-            int aLength = aToIndex - aFromIndex;
-            int bLength = bToIndex - bFromIndex;
-            int length = Math.min(aLength, bLength);
-
-            for (int i = 0;; ++i) {
-                if (i >= length) {
-                    return (aLength == bLength) ? -1 : length;
-                }
-                if (a[aFromIndex + i] != a[aFromIndex + i]) {
-                    return i;
-                }
             }
         }
     }
