@@ -93,6 +93,7 @@
 #
 # List of providers and their preference orders (see above):
 #
+security.provider.tbd=com.ibm.crypto.plus.provider.OpenJCEPlusSemeruDefaults
 security.provider.tbd=SUN
 security.provider.tbd=SunRsaSign
 security.provider.tbd=SunEC
