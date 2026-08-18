@@ -146,7 +146,8 @@ public class KAKeyDerivation implements SSLKeyDerivation {
                         HKDFParameterSpec.ofExtract().addSalt(zeros)
                         .addIKM(zeros).extractOnly());
                 if (SSLLogger.isOn()
-                    && (SSLLogger.isOn(SSLLogger.Opt.SSL) || SSLLogger.isOn(SSLLogger.Opt.HANDSHAKE))
+                    && SSLLogger.isOn(SSLLogger.Opt.SSL)
+                    && SSLLogger.isOn(SSLLogger.Opt.HANDSHAKE)
                 ) {
                     SSLLogger.finer("No PSK is in use, the KDF is from: " + hkdf.getProviderName()
                             + ", the classname for earlySecret key is " + earlySecret.getClass().getName());
@@ -170,7 +171,8 @@ public class KAKeyDerivation implements SSLKeyDerivation {
             }
             SecretKey result = hkdf.deriveKey(label, spec.extractOnly());
             if (SSLLogger.isOn()
-                && (SSLLogger.isOn(SSLLogger.Opt.SSL) || SSLLogger.isOn(SSLLogger.Opt.HANDSHAKE))
+                && SSLLogger.isOn(SSLLogger.Opt.SSL)
+                && SSLLogger.isOn(SSLLogger.Opt.HANDSHAKE)
             ) {
                 SSLLogger.finer("derive handshake secret, the KDF is from: "
                         + hkdf.getProviderName() + ", the classname for sharedSecret key is " + result.getClass().getName());

@@ -132,7 +132,8 @@ public class Hybrid {
             leftSpec = getSpec(leftAlg);
             rightSpec = getSpec(rightAlg);
             if (SSLLogger.isOn()
-                && (SSLLogger.isOn(SSLLogger.Opt.SSL) || SSLLogger.isOn(SSLLogger.Opt.HANDSHAKE))
+                && SSLLogger.isOn(SSLLogger.Opt.SSL)
+                && SSLLogger.isOn(SSLLogger.Opt.HANDSHAKE)
             ) {
                 SSLLogger.finer("Hybrid KeyPairGenerator:\n"
                         + "  " + leftAlg + " is from " + left.getProvider().getName() + "\n"
@@ -158,7 +159,8 @@ public class Hybrid {
             var kp1 = left.generateKeyPair();
             var kp2 = right.generateKeyPair();
             if (SSLLogger.isOn()
-                && (SSLLogger.isOn(SSLLogger.Opt.SSL) || SSLLogger.isOn(SSLLogger.Opt.HANDSHAKE))
+                && SSLLogger.isOn(SSLLogger.Opt.SSL)
+                && SSLLogger.isOn(SSLLogger.Opt.HANDSHAKE)
             ) {
                 SSLLogger.finer("Hybrid KeyPairGenerator:\n"
                         + "  left publicKey is from " + kp1.getPublic().getClass().getName() + ", "
@@ -322,7 +324,8 @@ public class Hybrid {
                 KEM.Encapsulator rightEnc = right.newEncapsulator(pk.right, secureRandom);
 
                 if (SSLLogger.isOn()
-                    && (SSLLogger.isOn(SSLLogger.Opt.SSL) || SSLLogger.isOn(SSLLogger.Opt.HANDSHAKE))
+                    && SSLLogger.isOn(SSLLogger.Opt.SSL)
+                    && SSLLogger.isOn(SSLLogger.Opt.HANDSHAKE)
                 ) {
                     SSLLogger.finer("Hybrid KEM NewEncapsulator:\n"
                             + "  LeftEnc [" + leftname + "]: Provider=" + leftEnc.providerName()
@@ -347,7 +350,8 @@ public class Hybrid {
                 KEM.Decapsulator rightDec = right.newDecapsulator(pk.right);
 
                 if (SSLLogger.isOn()
-                    && (SSLLogger.isOn(SSLLogger.Opt.SSL) || SSLLogger.isOn(SSLLogger.Opt.HANDSHAKE))
+                    && SSLLogger.isOn(SSLLogger.Opt.SSL)
+                    && SSLLogger.isOn(SSLLogger.Opt.HANDSHAKE)
                 ) {
                     SSLLogger.finer("Hybrid KEM NewDecapsulator:\n"
                             + "  LeftDec [" + leftname + "]: Provider=" + leftDec.providerName()
