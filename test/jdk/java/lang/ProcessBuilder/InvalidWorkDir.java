@@ -21,6 +21,12 @@
  * questions.
  */
 
+/*
+ * ===========================================================================
+ * (c) Copyright IBM Corp. 2026, 2026 All Rights Reserved
+ * ===========================================================================
+ */
+
 /**
  * @test id=FORK
  * @bug 8379967
@@ -53,7 +59,14 @@ public class InvalidWorkDir {
         try(Process p = bld.start()) {
             throw new RuntimeException("IOE expected");
         } catch (IOException e) {
-            if (!e.getMessage().matches(".*Failed to access working directory.*No such file or directory.*")) {
+            /*
+             * ENOENT error message differs on AIX due to setlocale(LC_ALL, "")
+             * and is reported as "A file or directory in the path name does not exist."
+             */
+            if (!e.getMessage().matches(".*Failed to access working directory.*"
+                + "(No such file or directory|"
+                + "A file or directory in the path name does not exist).*")
+            ) {
                 throw new RuntimeException(String.format("got IOE but with different text (%s)", e.getMessage()));
             }
         }
