@@ -23,7 +23,7 @@
 
 /*
  * ===========================================================================
- * (c) Copyright IBM Corp. 2022, 2022 All Rights Reserved
+ * (c) Copyright IBM Corp. 2022, 2026 All Rights Reserved
  * ===========================================================================
  */
 
@@ -57,7 +57,7 @@ public class Platform {
     private static final String compiler    = System.getProperty("sun.management.compiler");
     private static final String testJdk     = System.getProperty("test.jdk");
 
-    private static boolean isJ9() {
+    public static boolean isJ9() {
         return vmName.contains("OpenJ9") || vmName.contains("IBM");
     }
 
