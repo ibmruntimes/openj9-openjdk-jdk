@@ -72,7 +72,11 @@ import static java.lang.constant.ConstantDescs.*;
 // This classloader is parallel capable. It uses the built in classloading lock via
 // loadClass to ensure that it defines a given GenX or FieldX only once.
 public class BigClassTreeClassLoader extends ClassLoader {
-
+    static {
+        if (!registerAsParallelCapable()) {
+            throw new IllegalStateException("could not register parallel classloader");
+        }
+    }
     // Sanity test, this should never fail.
     public static void main(String[] args) throws ClassNotFoundException {
         var fields = new FieldGeneration(1, Optional.empty(), Optional.empty());
@@ -114,7 +118,7 @@ public class BigClassTreeClassLoader extends ClassLoader {
         }
         this.availableStrategies = new Strategy[] { new GenStrategy(fields.index), new FieldStrategy(fields) };
         // Finally, register as a parallel capable classloader for stress tests.
-        if(!registerAsParallelCapable() || !isRegisteredAsParallelCapable()) {
+        if(!isRegisteredAsParallelCapable()) {
             throw new IllegalStateException("could not register parallel classloader");
         }
     }
