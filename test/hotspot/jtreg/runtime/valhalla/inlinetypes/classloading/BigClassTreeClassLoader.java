@@ -1,4 +1,28 @@
 /*
+ * ===========================================================================
+ * (c) Copyright IBM Corp. 2022, 2026 All Rights Reserved
+ * ===========================================================================
+ *
+ * This code is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License version 2 only, as
+ * published by the Free Software Foundation.
+ *
+ * IBM designates this particular file as subject to the "Classpath" exception
+ * as provided by IBM in the LICENSE file that accompanied this code.
+ *
+ * This code is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+ * version 2 for more details (a copy is included in the LICENSE file that
+ * accompanied this code).
+ *
+ * You should have received a copy of the GNU General Public License version
+ * 2 along with this work; if not, see <http://www.gnu.org/licenses/>.
+ *
+ * ===========================================================================
+ */
+
+/*
  * Copyright (c) 2025, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
@@ -72,7 +96,11 @@ import static java.lang.constant.ConstantDescs.*;
 // This classloader is parallel capable. It uses the built in classloading lock via
 // loadClass to ensure that it defines a given GenX or FieldX only once.
 public class BigClassTreeClassLoader extends ClassLoader {
-
+    static {
+        if (!registerAsParallelCapable()) {
+            throw new IllegalStateException("could not register parallel classloader");
+        }
+    }
     // Sanity test, this should never fail.
     public static void main(String[] args) throws ClassNotFoundException {
         var fields = new FieldGeneration(1, Optional.empty(), Optional.empty());
@@ -114,7 +142,7 @@ public class BigClassTreeClassLoader extends ClassLoader {
         }
         this.availableStrategies = new Strategy[] { new GenStrategy(fields.index), new FieldStrategy(fields) };
         // Finally, register as a parallel capable classloader for stress tests.
-        if(!registerAsParallelCapable() || !isRegisteredAsParallelCapable()) {
+        if(!isRegisteredAsParallelCapable()) {
             throw new IllegalStateException("could not register parallel classloader");
         }
     }
