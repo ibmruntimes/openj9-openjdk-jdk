@@ -21,6 +21,12 @@
  * questions.
  */
 
+/*
+ * ===========================================================================
+ * (c) Copyright IBM Corp. 2026, 2026 All Rights Reserved
+ * ===========================================================================
+ */
+
 import java.io.Writer;
 import java.lang.reflect.Method;
 import java.nio.file.Files;
@@ -29,6 +35,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.stream.Stream;
 
+import jdk.test.lib.Platform;
 import jdk.test.lib.process.OutputAnalyzer;
 import jdk.test.lib.process.ProcessTools;
 import org.junit.jupiter.api.Assumptions;
@@ -149,7 +156,15 @@ public class IO {
                     }
                     """);
         }
-        var pb = ProcessTools.createTestJavaProcessBuilder("-Xlog:aot=off", "-Xlog:cds=off", file.toString());
+
+        ProcessBuilder pb;
+        if (Platform.isJ9()) {
+            /* The AOT/CDS -Xlog options are unsupported by OpenJ9 and are reported to stderr. */
+            pb = ProcessTools.createTestJavaProcessBuilder(file.toString());
+        } else {
+            pb = ProcessTools.createTestJavaProcessBuilder("-Xlog:aot=off", "-Xlog:cds=off", file.toString());
+        }
+
         OutputAnalyzer output = ProcessTools.executeProcess(pb);
         assertEquals(0, output.getExitValue());
         assertTrue(output.getStderr().isEmpty());

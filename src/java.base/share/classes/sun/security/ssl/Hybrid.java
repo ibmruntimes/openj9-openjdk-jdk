@@ -288,6 +288,17 @@ public class Hybrid {
                                 " algorithm: " + rightname);
                     }
 
+                    if (SSLLogger.isOn()
+                        && SSLLogger.isOn(SSLLogger.Opt.SSL)
+                        && SSLLogger.isOn(SSLLogger.Opt.HANDSHAKE)
+                    ) {
+                        SSLLogger.finer("Hybrid KeyFactory:\n"
+                                + "  " + this.leftname + " is from " + this.left.getProvider().getName() + ", "
+                                + "left publicKey from " + leftKey.getClass().getName() + "\n"
+                                + "  " + this.rightname + " is from " + this.right.getProvider().getName() + ", "
+                                + "right publicKey from " + rightKey.getClass().getName());
+                    }
+
                     return new PublicKeyImpl("Hybrid", leftKey, rightKey);
                 } catch (Exception e) {
                     throw new InvalidKeyException("Failed to decode " +
