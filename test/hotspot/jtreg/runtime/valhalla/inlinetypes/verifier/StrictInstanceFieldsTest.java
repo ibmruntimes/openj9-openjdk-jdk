@@ -22,6 +22,12 @@
  */
 
 /*
+ * ===========================================================================
+ * (c) Copyright IBM Corp. 2026, 2026 All Rights Reserved
+ * ===========================================================================
+ */
+
+/*
  * @test
  * @enablePreview
  * @library /test/lib
@@ -133,16 +139,43 @@ public class StrictInstanceFieldsTest {
         negativeTest(TryCatchChildBad.class, "Inconsistent stackmap frames at branch target");
 
         // Early_Larval frame contains another early_larval instead of a base frame
-        negativeTest(NestedEarlyLarval.class, "Early larval frame must be followed by a base frame", true, false);
+        String nestedEarlyLarvalMessage = "Early larval frame must be followed by a base frame";
+        try {
+            negativeTest(NestedEarlyLarval.class, nestedEarlyLarvalMessage, true, false);
+            throw new RuntimeException("Should fail verification");
+        } catch (VerifyError e) {
+            if (!e.getMessage().contains(nestedEarlyLarvalMessage)) {
+                throw new RuntimeException("wrong exception: " + e.getMessage());
+            }
+            e.printStackTrace();
+        }
 
         // Stack map table ends in early_larval frame without base frame
-        negativeTest(EndsInEarlyLarval.class, "Early larval frame must be followed by a base frame", true, false);
+        String endsInEarlyLarvalMessage = "Early larval frame must be followed by a base frame";
+        try {
+            negativeTest(EndsInEarlyLarval.class, endsInEarlyLarvalMessage, true, false);
+            throw new RuntimeException("Should fail verification");
+        } catch (VerifyError e) {
+            if (!e.getMessage().contains(endsInEarlyLarvalMessage)) {
+                throw new RuntimeException("wrong exception: " + e.getMessage());
+            }
+            e.printStackTrace();
+        }
 
         // Early_larval frame includes a strict field not preset in the original set of unset fields
         negativeTest(EarlyLarvalNotSubset.class, "Strict fields not a subset of initial strict instance fields", true, false);
 
         // Early_larval frame includes a constant pool index that doesn't point to a NameAndType
-        negativeTest(InvalidIndexInEarlyLarval.class, "Invalid constant pool index in early larval frame", true, false);
+        String invalidIndexInEarlyLarvalMessage = "Invalid constant pool index in early larval frame";
+        try {
+            negativeTest(InvalidIndexInEarlyLarval.class, invalidIndexInEarlyLarvalMessage, true, false);
+            throw new RuntimeException("Should fail verification");
+        } catch (VerifyError e) {
+            if (!e.getMessage().contains(invalidIndexInEarlyLarvalMessage)) {
+                throw new RuntimeException("wrong exception: " + e.getMessage());
+            }
+            e.printStackTrace();
+        }
 
         System.out.println("Passed");
     }
