@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019, 2024, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2019, 2026, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -23,24 +23,25 @@
 
 /*
  * ===========================================================================
- * (c) Copyright IBM Corp. 2023, 2023 All Rights Reserved
+ * (c) Copyright IBM Corp. 2023, 2026 All Rights Reserved
  * ===========================================================================
  */
 
 /*
  * @test
  * @modules java.base/jdk.internal.misc
- * @run testng TestValueLayouts
+ * @run junit TestValueLayouts
  */
 
-import org.testng.annotations.*;
 
 import java.lang.foreign.*;
 import java.nio.ByteOrder;
 import jdk.internal.misc.Unsafe;
 
 import static java.lang.foreign.ValueLayout.*;
-import static org.testng.Assert.*;
+
+import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
 
 public class TestValueLayouts {
 
@@ -149,10 +150,10 @@ public class TestValueLayouts {
               Class<?> carrier,
               long byteSize,
               long byteAlignment) {
-        assertEquals(layout.carrier(), carrier);
-        assertEquals(layout.byteSize(), byteSize);
-        assertEquals(layout.order(), ByteOrder.nativeOrder());
-        assertEquals(layout.byteAlignment(), (isAixOS && (layout == JAVA_DOUBLE)) ? 4 : byteAlignment);
+        assertEquals(carrier, layout.carrier());
+        assertEquals(byteSize, layout.byteSize());
+        assertEquals(ByteOrder.nativeOrder(), layout.order());
+        assertEquals((isAixOS && (layout == JAVA_DOUBLE)) ? 4 : byteAlignment, layout.byteAlignment());
         assertTrue(layout.name().isEmpty());
 
     }

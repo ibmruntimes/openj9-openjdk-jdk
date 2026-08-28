@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, 2023, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2021, 2026, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -23,13 +23,13 @@
 
 /*
  * ===========================================================================
- * (c) Copyright IBM Corp. 2022, 2022 All Rights Reserved
+ * (c) Copyright IBM Corp. 2022, 2026 All Rights Reserved
  * ===========================================================================
  */
 
 /*
  * @test
- * @bug 8276422
+ * @bug 8276422 8387729
  * @summary Invalid/missing values for the finalization option should be rejected
  * @library /test/lib
  * @run driver InvalidFinalizationOption
@@ -40,12 +40,17 @@ import jdk.test.lib.process.OutputAnalyzer;
 
 public class InvalidFinalizationOption {
     public static void main(String[] args) throws Exception {
-        record TestData(String arg, String expected) { }
+        record TestData(String[] arg, String expected) { }
 
         TestData[] testData = {
-            new TestData("--finalization",        "Command-line option unrecognised"),
-            new TestData("--finalization=",       "Command-line option unrecognised"),
-            new TestData("--finalization=azerty", "Command-line option unrecognised")
+            new TestData(new String[] { "--finalization" },
+                    "Command-line option unrecognised"),
+            new TestData(new String[] { "--finalization=" },
+                    "Command-line option unrecognised"),
+            new TestData(new String[] { "--finalization=azerty" },
+                    "Command-line option unrecognised"),
+            new TestData(new String[] { "--finalization", "azerty" },
+                    "Command-line option unrecognised")
         };
 
         for (var data : testData) {
