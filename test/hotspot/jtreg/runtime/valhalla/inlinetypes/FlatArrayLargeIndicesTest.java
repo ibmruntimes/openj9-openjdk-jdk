@@ -23,6 +23,12 @@
  */
 
 /*
+ * ===========================================================================
+ * (c) Copyright IBM Corp. 2026, 2026 All Rights Reserved
+ * ===========================================================================
+ */
+
+/*
  * @test id=interpreted
  * @summary Ensures that large flat array indexing doesn't cause overflows.
  * @bug 8371604
@@ -31,6 +37,7 @@
  * @library /test/lib /
  * @modules java.base/jdk.internal.value
  * @run junit/othervm/timeout=480 -Xmx18G -Xint
+        -XX:+EnableFlattening -XX:ValueTypeFlatteningThreshold=9999 -XX:+EnableArrayFlattening
         runtime.valhalla.inlinetypes.FlatArrayLargeIndicesTest
  */
 
@@ -43,6 +50,7 @@
  * @library /test/lib /
  * @modules java.base/jdk.internal.value
  * @run junit/othervm/timeout=480 -Xmx18G -XX:TieredStopAtLevel=3 -Xcomp
+        -XX:+EnableFlattening -XX:ValueTypeFlatteningThreshold=9999 -XX:+EnableArrayFlattening
         runtime.valhalla.inlinetypes.FlatArrayLargeIndicesTest
  */
 
@@ -55,6 +63,7 @@
  * @library /test/lib /
  * @modules java.base/jdk.internal.value
  * @run junit/othervm/timeout=480 -Xmx18G -XX:-TieredCompilation -Xcomp
+        -XX:+EnableFlattening -XX:ValueTypeFlatteningThreshold=9999 -XX:+EnableArrayFlattening
         runtime.valhalla.inlinetypes.FlatArrayLargeIndicesTest
  */
 
@@ -74,9 +83,12 @@ public final class FlatArrayLargeIndicesTest {
 
     public static value record Box(int underlying) {}
 
+    private static final Box DEFAULT = new Box(0);
+
     @Test
     public void testStore() {
-        Box[] arr = new Box[BIG];
+        /* In OpenJ9 only null-restricted arrays are flattened. */
+        Box[] arr = (Box[]) ValueClass.newNullRestrictedAtomicArray(Box.class, BIG, DEFAULT);
         assertFlat(arr);
         arr[INDEX_1] = new Box(19);
         System.out.println(arr);
@@ -84,10 +96,12 @@ public final class FlatArrayLargeIndicesTest {
 
     @Test
     public void testLoad() {
-        Box[] arr = new Box[BIG];
+        /* In OpenJ9 only null-restricted arrays are flattened. */
+        Box[] arr = (Box[]) ValueClass.newNullRestrictedAtomicArray(Box.class, BIG, DEFAULT);
         assertFlat(arr);
         Box box = arr[INDEX_2];
-        assertNull(box, "the box should be null");
+        /* Every slot of a null-restricted array is initialized with a default value, hence no null values are stored. */
+        assertNotNull(box, "the box should not be null");
     }
 
     private void assertFlat(Box[] arr) {
