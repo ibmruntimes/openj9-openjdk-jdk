@@ -21,6 +21,11 @@
  * questions.
  *
  */
+/*
+ * ===========================================================================
+ * (c) Copyright IBM Corp. 2026, 2026 All Rights Reserved
+ * ===========================================================================
+ */
 
 /*
  * @test
@@ -45,7 +50,8 @@ import org.junit.jupiter.api.Test;
 class ConcurrentClassLoadingTest {
     private static final boolean DEBUG = false;
     private static final int N_ITER = 125;
-    private static final int DEPTH = 100;
+    // Reduce depth to avoid StackOverflowError on platforms with smaller default native stack sizes.
+    private static final int DEPTH = 50;
 
     @Test
     void test() throws InterruptedException {
