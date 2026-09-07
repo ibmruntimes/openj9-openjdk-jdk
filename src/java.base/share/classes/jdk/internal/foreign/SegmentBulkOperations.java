@@ -112,8 +112,10 @@ public final class SegmentBulkOperations {
         src.checkAccess(srcOffset, size, true);
         dst.checkAccess(dstOffset, size, false);
 
-        if (size <= 0) {
-            // Do nothing
+        if (size == 0) {
+            // No memory access occurs below, so the segments' states must be checked explicitly.
+            src.sessionImpl().checkValidState();
+            dst.sessionImpl().checkValidState();
         } else if (size < NATIVE_THRESHOLD_COPY && !src.overlaps(dst)) {
             // 0 < size < FILL_NATIVE_LIMIT : 0...0X...XXXX
             //
