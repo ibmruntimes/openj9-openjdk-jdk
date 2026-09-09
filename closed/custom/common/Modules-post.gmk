@@ -44,13 +44,6 @@ else
 	#
 endif
 
-ifeq (false,$(OPENJ9_ENABLE_JFR))
-  MODULES_FILTER += \
-	jdk.jfr \
-	jdk.management.jfr \
-	#
-endif
-
 MODULES_FILTER += \
 	jdk.aot \
 	jdk.hotspot.agent \
