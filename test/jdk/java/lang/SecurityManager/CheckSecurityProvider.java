@@ -61,6 +61,8 @@ public class CheckSecurityProvider {
         List<String> expected = new ArrayList<>();
 
         // NOTE: the ordering must match what's defined inside java.security
+        layer.findModule("openjceplus")
+            .ifPresent(m -> expected.add("com.ibm.crypto.plus.provider.OpenJCEPlusSemeruDefaults"));
         expected.add("sun.security.provider.Sun");
         expected.add("sun.security.rsa.SunRsaSign");
         expected.add("sun.security.ec.SunEC");
