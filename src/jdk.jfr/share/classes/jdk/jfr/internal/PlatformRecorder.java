@@ -43,6 +43,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -626,8 +627,9 @@ public final class PlatformRecorder {
             } else {
                 if (r.getStopTime() != null) {
                     TimerTask stopTask = copy.createStopTask();
-                    copy.setStopTask(copy.createStopTask());
-                    getTimer().schedule(stopTask, r.getStopTime().toEpochMilli());
+                    copy.setStopTask(stopTask);
+                    long epochMilli = r.getStopTime().toEpochMilli();
+                    getTimer().schedule(stopTask, new Date(epochMilli));
                 }
             }
         }
