@@ -21,52 +21,32 @@
  * questions.
  */
 
+
+package runtime.valhalla.inlinetypes;
+
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.VarHandle;
+
 /*
- * @test
- * @bug 8389218 8392563
- * @summary Test that PhaseCCP reaches a fixpoint for CmpU with a wrapped
- *          AddI range or SubI range.
- * @run main/othervm -Xcomp -XX:-TieredCompilation
- *                   -XX:CompileCommand=compileonly,${test.main.class}::test*
- *                   ${test.main.class}
+ * @test VarHandleCASOfEmptyClass
+ * @summary VarHandle compareAndSet can handle empty value classes
+ * @bug 8391651
+ * @enablePreview
+ * @compile VarHandleCASOfEmptyClass.java
+ * @run main runtime.valhalla.inlinetypes.VarHandleCASOfEmptyClass
  */
 
-package compiler.ccp;
+public class VarHandleCASOfEmptyClass {
+    static value class Empty { }
 
-public class TestCmpUCCPFixpoint {
-    static int iFld;
-    static int limit;
-    static float f;
-
-    public static void main(String[] args) {
-        test1();
-        test2();
+    static class Holder {
+        Empty value;
     }
 
-    // CmpU with a wrapped AddI range.
-    static void test1() {
-        short x = -100;
-
-        for (int i = 0; i < limit; i++) {
-            x++;
-        }
-        x++;
-
-        switch (x) {
-            case Short.MIN_VALUE + 1:
-            case Short.MAX_VALUE:
-                iFld = 2;
-        }
-    }
-
-    // CmpU with a wrapped SubI range.
-    static void test2() {
-        byte b;
-        for (b = 0; b < 6; b++) {}
-        switch (-b) {
-            case 966:
-            case -126:
-                f = 0;
+    public static void main(String[] args) throws ReflectiveOperationException {
+        VarHandle handle = MethodHandles.lookup().findVarHandle(Holder.class, "value", Empty.class);
+        if (!handle.compareAndSet(new Holder(), null, new Empty())) {
+            throw new RuntimeException("compareAndSet failed");
         }
     }
 }
