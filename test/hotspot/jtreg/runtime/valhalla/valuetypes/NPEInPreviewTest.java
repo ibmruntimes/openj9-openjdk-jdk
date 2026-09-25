@@ -126,30 +126,26 @@ public class NPEInPreviewTest {
     // Should not get the message:
     // There cannot be a NullPointerException at bci 4 of method void NPEInPreviewTest.testNullRestrictedStaticFieldError()
     static void testNullRestrictedStaticFieldError() {
-        String expectedMessage = "Cannot store null in a null-restricted static field";
+        String expectedMessage = "Cannot store null in a null-restricted field";
 
         try {
             staticVal = null;
         } catch (NullPointerException npe) {
             String message = npe.getMessage();
             System.out.println("*** " + message);
-            if(interpreterMode){
-                Asserts.assertEquals(expectedMessage, message);
-            }
+            Asserts.assertEquals(expectedMessage, message);
         }
     }
 
     static void testNullRestrictedStaticFieldError2() {
-        String expectedMessage = "Cannot store null in a null-restricted static field";
+        String expectedMessage = "Cannot store null in a null-restricted field";
 
         try {
             staticVal = nullStaticVal;
         } catch (NullPointerException npe) {
             String message = npe.getMessage();
             System.out.println("*** " + message);
-            if(interpreterMode){
-                Asserts.assertEquals(expectedMessage, message);
-            }
+            Asserts.assertEquals(expectedMessage, message);
         }
     }
 
