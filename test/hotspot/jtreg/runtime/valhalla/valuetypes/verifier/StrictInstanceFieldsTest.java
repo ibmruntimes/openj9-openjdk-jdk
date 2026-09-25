@@ -193,7 +193,7 @@ public class StrictInstanceFieldsTest {
 
         negativeTest(LateOrdinaryStrictFrame.class, "Inconsistent stackmap frames at branch target");
 
-        negativeTest(StrictFieldNoEarlyLarval.class, "Constructor must call super() or this() before return");
+        negativeTest(StrictFieldNoEarlyLarval.class, "<init> does not call this <init> or super <init>");
 
         System.out.println("Passed");
     }
