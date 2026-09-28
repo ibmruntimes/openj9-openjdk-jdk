@@ -138,7 +138,7 @@ public class StrictInstanceFieldsTest {
         negativeTest(BadChild1.class, "All strict fields must be initialized before super()");
 
         // Attempt to assign a strict field not present in the original set of unset fields
-        negativeTest(StrictFieldNotSubset.class, "Bad <init> method call");
+        negativeTest(StrictFieldNotSubset.class, "invokespecial of wrong initializer");
 
         // Constructor with control flow but field is not initialized
         negativeTest(ControlFlowChildBad.class, "Inconsistent stackmap frames at branch target", true, false);
