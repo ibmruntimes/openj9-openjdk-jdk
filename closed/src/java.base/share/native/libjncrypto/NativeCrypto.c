@@ -698,7 +698,7 @@ find_crypto_library(jboolean traceEnabled, jboolean skipBundled, const char *cho
 #elif defined(__APPLE__) /* defined(_AIX) */
     static const char bundledLibName[] = "libcrypto-semeru.dylib";
 #elif defined(_WIN32) /* defined(__APPLE__) */
-    static const char bundledLibName[] = "crypto-semeru.dll";
+    static const char bundledLibName[] = "libcrypto-3-semeru.dll";
 #else /* defined(_WIN32) */
     static const char bundledLibName[] = "libcrypto-semeru.so";
 #endif /* defined(_AIX) */
