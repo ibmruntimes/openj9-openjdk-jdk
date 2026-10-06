@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, 2026, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2026, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -21,22 +21,32 @@
  * questions.
  */
 
-package jdk.jfr.event.profiling;
 
-import jdk.test.lib.jfr.EventNames;
+package runtime.valhalla.inlinetypes;
 
-/**
- * @test
- * @requires vm.hasJFR & vm.continuations
- * @requires vm.opt.DeoptimizeALot != true
- * @library /test/lib
- * @build jdk.jfr.event.profiling.StackTraceTestMatrix
- * @run main/othervm jdk.jfr.event.profiling.TestFullStackTrace
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.VarHandle;
+
+/*
+ * @test VarHandleCAEOfEmptyClass
+ * @summary VarHandle compareAndExchange can handle empty value classes
+ * @bug 8391651
+ * @enablePreview
+ * @compile VarHandleCAEOfEmptyClass.java
+ * @run main runtime.valhalla.inlinetypes.VarHandleCAEOfEmptyClass
  */
-public class TestFullStackTrace {
 
-    public static void main(String[] args) throws Throwable {
-        StackTraceTestMatrix.runAllThreadKinds(EventNames.ExecutionSample, "sampledThread");
+public class VarHandleCAEOfEmptyClass {
+    static value class Empty { }
+
+    static class Holder {
+        Empty value;
     }
 
+    public static void main(String[] args) throws ReflectiveOperationException {
+        VarHandle handle = MethodHandles.lookup().findVarHandle(Holder.class, "value", Empty.class);
+        if (handle.compareAndExchange(new Holder(), null, new Empty()) != null) {
+            throw new RuntimeException("compareAndExchange failed");
+        }
+    }
 }
