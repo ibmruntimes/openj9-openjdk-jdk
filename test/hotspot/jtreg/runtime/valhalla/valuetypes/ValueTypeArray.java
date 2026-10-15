@@ -21,6 +21,12 @@
  * questions.
  */
 
+/*
+ * ===========================================================================
+ * (c) Copyright IBM Corp. 2026, 2026 All Rights Reserved
+ * ===========================================================================
+ */
+
 package runtime.valhalla.valuetypes;
 
 import jdk.internal.value.ValueClass;
@@ -122,13 +128,13 @@ public class ValueTypeArray {
         Point p = defaultPoint[0];
         assertEquals(p.x, 0, "invalid default loaded from array");
         assertEquals(p.y, 0, "invalid default loaded from array");
-        boolean gotNpe = false;
+        boolean gotAse = false;
         try {
             defaultPoint[0] = (Point) getNull();
-        } catch (NullPointerException npe) {
-            gotNpe = true;
+        } catch (ArrayStoreException ase) {
+            gotAse = true;
         }
-        assertTrue(gotNpe, "Expected NullPointerException");
+        assertTrue(gotAse, "Expected ArrayStoreException");
 
         Point[] points = createSimplePointArray();
         System.gc(); // check that VTs survive GC
