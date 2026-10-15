@@ -162,7 +162,7 @@ public class StrictInstanceFieldsTest {
         }
 
         // Frame nested inside early_larval does not have uninitializedThis flag
-        negativeTest(EarlyLarvalNoUninitThis.class, "Cannot have uninitialized strict fields without an uninitializedThis");
+        negativeTest(EarlyLarvalNoUninitThis.class, "Uninitialized strict fields are only permitted before the receiver has been initialized");
 
         // Stack map table ends in early_larval frame without base frame
         String endsInEarlyLarvalMessage = "Early larval frame must be followed by a base frame";
