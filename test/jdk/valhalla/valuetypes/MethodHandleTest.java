@@ -21,6 +21,11 @@
  * questions.
  */
 
+/*
+ * ===========================================================================
+ * (c) Copyright IBM Corp. 2026, 2026 All Rights Reserved
+ * ===========================================================================
+ */
 
 /*
  * @test
@@ -201,7 +206,7 @@ public class MethodHandleTest {
         // set an array element to null
         if (nullRestricted) {
             assertTrue(vh.get(array, 1) != null);
-            assertThrows(NullPointerException.class, () -> setter.invoke(array, 1, null));
+            assertThrows(ArrayStoreException.class, () -> setter.invoke(array, 1, null));
             assertThrows(NullPointerException.class, () -> vh.set(array, 1, null));
         } else {
             setter.invoke(array, 1, null);
