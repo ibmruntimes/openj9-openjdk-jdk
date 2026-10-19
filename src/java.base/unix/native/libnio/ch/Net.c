@@ -49,11 +49,6 @@
 #include "nio_util.h"
 #include "nio.h"
 
-#ifdef _AIX
-#include <stdlib.h>
-#include <sys/utsname.h>
-#endif
-
 #include "ut_jcl_nio.h"
 
 /**
