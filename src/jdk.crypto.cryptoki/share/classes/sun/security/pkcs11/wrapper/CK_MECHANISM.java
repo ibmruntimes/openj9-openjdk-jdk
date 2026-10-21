@@ -1,8 +1,7 @@
 /*
  * Copyright (c) 2003, 2025, Oracle and/or its affiliates. All rights reserved.
- */
-
-/* Copyright  (c) 2002 Graz University of Technology. All rights reserved.
+ * Copyright (c) 2026, IBM Corporation. All rights reserved.
+ * Copyright (c) 2002 Graz University of Technology. All rights reserved.
  *
  * Redistribution and use in  source and binary forms, with or without
  * modification, are permitted  provided that the following conditions are met:
@@ -43,12 +42,6 @@
  *  OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
  *  OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY  OF SUCH DAMAGE.
- */
-
-/*
- * ===========================================================================
- * (c) Copyright IBM Corp. 2024, 2024 All Rights Reserved
- * ===========================================================================
  */
 
 package sun.security.pkcs11.wrapper;
@@ -117,7 +110,7 @@ public class CK_MECHANISM {
         init(mechanism, params);
     }
 
-    public CK_MECHANISM(long mechanism, CK_NSS_TLS_EXTENDED_MASTER_KEY_DERIVE_PARAMS params) {
+    public CK_MECHANISM(long mechanism, CK_TLS12_EXTENDED_MASTER_KEY_DERIVE_PARAMS params) {
         init(mechanism, params);
     }
 

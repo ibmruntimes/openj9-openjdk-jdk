@@ -1,8 +1,7 @@
 /*
  * Copyright (c) 2003, 2025, Oracle and/or its affiliates. All rights reserved.
- */
-
-/* Copyright  (c) 2002 Graz University of Technology. All rights reserved.
+ * Copyright (c) 2026, IBM Corporation. All rights reserved.
+ * Copyright (c) 2002 Graz University of Technology. All rights reserved.
  *
  * Redistribution and use in  source and binary forms, with or without
  * modification, are permitted  provided that the following conditions are met:
@@ -43,12 +42,6 @@
  *  OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
  *  OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY  OF SUCH DAMAGE.
- */
-
-/*
- * ===========================================================================
- * (c) Copyright IBM Corp. 2024, 2024 All Rights Reserved
- * ===========================================================================
  */
 
 package sun.security.pkcs11.wrapper;
@@ -995,14 +988,13 @@ public interface PKCS11Constants {
     public static final long  CKM_SP800_108_FEEDBACK_KDF     = 0x000003adL;
     public static final long  CKM_SP800_108_DOUBLE_PIPELINE_KDF = 0x000003aeL;
 
+    public static final long CKM_TLS12_EXTENDED_MASTER_KEY_DERIVE = 0x00000056L;
+    public static final long CKM_TLS12_EXTENDED_MASTER_KEY_DERIVE_DH = 0x00000057L;
+
     public static final long  CKM_VENDOR_DEFINED             = 0x80000000L;
 
     // NSS private
     public static final long  CKM_NSS_TLS_PRF_GENERAL        = 0x80000373L;
-    public static final long  CKM_NSS_TLS_EXTENDED_MASTER_KEY_DERIVE
-                                        /* (CKM_NSS + 25) */ = 0xCE534369L;
-    public static final long  CKM_NSS_TLS_EXTENDED_MASTER_KEY_DERIVE_DH
-                                        /* (CKM_NSS + 26) */ = 0xCE53436AL;
     // Additional PKCS #12 PBE key derivation algorithms defined in NSS v3.29
     public static final long  CKM_NSS_PKCS12_PBE_SHA224_HMAC_KEY_GEN
                                         /* (CKM_NSS + 29) */ = 0xCE53436DL;
