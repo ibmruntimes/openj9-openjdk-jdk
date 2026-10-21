@@ -1,8 +1,7 @@
 /*
  * Copyright (c) 2003, 2025, Oracle and/or its affiliates. All rights reserved.
- */
-
-/* Copyright  (c) 2002 Graz University of Technology. All rights reserved.
+ * Copyright (c) 2026, IBM Corporation. All rights reserved.
+ * Copyright (c) 2002 Graz University of Technology. All rights reserved.
  *
  * Redistribution and use in  source and binary forms, with or without
  * modification, are permitted  provided that the following conditions are met:
@@ -46,12 +45,6 @@
  */
 
 /*
- * ===========================================================================
- * (c) Copyright IBM Corp. 2024, 2024 All Rights Reserved
- * ===========================================================================
- */
-
-/*
  * pkcs11wrapper.h
  * 18.05.2001
  *
@@ -82,8 +75,6 @@
 #define CKA_NETSCAPE_TRUST_EMAIL_PROTECTION     (CKA_NETSCAPE_TRUST_BASE + 11)
 #define CKA_NETSCAPE_DB                         0xD5A0DB00
 #define CKM_NSS_TLS_PRF_GENERAL                 0x80000373
-#define CKM_NSS_TLS_EXTENDED_MASTER_KEY_DERIVE    (CKA_NETSCAPE_BASE + 25)
-#define CKM_NSS_TLS_EXTENDED_MASTER_KEY_DERIVE_DH (CKA_NETSCAPE_BASE + 26)
 
 /* additional PKCS #12 PBE key derivation algorithms defined in NSS v3.29 */
 #define CKM_NSS_PKCS12_PBE_SHA224_HMAC_KEY_GEN  (CKA_NETSCAPE_BASE + 29)
@@ -314,7 +305,7 @@ void printDebug(const char *format, ...);
 // CLASS_SSL3_KEY_MAT_OUT is used by CLASS_SSL3_KEY_MAT_PARAMS and CK_TLS12_KEY_MAT_PARAMS
 #define CLASS_SSL3_MASTER_KEY_DERIVE_PARAMS "sun/security/pkcs11/wrapper/CK_SSL3_MASTER_KEY_DERIVE_PARAMS"
 #define CLASS_TLS12_MASTER_KEY_DERIVE_PARAMS "sun/security/pkcs11/wrapper/CK_TLS12_MASTER_KEY_DERIVE_PARAMS"
-#define CLASS_NSS_TLS_EXTENDED_MASTER_KEY_DERIVE_PARAMS "sun/security/pkcs11/wrapper/CK_NSS_TLS_EXTENDED_MASTER_KEY_DERIVE_PARAMS"
+#define CLASS_TLS12_EXTENDED_MASTER_KEY_DERIVE_PARAMS "sun/security/pkcs11/wrapper/CK_TLS12_EXTENDED_MASTER_KEY_DERIVE_PARAMS"
 #define CLASS_SSL3_KEY_MAT_PARAMS "sun/security/pkcs11/wrapper/CK_SSL3_KEY_MAT_PARAMS"
 #define CLASS_TLS12_KEY_MAT_PARAMS "sun/security/pkcs11/wrapper/CK_TLS12_KEY_MAT_PARAMS"
 #define CLASS_TLS_PRF_PARAMS "sun/security/pkcs11/wrapper/CK_TLS_PRF_PARAMS"
@@ -452,8 +443,8 @@ typedef struct {
 void copyBackPBEInitializationVector(JNIEnv *env, CK_MECHANISM *ckMechanism, jobject jMechanism);
 void copyBackSetUnwrappedKey(JNIEnv *env, CK_MECHANISM *ckMechanism, jobject jMechanism);
 void ssl3CopyBackClientVersion(JNIEnv *env, CK_MECHANISM *ckMechanism, jobject jMechanism);
-void tls12CopyBackClientVersion(JNIEnv *env, CK_MECHANISM *ckMechanism, jobject jMechanism);
-void tlsEmsCopyBackClientVersion(JNIEnv *env, CK_MECHANISM *ckMechanism, jobject jMechanism);
+void copyBackClientVersion(JNIEnv *env, CK_MECHANISM_PTR ckpMechanism, jobject jMechanism,
+        CK_VERSION_PTR pVersion, const char *mechanismClass);
 void ssl3CopyBackKeyMatParams(JNIEnv *env, CK_MECHANISM *ckMechanism, jobject jMechanism);
 void tls12CopyBackKeyMatParams(JNIEnv *env, CK_MECHANISM *ckMechanism, jobject jMechanism);
 

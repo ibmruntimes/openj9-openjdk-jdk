@@ -9,12 +9,6 @@
  * http://docs.oasis-open.org/pkcs11/pkcs11-spec/v3.2/pkcs11-spec-v3.2.html
  */
 
-/*
- * ===========================================================================
- * (c) Copyright IBM Corp. 2024, 2024 All Rights Reserved
- * ===========================================================================
- */
-
 /* See top of pkcs11.h for information about the macros that
  * must be defined and the structure-packing conventions that
  * must be set before including this file.
@@ -2339,16 +2333,6 @@ typedef struct CK_TLS12_MASTER_KEY_DERIVE_PARAMS {
 
 typedef CK_TLS12_MASTER_KEY_DERIVE_PARAMS CK_PTR \
                                 CK_TLS12_MASTER_KEY_DERIVE_PARAMS_PTR;
-
-typedef struct CK_NSS_TLS_EXTENDED_MASTER_KEY_DERIVE_PARAMS {
-    CK_MECHANISM_TYPE prfHashMechanism;
-    CK_BYTE_PTR       pSessionHash;
-    CK_ULONG          ulSessionHashLen;
-    CK_VERSION_PTR    pVersion;
-} CK_NSS_TLS_EXTENDED_MASTER_KEY_DERIVE_PARAMS;
-
-typedef CK_NSS_TLS_EXTENDED_MASTER_KEY_DERIVE_PARAMS CK_PTR \
-        CK_NSS_TLS_EXTENDED_MASTER_KEY_DERIVE_PARAMS_PTR;
 
 typedef struct CK_TLS12_KEY_MAT_PARAMS {
     CK_ULONG                  ulMacSizeInBits;

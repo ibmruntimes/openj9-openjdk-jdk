@@ -1,8 +1,7 @@
 /*
  * Copyright (c) 2003, 2025, Oracle and/or its affiliates. All rights reserved.
- */
-
-/* Copyright  (c) 2002 Graz University of Technology. All rights reserved.
+ * Copyright (c) 2026, IBM Corporation. All rights reserved.
+ * Copyright (c) 2002 Graz University of Technology. All rights reserved.
  *
  * Redistribution and use in  source and binary forms, with or without
  * modification, are permitted  provided that the following conditions are met:
@@ -43,12 +42,6 @@
  *  OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
  *  OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY  OF SUCH DAMAGE.
- */
-
-/*
- * ===========================================================================
- * (c) Copyright IBM Corp. 2024, 2024 All Rights Reserved
- * ===========================================================================
  */
 
 package sun.security.pkcs11.wrapper;
@@ -1168,14 +1161,14 @@ public class Functions {
         addMech(CKM_SP800_108_FEEDBACK_KDF,     "CKM_SP800_108_FEEDBACK_KDF");
         addMech(CKM_SP800_108_DOUBLE_PIPELINE_KDF,
                                          "CKM_SP800_108_DOUBLE_PIPELINE_KDF");
+        addMech(CKM_TLS12_EXTENDED_MASTER_KEY_DERIVE,
+                                         "CKM_TLS12_EXTENDED_MASTER_KEY_DERIVE");
+        addMech(CKM_TLS12_EXTENDED_MASTER_KEY_DERIVE_DH,
+                                         "CKM_TLS12_EXTENDED_MASTER_KEY_DERIVE_DH");
 
         addMech(CKM_VENDOR_DEFINED,             "CKM_VENDOR_DEFINED");
 
         addMech(CKM_NSS_TLS_PRF_GENERAL,        "CKM_NSS_TLS_PRF_GENERAL");
-        addMech(CKM_NSS_TLS_EXTENDED_MASTER_KEY_DERIVE,
-                                    "CKM_NSS_TLS_EXTENDED_MASTER_KEY_DERIVE");
-        addMech(CKM_NSS_TLS_EXTENDED_MASTER_KEY_DERIVE_DH,
-                                    "CKM_NSS_TLS_EXTENDED_MASTER_KEY_DERIVE_DH");
         addMech(CKM_NSS_PKCS12_PBE_SHA224_HMAC_KEY_GEN,
                                     "CKM_NSS_PKCS12_PBE_SHA224_HMAC_KEY_GEN");
         addMech(CKM_NSS_PKCS12_PBE_SHA256_HMAC_KEY_GEN,
