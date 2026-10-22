@@ -21,6 +21,12 @@
  * questions.
  */
 
+/*
+ * ===========================================================================
+ * (c) Copyright IBM Corp. 2026, 2026 All Rights Reserved
+ * ===========================================================================
+ */
+
 // Test data class, not a test.
 final class NamedGroupTestData {
 
@@ -46,6 +52,7 @@ final class NamedGroupTestData {
             "secp224k1",
             "secp224r1",
             "secp256k1",
+            "brainpoolP512r1tls13",
             "ffdhe6144",
             "ffdhe8192",
             "SecP256r1MLKEM768",
