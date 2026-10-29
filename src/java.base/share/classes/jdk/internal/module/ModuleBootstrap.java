@@ -477,6 +477,7 @@ public final class ModuleBootstrap {
                 && !haveUpgradeModulePath
                 && allJrtOrModularJar(cf)) {
             assert !isPatched;
+            assert !JLA.hasModuleReflectionData();
 
             // Archive module graph and maybe boot layer
             boolean hasSplitPackages = containsSplitPackages(cf);
