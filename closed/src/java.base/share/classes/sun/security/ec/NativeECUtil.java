@@ -25,12 +25,13 @@
 
 /*
  * ===========================================================================
- * (c) Copyright IBM Corp. 2022, 2024 All Rights Reserved
+ * (c) Copyright IBM Corp. 2022, 2026 All Rights Reserved
  * ===========================================================================
  */
 
 package sun.security.ec;
 
+import java.lang.ref.Cleaner;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.math.BigInteger;
@@ -163,59 +164,91 @@ public final class NativeECUtil {
     }
 
     /**
-     * Returns the native pointer for the provided EC public key.
-     *
-     * @param key   the EC public key
-     * @return      the native EC public key context pointer or -1 on error
+     * A native EC key pointer and the handle used to free it.
      */
-    static long getPublicKeyNativePtr(ECPublicKey key) {
-        synchronized (key) {
-            long nativePointer = encodeGroup(key.getParams());
-            if (nativePointer != -1) {
-                try {
-                    byte[] x = key.getW().getAffineX().toByteArray();
-                    byte[] y = key.getW().getAffineY().toByteArray();
-                    int fieldType = NativeCrypto.ECField_Fp;
-                    if (key.getParams().getCurve().getField() instanceof ECFieldF2m) {
-                        fieldType = NativeCrypto.ECField_F2m;
-                    }
-                    if (nativeCrypto.ECCreatePublicKey(nativePointer, x, x.length, y, y.length, fieldType) == -1) {
-                        nativeCrypto.ECDestroyKey(nativePointer);
-                        nativePointer = -1;
-                    }
-                } finally {
-                    if (nativePointer != -1) {
-                        nativeCrypto.createECKeyCleaner(key, nativePointer);
-                    }
-                }
-            }
-            return nativePointer;
+    static final class NativeKey {
+        final long pointer;
+        private final Cleaner.Cleanable cleanable;
+
+        NativeKey(long pointer, Cleaner.Cleanable cleanable) {
+            this.pointer = pointer;
+            this.cleanable = cleanable;
         }
     }
 
     /**
-     * Returns the native pointer for the provided EC private key.
+     * Frees the native key. Does nothing if the key is null or already freed.
      *
-     * @param key   the EC private key
-     * @return      the native EC private key context pointer or -1 on error
+     * @param key   the native key, may be null
      */
-    static long getPrivateKeyNativePtr(ECPrivateKey key) {
+    static void releaseNativeKey(NativeKey key) {
+        if (key != null) {
+            key.cleanable.clean();
+        }
+    }
+
+    /**
+     * Creates a native key for the provided EC public key.
+     *
+     * @param key   the EC public key
+     * @return      the native key, or null on error
+     */
+    static NativeKey createPublicKeyNative(ECPublicKey key) {
         synchronized (key) {
             long nativePointer = encodeGroup(key.getParams());
-            if (nativePointer != -1) {
-                try {
-                    byte[] value = key.getS().toByteArray();
-                    if (nativeCrypto.ECCreatePrivateKey(nativePointer, value, value.length) == -1) {
-                        nativeCrypto.ECDestroyKey(nativePointer);
-                        nativePointer = -1;
-                    }
-                } finally {
-                    if (nativePointer != -1) {
-                        nativeCrypto.createECKeyCleaner(key, nativePointer);
-                    }
+            if (nativePointer == -1) {
+                return null;
+            }
+            // Register first so the key is freed on any failure below.
+            Cleaner.Cleanable cleanable = nativeCrypto.createECKeyCleaner(key, nativePointer);
+            boolean success = false;
+            try {
+                byte[] x = key.getW().getAffineX().toByteArray();
+                byte[] y = key.getW().getAffineY().toByteArray();
+                int fieldType = NativeCrypto.ECField_Fp;
+                if (key.getParams().getCurve().getField() instanceof ECFieldF2m) {
+                    fieldType = NativeCrypto.ECField_F2m;
+                }
+                if (nativeCrypto.ECCreatePublicKey(nativePointer, x, x.length, y, y.length, fieldType) == -1) {
+                    return null;
+                }
+                success = true;
+                return new NativeKey(nativePointer, cleanable);
+            } finally {
+                if (!success) {
+                    cleanable.clean();
                 }
             }
-            return nativePointer;
+        }
+    }
+
+    /**
+     * Creates a native key for the provided EC private key.
+     *
+     * @param key   the EC private key
+     * @return      the native key, or null on error
+     */
+    static NativeKey createPrivateKeyNative(ECPrivateKey key) {
+        synchronized (key) {
+            long nativePointer = encodeGroup(key.getParams());
+            if (nativePointer == -1) {
+                return null;
+            }
+            // Register first so the key is freed on any failure below.
+            Cleaner.Cleanable cleanable = nativeCrypto.createECKeyCleaner(key, nativePointer);
+            boolean success = false;
+            try {
+                byte[] value = key.getS().toByteArray();
+                if (nativeCrypto.ECCreatePrivateKey(nativePointer, value, value.length) == -1) {
+                    return null;
+                }
+                success = true;
+                return new NativeKey(nativePointer, cleanable);
+            } finally {
+                if (!success) {
+                    cleanable.clean();
+                }
+            }
         }
     }
 

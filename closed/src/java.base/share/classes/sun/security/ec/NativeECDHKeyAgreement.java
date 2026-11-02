@@ -78,8 +78,11 @@ public final class NativeECDHKeyAgreement extends KeyAgreementSpi {
     /* private key, if initialized */
     private ECPrivateKey privateKey;
 
-    /* pointer to native private key, if initialized */
-    private long nativePrivateKey;
+    /* key that nativePrivateKey was created from */
+    private ECPrivateKey previousPrivateKey;
+
+    /* native private key, if initialized */
+    private NativeECUtil.NativeKey nativePrivateKey;
 
     /* operations associated with private key, if initialized */
     private ECOperations privateKeyOps;
@@ -87,8 +90,11 @@ public final class NativeECDHKeyAgreement extends KeyAgreementSpi {
     /* public key, non-null between doPhase() & generateSecret() only */
     private ECPublicKey publicKey;
 
-    /* pointer to native public key, if initialized */
-    private long nativePublicKey;
+    /* key that nativePublicKey was created from */
+    private ECPublicKey previousPublicKey;
+
+    /* native public key, if initialized */
+    private NativeECUtil.NativeKey nativePublicKey;
 
     /* the type of EC curve */
     private String curve;
@@ -129,8 +135,21 @@ public final class NativeECDHKeyAgreement extends KeyAgreementSpi {
             ECUtil.checkPrivateKey(ecPrivateKey);
 
             this.privateKey = ecPrivateKey;
-            this.nativePrivateKey = NativeECUtil.getPrivateKeyNativePtr(ecPrivateKey);
-            if (this.nativePrivateKey == -1) {
+            this.privateKeyOps = ops;
+
+            this.curve = NativeECUtil.getCurveName(params);
+            if ((this.curve == null) || !NativeECUtil.isCurveSupported(this.curve, params)) {
+                this.initializeJavaImplementation(key);
+                return;
+            }
+
+            /* reuse the native key if the key is unchanged */
+            if ((this.nativePrivateKey == null) || (ecPrivateKey != this.previousPrivateKey)) {
+                NativeECUtil.releaseNativeKey(this.nativePrivateKey);
+                this.nativePrivateKey = NativeECUtil.createPrivateKeyNative(ecPrivateKey);
+                this.previousPrivateKey = ecPrivateKey;
+            }
+            if (this.nativePrivateKey == null) {
                 if (nativeCryptTrace) {
                     System.err.println("Init: Could not create a pointer to a native private key."
                             + " Using Java implementation.");
@@ -139,14 +158,7 @@ public final class NativeECDHKeyAgreement extends KeyAgreementSpi {
                 return;
             }
 
-            this.privateKeyOps = ops;
-
-            this.curve = NativeECUtil.getCurveName(params);
-            if ((this.curve != null) && NativeECUtil.isCurveSupported(this.curve, params)) {
-                this.javaImplementation = null;
-            } else {
-                this.initializeJavaImplementation(key);
-            }
+            this.javaImplementation = null;
         } else {
             boolean absent = NativeECUtil.putCurveIfAbsent("ECKeyImpl", Boolean.FALSE);
             /* only print the first time a curve is used */
@@ -206,8 +218,13 @@ public final class NativeECDHKeyAgreement extends KeyAgreementSpi {
         }
 
         this.publicKey = ecKey;
-        this.nativePublicKey = NativeECUtil.getPublicKeyNativePtr(ecKey);
-        if (this.nativePublicKey == -1) {
+        /* reuse the native key if the key is unchanged */
+        if ((this.nativePublicKey == null) || (ecKey != this.previousPublicKey)) {
+            NativeECUtil.releaseNativeKey(this.nativePublicKey);
+            this.nativePublicKey = NativeECUtil.createPublicKeyNative(ecKey);
+            this.previousPublicKey = ecKey;
+        }
+        if (this.nativePublicKey == null) {
             if (nativeCryptTrace) {
                 System.err.println("DoPhase: Could not create a pointer to a native public key."
                         + " Using Java implementation.");
@@ -329,7 +346,7 @@ public final class NativeECDHKeyAgreement extends KeyAgreementSpi {
             nativeCrypto = NativeCrypto.getNativeCrypto();
         }
         synchronized (this.privateKey) {
-            ret = nativeCrypto.ECDeriveKey(nativePublicKey, nativePrivateKey, sharedSecret, offset, this.secretLen);
+            ret = nativeCrypto.ECDeriveKey(nativePublicKey.pointer, nativePrivateKey.pointer, sharedSecret, offset, this.secretLen);
         }
         if (ret == -1) {
             throw new ProviderException("Could not derive key");

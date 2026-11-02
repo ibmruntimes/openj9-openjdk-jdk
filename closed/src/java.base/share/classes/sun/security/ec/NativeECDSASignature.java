@@ -102,14 +102,14 @@ abstract class NativeECDSASignature extends SignatureSpi {
     // private key, if initialized for signing
     private ECPrivateKey privateKey;
 
-    // native private key pointer, if initialized for signing
-    private long nativePrivateKey;
+    // native private key, if initialized for signing
+    private NativeECUtil.NativeKey nativePrivateKey;
 
     // public key, if initialized for verifying
     private ECPublicKey publicKey;
 
-    // native public key pointer, if initialized for verifying
-    private long nativePublicKey;
+    // native public key, if initialized for verifying
+    private NativeECUtil.NativeKey nativePublicKey;
 
     // the format (i.e., true for the IEEE P1363 format and false for ASN.1)
     private final boolean p1363Format;
@@ -393,12 +393,16 @@ abstract class NativeECDSASignature extends SignatureSpi {
         ECPublicKey key = (ECPublicKey) ECKeyFactory.toECKey(publicKey);
         // Should check that the supplied key is appropriate for signature
         // algorithm (e.g. P-256 for SHA256withECDSA).
+        // Reuse the native key if the key is unchanged.
+        if ((this.nativePublicKey == null) || (key != this.publicKey)) {
+            NativeECUtil.releaseNativeKey(this.nativePublicKey);
+            this.nativePublicKey = NativeECUtil.createPublicKeyNative(key);
+        }
         this.publicKey = key;
         this.privateKey = null;
         resetDigest();
 
-        this.nativePublicKey = NativeECUtil.getPublicKeyNativePtr(key);
-        if (this.nativePublicKey == -1) {
+        if (this.nativePublicKey == null) {
             this.javaImplementation = getJavaInstance();
             this.javaImplementation.engineInitVerify(publicKey);
             if (nativeCryptTrace) {
@@ -450,13 +454,17 @@ abstract class NativeECDSASignature extends SignatureSpi {
         ECUtil.checkPrivateKey(key);
         // Should check that the supplied key is appropriate for signature
         // algorithm (e.g. P-256 for SHA256withECDSA).
+        // Reuse the native key if the key is unchanged.
+        if ((this.nativePrivateKey == null) || (key != this.privateKey)) {
+            NativeECUtil.releaseNativeKey(this.nativePrivateKey);
+            this.nativePrivateKey = NativeECUtil.createPrivateKeyNative(key);
+        }
         this.privateKey = key;
         this.publicKey = null;
         this.random = random;
         resetDigest();
 
-        this.nativePrivateKey = NativeECUtil.getPrivateKeyNativePtr(key);
-        if (this.nativePrivateKey == -1) {
+        if (this.nativePrivateKey == null) {
             this.javaImplementation = getJavaInstance();
             this.javaImplementation.engineInitSign(privateKey, random);
             if (nativeCryptTrace) {
@@ -555,7 +563,7 @@ abstract class NativeECDSASignature extends SignatureSpi {
 
         int ret;
         synchronized (this.privateKey) {
-            ret = nativeCrypto.ECDSASign(nativePrivateKey, digest, digestLen, sig, sig.length);
+            ret = nativeCrypto.ECDSASign(nativePrivateKey.pointer, digest, digestLen, sig, sig.length);
         }
         if (ret == -1) {
             throw new ProviderException("An error occured when creating signature");
@@ -617,7 +625,7 @@ abstract class NativeECDSASignature extends SignatureSpi {
 
         int ret;
         synchronized (this.publicKey) {
-            ret = nativeCrypto.ECDSAVerify(nativePublicKey, digest, digestLen, sig, sig.length);
+            ret = nativeCrypto.ECDSAVerify(nativePublicKey.pointer, digest, digestLen, sig, sig.length);
         }
 
         if (ret == 1) {
