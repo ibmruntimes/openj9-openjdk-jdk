@@ -201,7 +201,6 @@ public final class NativeECUtil {
             }
             // Register first so the key is freed on any failure below.
             Cleaner.Cleanable cleanable = nativeCrypto.createECKeyCleaner(key, nativePointer);
-            boolean success = false;
             try {
                 byte[] x = key.getW().getAffineX().toByteArray();
                 byte[] y = key.getW().getAffineY().toByteArray();
@@ -212,10 +211,11 @@ public final class NativeECUtil {
                 if (nativeCrypto.ECCreatePublicKey(nativePointer, x, x.length, y, y.length, fieldType) == -1) {
                     return null;
                 }
-                success = true;
-                return new NativeKey(nativePointer, cleanable);
+                var nativeKey = new NativeKey(nativePointer, cleanable);
+                cleanable = null;
+                return nativeKey;
             } finally {
-                if (!success) {
+                if (cleanable != null) {
                     cleanable.clean();
                 }
             }
@@ -236,16 +236,16 @@ public final class NativeECUtil {
             }
             // Register first so the key is freed on any failure below.
             Cleaner.Cleanable cleanable = nativeCrypto.createECKeyCleaner(key, nativePointer);
-            boolean success = false;
             try {
                 byte[] value = key.getS().toByteArray();
                 if (nativeCrypto.ECCreatePrivateKey(nativePointer, value, value.length) == -1) {
                     return null;
                 }
-                success = true;
-                return new NativeKey(nativePointer, cleanable);
+                var nativeKey = new NativeKey(nativePointer, cleanable);
+                cleanable = null;
+                return nativeKey;
             } finally {
-                if (!success) {
+                if (cleanable != null) {
                     cleanable.clean();
                 }
             }

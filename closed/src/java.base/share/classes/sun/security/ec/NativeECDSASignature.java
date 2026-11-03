@@ -399,6 +399,10 @@ abstract class NativeECDSASignature extends SignatureSpi {
             this.nativePublicKey = NativeECUtil.createPublicKeyNative(key);
         }
         this.publicKey = key;
+        if (this.nativePrivateKey != null) {
+            NativeECUtil.releaseNativeKey(this.nativePrivateKey);
+            this.nativePrivateKey = null;
+        }
         this.privateKey = null;
         resetDigest();
 
@@ -460,6 +464,10 @@ abstract class NativeECDSASignature extends SignatureSpi {
             this.nativePrivateKey = NativeECUtil.createPrivateKeyNative(key);
         }
         this.privateKey = key;
+        if (this.nativePublicKey != null) {
+            NativeECUtil.releaseNativeKey(this.nativePublicKey);
+            this.nativePublicKey = null;
+        }
         this.publicKey = null;
         this.random = random;
         resetDigest();
