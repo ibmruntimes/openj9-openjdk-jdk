@@ -123,6 +123,7 @@ public final class NativeECDHKeyAgreement extends KeyAgreementSpi {
          * privateKey is kept so it can be compared with the incoming key, and
          * is cleared on every exit that does not end on the native path.
          */
+
         if (!(key instanceof PrivateKey)) {
             clearPrivateKey();
             throw new InvalidKeyException
@@ -132,7 +133,7 @@ public final class NativeECDHKeyAgreement extends KeyAgreementSpi {
         ECKey ecKey;
         try {
             ecKey = ECKeyFactory.toECKey(key);
-        } catch (InvalidKeyException e) {
+        } catch (InvalidKeyException | RuntimeException | Error e) {
             clearPrivateKey();
             throw e;
         }
@@ -148,7 +149,7 @@ public final class NativeECDHKeyAgreement extends KeyAgreementSpi {
             }
             try {
                 ECUtil.checkPrivateKey(ecPrivateKey);
-            } catch (InvalidKeyException e) {
+            } catch (InvalidKeyException | RuntimeException | Error e) {
                 clearPrivateKey();
                 throw e;
             }
@@ -162,11 +163,14 @@ public final class NativeECDHKeyAgreement extends KeyAgreementSpi {
                 return;
             }
 
-            /* reuse the native key if the key is unchanged */
-            if ((this.nativePrivateKey == null) || (ecPrivateKey != this.privateKey)) {
-                clearPrivateKey();
+            if ((this.nativePrivateKey != null) && (ecPrivateKey == this.privateKey)) {
+                /* the key has not changed, reuse the native key */
+            } else {
+                NativeECUtil.releaseNativeKey(this.nativePrivateKey);
                 this.nativePrivateKey = NativeECUtil.createPrivateKeyNative(ecPrivateKey);
+                this.privateKey = ecPrivateKey;
             }
+
             if (this.nativePrivateKey == null) {
                 clearPrivateKey();
                 if (nativeCryptTrace) {
@@ -177,7 +181,6 @@ public final class NativeECDHKeyAgreement extends KeyAgreementSpi {
                 return;
             }
 
-            this.privateKey = ecPrivateKey;
             this.javaImplementation = null;
         } else {
             clearPrivateKey();

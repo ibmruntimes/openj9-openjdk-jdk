@@ -393,17 +393,18 @@ abstract class NativeECDSASignature extends SignatureSpi {
         ECPublicKey key = (ECPublicKey) ECKeyFactory.toECKey(publicKey);
         // Should check that the supplied key is appropriate for signature
         // algorithm (e.g. P-256 for SHA256withECDSA).
-        // Reuse the native key if the key is unchanged.
-        if ((this.nativePublicKey == null) || (key != this.publicKey)) {
-            NativeECUtil.releaseNativeKey(this.nativePublicKey);
-            this.nativePublicKey = NativeECUtil.createPublicKeyNative(key);
-        }
-        this.publicKey = key;
         if (this.nativePrivateKey != null) {
             NativeECUtil.releaseNativeKey(this.nativePrivateKey);
             this.nativePrivateKey = null;
         }
         this.privateKey = null;
+        if ((this.nativePublicKey != null) && (key == this.publicKey)) {
+            /* the key has not changed, reuse the native key */
+        } else {
+            NativeECUtil.releaseNativeKey(this.nativePublicKey);
+            this.nativePublicKey = NativeECUtil.createPublicKeyNative(key);
+            this.publicKey = key;
+        }
         resetDigest();
 
         if (this.nativePublicKey == null) {
@@ -458,17 +459,18 @@ abstract class NativeECDSASignature extends SignatureSpi {
         ECUtil.checkPrivateKey(key);
         // Should check that the supplied key is appropriate for signature
         // algorithm (e.g. P-256 for SHA256withECDSA).
-        // Reuse the native key if the key is unchanged.
-        if ((this.nativePrivateKey == null) || (key != this.privateKey)) {
-            NativeECUtil.releaseNativeKey(this.nativePrivateKey);
-            this.nativePrivateKey = NativeECUtil.createPrivateKeyNative(key);
-        }
-        this.privateKey = key;
         if (this.nativePublicKey != null) {
             NativeECUtil.releaseNativeKey(this.nativePublicKey);
             this.nativePublicKey = null;
         }
         this.publicKey = null;
+        if ((this.nativePrivateKey != null) && (key == this.privateKey)) {
+            /* the key has not changed, reuse the native key */
+        } else {
+            NativeECUtil.releaseNativeKey(this.nativePrivateKey);
+            this.nativePrivateKey = NativeECUtil.createPrivateKeyNative(key);
+            this.privateKey = key;
+        }
         this.random = random;
         resetDigest();
 
