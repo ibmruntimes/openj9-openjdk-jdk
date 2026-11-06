@@ -78,8 +78,8 @@ public final class NativeECDHKeyAgreement extends KeyAgreementSpi {
     /* private key, if initialized */
     private ECPrivateKey privateKey;
 
-    /* pointer to native private key, if initialized */
-    private long nativePrivateKey;
+    /* native private key, created from privateKey */
+    private NativeECUtil.NativeKey nativePrivateKey;
 
     /* operations associated with private key, if initialized */
     private ECOperations privateKeyOps;
@@ -87,8 +87,8 @@ public final class NativeECDHKeyAgreement extends KeyAgreementSpi {
     /* public key, non-null between doPhase() & generateSecret() only */
     private ECPublicKey publicKey;
 
-    /* pointer to native public key, if initialized */
-    private long nativePublicKey;
+    /* native public key, non-null only while publicKey is non-null */
+    private NativeECUtil.NativeKey nativePublicKey;
 
     /* the type of EC curve */
     private String curve;
@@ -105,32 +105,74 @@ public final class NativeECDHKeyAgreement extends KeyAgreementSpi {
     public NativeECDHKeyAgreement() {
     }
 
+    /* Clears privateKey and frees its native key. */
+    private void clearPrivateKey() {
+        NativeECUtil.releaseNativeKey(this.nativePrivateKey);
+        this.nativePrivateKey = null;
+        this.privateKey = null;
+    }
+
     private void init(Key key)
             throws InvalidKeyException, InvalidAlgorithmParameterException {
-        this.privateKey = null;
         this.privateKeyOps = null;
+        NativeECUtil.releaseNativeKey(this.nativePublicKey);
+        this.nativePublicKey = null;
         this.publicKey = null;
 
+        /*
+         * privateKey is kept so it can be compared with the incoming key, and
+         * is cleared on every exit that does not end on the native path.
+         */
+
         if (!(key instanceof PrivateKey)) {
+            clearPrivateKey();
             throw new InvalidKeyException
                 ("Key must be an instance of PrivateKey");
         }
         /* attempt to translate the key if it is not an ECKey */
-        ECKey ecKey = ECKeyFactory.toECKey(key);
+        ECKey ecKey;
+        try {
+            ecKey = ECKeyFactory.toECKey(key);
+        } catch (InvalidKeyException | RuntimeException | Error e) {
+            clearPrivateKey();
+            throw e;
+        }
         if (ecKey instanceof ECPrivateKey ecPrivateKey) {
             ECParameterSpec params = ecPrivateKey.getParams();
             ECOperations ops = ECOperations.forParameters(params).orElse(null);
             if ((ops == null) && !NativeECUtil.isBrainpoolP512r1(params)) {
+                clearPrivateKey();
                 NamedCurve nc = CurveDB.lookup(params);
                 throw new InvalidAlgorithmParameterException(
                         "Curve not supported: " +
                         ((nc != null) ? nc.toString() : "unknown"));
             }
-            ECUtil.checkPrivateKey(ecPrivateKey);
+            try {
+                ECUtil.checkPrivateKey(ecPrivateKey);
+            } catch (InvalidKeyException | RuntimeException | Error e) {
+                clearPrivateKey();
+                throw e;
+            }
 
-            this.privateKey = ecPrivateKey;
-            this.nativePrivateKey = NativeECUtil.getPrivateKeyNativePtr(ecPrivateKey);
-            if (this.nativePrivateKey == -1) {
+            this.privateKeyOps = ops;
+
+            this.curve = NativeECUtil.getCurveName(params);
+            if ((this.curve == null) || !NativeECUtil.isCurveSupported(this.curve, params)) {
+                clearPrivateKey();
+                this.initializeJavaImplementation(key);
+                return;
+            }
+
+            if ((this.nativePrivateKey != null) && (ecPrivateKey == this.privateKey)) {
+                /* the key has not changed, reuse the native key */
+            } else {
+                NativeECUtil.releaseNativeKey(this.nativePrivateKey);
+                this.nativePrivateKey = NativeECUtil.createPrivateKeyNative(ecPrivateKey);
+                this.privateKey = ecPrivateKey;
+            }
+
+            if (this.nativePrivateKey == null) {
+                clearPrivateKey();
                 if (nativeCryptTrace) {
                     System.err.println("Init: Could not create a pointer to a native private key."
                             + " Using Java implementation.");
@@ -139,15 +181,9 @@ public final class NativeECDHKeyAgreement extends KeyAgreementSpi {
                 return;
             }
 
-            this.privateKeyOps = ops;
-
-            this.curve = NativeECUtil.getCurveName(params);
-            if ((this.curve != null) && NativeECUtil.isCurveSupported(this.curve, params)) {
-                this.javaImplementation = null;
-            } else {
-                this.initializeJavaImplementation(key);
-            }
+            this.javaImplementation = null;
         } else {
+            clearPrivateKey();
             boolean absent = NativeECUtil.putCurveIfAbsent("ECKeyImpl", Boolean.FALSE);
             /* only print the first time a curve is used */
             if (absent && nativeCryptTrace) {
@@ -206,8 +242,8 @@ public final class NativeECDHKeyAgreement extends KeyAgreementSpi {
         }
 
         this.publicKey = ecKey;
-        this.nativePublicKey = NativeECUtil.getPublicKeyNativePtr(ecKey);
-        if (this.nativePublicKey == -1) {
+        this.nativePublicKey = NativeECUtil.createPublicKeyNative(ecKey);
+        if (this.nativePublicKey == null) {
             if (nativeCryptTrace) {
                 System.err.println("DoPhase: Could not create a pointer to a native public key."
                         + " Using Java implementation.");
@@ -329,11 +365,13 @@ public final class NativeECDHKeyAgreement extends KeyAgreementSpi {
             nativeCrypto = NativeCrypto.getNativeCrypto();
         }
         synchronized (this.privateKey) {
-            ret = nativeCrypto.ECDeriveKey(nativePublicKey, nativePrivateKey, sharedSecret, offset, this.secretLen);
+            ret = nativeCrypto.ECDeriveKey(nativePublicKey.pointer, nativePrivateKey.pointer, sharedSecret, offset, this.secretLen);
         }
         if (ret == -1) {
             throw new ProviderException("Could not derive key");
         }
+        NativeECUtil.releaseNativeKey(this.nativePublicKey);
+        this.nativePublicKey = null;
         this.publicKey = null;
         return this.secretLen;
     }
