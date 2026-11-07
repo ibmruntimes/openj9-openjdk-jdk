@@ -45,7 +45,7 @@ import jdk.javadoc.internal.doclets.formats.html.HtmlIds;
  * can be scrolled if necessary, and optional side and footer
  * contents that are only rendered if available.
  */
-public class BodyContents extends Content {
+public class BodyContents {
 
     private final List<Content> mainContents = new ArrayList<>();
     private Content side = null;
@@ -73,28 +73,11 @@ public class BodyContents extends Content {
     }
 
     /**
-     * {@inheritDoc}
-     *
-     * @implSpec This implementation always returns {@code false}.
-     *
-     * @return {@code false}
-     */
-    @Override
-    public boolean isEmpty() {
-        return false;
-    }
-
-    @Override
-    public boolean write(Writer out, String newline, boolean atNewline) throws IOException {
-        return toContent().write(out, newline, atNewline);
-    }
-
-    /**
      * Returns the HTML for the contents of the BODY element.
      *
      * @return the HTML
      */
-    private Content toContent() {
+    public Content toContent() {
         if (header == null)
             throw new NullPointerException();
 
