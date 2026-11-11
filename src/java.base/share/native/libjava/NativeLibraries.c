@@ -25,7 +25,7 @@
 
 /*
  * ===========================================================================
- * (c) Copyright IBM Corp. 2022, 2024 All Rights Reserved
+ * (c) Copyright IBM Corp. 2022, 2026 All Rights Reserved
  * ===========================================================================
  */
 
@@ -162,6 +162,7 @@ Java_jdk_internal_loader_NativeLibraries_load
             goto done;
         }
         (*env)->SetIntField(env, lib, jniVersionID, jniVersion);
+        JVM_RecordLibrary(env, lib, cname);
     } else {
         cause = (*env)->ExceptionOccurred(env);
         if (cause) {
