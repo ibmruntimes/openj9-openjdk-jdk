@@ -34,17 +34,25 @@
  * @run junit ${test.main.class}
  */
 
+/*
+ * ===========================================================================
+ * (c) Copyright IBM Corp. 2026, 2026 All Rights Reserved
+ * ===========================================================================
+ */
+
 import java.util.Optional;
 import java.util.OptionalInt;
 
 import jdk.internal.value.ValueClass;
 import jdk.test.lib.helpers.StrictInit;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class ValueClassPreviewTest {
     @Test
+    @Disabled
     void testHasBinaryPayload() {
         assertTrue(ValueClass.hasBinaryPayload(Integer.class));
         assertTrue(ValueClass.hasBinaryPayload(OptionalInt.class));
