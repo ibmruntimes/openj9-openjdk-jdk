@@ -232,7 +232,7 @@ ifneq ($(OPENSSL_BUNDLE_LIB_PATH), )
   endif
 
   # Windows keeps the OpenSSL-produced name (libcrypto-3-semeru.dll) with no rename.
-  ifeq (windows,$(OPENJDK_TARGET_OS))
+  ifeq ($(call isTargetOs, windows), true)
     LIBCRYPTO_TARGET_LIB := $(LIB_DST_DIR)/libcrypto-3-semeru.dll
   else
     LIBCRYPTO_TARGET_LIB := $(LIB_DST_DIR)/$(LIBRARY_PREFIX)crypto-semeru$(SHARED_LIBRARY_SUFFIX)
