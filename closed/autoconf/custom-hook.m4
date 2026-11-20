@@ -701,6 +701,13 @@ AC_DEFUN([CONFIGURE_OPENSSL],
     # If not specified, default is to not bundle openssl
     if test "x$enable_openssl_bundling" != xyes ; then
       enable_openssl_bundling=no
+    elif test "x$with_openssl" = xfetched ; then
+      enable_openssl_bundling=yes
+    else
+      enable_openssl_bundling=no
+      AC_MSG_RESULT([no])
+      printf "The option --enable-openssl-bundling is only available with --with-openssl=fetched.\n"
+      AC_MSG_ERROR([Cannot continue])
     fi
     # Process --with-openssl=fetched
     if test "x$with_openssl" = xfetched ; then
@@ -742,22 +749,10 @@ AC_DEFUN([CONFIGURE_OPENSSL],
       if test "x$FOUND_OPENSSL" != xyes ; then
         AC_MSG_ERROR([Unable to find openssl 1.0.2(and above) installed on System. Please use other options for '--with-openssl'])
       fi
-      # The crypto library bundling option is not available when --with-openssl=system.
-      if test "x$enable_openssl_bundling" = xyes ; then
-        AC_MSG_RESULT([no])
-        printf "The option --enable-openssl-bundling is not available with --with-openssl=system. Use --with-openssl=fetched to bundle crypto library\n"
-        AC_MSG_ERROR([Cannot continue])
-      fi
     # Process --with-openssl=/custom/path/where/openssl/is/present
     # As the value is not fetched or system, assume user specified the
     # path where openssl is installed
     else
-      # The crypto library bundling option is not available when --with-openssl=<path>.
-      if test "x$enable_openssl_bundling" = xyes ; then
-        AC_MSG_RESULT([no])
-        printf "The option --enable-openssl-bundling is not available with --with-openssl=<path>. Use --with-openssl=fetched to bundle crypto library\n"
-        AC_MSG_ERROR([Cannot continue])
-      fi
       OPENSSL_DIR=$with_openssl
       UTIL_FIXUP_PATH(OPENSSL_DIR)
       if test -s "$OPENSSL_DIR/include/openssl/evp.h" ; then

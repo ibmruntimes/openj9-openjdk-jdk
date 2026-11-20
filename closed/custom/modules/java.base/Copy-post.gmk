@@ -230,10 +230,11 @@ ifneq ($(OPENSSL_BUNDLE_LIB_PATH), )
 
   ifeq (true,$(OPENJ9_ENABLE_JITSERVER))
     ifeq ($(call isTargetOs, linux), true)
-      LIBSSL_PATH := $(wildcard $(OPENSSL_BUNDLE_LIB_PATH)/libssl-semeru.so)
+      LIBSSL_NAME := $(LIBRARY_PREFIX)ssl-semeru$(SHARED_LIBRARY_SUFFIX)
+      LIBSSL_PATH := $(wildcard $(OPENSSL_BUNDLE_LIB_PATH)/$(LIBSSL_NAME))
 
       ifneq ($(LIBSSL_PATH), )
-        LIBSSL_TARGET_LIB = $(LIB_DST_DIR)/$(LIBRARY_PREFIX)ssl-semeru$(SHARED_LIBRARY_SUFFIX)
+        LIBSSL_TARGET_LIB = $(LIB_DST_DIR)/$(LIBSSL_NAME)
         TARGETS += $(LIBSSL_TARGET_LIB)
         $(LIBSSL_TARGET_LIB) : $(LIBSSL_PATH)
 			$(call install-file)
