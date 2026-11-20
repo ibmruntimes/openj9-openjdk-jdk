@@ -205,8 +205,9 @@ endif # OPENJ9_ENABLE_JFR
 
 ##########################################################################################
 # Optionally copy OpenSSL Crypto Library
-# OPENSSL_BUNDLE_LIB_PATH is only set for --with-openssl=fetched, where the library is
-# built by closed/openssl.gmk as libcrypto-semeru (libcrypto-3-semeru.dll on Windows).
+# OpenSSL is only bundled when --with-openssl=fetched --enable-openssl-bundling is set.
+# In this case, the library is built is named libcrypto-semeru (libcrypto-3-semeru.dll
+# on Windows).
 ifneq ($(OPENSSL_BUNDLE_LIB_PATH), )
   # Windows keeps the OpenSSL-produced name (libcrypto-3-semeru.dll) with no rename.
   ifeq ($(call isTargetOs, windows), true)
