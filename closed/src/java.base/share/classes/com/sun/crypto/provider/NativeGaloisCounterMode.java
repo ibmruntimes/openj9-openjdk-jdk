@@ -24,7 +24,7 @@
  */
 /*
  * ===========================================================================
- * (c) Copyright IBM Corp. 2018, 2025 All Rights Reserved
+ * (c) Copyright IBM Corp. 2018, 2026 All Rights Reserved
  * ===========================================================================
  */
 
@@ -806,8 +806,11 @@ abstract class NativeGaloisCounterMode extends CipherSpi {
                         ("Can't fit both data and tag into one buffer");
                 }
 
-                if ((out.length - outOfs) < (inLen + localTagLenBytes)) {
-                    throw new ShortBufferException("Output buffer too small");
+                try {
+                    ArrayUtil.nullAndBoundsCheck(out, outOfs,
+                        getOutputSize(inLen, true));
+                } catch (ArrayIndexOutOfBoundsException e) {
+                    throw new ShortBufferException("Output buffer invalid");
                 }
 
                 int bLen = getBufferedLength();
@@ -859,6 +862,13 @@ abstract class NativeGaloisCounterMode extends CipherSpi {
         public int doFinal(ByteBuffer src, ByteBuffer dst) throws
             IllegalBlockSizeException, ShortBufferException {
             checkReInit();
+            int bLen = getBufferedLength();
+            // includes ibuffer data and the tag; long avoids int overflow
+            long neededLen = (long) src.remaining() + bLen + tagLenBytes;
+            if (dst.remaining() < neededLen) {
+                throw new ShortBufferException("Output buffer too small, " +
+                    "must be at least " + neededLen + " bytes long");
+            }
             // Get array from source
             byte[] src_arr = getBbArray(src);
             int src_ofs = src.hasArray() ? (src.position() + src.arrayOffset()) : 0;
@@ -1061,6 +1071,13 @@ abstract class NativeGaloisCounterMode extends CipherSpi {
         public int doFinal(ByteBuffer src, ByteBuffer dst)
             throws IllegalBlockSizeException, AEADBadTagException,
             ShortBufferException {
+            int bLen = getBufferedLength();
+            // input includes ibuffer data and the tag; long avoids int overflow
+            long neededLen = (long) src.remaining() + bLen - tagLenBytes;
+            if (dst.remaining() < neededLen) {
+                throw new ShortBufferException("Output buffer too small, " +
+                    "must be at least " + neededLen + " bytes long");
+            }
             // Get array from source
             byte[] src_arr = getBbArray(src);
             int src_ofs = src.hasArray() ? (src.position() + src.arrayOffset()) : 0;
