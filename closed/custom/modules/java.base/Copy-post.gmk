@@ -204,8 +204,8 @@ $(call openj9_copy_files,, \
 endif # OPENJ9_ENABLE_JFR
 
 ##########################################################################################
-# Optionally copy OpenSSL Crypto Library
-# OpenSSL is only bundled when --with-openssl=fetched --enable-openssl-bundling is set.
+# Optionally copy OpenSSL Crypto Library.
+# OpenSSL is only bundled when --with-openssl=fetched and --enable-openssl-bundling are set.
 # In this case, the library is built is named libcrypto-semeru (libcrypto-3-semeru.dll
 # on Windows).
 ifneq ($(OPENSSL_BUNDLE_LIB_PATH), )
