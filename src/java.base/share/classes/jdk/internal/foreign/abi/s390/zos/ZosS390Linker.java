@@ -25,7 +25,7 @@
 
 /*
  * ===========================================================================
- * (c) Copyright IBM Corp. 2024, 2024 All Rights Reserved
+ * (c) Copyright IBM Corp. 2024, 2026 All Rights Reserved
  * ===========================================================================
  */
 
@@ -45,7 +45,7 @@ import java.util.Map;
 public final class ZosS390Linker extends AbstractLinker {
 
     private static final Map<String, MemoryLayout> CANONICAL_LAYOUTS =
-            SharedUtils.canonicalLayouts(ValueLayout.JAVA_LONG, ValueLayout.JAVA_LONG, ValueLayout.JAVA_INT);
+            SharedUtils.canonicalLayouts(ValueLayout.JAVA_LONG, ULONG, UBYTE, UINT);
 
     public static ZosS390Linker getInstance() {
         final class Holder {
