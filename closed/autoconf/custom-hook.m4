@@ -689,7 +689,7 @@ AC_DEFUN([CONFIGURE_OPENSSL],
   AC_ARG_WITH(openssl, [AS_HELP_STRING([--with-openssl],
     [Use either fetched | system | <path to openssl version 1.0.2 or later>])])
   AC_ARG_ENABLE(openssl-bundling, [AS_HELP_STRING([--enable-openssl-bundling],
-    [enable bundling of the openssl crypto library with the jdk build])])
+    [enable bundling of the openssl crypto library with the jdk build (only available with --with-openssl=fetched)])])
   BUILD_OPENSSL=false
   OPENSSL_BUNDLE_LIB_PATH=
   WITH_OPENSSL=true
@@ -701,13 +701,25 @@ AC_DEFUN([CONFIGURE_OPENSSL],
     # If not specified, default is to not bundle openssl
     if test "x$enable_openssl_bundling" != xyes ; then
       enable_openssl_bundling=no
+    elif test "x$with_openssl" = xfetched ; then
+      enable_openssl_bundling=yes
+    else
+      enable_openssl_bundling=no
+      AC_MSG_RESULT([no])
+      printf "The option --enable-openssl-bundling is only available with --with-openssl=fetched.\n"
+      AC_MSG_ERROR([Cannot continue])
     fi
     # Process --with-openssl=fetched
     if test "x$with_openssl" = xfetched ; then
       if test -d "$TOPDIR/openssl" ; then
         OPENSSL_DIR="$TOPDIR/openssl"
         OPENSSL_CFLAGS="-I${OPENSSL_DIR}/include"
-        if ! test -s "$OPENSSL_DIR/${LIBRARY_PREFIX}crypto${SHARED_LIBRARY_SUFFIX}" ; then
+        if test "x$OPENJDK_TARGET_OS" = xwindows ; then
+          OPENSSL_LIBRARY="$OPENSSL_DIR/libcrypto-3-semeru.dll"
+        else
+          OPENSSL_LIBRARY="$OPENSSL_DIR/${LIBRARY_PREFIX}crypto-semeru${SHARED_LIBRARY_SUFFIX}"
+        fi
+        if ! test -s "$OPENSSL_LIBRARY" ; then
           BUILD_OPENSSL=true
         fi
         if test "x$enable_openssl_bundling" = xyes ; then
@@ -737,12 +749,6 @@ AC_DEFUN([CONFIGURE_OPENSSL],
       if test "x$FOUND_OPENSSL" != xyes ; then
         AC_MSG_ERROR([Unable to find openssl 1.0.2(and above) installed on System. Please use other options for '--with-openssl'])
       fi
-      # The crypto library bundling option is not available when --with-openssl=system.
-      if test "x$enable_openssl_bundling" = xyes ; then
-        AC_MSG_RESULT([no])
-        printf "The option --enable-openssl-bundling is not available with --with-openssl=system. Use option fetched or openssl-custom-path to bundle crypto library\n"
-        AC_MSG_ERROR([Cannot continue])
-      fi
     # Process --with-openssl=/custom/path/where/openssl/is/present
     # As the value is not fetched or system, assume user specified the
     # path where openssl is installed
@@ -751,49 +757,6 @@ AC_DEFUN([CONFIGURE_OPENSSL],
       UTIL_FIXUP_PATH(OPENSSL_DIR)
       if test -s "$OPENSSL_DIR/include/openssl/evp.h" ; then
         OPENSSL_CFLAGS="-I${OPENSSL_DIR}/include"
-        if test "x$OPENJDK_BUILD_OS_ENV" = xwindows.cygwin ; then
-          if test "x$enable_openssl_bundling" = xyes ; then
-            if test -d "$OPENSSL_DIR/bin" ; then
-              OPENSSL_BUNDLE_LIB_PATH="${OPENSSL_DIR}/bin"
-            else
-              OPENSSL_BUNDLE_LIB_PATH="${OPENSSL_DIR}"
-            fi
-          fi
-        else
-          if test -s "$OPENSSL_DIR/lib/${LIBRARY_PREFIX}crypto${SHARED_LIBRARY_SUFFIX}" ; then
-            OPENSSL_CFLAGS="-I${OPENSSL_DIR}/include"
-            if test "x$enable_openssl_bundling" = xyes ; then
-              # On Mac OSX, create local copy of the crypto library to update @rpath
-              # as the default is /usr/local/lib.
-              if test "x$OPENJDK_BUILD_OS" = xmacosx ; then
-                LOCAL_CRYPTO="$TOPDIR/openssl"
-                $MKDIR -p "${LOCAL_CRYPTO}"
-                $CP "${OPENSSL_DIR}/libcrypto.1.1.dylib" "${LOCAL_CRYPTO}"
-                $CP "${OPENSSL_DIR}/libcrypto.1.0.0.dylib" "${LOCAL_CRYPTO}"
-                $CP -a "${OPENSSL_DIR}/libcrypto.dylib" "${LOCAL_CRYPTO}"
-                OPENSSL_BUNDLE_LIB_PATH="${LOCAL_CRYPTO}"
-              else
-                OPENSSL_BUNDLE_LIB_PATH="${OPENSSL_DIR}/lib"
-              fi
-            fi
-          elif test -s "$OPENSSL_DIR/${LIBRARY_PREFIX}crypto${SHARED_LIBRARY_SUFFIX}" ; then
-            OPENSSL_CFLAGS="-I${OPENSSL_DIR}/include"
-            if test "x$enable_openssl_bundling" = xyes ; then
-              # On Mac OSX, create local copy of the crypto library to update @rpath
-              # as the default is /usr/local/lib.
-              if test "x$OPENJDK_BUILD_OS" = xmacosx ; then
-                LOCAL_CRYPTO="$TOPDIR/openssl"
-                $MKDIR -p "${LOCAL_CRYPTO}"
-                $CP "${OPENSSL_DIR}/libcrypto.1.1.dylib" "${LOCAL_CRYPTO}"
-                $CP "${OPENSSL_DIR}/libcrypto.1.0.0.dylib" "${LOCAL_CRYPTO}"
-                $CP -a "${OPENSSL_DIR}/libcrypto.dylib" "${LOCAL_CRYPTO}"
-                OPENSSL_BUNDLE_LIB_PATH="${LOCAL_CRYPTO}"
-              else
-                OPENSSL_BUNDLE_LIB_PATH="${OPENSSL_DIR}"
-              fi
-            fi
-          fi
-        fi
       else
         # openssl is not found in user specified location. Abort.
         AC_MSG_RESULT([no])
